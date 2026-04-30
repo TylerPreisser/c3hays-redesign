@@ -114,7 +114,7 @@ export default function WatchPage() {
             style={{ border: "1px solid rgba(255,255,255,0.1)" }}>
             {/* On mobile (single column) use a bottom border; on md+ it becomes a right border between columns */}
             <div className="p-8 border-b border-white/10 md:border-b-0 md:border-r md:border-white/10">
-              <p className="font-bold text-xs uppercase tracking-widest mb-5" style={{ color: "#e53539" }}>Hays</p>
+              <p className="font-bold text-xs uppercase tracking-widest mb-5" style={{ color: "#10405D" }}>Hays</p>
               <div className="flex flex-col gap-2 text-sm" style={{ color: "rgba(255,255,255,0.65)" }}>
                 <p>Saturday — 5:00 PM</p>
                 <p>Sunday — 8:00 AM</p>
@@ -123,7 +123,7 @@ export default function WatchPage() {
               </div>
             </div>
             <div className="p-8">
-              <p className="font-bold text-xs uppercase tracking-widest mb-5" style={{ color: "#e53539" }}>Colby</p>
+              <p className="font-bold text-xs uppercase tracking-widest mb-5" style={{ color: "#10405D" }}>Colby</p>
               <div className="flex flex-col gap-2 text-sm" style={{ color: "rgba(255,255,255,0.65)" }}>
                 <p>Sunday — 10:00 AM</p>
               </div>

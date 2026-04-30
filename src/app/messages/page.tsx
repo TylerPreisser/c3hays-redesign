@@ -158,7 +158,7 @@ export default function MessagesPage() {
                   <div className="absolute top-3 left-3">
                     <span
                       className="px-2.5 py-1 text-xs font-bold uppercase tracking-wider"
-                      style={{ background: "#e53539", color: "#fff" }}
+                      style={{ background: "#10405D", color: "#fff" }}
                     >
                       {msg.series}
                     </span>

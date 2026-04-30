@@ -74,9 +74,9 @@ export default function AboutPage() {
               <p className="overline mb-4" style={{ color: "rgba(35,46,44,0.45)" }}>Our Mission</p>
               <h2 className="display-2 mb-6 text-balance" style={{ color: "#232e2c" }}>
                 We exist to{" "}
-                <em className="not-italic" style={{ color: "#e53539" }}>Meet.</em>{" "}
-                <em className="not-italic" style={{ color: "#e53539" }}>Grow.</em>{" "}
-                <em className="not-italic" style={{ color: "#e53539" }}>Serve.</em>
+                <em className="not-italic" style={{ color: "#10405D" }}>Meet.</em>{" "}
+                <em className="not-italic" style={{ color: "#10405D" }}>Grow.</em>{" "}
+                <em className="not-italic" style={{ color: "#10405D" }}>Serve.</em>
               </h2>
               <p className="body-lg mb-5" style={{ color: "rgba(35,46,44,0.7)" }}>
                 {site.mission}
@@ -129,7 +129,7 @@ export default function AboutPage() {
               >
                 <span
                   className="block text-xs font-bold uppercase tracking-widest mb-5"
-                  style={{ color: "#e53539" }}
+                  style={{ color: "#10405D" }}
                 >
                   {String(i + 1).padStart(2, "0")}
                 </span>

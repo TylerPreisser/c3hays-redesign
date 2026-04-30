@@ -66,7 +66,7 @@ export default function GivePage() {
           <p className="overline mb-4" style={{ color: "rgba(255,255,255,0.55)" }}>Generosity</p>
           <h1 className="display-1 text-white text-balance">
             Your giving is{" "}
-            <em className="not-italic" style={{ color: "#e53539" }}>changing</em>{" "}
+            <em className="not-italic" style={{ color: "#10405D" }}>changing</em>{" "}
             the world.
           </h1>
           <p className="body-lg mt-6 max-w-lg" style={{ color: "rgba(255,255,255,0.65)" }}>
@@ -99,7 +99,7 @@ export default function GivePage() {
                   <div className="mb-6">
                     <Icon
                       size={28}
-                      style={{ color: "#e53539" }}
+                      style={{ color: "#10405D" }}
                       strokeWidth={1.5}
                     />
                   </div>
@@ -172,7 +172,7 @@ export default function GivePage() {
             give, not reluctantly or under compulsion, for God loves a
             cheerful giver.&rdquo;
           </blockquote>
-          <p className="text-sm font-semibold uppercase tracking-widest" style={{ color: "#e53539" }}>
+          <p className="text-sm font-semibold uppercase tracking-widest" style={{ color: "#10405D" }}>
             2 Corinthians 9:7
           </p>
           <div className="mt-12">

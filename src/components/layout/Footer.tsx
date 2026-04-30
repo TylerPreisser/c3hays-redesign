@@ -12,8 +12,9 @@ export default function Footer() {
       {/* Main footer grid */}
       <div className="container-c3 py-20 lg:py-24">
         <div className="grid grid-cols-1 md:grid-cols-12 gap-10 md:gap-8">
-          {/* Brand + social */}
-          <div className="md:col-span-4">
+
+          {/* Brand + address + social — col-span-3 */}
+          <div className="md:col-span-3">
             <Link href="/" className="flex items-center gap-3 mb-6">
               <Image
                 src="/brand/logo.png"
@@ -24,17 +25,25 @@ export default function Footer() {
               />
               <div>
                 <div className="text-white font-bold text-sm tracking-widest uppercase">C3</div>
-                <div className="text-[#f2efed]/40 text-xs mt-0.5 tracking-wider uppercase">Celebration Community</div>
+                <div className="text-xs mt-0.5 tracking-wider uppercase" style={{ color: "rgba(242,239,237,0.4)" }}>Celebration Community</div>
               </div>
             </Link>
             <address className="not-italic text-sm leading-relaxed mb-2" style={{ color: "rgba(242,239,237,0.5)" }}>
               {site.address.street}<br />
               {site.address.city}, {site.address.state} {site.address.zip}
             </address>
-            <a href={`tel:${site.phone.replace(/\D/g, "")}`} className="block text-sm mb-0.5 hover:text-white transition-colors duration-150" style={{ color: "rgba(242,239,237,0.5)" }}>
+            <a
+              href={`tel:${site.phone.replace(/\D/g, "")}`}
+              className="block text-sm mb-0.5 hover:text-white transition-colors duration-150"
+              style={{ color: "rgba(242,239,237,0.5)" }}
+            >
               {site.phone}
             </a>
-            <a href={`mailto:${site.email}`} className="block text-sm mb-6 hover:text-white transition-colors duration-150" style={{ color: "rgba(242,239,237,0.5)" }}>
+            <a
+              href={`mailto:${site.email}`}
+              className="block text-sm mb-6 hover:text-white transition-colors duration-150"
+              style={{ color: "rgba(242,239,237,0.5)" }}
+            >
               {site.email}
             </a>
             {/* Social */}
@@ -57,8 +66,8 @@ export default function Footer() {
             </div>
           </div>
 
-          {/* Nav links */}
-          <div className="md:col-span-2 md:col-start-6">
+          {/* Nav links — col-span-2 */}
+          <div className="md:col-span-2 md:col-start-5">
             <p className="overline mb-5" style={{ color: "rgba(242,239,237,0.35)" }}>Explore</p>
             <ul className="flex flex-col gap-3">
               {navItems.map((item) => (
@@ -81,20 +90,24 @@ export default function Footer() {
                   Plan a Visit
                 </Link>
               </li>
-              <li>
+              <li className="pt-2">
                 <Link
                   href="/give/"
-                  className="text-sm font-semibold hover:text-white transition-colors duration-150"
-                  style={{ color: "#e53539" }}
+                  className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] transition-all duration-200"
+                  style={{
+                    backgroundColor: "#10405D",
+                    color: "#ffffff",
+                    padding: "0.625rem 1rem",
+                  }}
                 >
-                  Give →
+                  Give <span aria-hidden>→</span>
                 </Link>
               </li>
             </ul>
           </div>
 
-          {/* Campus info */}
-          <div className="md:col-span-2">
+          {/* Campus info — col-span-3 */}
+          <div className="md:col-span-3">
             <p className="overline mb-5" style={{ color: "rgba(242,239,237,0.35)" }}>Hays Campus</p>
             <address className="not-italic text-sm leading-relaxed mb-3" style={{ color: "rgba(242,239,237,0.5)" }}>
               {site.address.street}<br />
@@ -106,10 +119,10 @@ export default function Footer() {
             </div>
           </div>
 
-          {/* Newsletter */}
-          <div className="md:col-span-3">
+          {/* Newsletter — col-span-4, enough room for the form */}
+          <div className="md:col-span-4">
             <p className="overline mb-5" style={{ color: "rgba(242,239,237,0.35)" }}>Stay Connected</p>
-            <p className="text-sm mb-5" style={{ color: "rgba(242,239,237,0.5)" }}>
+            <p className="text-sm mb-5" style={{ color: "rgba(242,239,237,0.55)" }}>
               Sermon notes, announcements, and what&apos;s happening at C3 — in your inbox.
             </p>
             <NewsletterForm />
@@ -119,7 +132,10 @@ export default function Footer() {
 
       {/* Bottom bar */}
       <div style={{ borderTop: "1px solid rgba(242,239,237,0.08)" }}>
-        <div className="container-c3 py-5 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs" style={{ color: "rgba(242,239,237,0.3)" }}>
+        <div
+          className="container-c3 py-5 flex flex-wrap items-center justify-between gap-4 text-xs"
+          style={{ color: "rgba(242,239,237,0.3)" }}
+        >
           <p>© {year} Celebration Community Church · All rights reserved</p>
           <p>Built by Tyler Preisser</p>
         </div>

@@ -62,20 +62,20 @@ export default function NT26Feature() {
 
           {/* Text left */}
           <div className="nt26-content">
-            <p className="overline mb-5" style={{ color: "rgba(255,255,255,0.45)" }}>
+            <p className="overline mb-5" style={{ color: "rgba(255,255,255,0.6)" }}>
               Bible Reading Plan
             </p>
             <h2 className="display-2 text-white mb-6 text-balance">
               Have you read your{" "}
-              <em className="not-italic" style={{ color: "#e53539" }}>Bible</em>{" "}
+              <em className="not-italic" style={{ color: "#10405D" }}>Bible</em>{" "}
               today?
             </h2>
-            <p className="mb-5" style={{ fontSize: "1.125rem", color: "rgba(255,255,255,0.65)", lineHeight: 1.65 }}>
+            <p className="mb-5" style={{ fontSize: "1.125rem", color: "rgba(255,255,255,0.88)", lineHeight: 1.65 }}>
               The NT26 Reading Plan takes you through the entire New Testament
               in 2026 — one chapter at a time, together as a church family. No
               experience required. Just a willing heart.
             </p>
-            <p className="mb-10" style={{ fontSize: "1rem", color: "rgba(255,255,255,0.45)", lineHeight: 1.65 }}>
+            <p className="mb-10" style={{ fontSize: "1rem", color: "rgba(255,255,255,0.72)", lineHeight: 1.65 }}>
               Join thousands reading alongside C3. We&apos;ll walk through every word
               Jesus spoke, every letter Paul wrote, and every vision John
               received — together.

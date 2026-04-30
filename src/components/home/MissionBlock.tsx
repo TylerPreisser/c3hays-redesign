@@ -58,14 +58,14 @@ export default function MissionBlock() {
             }}
           >
             We exist to{" "}
-            <em className="not-italic" style={{ color: "#e53539" }}>meet</em>{" "}
+            <em className="not-italic" style={{ color: "#10405D" }}>meet</em>{" "}
             Him, grow in Him, and{" "}
-            <em className="not-italic" style={{ color: "#e53539" }}>serve</em>{" "}
+            <em className="not-italic" style={{ color: "#10405D" }}>serve</em>{" "}
             through Him.
           </h2>
           <div
             className="mt-10 w-12 mx-auto"
-            style={{ height: 2, backgroundColor: "#e53539" }}
+            style={{ height: 2, backgroundColor: "#10405D" }}
           />
         </div>
       </div>

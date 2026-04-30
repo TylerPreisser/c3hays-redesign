@@ -78,7 +78,7 @@ export default function ConnectPage() {
               <div className="text-center py-16">
                 <div
                   className="w-16 h-16 flex items-center justify-center mx-auto mb-6"
-                  style={{ background: "#e53539" }}
+                  style={{ background: "#10405D" }}
                 >
                   <CheckCircle size={28} className="text-white" />
                 </div>
@@ -102,7 +102,7 @@ export default function ConnectPage() {
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm font-semibold mb-2" htmlFor="first-name" style={{ color: "#232e2c" }}>
-                        First name <span style={{ color: "#e53539" }}>*</span>
+                        First name <span style={{ color: "#10405D" }}>*</span>
                       </label>
                       <input
                         id="first-name"
@@ -116,7 +116,7 @@ export default function ConnectPage() {
                     </div>
                     <div>
                       <label className="block text-sm font-semibold mb-2" htmlFor="last-name" style={{ color: "#232e2c" }}>
-                        Last name <span style={{ color: "#e53539" }}>*</span>
+                        Last name <span style={{ color: "#10405D" }}>*</span>
                       </label>
                       <input
                         id="last-name"
@@ -130,7 +130,7 @@ export default function ConnectPage() {
                     </div>
                     <div>
                       <label className="block text-sm font-semibold mb-2" htmlFor="email" style={{ color: "#232e2c" }}>
-                        Email <span style={{ color: "#e53539" }}>*</span>
+                        Email <span style={{ color: "#10405D" }}>*</span>
                       </label>
                       <input
                         id="email"

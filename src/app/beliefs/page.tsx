@@ -64,7 +64,7 @@ export default function BeliefsPage() {
                     <div className="shrink-0 mt-1">
                       <span
                         className="text-sm font-bold"
-                        style={{ color: "#e53539" }}
+                        style={{ color: "#10405D" }}
                       >
                         {String(i + 1).padStart(2, "0")}
                       </span>

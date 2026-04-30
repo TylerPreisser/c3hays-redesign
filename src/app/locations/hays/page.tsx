@@ -78,14 +78,14 @@ export default function HaysCampusPage() {
                 </h3>
                 <div className="flex flex-col gap-3">
                   <div className="flex items-start gap-3">
-                    <Clock size={14} style={{ color: "#e53539", marginTop: 2 }} className="shrink-0" />
+                    <Clock size={14} style={{ color: "#10405D", marginTop: 2 }} className="shrink-0" />
                     <div className="text-sm" style={{ color: "rgba(35,46,44,0.7)" }}>
                       <p className="font-semibold" style={{ color: "#232e2c" }}>Saturday</p>
                       <p>5:00 PM</p>
                     </div>
                   </div>
                   <div className="flex items-start gap-3">
-                    <Clock size={14} style={{ color: "#e53539", marginTop: 2 }} className="shrink-0" />
+                    <Clock size={14} style={{ color: "#10405D", marginTop: 2 }} className="shrink-0" />
                     <div className="text-sm" style={{ color: "rgba(35,46,44,0.7)" }}>
                       <p className="font-semibold" style={{ color: "#232e2c" }}>Sunday</p>
                       <p>8:00 AM · 9:30 AM · 11:00 AM</p>
@@ -100,7 +100,7 @@ export default function HaysCampusPage() {
                   Location
                 </h3>
                 <div className="flex items-start gap-3 mb-5">
-                  <MapPin size={14} style={{ color: "#e53539", marginTop: 2 }} className="shrink-0" />
+                  <MapPin size={14} style={{ color: "#10405D", marginTop: 2 }} className="shrink-0" />
                   <address className="not-italic text-sm" style={{ color: "rgba(35,46,44,0.65)" }}>
                     {site.address.street}
                     <br />
@@ -130,7 +130,7 @@ export default function HaysCampusPage() {
                     className="flex items-center gap-2.5 text-sm transition-colors duration-150"
                     style={{ color: "rgba(35,46,44,0.65)" }}
                   >
-                    <Phone size={14} style={{ color: "#e53539" }} />
+                    <Phone size={14} style={{ color: "#10405D" }} />
                     {site.phone}
                   </a>
                   <a
@@ -138,7 +138,7 @@ export default function HaysCampusPage() {
                     className="flex items-center gap-2.5 text-sm transition-colors duration-150"
                     style={{ color: "rgba(35,46,44,0.65)" }}
                   >
-                    <Mail size={14} style={{ color: "#e53539" }} />
+                    <Mail size={14} style={{ color: "#10405D" }} />
                     {site.email}
                   </a>
                 </div>

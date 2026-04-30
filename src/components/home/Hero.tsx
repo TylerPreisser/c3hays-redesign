@@ -10,7 +10,7 @@ const WORD_EASE = [0.16, 1, 0.3, 1] as const;
 export default function Hero() {
   return (
     <section
-      className="relative flex flex-col justify-end overflow-hidden"
+      className="relative flex items-center justify-center overflow-hidden"
       style={{ minHeight: "100dvh" }}
     >
       {/* Background image with Ken Burns */}
@@ -23,157 +23,91 @@ export default function Hero() {
           priority
           quality={90}
         />
-        {/* Cinematic gradient overlay — dark at top for nav legibility,
-            heavier at bottom for headline contrast */}
+        {/* Cinematic gradient overlay — darkened for legibility over bright sky */}
         <div
           className="absolute inset-0"
           style={{
             background:
-              "linear-gradient(180deg, rgba(10,10,10,0.35) 0%, rgba(10,10,10,0.55) 60%, rgba(10,10,10,0.78) 100%)",
+              "linear-gradient(180deg, rgba(0,0,0,0.45) 0%, rgba(0,0,0,0.55) 50%, rgba(0,0,0,0.65) 100%)",
           }}
         />
       </div>
 
-      {/* Hero content — bottom-left positioned */}
+      {/* Hero content — fully centered */}
       <div
-        className="relative z-10 container-c3 pb-20 md:pb-28 lg:pb-36"
-        style={{ paddingTop: "calc(8rem + env(safe-area-inset-top))" }}
+        className="relative z-10 container-c3 flex flex-col items-center text-center"
+        style={{ paddingTop: "env(safe-area-inset-top)", paddingBottom: "6rem" }}
       >
-        <div className="max-w-3xl">
-          {/* Overline */}
-          <motion.p
-            className="overline mb-6"
-            style={{ color: "rgba(255,255,255,0.6)", letterSpacing: "0.18em" }}
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, ease: "easeOut", delay: 0.1 }}
-          >
-            WELCOME HOME.
-          </motion.p>
+        {/* H1 — word-by-word stagger on just two words */}
+        <h1 className="display-hero text-white mb-5" style={{ lineHeight: 1.0 }}>
+          {"Welcome Home.".split(" ").map((word, wi) => (
+            <motion.span
+              key={`hero-word-${wi}`}
+              className="inline-block mr-[0.2em] last:mr-0"
+              initial={{ opacity: 0, y: 40 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{
+                duration: 0.9,
+                ease: WORD_EASE,
+                delay: 0.15 + wi * 0.1,
+              }}
+            >
+              {word}
+            </motion.span>
+          ))}
+        </h1>
 
-          {/* Headline — word-by-word stagger */}
-          <h1 className="display-hero text-white mb-8" style={{ lineHeight: 1.05 }}>
-            {/* Line 1 */}
-            <span className="block">
-              {"We exist to ".split(" ").map((word, wi) => (
-                <motion.span
-                  key={`l1-text-${wi}`}
-                  className="inline-block mr-[0.25em]"
-                  initial={{ opacity: 0, y: 40 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{
-                    duration: 0.8,
-                    ease: WORD_EASE,
-                    delay: 0.2 + wi * 0.06,
-                  }}
-                >
-                  {word}
-                </motion.span>
-              ))}
-              <motion.em
-                className="not-italic"
-                style={{ color: "#e53539" }}
-                initial={{ opacity: 0, y: 40 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, ease: WORD_EASE, delay: 0.2 + 4 * 0.06 }}
-              >
-                meet
-              </motion.em>
-              <motion.span
-                className="inline-block ml-[0.25em]"
-                initial={{ opacity: 0, y: 40 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, ease: WORD_EASE, delay: 0.2 + 5 * 0.06 }}
-              >
-                Him,
-              </motion.span>
-            </span>
+        {/* Supporting line */}
+        <motion.p
+          className="mb-10"
+          style={{ fontSize: "1.125rem", lineHeight: 1.6, color: "rgba(255,255,255,0.82)" }}
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7, ease: "easeOut", delay: 0.5 }}
+        >
+          A church family in Hays &amp; Colby, Kansas.
+        </motion.p>
 
-            {/* Line 2 */}
-            <span className="block">
-              {"grow in Him, and ".split(" ").filter(Boolean).map((word, wi) => (
-                <motion.span
-                  key={`l2-text-${wi}`}
-                  className="inline-block mr-[0.25em]"
-                  initial={{ opacity: 0, y: 40 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{
-                    duration: 0.8,
-                    ease: WORD_EASE,
-                    delay: 0.2 + (wi + 6) * 0.06,
-                  }}
-                >
-                  {word}
-                </motion.span>
-              ))}
-              <motion.em
-                className="not-italic"
-                style={{ color: "#e53539" }}
-                initial={{ opacity: 0, y: 40 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, ease: WORD_EASE, delay: 0.2 + 11 * 0.06 }}
-              >
-                serve
-              </motion.em>
-              <motion.span
-                className="inline-block ml-[0.25em]"
-                initial={{ opacity: 0, y: 40 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, ease: WORD_EASE, delay: 0.2 + 12 * 0.06 }}
-              >
-                through Him.
-              </motion.span>
-            </span>
-          </h1>
-
-          {/* Subheading */}
-          <motion.p
-            className="text-white/70 mb-10 max-w-lg"
-            style={{ fontSize: "1.125rem", lineHeight: 1.6 }}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, ease: "easeOut", delay: 0.95 }}
-          >
-            Jesus is central to everything we do at C3 — a church family for
-            everyone in Hays and Colby, Kansas.
-          </motion.p>
-
-          {/* CTAs */}
-          <motion.div
-            className="flex flex-wrap gap-4"
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, ease: "easeOut", delay: 1.1 }}
-          >
-            <Link href="/visit/" className="btn btn-primary btn-lg">
-              Plan Your Visit
-            </Link>
-            <Link href="/watch/" className="btn btn-outline btn-lg">
-              Watch Online
-            </Link>
-          </motion.div>
-        </div>
-
-        {/* Service times — minimal text row */}
+        {/* CTAs — centered */}
         <motion.div
-          className="mt-14 flex flex-wrap gap-6"
+          className="flex flex-wrap items-center justify-center gap-4 mb-14"
+          initial={{ opacity: 0, y: 14 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, ease: "easeOut", delay: 0.7 }}
+        >
+          <Link href="/visit/" className="btn btn-primary btn-lg">
+            Plan Your Visit
+          </Link>
+          <Link href="/watch/" className="btn btn-outline btn-lg">
+            Watch Online
+          </Link>
+        </motion.div>
+
+        {/* Service times — single centered row */}
+        <motion.div
+          className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ duration: 0.6, ease: "easeOut", delay: 1.3 }}
+          transition={{ duration: 0.6, ease: "easeOut", delay: 1.0 }}
         >
-          {serviceTimes.map((s) => (
-            <div
-              key={s.label}
-              className="flex items-center gap-2"
-            >
+          {serviceTimes.map((s, i) => (
+            <div key={s.label} className="flex items-center gap-2">
+              {i > 0 && (
+                <span
+                  className="hidden sm:block w-px h-3 shrink-0"
+                  style={{ background: "rgba(255,255,255,0.2)" }}
+                />
+              )}
               <span
-                className="w-1.5 h-1.5 shrink-0"
-                style={{ background: "#e53539" }}
+                className="w-1.5 h-1.5 rounded-full shrink-0"
+                style={{ background: "#10405D" }}
               />
-              <span className="text-xs font-semibold uppercase tracking-widest text-white/60">
+              <span className="text-xs font-semibold uppercase tracking-widest" style={{ color: "rgba(255,255,255,0.75)" }}>
                 {s.label}
               </span>
-              <span className="text-xs text-white/40">{s.times}</span>
+              <span className="text-xs" style={{ color: "rgba(255,255,255,0.5)" }}>
+                {s.times}
+              </span>
             </div>
           ))}
         </motion.div>

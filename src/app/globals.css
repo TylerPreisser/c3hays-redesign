@@ -5,24 +5,27 @@
    ───────────────────────────────────────────── */
 @theme {
   /* ── Brand Colors ─────────────────────────── */
-  --color-crimson:    #e53539;
+  --color-crimson:    #e53539;   /* defined but NOT used as primary accent */
+  --color-navy:       #10405D;   /* C3 brand navy — PRIMARY accent */
+  --color-navy-hover: #0a2d44;   /* darker navy for hover states */
+  --color-ink-deep:   #0a1f2e;   /* sophisticated near-black-navy for dark sections */
   --color-sunset:     #ed9d79;
   --color-sky:        #18aecb;
   --color-seafoam:    #60c0af;
   --color-gold:       #d5a56b;
   --color-evergreen:  #232e2c;
-  --color-navy:       #10405D;
   --color-black:      #0a0a0a;
   --color-off-white:  #f2efed;
   --color-white:      #ffffff;
   --color-gray:       #dadada;
 
   /* ── Semantic Tokens ─────────────────────── */
+  --color-accent:     #10405D;   /* alias — primary accent = navy */
   --color-bg:         #f2efed;
   --color-text:       #232e2c;
 
   /* ── Typography ──────────────────────────── */
-  --font-sans:        var(--font-inter), "Inter", system-ui, -apple-system, sans-serif;
+  --font-sans:        var(--font-hanken), "Hanken Grotesk", "Helvetica Neue", Helvetica, Arial, sans-serif;
 
   /* ── Radii (keep sharp) ───────────────────── */
   --radius-sm:        0.25rem;
@@ -69,7 +72,7 @@ img, video, svg {
 }
 
 :focus-visible {
-  outline: 2px solid var(--color-crimson);
+  outline: 2px solid var(--color-navy);
   outline-offset: 3px;
 }
 
@@ -77,46 +80,46 @@ img, video, svg {
    Typography Scale
    ───────────────────────────────────────────── */
 
-/* Hero H1 — 56–80px */
+/* Hero H1 — 80–110px, short "Welcome Home." centered */
 .display-hero {
   font-family: var(--font-sans);
-  font-size: clamp(3.5rem, 7vw, 5rem);
+  font-size: clamp(3.5rem, 8vw, 7rem);
   font-weight: 700;
-  line-height: 1.05;
-  letter-spacing: -0.02em;
+  line-height: 1.0;
+  letter-spacing: -0.025em;
 }
 
 /* Section H2 — 40–60px */
 .display-1 {
   font-family: var(--font-sans);
   font-size: clamp(2.5rem, 5vw, 3.75rem);
-  font-weight: 700;
+  font-weight: 600;
   line-height: 1.1;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.025em;
 }
 
 /* Section H2 alt — slightly smaller */
 .display-2 {
   font-family: var(--font-sans);
   font-size: clamp(2.25rem, 4.5vw, 3.5rem);
-  font-weight: 700;
+  font-weight: 600;
   line-height: 1.1;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.025em;
 }
 
 /* H3 — 24–32px */
 .heading-1 {
   font-size: clamp(1.75rem, 3vw, 2.5rem);
-  font-weight: 700;
+  font-weight: 600;
   line-height: 1.15;
-  letter-spacing: -0.015em;
+  letter-spacing: -0.02em;
 }
 
 .heading-2 {
   font-size: clamp(1.5rem, 2.5vw, 2rem);
   font-weight: 600;
   line-height: 1.2;
-  letter-spacing: -0.01em;
+  letter-spacing: -0.015em;
 }
 
 .heading-3 {
@@ -207,30 +210,30 @@ img, video, svg {
   text-transform: uppercase;
 }
 
-/* Primary — crimson fill → white hover */
+/* Primary — navy fill → white hover */
 .btn-primary {
-  background-color: var(--color-crimson);
+  background-color: var(--color-navy);
   color: #fff;
-  border-color: var(--color-crimson);
+  border-color: var(--color-navy);
 }
 
 .btn-primary:hover {
-  background-color: #fff;
-  color: var(--color-crimson);
-  border-color: var(--color-crimson);
+  background-color: var(--color-navy-hover);
+  color: #fff;
+  border-color: var(--color-navy-hover);
 }
 
-/* Gold — for Give/donate emphasis */
+/* Gold — for Give/donate emphasis (also navy for brand consistency) */
 .btn-gold {
-  background-color: var(--color-crimson);
+  background-color: var(--color-navy);
   color: #fff;
-  border-color: var(--color-crimson);
+  border-color: var(--color-navy);
 }
 
 .btn-gold:hover {
-  background-color: #fff;
-  color: var(--color-crimson);
-  border-color: var(--color-crimson);
+  background-color: var(--color-navy-hover);
+  color: #fff;
+  border-color: var(--color-navy-hover);
 }
 
 /* Outline white — on dark sections */
@@ -558,9 +561,9 @@ html.lenis body {
 }
 
 /* ─────────────────────────────────────────────
-   Section transition accent — 2px crimson rule
-   Rendered as a centered pill rule that appears
-   as a deliberate seam between dark/light sections.
+   Section transition accent — 2px navy rule
+   Centered pill rule that reads as a deliberate
+   seam between dark/light sections.
    ───────────────────────────────────────────── */
 .section-rule {
   display: flex;
@@ -574,7 +577,7 @@ html.lenis body {
   display: block;
   width: 3rem;
   height: 2px;
-  background-color: var(--color-crimson);
+  background-color: var(--color-navy);
   opacity: 0.5;
 }
 
@@ -603,11 +606,11 @@ html.lenis body {
 }
 
 /* ─────────────────────────────────────────────
-   Crisis callout — prominent crimson card
+   Crisis callout — prominent navy card
    ───────────────────────────────────────────── */
 .crisis-card {
-  border: 2px solid var(--color-crimson);
-  background-color: rgba(229, 53, 57, 0.04);
+  border: 2px solid var(--color-navy);
+  background-color: rgba(16, 64, 93, 0.04);
   padding: 1.5rem 2rem;
 }
 

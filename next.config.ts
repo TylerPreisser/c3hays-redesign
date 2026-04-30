@@ -9,6 +9,7 @@ const nextConfig: NextConfig = {
     // Hero.tsx uses quality={90} — keep it allowed to silence the dev warning.
     qualities: [75, 90],
   },
+  devIndicators: false,
 };
 
 export default nextConfig;

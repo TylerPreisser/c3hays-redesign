@@ -91,7 +91,7 @@ export default function VisitPage() {
               return (
                 <div key={item.title}>
                   <div className="mb-5">
-                    <Icon size={28} style={{ color: "#e53539" }} strokeWidth={1.5} />
+                    <Icon size={28} style={{ color: "#10405D" }} strokeWidth={1.5} />
                   </div>
                   <h3 className="heading-3 mb-3" style={{ color: "#232e2c" }}>
                     {item.title}
@@ -122,7 +122,7 @@ export default function VisitPage() {
                 className="p-8"
                 style={{ borderRight: i === 0 ? "1px solid rgba(255,255,255,0.1)" : "none" }}
               >
-                <h3 className="font-bold text-sm uppercase tracking-widest mb-5" style={{ color: "#e53539" }}>
+                <h3 className="font-bold text-sm uppercase tracking-widest mb-5" style={{ color: "#10405D" }}>
                   {loc.name} Campus
                 </h3>
                 <div className="flex items-start gap-3 mb-4">

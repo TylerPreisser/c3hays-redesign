@@ -63,7 +63,7 @@ export default function LocationsSection() {
           <h2 className="display-2" style={{ color: "#232e2c" }}>
             Find a location near you.
           </h2>
-          <p className="mt-4 max-w-md" style={{ fontSize: "1.125rem", color: "rgba(35,46,44,0.65)", lineHeight: 1.6 }}>
+          <p className="mt-4 max-w-md" style={{ fontSize: "1.125rem", color: "rgba(35,46,44,0.82)", lineHeight: 1.6 }}>
             Two campuses, one church family. Come as you are.
           </p>
         </div>

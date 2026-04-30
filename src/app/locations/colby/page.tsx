@@ -73,7 +73,7 @@ export default function ColbyCampusPage() {
                   Service Times
                 </h3>
                 <div className="flex items-start gap-3">
-                  <Clock size={14} style={{ color: "#e53539", marginTop: 2 }} className="shrink-0" />
+                  <Clock size={14} style={{ color: "#10405D", marginTop: 2 }} className="shrink-0" />
                   <div className="text-sm" style={{ color: "rgba(35,46,44,0.7)" }}>
                     <p className="font-semibold" style={{ color: "#232e2c" }}>Sunday</p>
                     <p>10:00 AM</p>
@@ -86,7 +86,7 @@ export default function ColbyCampusPage() {
                   Location
                 </h3>
                 <div className="flex items-start gap-3 mb-5">
-                  <MapPin size={14} style={{ color: "#e53539", marginTop: 2 }} className="shrink-0" />
+                  <MapPin size={14} style={{ color: "#10405D", marginTop: 2 }} className="shrink-0" />
                   <address className="not-italic text-sm" style={{ color: "rgba(35,46,44,0.65)" }}>
                     1923 S Range
                     <br />

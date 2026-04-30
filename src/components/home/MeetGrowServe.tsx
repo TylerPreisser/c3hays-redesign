@@ -103,9 +103,9 @@ export default function MeetGrowServe() {
         <div className="mgs-heading mb-16 md:mb-20">
           <p className="overline mb-4" style={{ color: "rgba(35,46,44,0.45)" }}>Our Purpose</p>
           <h2 className="display-2" style={{ color: "#232e2c" }}>
-            Meet. <em className="not-italic" style={{ color: "#e53539" }}>Grow.</em> Serve.
+            Meet. <em className="not-italic" style={{ color: "#10405D" }}>Grow.</em> Serve.
           </h2>
-          <p className="mt-5 max-w-md" style={{ fontSize: "1.125rem", color: "rgba(35,46,44,0.65)", lineHeight: 1.6 }}>
+          <p className="mt-5 max-w-md" style={{ fontSize: "1.125rem", color: "rgba(35,46,44,0.82)", lineHeight: 1.6 }}>
             Three words that define why we exist — and how Jesus shapes every part of life at C3.
           </p>
         </div>
@@ -130,9 +130,9 @@ export default function MeetGrowServe() {
               </div>
 
               {/* Text content */}
-              <p className="overline mb-3" style={{ color: "#e53539" }}>{pillar.word}</p>
+              <p className="overline mb-3" style={{ color: "#10405D" }}>{pillar.word}</p>
               <h3 className="heading-2 mb-3" style={{ color: "#232e2c" }}>{pillar.headline}</h3>
-              <p className="mb-5 leading-relaxed" style={{ fontSize: "1rem", color: "rgba(35,46,44,0.65)", lineHeight: 1.65 }}>
+              <p className="mb-5 leading-relaxed" style={{ fontSize: "1rem", color: "rgba(35,46,44,0.82)", lineHeight: 1.65 }}>
                 {pillar.body}
               </p>
               <Link

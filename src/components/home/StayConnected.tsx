@@ -92,7 +92,7 @@ export default function StayConnected() {
           <h2 className="display-2 text-white">
             We&apos;re here.
           </h2>
-          <p className="mt-4 max-w-md" style={{ fontSize: "1.125rem", color: "rgba(255,255,255,0.55)", lineHeight: 1.6 }}>
+          <p className="mt-4 max-w-md" style={{ fontSize: "1.125rem", color: "rgba(255,255,255,0.82)", lineHeight: 1.6 }}>
             However you like to connect — we&apos;re ready.
           </p>
         </div>
@@ -124,10 +124,10 @@ export default function StayConnected() {
                 >
                   {item.title}
                 </h3>
-                <p className="text-sm mb-4" style={{ color: "rgba(255,255,255,0.45)", lineHeight: 1.65 }}>
+                <p className="text-sm mb-4" style={{ color: "rgba(255,255,255,0.75)", lineHeight: 1.65 }}>
                   {item.body}
                 </p>
-                <span className="arrow-link" style={{ color: "#e53539" }}>
+                <span className="arrow-link" style={{ color: "#10405D" }}>
                   {item.cta} <span className="arrow">→</span>
                 </span>
               </a>
