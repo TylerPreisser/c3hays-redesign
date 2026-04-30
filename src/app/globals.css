@@ -31,6 +31,7 @@
 
   /* ── Typography ──────────────────────────── */
   --font-sans:        var(--font-hanken), "Hanken Grotesk", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --font-display:     var(--font-fraunces), Georgia, "Times New Roman", serif;
 
   /* ── Radii (keep sharp) ───────────────────── */
   --radius-sm:        0.25rem;
@@ -87,29 +88,30 @@ img, video, svg {
 
 /* Hero H1 — 80–110px, short "Welcome Home." centered */
 .display-hero {
-  font-family: var(--font-sans);
+  font-family: var(--font-display);
   font-size: clamp(3.5rem, 8vw, 7rem);
   font-weight: 700;
   line-height: 1.0;
   letter-spacing: -0.025em;
+  font-feature-settings: "ss01" 1;
 }
 
 /* Section H2 — 40–60px */
 .display-1 {
-  font-family: var(--font-sans);
+  font-family: var(--font-display);
   font-size: clamp(2.5rem, 5vw, 3.75rem);
   font-weight: 600;
   line-height: 1.1;
-  letter-spacing: -0.025em;
+  letter-spacing: -0.02em;
 }
 
 /* Section H2 alt — slightly smaller */
 .display-2 {
-  font-family: var(--font-sans);
+  font-family: var(--font-display);
   font-size: clamp(2.25rem, 4.5vw, 3.5rem);
   font-weight: 600;
   line-height: 1.1;
-  letter-spacing: -0.025em;
+  letter-spacing: -0.02em;
 }
 
 /* H3 — 24–32px */
@@ -251,6 +253,19 @@ img, video, svg {
 .btn-outline:hover {
   background-color: #fff;
   color: var(--color-ink);
+}
+
+/* Ghost white — translucent on dark hero backgrounds */
+.btn-hero-ghost {
+  background-color: rgba(255, 255, 255, 0.12);
+  color: #fff;
+  border: 2.5px solid rgba(255, 255, 255, 0.95);
+}
+
+.btn-hero-ghost:hover {
+  background-color: #fff;
+  color: var(--color-ink);
+  border-color: #fff;
 }
 
 /* Outline dark — on light sections */

@@ -113,8 +113,12 @@ export default function StayConnected() {
                 href={item.href}
                 target={item.href.startsWith("http") ? "_blank" : undefined}
                 rel={item.href.startsWith("http") ? "noopener noreferrer" : undefined}
-                className="connect-item group block p-8 transition-colors duration-200"
+                className="connect-item group block transition-colors duration-200"
                 style={{
+                  padding: "3rem 2rem",
+                  minHeight: "280px",
+                  display: "flex",
+                  flexDirection: "column",
                   borderRight: isLastInRow ? "none" : "1px solid rgba(27,28,28,0.1)",
                 }}
               >
@@ -128,20 +132,20 @@ export default function StayConnected() {
                 </div>
 
                 {/* Overline */}
-                <p className="overline mb-2" style={{ color: "rgba(27,28,28,0.4)" }}>
+                <p className="overline mb-3" style={{ color: "rgba(27,28,28,0.4)" }}>
                   {item.overline}
                 </p>
 
                 {/* Title */}
                 <h3
-                  className="font-bold mb-3 transition-colors duration-200 group-hover:text-[#1cc3af]"
+                  className="font-bold mb-2 transition-colors duration-200 group-hover:text-[#1cc3af]"
                   style={{ color: "#1b1c1c", fontSize: "1.125rem", lineHeight: 1.3 }}
                 >
                   {item.title}
                 </h3>
 
                 {/* Body */}
-                <p className="text-sm mb-5" style={{ color: "rgba(27,28,28,0.65)", lineHeight: 1.65 }}>
+                <p className="text-sm mb-5" style={{ color: "rgba(27,28,28,0.65)", lineHeight: 1.65, flex: 1 }}>
                   {item.body}
                 </p>
 

@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Hanken_Grotesk } from "next/font/google";
+import { Hanken_Grotesk, Fraunces } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
@@ -11,6 +11,15 @@ const hankenGrotesk = Hanken_Grotesk({
   weight: ["400", "500", "600", "700"],
   variable: "--font-hanken",
   display: "swap",
+});
+
+const fraunces = Fraunces({
+  subsets: ["latin"],
+  weight: "variable",
+  style: ["normal", "italic"],
+  variable: "--font-fraunces",
+  display: "swap",
+  axes: ["opsz", "SOFT", "WONK"],
 });
 
 export const viewport: Viewport = {
@@ -83,7 +92,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning className={hankenGrotesk.variable}>
+    <html lang="en" suppressHydrationWarning className={`${hankenGrotesk.variable} ${fraunces.variable}`}>
       <head>
         <script
           type="application/ld+json"

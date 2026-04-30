@@ -101,13 +101,9 @@ export default function MeetGrowServe() {
       <div className="container-c3">
         {/* Header */}
         <div className="mgs-heading mb-16 md:mb-20">
-          <p className="overline mb-4" style={{ color: "rgba(27,28,28,0.4)" }}>Our Purpose</p>
           <h2 className="display-2" style={{ color: "#1b1c1c" }}>
-            Meet. <em className="not-italic" style={{ color: "#1cc3af" }}>Grow.</em> Serve.
+            Meet. <em style={{ color: "#1cc3af", fontStyle: "italic" }}>Grow.</em> Serve.
           </h2>
-          <p className="mt-5 max-w-md" style={{ fontSize: "1.125rem", color: "rgba(27,28,28,0.80)", lineHeight: 1.6 }}>
-            Three words that define why we exist — and how Jesus shapes every part of life at C3.
-          </p>
         </div>
 
         {/* 3-up tile grid */}

@@ -15,8 +15,8 @@ export default function Footer() {
           {/* Col 1 — Logo + contact */}
           <div>
             {/* Logo — white on dark background */}
-            <Link href="/" className="inline-block mb-5 text-white" aria-label="C3 Home">
-              <Logo size={40} />
+            <Link href="/" className="inline-block mb-5" aria-label="C3 Home">
+              <Logo size={40} variant="light" />
             </Link>
             <p className="text-sm font-semibold mb-4" style={{ color: "rgba(255,255,255,0.80)" }}>
               Celebration Community Church

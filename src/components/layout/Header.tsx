@@ -61,17 +61,13 @@ export default function Header() {
       >
         <nav className="container-c3 flex items-center justify-between h-16 lg:h-[4.5rem]">
 
-          {/* Logo — currentColor adapts: white when transparent, ink when scrolled */}
+          {/* Logo — light on transparent dark hero, dark on scrolled white header */}
           <Link
             href="/"
             aria-label="C3 — Celebration Community Church — Home"
             className="shrink-0 flex items-center"
-            style={{
-              color: isScrolled ? "#1b1c1c" : "#ffffff",
-              transition: "color 200ms cubic-bezier(0.33, 0, 0.19, 1)",
-            }}
           >
-            <Logo size={38} />
+            <Logo size={38} variant={isScrolled ? "dark" : "light"} />
           </Link>
 
           {/* Desktop Nav — centered text links */}
@@ -159,11 +155,11 @@ export default function Header() {
             <div className="flex items-center justify-between h-16 container-c3 border-b border-white/10">
               <Link
                 href="/"
-                className="flex items-center text-white"
+                className="flex items-center"
                 onClick={() => setMobileOpen(false)}
                 aria-label="C3 Home"
               >
-                <Logo size={34} />
+                <Logo size={34} variant="light" />
               </Link>
               <button
                 onClick={() => setMobileOpen(false)}

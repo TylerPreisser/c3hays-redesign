@@ -37,7 +37,7 @@ export default function GiveSection() {
     /* Full-bleed dark image section */
     <section
       ref={sectionRef}
-      className="relative overflow-hidden"
+      className="relative overflow-hidden flex flex-col items-center justify-center"
       style={{ minHeight: "60vh" }}
     >
       {/* Background */}
@@ -56,24 +56,29 @@ export default function GiveSection() {
         />
       </div>
 
-      {/* Content — centered vertically */}
-      <div className="relative z-10 section container-c3 flex flex-col items-center justify-center text-center">
-        <div className="give-content max-w-2xl">
+      {/* Content — dead-centered both axes */}
+      <div
+        className="relative z-10 flex items-center justify-center text-center section"
+        style={{ width: "100%" }}
+      >
+        <div className="give-content w-full max-w-2xl mx-auto px-6">
           <p className="overline mb-6" style={{ color: "rgba(255,255,255,0.45)" }}>
             Generosity
           </p>
           <h2 className="display-2 text-white mb-6 text-balance">
             Your giving is{" "}
-            <em className="not-italic" style={{ color: "#1cc3af" }}>changing</em>{" "}
+            <em style={{ color: "#1cc3af", fontStyle: "italic" }}>changing</em>{" "}
             the world.
           </h2>
-          <p className="mb-10 max-w-lg mx-auto" style={{ fontSize: "1.125rem", color: "rgba(255,255,255,0.85)", lineHeight: 1.65 }}>
+          <p className="mb-10 mx-auto" style={{ fontSize: "1.125rem", color: "rgba(255,255,255,0.85)", lineHeight: 1.65, maxWidth: "32rem" }}>
             At C3 we understand that God owns everything. We invite you to join
             us in stewardship — generously giving toward what God values.
           </p>
-          <Link href="/give/" className="btn btn-primary btn-lg">
-            Give Now
-          </Link>
+          <div className="flex justify-center">
+            <Link href="/give/" className="btn btn-primary btn-lg">
+              Give Now
+            </Link>
+          </div>
         </div>
       </div>
     </section>
