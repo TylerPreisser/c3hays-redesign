@@ -58,24 +58,21 @@ export default function LocationsSection() {
     /* Mist off-white section */
     <section ref={sectionRef} className="section" style={{ backgroundColor: "#f6f6f6" }}>
       <div className="container-c3">
-        {/* Header */}
-        <div className="locations-heading mb-14 md:mb-16">
-          <p className="overline mb-4" style={{ color: "rgba(27,28,28,0.4)" }}>Our Campuses</p>
+        {/* Header — overline + display only, no subheader */}
+        <div className="locations-heading" style={{ marginBottom: "5rem" }}>
+          <p className="overline mb-5" style={{ color: "rgba(27,28,28,0.4)" }}>Our Campuses</p>
           <h2 className="display-2" style={{ color: "#1b1c1c" }}>
             Find a location near you.
           </h2>
-          <p className="mt-4 max-w-md" style={{ fontSize: "1.125rem", color: "rgba(27,28,28,0.80)", lineHeight: 1.6 }}>
-            Two campuses, one church family. Come as you are.
-          </p>
         </div>
 
         {/* Campus grid — 2-up full bleed image cards */}
-        <div className="campus-grid grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-10">
+        <div className="campus-grid grid grid-cols-1 lg:grid-cols-2 gap-10 md:gap-12">
           {locations.map((loc) => (
             <div
               key={loc.id}
               className="campus-card group relative overflow-hidden"
-              style={{ height: 480, borderRadius: 0 }}
+              style={{ height: 560, borderRadius: 0 }}
             >
               {/* Full-bleed background image */}
               <Image
@@ -94,16 +91,16 @@ export default function LocationsSection() {
                 }}
               />
 
-              {/* Content — positioned at bottom */}
-              <div className="absolute inset-0 flex flex-col justify-end p-10 md:p-12">
-                <p className="overline mb-3" style={{ color: "rgba(255,255,255,0.55)" }}>
-                  {loc.name} Campus
-                </p>
-                <h3 className="heading-1 text-white mb-4">{loc.name}</h3>
-                <p className="text-white/70 mb-10" style={{ fontSize: "1rem", lineHeight: 1.6 }}>
+              {/* Content — positioned at bottom, generous breathing */}
+              <div
+                className="absolute inset-0 flex flex-col justify-end"
+                style={{ padding: "3.5rem 3rem" }}
+              >
+                <h3 className="heading-1 text-white" style={{ marginBottom: "1.75rem" }}>{loc.name}</h3>
+                <p className="text-white/75" style={{ fontSize: "1rem", lineHeight: 1.65, marginBottom: "3rem" }}>
                   {loc.description}
                 </p>
-                <div className="flex flex-wrap gap-3">
+                <div className="flex flex-wrap gap-4">
                   <Link
                     href={`/locations/${loc.slug}/`}
                     className="btn btn-primary btn-sm"

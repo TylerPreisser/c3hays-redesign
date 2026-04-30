@@ -73,7 +73,7 @@ export default function Hero() {
         style={{ paddingTop: "6rem", paddingBottom: "6rem" }}
       >
         {/* H1 — word-by-word stagger */}
-        <h1 className="display-hero text-white mb-20 md:mb-28">
+        <h1 className="display-hero text-white" style={{ marginBottom: "clamp(4rem, 12vh, 10rem)" }}>
           {"Welcome home.".split(" ").map((word, wi) => (
             <motion.span
               key={`hero-word-${wi}`}
@@ -91,17 +91,17 @@ export default function Hero() {
           ))}
         </h1>
 
-        {/* CTAs */}
+        {/* CTAs — small + spaced */}
         <motion.div
-          className="flex flex-wrap items-center justify-center gap-5 md:gap-6"
+          className="flex flex-wrap items-center justify-center gap-6 md:gap-8"
           initial={{ opacity: 0, y: 14 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, ease: "easeOut", delay: 0.7 }}
         >
-          <Link href="/visit/" className="btn btn-primary">
+          <Link href="/visit/" className="btn btn-primary btn-sm">
             Plan Your Visit
           </Link>
-          <Link href="/watch/" className="btn btn-hero-ghost">
+          <Link href="/watch/" className="btn btn-hero-ghost btn-sm">
             Watch Live
           </Link>
         </motion.div>

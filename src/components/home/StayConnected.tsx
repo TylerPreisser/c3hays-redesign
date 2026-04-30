@@ -89,20 +89,17 @@ export default function StayConnected() {
     <section ref={sectionRef} className="section" style={{ backgroundColor: "#ffffff" }}>
       <div className="container-c3">
         {/* Header */}
-        <div className="connect-heading mb-16">
-          <p className="overline mb-4" style={{ color: "rgba(27,28,28,0.4)" }}>
+        <div className="connect-heading" style={{ marginBottom: "5rem" }}>
+          <p className="overline mb-5" style={{ color: "rgba(27,28,28,0.4)" }}>
             Get Connected
           </p>
           <h2 className="display-2" style={{ color: "#1b1c1c" }}>
             We&apos;re here for you.
           </h2>
-          <p className="mt-4 max-w-md" style={{ fontSize: "1.125rem", color: "rgba(27,28,28,0.65)", lineHeight: 1.6 }}>
-            However you prefer to connect — we&apos;re ready.
-          </p>
         </div>
 
-        {/* 4-up flat tile grid — no phone mockup, no glassy effects */}
-        <div className="connect-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8"
+        {/* 4-up flat tile grid */}
+        <div className="connect-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 md:gap-10"
           style={{ border: "1px solid rgba(27,28,28,0.1)" }}>
           {connectItems.map((item, i) => {
             const Icon = item.icon;
@@ -115,15 +112,15 @@ export default function StayConnected() {
                 rel={item.href.startsWith("http") ? "noopener noreferrer" : undefined}
                 className="connect-item group block transition-colors duration-200"
                 style={{
-                  padding: "3rem 2rem",
-                  minHeight: "360px",
+                  padding: "4rem 2.5rem",
+                  minHeight: "440px",
                   display: "flex",
                   flexDirection: "column",
                   borderRight: isLastInRow ? "none" : "1px solid rgba(27,28,28,0.1)",
                 }}
               >
                 {/* Icon */}
-                <div className="mb-8">
+                <div style={{ marginBottom: "3rem" }}>
                   <Icon
                     size={26}
                     strokeWidth={1.5}
@@ -132,20 +129,20 @@ export default function StayConnected() {
                 </div>
 
                 {/* Overline */}
-                <p className="overline mb-3" style={{ color: "rgba(27,28,28,0.4)" }}>
+                <p className="overline" style={{ color: "rgba(27,28,28,0.4)", marginBottom: "1.25rem" }}>
                   {item.overline}
                 </p>
 
                 {/* Title */}
                 <h3
-                  className="font-bold mb-4 transition-colors duration-200 group-hover:text-[#1cc3af]"
-                  style={{ color: "#1b1c1c", fontSize: "1.125rem", lineHeight: 1.3 }}
+                  className="font-bold transition-colors duration-200 group-hover:text-[#1cc3af]"
+                  style={{ color: "#1b1c1c", fontSize: "1.125rem", lineHeight: 1.3, marginBottom: "1.75rem" }}
                 >
                   {item.title}
                 </h3>
 
                 {/* Body */}
-                <p className="text-sm mb-8" style={{ color: "rgba(27,28,28,0.65)", lineHeight: 1.65, flex: 1 }}>
+                <p className="text-sm" style={{ color: "rgba(27,28,28,0.65)", lineHeight: 1.7, flex: 1, marginBottom: "2.5rem" }}>
                   {item.body}
                 </p>
 
