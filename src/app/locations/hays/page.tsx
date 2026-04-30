@@ -40,7 +40,6 @@ export default function HaysCampusPage() {
           >
             ← Campuses
           </Link>
-          <p className="overline mb-4" style={{ color: "rgba(255,255,255,0.55)" }}>Campus</p>
           <h1 className="display-1 text-white">Hays</h1>
         </div>
       </section>

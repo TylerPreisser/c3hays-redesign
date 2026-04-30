@@ -60,7 +60,6 @@ export default function ConnectPage() {
           />
         </div>
         <div className="relative z-10 container-c3 pb-16 pt-40">
-          <p className="overline mb-4" style={{ color: "rgba(255,255,255,0.55)" }}>New Here?</p>
           <h1 className="display-1 text-white">Let&apos;s connect.</h1>
           <p className="body-lg mt-3 max-w-lg" style={{ color: "rgba(255,255,255,0.65)" }}>
             Tell us a little about you so we can help you find your place.
@@ -96,11 +95,6 @@ export default function ConnectPage() {
               </div>
             ) : (
               <form onSubmit={handleSubmit} noValidate>
-                {/* Section label */}
-                <p className="overline mb-8" style={{ color: "rgba(27,28,28,0.40)" }}>
-                  Your Information
-                </p>
-
                 {/* Fields — single column, 24px gap */}
                 <div className="flex flex-col gap-6">
 
@@ -193,9 +187,16 @@ export default function ConnectPage() {
 
                   {/* Interests */}
                   <div>
-                    <p className="overline mb-4" style={{ color: "rgba(27,28,28,0.40)", fontSize: "0.6875rem" }}>
-                      I&apos;m interested in…
-                    </p>
+                    <label
+                      className="block mb-3"
+                      style={{
+                        fontSize: "0.875rem",
+                        fontWeight: 600,
+                        color: "rgba(27,28,28,0.85)",
+                      }}
+                    >
+                      I&apos;m interested in
+                    </label>
                     <div className="flex flex-wrap gap-2">
                       {interests.map((item) => (
                         <button
@@ -251,8 +252,11 @@ function FieldGroup({
   return (
     <div className="flex flex-col gap-2">
       <label
-        className="overline"
-        style={{ fontSize: "0.6875rem", color: "rgba(27,28,28,0.55)" }}
+        style={{
+          fontSize: "0.875rem",
+          fontWeight: 600,
+          color: "rgba(27,28,28,0.85)",
+        }}
       >
         {label}
         {required && (

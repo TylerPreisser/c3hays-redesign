@@ -102,9 +102,6 @@ export default function MeetGrowServe() {
       <div className="container-c3">
         {/* Header */}
         <div className="mgs-heading mb-16 md:mb-20">
-          <p className="overline mb-5" style={{ color: "rgba(27,28,28,0.4)" }}>
-            Take a Next Step
-          </p>
           <h2 className="display-2" style={{ color: "#1b1c1c" }}>
             Find your place at C3.
           </h2>
@@ -129,7 +126,6 @@ export default function MeetGrowServe() {
               </div>
 
               {/* Text content */}
-              <p className="overline mb-3" style={{ color: "#1cc3af" }}>{pillar.word}</p>
               <h3 className="heading-2 mb-4" style={{ color: "#1b1c1c" }}>{pillar.headline}</h3>
               <p className="mb-5 leading-relaxed" style={{ fontSize: "1rem", color: "rgba(27,28,28,0.80)", lineHeight: 1.65 }}>
                 {pillar.body}

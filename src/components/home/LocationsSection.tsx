@@ -60,9 +60,6 @@ export default function LocationsSection() {
       <div className="container-c3">
         {/* Header */}
         <div className="locations-heading" style={{ marginBottom: "5rem" }}>
-          <p className="overline mb-5" style={{ color: "rgba(27,28,28,0.4)" }}>
-            Our Campuses
-          </p>
           <h2 className="display-2" style={{ color: "#1b1c1c" }}>
             Find a location near you.
           </h2>

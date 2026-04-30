@@ -34,7 +34,6 @@ export default function CounselingPage() {
           />
         </div>
         <div className="relative z-10 container-c3 pb-16 pt-40">
-          <p className="overline mb-4" style={{ color: "rgba(255,255,255,0.55)" }}>Care</p>
           <h1 className="display-1 text-white">Counseling</h1>
           <p className="body-lg mt-4 max-w-lg" style={{ color: "rgba(255,255,255,0.65)" }}>
             Professional, Bible-based counseling — for people who want to grow in wholeness.
@@ -46,7 +45,6 @@ export default function CounselingPage() {
       <section className="section" style={{ backgroundColor: "#ffffff" }}>
         <div className="container-c3">
           <div className="max-w-3xl mb-16">
-            <p className="overline mb-4" style={{ color: "rgba(27,28,28,0.4)" }}>Our Vision</p>
             <h2 className="display-2 mb-6 text-balance" style={{ color: "#1b1c1c" }}>
               Whole people, through Christ.
             </h2>
@@ -120,7 +118,6 @@ export default function CounselingPage() {
       {/* Fees & policies */}
       <section className="section" style={{ backgroundColor: "#1b1c1c" }}>
         <div className="container-c3">
-          <p className="overline mb-8" style={{ color: "rgba(255,255,255,0.35)" }}>Policies</p>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-0 max-w-2xl"
             style={{ border: "1px solid rgba(255,255,255,0.1)" }}>
             <div className="p-8" style={{ borderRight: "1px solid rgba(255,255,255,0.1)" }}>
@@ -166,7 +163,6 @@ export default function CounselingPage() {
       {/* Connect CTA */}
       <section className="section" style={{ backgroundColor: "#ffffff" }}>
         <div className="container-c3 text-center max-w-xl">
-          <p className="overline mb-4" style={{ color: "rgba(27,28,28,0.4)" }}>Take the First Step</p>
           <h2 className="display-2 mb-5 text-balance" style={{ color: "#1b1c1c" }}>
             You don&apos;t have to carry it alone.
           </h2>

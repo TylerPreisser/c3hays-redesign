@@ -67,7 +67,6 @@ export default function VisitPage() {
           />
         </div>
         <div className="relative z-10 container-c3 pb-20 pt-40">
-          <p className="overline mb-4" style={{ color: "rgba(255,255,255,0.55)" }}>First Visit</p>
           <h1 className="display-1 text-white text-balance">Plan your first visit.</h1>
           <p className="body-lg mt-5 max-w-lg" style={{ color: "rgba(255,255,255,0.65)" }}>
             What to expect when you walk through our doors.
@@ -79,7 +78,6 @@ export default function VisitPage() {
       <section className="section" style={{ backgroundColor: "#ffffff" }}>
         <div className="container-c3">
           <div className="max-w-xl mb-16">
-            <p className="overline mb-4" style={{ color: "rgba(27,28,28,0.4)" }}>What to Expect</p>
             <h2 className="display-2 text-balance" style={{ color: "#1b1c1c" }}>
               No surprises. Just welcome.
             </h2>
@@ -110,7 +108,6 @@ export default function VisitPage() {
       <section className="section" style={{ backgroundColor: "#1b1c1c" }}>
         <div className="container-c3">
           <div className="max-w-xl mb-12">
-            <p className="overline mb-4" style={{ color: "rgba(255,255,255,0.35)" }}>Times &amp; Locations</p>
             <h2 className="heading-1 text-white">When do services meet?</h2>
           </div>
 
@@ -162,7 +159,6 @@ export default function VisitPage() {
         <div className="container-c3">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div>
-              <p className="overline mb-4" style={{ color: "rgba(27,28,28,0.4)" }}>Let Us Know You&apos;re Coming</p>
               <h2 className="display-2 mb-5 text-balance" style={{ color: "#1b1c1c" }}>
                 We&apos;re saving you a seat.
               </h2>

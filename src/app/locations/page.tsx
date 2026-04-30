@@ -34,7 +34,6 @@ export default function LocationsPage() {
           />
         </div>
         <div className="relative z-10 container-c3 pb-16 pt-40">
-          <p className="overline mb-4" style={{ color: "rgba(255,255,255,0.55)" }}>Find Us</p>
           <h1 className="display-1 text-white">Our Campuses</h1>
           <p className="body-lg mt-4 max-w-lg" style={{ color: "rgba(255,255,255,0.65)" }}>
             Two campuses. One church family. You&apos;re welcome at both.
@@ -66,9 +65,6 @@ export default function LocationsPage() {
                   }}
                 />
                 <div className="absolute inset-0 flex flex-col justify-end p-8 md:p-10">
-                  <p className="overline mb-3" style={{ color: "rgba(255,255,255,0.5)" }}>
-                    {loc.name} Campus
-                  </p>
                   <h2 className="heading-1 text-white mb-2">{loc.name}</h2>
                   <p className="text-sm mb-2" style={{ color: "rgba(255,255,255,0.65)" }}>
                     {loc.street}, {loc.city}, {loc.state} {loc.zip}

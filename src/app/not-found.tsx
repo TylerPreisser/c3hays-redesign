@@ -23,7 +23,6 @@ export default function NotFound() {
       </div>
 
       <div className="relative z-10 container-c3 text-center py-20">
-        <p className="overline mb-4" style={{ color: "#1cc3af" }}>404</p>
         <h1 className="display-1 text-white mb-5">Page not found</h1>
         <p className="body-lg mb-12 max-w-md mx-auto" style={{ color: "rgba(255,255,255,0.65)" }}>
           That page doesn&apos;t exist — but you&apos;re still welcome here.

@@ -78,7 +78,6 @@ export default function MessagesPage() {
           />
         </div>
         <div className="relative z-10 container-c3 pb-16 pt-40">
-          <p className="overline mb-4" style={{ color: "rgba(255,255,255,0.55)" }}>Sermons</p>
           <h1 className="display-1 text-white">Watch &amp; Listen</h1>
           <p className="body-lg mt-4 max-w-lg" style={{ color: "rgba(255,255,255,0.65)" }}>
             Miss a Sunday? Browse our full sermon archive on Vimeo, or tune
@@ -106,7 +105,6 @@ export default function MessagesPage() {
         <div className="container-c3">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5 mb-14">
             <div>
-              <p className="overline mb-2" style={{ color: "rgba(27,28,28,0.4)" }}>Archive</p>
               <h2 className="heading-1" style={{ color: "#1b1c1c" }}>Recent Messages</h2>
             </div>
             <div className="flex gap-3">

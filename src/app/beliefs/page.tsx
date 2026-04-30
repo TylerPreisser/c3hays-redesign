@@ -33,7 +33,6 @@ export default function BeliefsPage() {
           />
         </div>
         <div className="relative z-10 container-c3 pb-16 pt-40">
-          <p className="overline mb-4" style={{ color: "rgba(255,255,255,0.55)" }}>Doctrine</p>
           <h1 className="display-1 text-white">What We Believe</h1>
           <p className="body-lg mt-4 max-w-lg" style={{ color: "rgba(255,255,255,0.65)" }}>
             These are the convictions that anchor everything we do at C3 —
@@ -88,7 +87,6 @@ export default function BeliefsPage() {
       {/* Bottom CTA */}
       <section className="section" style={{ backgroundColor: "#1b1c1c" }}>
         <div className="container-c3 text-center max-w-xl">
-          <p className="overline mb-4" style={{ color: "rgba(255,255,255,0.35)" }}>Questions?</p>
           <h2 className="display-2 text-white mb-5">
             We&apos;d love to talk.
           </h2>

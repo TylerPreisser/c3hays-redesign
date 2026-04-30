@@ -53,7 +53,6 @@ export default function WatchPage() {
           />
         </div>
         <div className="relative z-10 container-c3 pb-16 pt-40">
-          <p className="overline mb-4" style={{ color: "rgba(255,255,255,0.55)" }}>Online</p>
           <h1 className="display-1 text-white mb-4">Watch C3 Live</h1>
           <p className="body-lg max-w-lg" style={{ color: "rgba(255,255,255,0.65)" }}>
             Join us online every weekend. Services stream live — and you can
@@ -110,7 +109,6 @@ export default function WatchPage() {
       {/* Service times */}
       <section className="py-16" style={{ backgroundColor: "#1b1c1c", borderTop: "1px solid rgba(255,255,255,0.08)" }}>
         <div className="container-c3">
-          <p className="overline mb-8" style={{ color: "rgba(255,255,255,0.35)" }}>Service Times</p>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-0 max-w-2xl"
             style={{ border: "1px solid rgba(255,255,255,0.1)" }}>
             <div className="p-8 border-b border-white/10 md:border-b-0 md:border-r md:border-white/10">
@@ -136,7 +134,6 @@ export default function WatchPage() {
       <section className="section" style={{ backgroundColor: "#ffffff" }}>
         <div className="container-c3">
           <div className="mb-12">
-            <p className="overline mb-2" style={{ color: "rgba(27,28,28,0.4)" }}>Recent</p>
             <h2 className="heading-1" style={{ color: "#1b1c1c" }}>Catch Up</h2>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">

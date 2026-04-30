@@ -62,7 +62,6 @@ export default function AboutPage() {
           />
         </div>
         <div className="relative z-10 container-c3 pb-16 pt-40">
-          <p className="overline mb-4" style={{ color: "rgba(255,255,255,0.55)" }}>Our Story</p>
           <h1 className="display-1 text-white text-balance">Who we are.</h1>
           <p className="body-lg mt-4 max-w-lg" style={{ color: "rgba(255,255,255,0.65)" }}>
             A people on a mission — to meet Jesus, grow with Him, and serve our community.
@@ -75,7 +74,6 @@ export default function AboutPage() {
         <div className="container-c3">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
             <div>
-              <p className="overline mb-4" style={{ color: "rgba(27,28,28,0.4)" }}>Our Mission</p>
               <h2 className="display-2 mb-6 text-balance" style={{ color: "#1b1c1c" }}>
                 We exist to{" "}
                 <em className="not-italic" style={{ color: "#1cc3af" }}>Meet.</em>{" "}
@@ -116,7 +114,6 @@ export default function AboutPage() {
       <section className="section" style={{ backgroundColor: "#1b1c1c" }}>
         <div className="container-c3">
           <div className="max-w-xl mb-14">
-            <p className="overline mb-4" style={{ color: "rgba(255,255,255,0.35)" }}>What Drives Us</p>
             <h2 className="display-2 text-white">Our Values</h2>
           </div>
           {/* Values grid — outline container, inner cell borders */}
@@ -148,7 +145,6 @@ export default function AboutPage() {
       {/* CTA */}
       <section className="section" style={{ backgroundColor: "#ffffff" }}>
         <div className="container-c3 text-center max-w-2xl">
-          <p className="overline mb-4" style={{ color: "rgba(27,28,28,0.4)" }}>Come As You Are</p>
           <h2 className="display-2 mb-5" style={{ color: "#1b1c1c" }}>Ready to visit?</h2>
           <p className="body-lg mb-10" style={{ color: "rgba(27,28,28,0.65)" }}>
             We&apos;d love to meet you. No pressure, no dress code — just come.

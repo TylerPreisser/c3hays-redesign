@@ -64,7 +64,6 @@ export default function GivePage() {
           />
         </div>
         <div className="relative z-10 container-c3 pb-20 pt-40">
-          <p className="overline mb-4" style={{ color: "rgba(255,255,255,0.55)" }}>Generosity</p>
           <h1 className="display-1 text-white text-balance">
             Your giving is{" "}
             <em className="not-italic" style={{ color: "#1cc3af" }}>changing</em>{" "}
@@ -81,7 +80,6 @@ export default function GivePage() {
       <section className="section" style={{ backgroundColor: "#ffffff" }}>
         <div className="container-c3">
           <div className="max-w-xl mb-14">
-            <p className="overline mb-4" style={{ color: "rgba(27,28,28,0.4)" }}>Stewardship</p>
             <h2 className="display-2" style={{ color: "#1b1c1c" }}>Three ways to give</h2>
           </div>
 
@@ -159,7 +157,6 @@ export default function GivePage() {
       {/* Scripture quote */}
       <section className="section" style={{ backgroundColor: "#1b1c1c" }}>
         <div className="container-c3 text-center max-w-2xl">
-          <p className="overline mb-6" style={{ color: "rgba(255,255,255,0.35)" }}>Scripture</p>
           <blockquote
             className="text-white text-balance mb-6"
             style={{
