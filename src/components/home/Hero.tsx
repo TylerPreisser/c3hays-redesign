@@ -48,7 +48,7 @@ export default function Hero() {
       {/* ── Background — B&W worship moment with subtle gradient ── */}
       <div className="absolute inset-0 z-0">
         <Image
-          src="/images/building.webp"
+          src="/images/worship.webp"
           alt=""
           fill
           priority
