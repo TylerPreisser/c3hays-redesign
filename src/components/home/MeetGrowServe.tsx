@@ -11,23 +11,23 @@ gsap.registerPlugin(ScrollTrigger);
 
 const pillars = [
   {
-    word: "Meet",
-    headline: "Meet with Him",
-    body: "Worship is where everything begins. When we gather, we encounter the living God — in song, Scripture, prayer, and community.",
+    word: "About",
+    headline: "Who We Are",
+    body: "A church family in Hays and Colby, Kansas — where everyone is welcome, just as you are.",
     image: "/images/congregation.webp",
     href: "/about/",
   },
   {
-    word: "Grow",
-    headline: "Grow in Him",
-    body: "Faith grows through the Word. Through small groups, Bible study, and discipleship, we become more like Jesus every day.",
+    word: "Messages",
+    headline: "Watch & Listen",
+    body: "Catch up on any message, any series — anytime, anywhere. New sermons every week.",
     image: "/images/gather.webp",
     href: "/messages/",
   },
   {
-    word: "Serve",
-    headline: "Serve through Him",
-    body: "We were made to give ourselves away. Serving the church and the community is how we live out the love of Christ.",
+    word: "Connect",
+    headline: "Connect with Us",
+    body: "Whether you're new or have been here a while, there's a place for you. Let us know how to help.",
     image: "/images/exterior.webp",
     href: "/connect/",
   },
@@ -102,8 +102,11 @@ export default function MeetGrowServe() {
       <div className="container-c3">
         {/* Header */}
         <div className="mgs-heading mb-16 md:mb-20">
+          <p className="overline mb-5" style={{ color: "rgba(27,28,28,0.4)" }}>
+            Take a Next Step
+          </p>
           <h2 className="display-2" style={{ color: "#1b1c1c" }}>
-            Meet. <em style={{ color: "#1cc3af", fontStyle: "italic" }}>Grow.</em> Serve.
+            Find your place at C3.
           </h2>
         </div>
 
@@ -126,6 +129,7 @@ export default function MeetGrowServe() {
               </div>
 
               {/* Text content */}
+              <p className="overline mb-3" style={{ color: "#1cc3af" }}>{pillar.word}</p>
               <h3 className="heading-2 mb-4" style={{ color: "#1b1c1c" }}>{pillar.headline}</h3>
               <p className="mb-5 leading-relaxed" style={{ fontSize: "1rem", color: "rgba(27,28,28,0.80)", lineHeight: 1.65 }}>
                 {pillar.body}

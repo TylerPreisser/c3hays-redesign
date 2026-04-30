@@ -63,6 +63,9 @@ export default function GiveSection() {
         style={{ minHeight: "inherit", paddingTop: "8rem", paddingBottom: "8rem" }}
       >
         <div className="give-content w-full max-w-2xl mx-auto px-6 text-center">
+          <p className="overline" style={{ color: "rgba(255,255,255,0.55)", marginBottom: "3rem" }}>
+            Generosity
+          </p>
           <h2 className="display-2 text-white text-balance" style={{ marginBottom: "3.5rem" }}>
             Your giving is{" "}
             <em style={{ color: "#1cc3af", fontStyle: "italic" }}>changing</em>{" "}

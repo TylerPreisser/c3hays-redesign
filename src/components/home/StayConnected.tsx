@@ -140,6 +140,11 @@ export default function StayConnected() {
                   />
                 </div>
 
+                {/* Overline */}
+                <p className="overline" style={{ color: "rgba(27,28,28,0.4)", marginBottom: "1.25rem" }}>
+                  {item.overline}
+                </p>
+
                 {/* Title */}
                 <h3
                   className="font-bold transition-colors duration-200 group-hover:text-[#1cc3af]"

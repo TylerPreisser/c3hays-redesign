@@ -50,6 +50,9 @@ export default function MissionBlock() {
     >
       <div className="container-c3">
         <div className="mission-text max-w-4xl mx-auto">
+          <p className="overline mb-8" style={{ color: "rgba(255,255,255,0.4)" }}>
+            Our Mission
+          </p>
           <h2
             className="text-white text-balance"
             style={{
