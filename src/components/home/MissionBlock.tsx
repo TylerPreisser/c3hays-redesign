@@ -50,15 +50,12 @@ export default function MissionBlock() {
     >
       <div className="container-c3">
         <div className="mission-text max-w-4xl mx-auto">
-          <p className="overline mb-8" style={{ color: "rgba(255,255,255,0.35)" }}>
-            Our Mission
-          </p>
           <h2
             className="text-white text-balance"
             style={{
               fontSize: "clamp(2.5rem, 6vw, 4.5rem)",
               fontWeight: 700,
-              lineHeight: 1.1,
+              lineHeight: 1.15,
               letterSpacing: "-0.02em",
             }}
           >
@@ -70,10 +67,6 @@ export default function MissionBlock() {
             <em style={{ color: "#1cc3af", fontStyle: "italic" }}>serve</em>{" "}
             through Him.
           </h2>
-          <div
-            className="mt-10 w-12 mx-auto"
-            style={{ height: 2, backgroundColor: "#1cc3af" }}
-          />
         </div>
       </div>
     </section>

@@ -126,8 +126,7 @@ export default function MeetGrowServe() {
               </div>
 
               {/* Text content */}
-              <p className="overline mb-3" style={{ color: "#1cc3af" }}>{pillar.word}</p>
-              <h3 className="heading-2 mb-3" style={{ color: "#1b1c1c" }}>{pillar.headline}</h3>
+              <h3 className="heading-2 mb-4" style={{ color: "#1b1c1c" }}>{pillar.headline}</h3>
               <p className="mb-5 leading-relaxed" style={{ fontSize: "1rem", color: "rgba(27,28,28,0.80)", lineHeight: 1.65 }}>
                 {pillar.body}
               </p>

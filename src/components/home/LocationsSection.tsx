@@ -58,9 +58,8 @@ export default function LocationsSection() {
     /* Mist off-white section */
     <section ref={sectionRef} className="section" style={{ backgroundColor: "#f6f6f6" }}>
       <div className="container-c3">
-        {/* Header — overline + display only, no subheader */}
+        {/* Header — display only, no overline */}
         <div className="locations-heading" style={{ marginBottom: "5rem" }}>
-          <p className="overline mb-5" style={{ color: "rgba(27,28,28,0.4)" }}>Our Campuses</p>
           <h2 className="display-2" style={{ color: "#1b1c1c" }}>
             Find a location near you.
           </h2>
@@ -91,15 +90,12 @@ export default function LocationsSection() {
                 }}
               />
 
-              {/* Content — positioned at bottom, generous breathing */}
+              {/* Content — positioned at bottom, name + CTAs only */}
               <div
                 className="absolute inset-0 flex flex-col justify-end"
                 style={{ padding: "3.5rem 3rem" }}
               >
-                <h3 className="heading-1 text-white" style={{ marginBottom: "1.75rem" }}>{loc.name}</h3>
-                <p className="text-white/75" style={{ fontSize: "1rem", lineHeight: 1.65, marginBottom: "3rem" }}>
-                  {loc.description}
-                </p>
+                <h3 className="heading-1 text-white" style={{ marginBottom: "2.5rem" }}>{loc.name}</h3>
                 <div className="flex flex-wrap gap-4">
                   <Link
                     href={`/locations/${loc.slug}/`}

@@ -18,17 +18,9 @@ export default function HomePage() {
     <>
       <Hero />
       <MissionBlock />
-      {/* Teal accent rule: dark MissionBlock → white MeetGrowServe */}
-      <div className="section-rule" style={{ backgroundColor: "#ffffff" }} />
       <MeetGrowServe />
-      {/* Teal accent rule: white MeetGrowServe → ink NT26Feature */}
-      <div className="section-rule" style={{ backgroundColor: "#1b1c1c" }} />
       <NT26Feature />
-      {/* Teal accent rule: ink NT26Feature → mist LocationsSection */}
-      <div className="section-rule" style={{ backgroundColor: "#f6f6f6" }} />
       <LocationsSection />
-      {/* Teal accent rule: mist LocationsSection → white StayConnected */}
-      <div className="section-rule" style={{ backgroundColor: "#ffffff" }} />
       <StayConnected />
       <GiveSection />
     </>

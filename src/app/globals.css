@@ -609,24 +609,7 @@ html.lenis body {
   color: var(--color-ink);
 }
 
-/* ─────────────────────────────────────────────
-   Section transition accent — 2px teal rule
-   ───────────────────────────────────────────── */
-.section-rule {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 1.5rem 0;
-}
-
-.section-rule::after {
-  content: "";
-  display: block;
-  width: 3rem;
-  height: 2px;
-  background-color: var(--color-teal);
-  opacity: 0.6;
-}
+/* (section-rule decorative divider removed — was visible "stupid line" between sections) */
 
 /* ─────────────────────────────────────────────
    Give page — equal sibling cards

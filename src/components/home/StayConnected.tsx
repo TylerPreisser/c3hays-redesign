@@ -90,17 +90,19 @@ export default function StayConnected() {
       <div className="container-c3">
         {/* Header */}
         <div className="connect-heading" style={{ marginBottom: "5rem" }}>
-          <p className="overline mb-5" style={{ color: "rgba(27,28,28,0.4)" }}>
-            Get Connected
-          </p>
           <h2 className="display-2" style={{ color: "#1b1c1c" }}>
             We&apos;re here for you.
           </h2>
         </div>
 
-        {/* 4-up flat tile grid */}
-        <div className="connect-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 md:gap-10"
-          style={{ border: "1px solid rgba(27,28,28,0.1)" }}>
+        {/*
+          Mobile: horizontal-scroll carousel with snap points
+          Desktop (lg+): 4-up grid with hairline separators
+        */}
+        <div
+          className="connect-grid lg:grid lg:grid-cols-4 lg:gap-0 flex lg:flex-none overflow-x-auto lg:overflow-visible -mx-6 lg:mx-0 px-6 lg:px-0 snap-x snap-mandatory lg:snap-none gap-6 lg:gap-0 no-scrollbar"
+          style={{ border: "none" }}
+        >
           {connectItems.map((item, i) => {
             const Icon = item.icon;
             const isLastInRow = i === connectItems.length - 1;
@@ -110,17 +112,19 @@ export default function StayConnected() {
                 href={item.href}
                 target={item.href.startsWith("http") ? "_blank" : undefined}
                 rel={item.href.startsWith("http") ? "noopener noreferrer" : undefined}
-                className="connect-item group block transition-colors duration-200"
+                className="connect-item group block transition-colors duration-200 shrink-0 lg:shrink snap-start"
                 style={{
-                  padding: "4rem 2.5rem",
-                  minHeight: "440px",
+                  padding: "3.5rem 2rem",
+                  minHeight: "420px",
+                  width: "min(85vw, 320px)",
                   display: "flex",
                   flexDirection: "column",
-                  borderRight: isLastInRow ? "none" : "1px solid rgba(27,28,28,0.1)",
+                  border: "1px solid rgba(27,28,28,0.1)",
+                  borderRight: isLastInRow ? "1px solid rgba(27,28,28,0.1)" : undefined,
                 }}
               >
                 {/* Icon */}
-                <div style={{ marginBottom: "3rem" }}>
+                <div style={{ marginBottom: "2.5rem" }}>
                   <Icon
                     size={26}
                     strokeWidth={1.5}
@@ -128,15 +132,10 @@ export default function StayConnected() {
                   />
                 </div>
 
-                {/* Overline */}
-                <p className="overline" style={{ color: "rgba(27,28,28,0.4)", marginBottom: "1.25rem" }}>
-                  {item.overline}
-                </p>
-
                 {/* Title */}
                 <h3
                   className="font-bold transition-colors duration-200 group-hover:text-[#1cc3af]"
-                  style={{ color: "#1b1c1c", fontSize: "1.125rem", lineHeight: 1.3, marginBottom: "1.75rem" }}
+                  style={{ color: "#1b1c1c", fontSize: "1.125rem", lineHeight: 1.3, marginBottom: "1.5rem" }}
                 >
                   {item.title}
                 </h3>
@@ -154,6 +153,11 @@ export default function StayConnected() {
             );
           })}
         </div>
+
+        {/* Mobile-only swipe hint */}
+        <p className="lg:hidden mt-6 text-xs uppercase tracking-[0.18em]" style={{ color: "rgba(27,28,28,0.35)" }}>
+          ← Swipe →
+        </p>
       </div>
     </section>
   );

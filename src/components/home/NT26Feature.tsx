@@ -63,9 +63,6 @@ export default function NT26Feature() {
 
           {/* Text left */}
           <div className="nt26-content">
-            <p className="overline" style={{ color: "rgba(255,255,255,0.55)", marginBottom: "2.5rem" }}>
-              Bible Reading Plan
-            </p>
             <h2 className="display-2 text-white text-balance" style={{ marginBottom: "3rem" }}>
               Have you read your{" "}
               <em className="not-italic" style={{ color: "#1cc3af" }}>Bible</em>{" "}

@@ -73,7 +73,7 @@ export default function Hero() {
         style={{ paddingTop: "6rem", paddingBottom: "6rem" }}
       >
         {/* H1 — word-by-word stagger */}
-        <h1 className="display-hero text-white" style={{ marginBottom: "clamp(4rem, 12vh, 10rem)" }}>
+        <h1 className="display-hero text-white" style={{ marginBottom: "clamp(2rem, 5vh, 4rem)" }}>
           {"Welcome home.".split(" ").map((word, wi) => (
             <motion.span
               key={`hero-word-${wi}`}
