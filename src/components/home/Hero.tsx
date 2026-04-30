@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { motion } from "framer-motion";
 
 /* ─────────────────────────────────────────────
@@ -44,20 +45,22 @@ export default function Hero() {
         </div>
       )}
 
-      {/* ── Background — deep ink gradient + subtle noise overlay ── */}
-      <div
-        className="absolute inset-0 z-0"
-        style={{
-          background: "linear-gradient(180deg, #1b1c1c 0%, #0d0d0d 100%)",
-        }}
-      >
-        {/* Subtle grain texture overlay */}
+      {/* ── Background — full-bleed photo with cinematic dim overlay ── */}
+      <div className="absolute inset-0 z-0">
+        <Image
+          src="/images/congregation.webp"
+          alt=""
+          fill
+          priority
+          sizes="100vw"
+          className="object-cover animate-ken-burns"
+        />
+        {/* Cinematic gradient overlay — dark at top + bottom, slightly lighter middle */}
         <div
           className="absolute inset-0"
           style={{
-            backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.05'/%3E%3C/svg%3E")`,
-            backgroundSize: "256px 256px",
-            opacity: 0.5,
+            background:
+              "linear-gradient(180deg, rgba(10,10,10,0.72) 0%, rgba(10,10,10,0.55) 45%, rgba(10,10,10,0.78) 100%)",
           }}
         />
       </div>
@@ -67,8 +70,8 @@ export default function Hero() {
         className="relative z-10 flex-1 flex flex-col items-center justify-center container-c3 text-center"
         style={{ paddingTop: "6rem", paddingBottom: "6rem" }}
       >
-        {/* H1 — word-by-word stagger, Fraunces display font */}
-        <h1 className="display-hero text-white mb-10" style={{ lineHeight: 1.0 }}>
+        {/* H1 — word-by-word stagger, Bricolage display font */}
+        <h1 className="display-hero text-white mb-16 md:mb-20">
           {"Welcome home.".split(" ").map((word, wi) => (
             <motion.span
               key={`hero-word-${wi}`}
