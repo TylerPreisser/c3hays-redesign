@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { Play } from "lucide-react";
+import { assetPath } from "@/lib/asset-path";
 
 export const metadata: Metadata = {
   title: "Watch Live",
@@ -37,7 +38,7 @@ export default function WatchPage() {
       <section className="relative flex items-end overflow-hidden" style={{ minHeight: "50vh" }}>
         <div className="absolute inset-0">
           <Image
-            src="/images/worship.webp"
+            src={assetPath("/images/worship.webp")}
             alt="C3 live worship service"
             fill
             className="object-cover"
@@ -143,7 +144,7 @@ export default function WatchPage() {
               <div key={msg.title} className="group cursor-pointer">
                 <div className="relative overflow-hidden mb-5" style={{ height: 200 }}>
                   <Image
-                    src={msg.image}
+                    src={assetPath(msg.image)}
                     alt={msg.title}
                     fill
                     className="object-cover transition-transform duration-500 group-hover:scale-[1.04]"

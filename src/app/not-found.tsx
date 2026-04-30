@@ -1,5 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
+import { assetPath } from "@/lib/asset-path";
 
 export default function NotFound() {
   return (
@@ -10,7 +11,7 @@ export default function NotFound() {
       {/* Background */}
       <div className="absolute inset-0 z-0">
         <Image
-          src="/images/hero-2.webp"
+          src={assetPath("/images/hero-2.webp")}
           alt="C3 worship"
           fill
           className="object-cover"

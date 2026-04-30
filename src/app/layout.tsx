@@ -5,6 +5,7 @@ import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import SmoothScrollProvider from "@/providers/SmoothScrollProvider";
 import { site } from "@/data/site";
+import { assetPath } from "@/lib/asset-path";
 
 const hankenGrotesk = Hanken_Grotesk({
   subsets: ["latin"],
@@ -35,7 +36,7 @@ export const metadata: Metadata = {
     description: site.mission,
     images: [
       {
-        url: "/images/hero-2.webp",
+        url: assetPath("/images/hero-2.webp"),
         width: 1200,
         height: 630,
         alt: `${site.name} congregation`,
@@ -48,8 +49,8 @@ export const metadata: Metadata = {
     description: site.mission,
   },
   icons: {
-    icon: "/brand/favicon.png",
-    apple: "/brand/logo.png",
+    icon: assetPath("/brand/favicon.png"),
+    apple: assetPath("/brand/logo.png"),
   },
 };
 

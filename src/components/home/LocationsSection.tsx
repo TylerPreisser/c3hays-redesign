@@ -6,6 +6,7 @@ import { useEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { locations } from "@/data/locations";
+import { assetPath } from "@/lib/asset-path";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -78,7 +79,7 @@ export default function LocationsSection() {
             >
               {/* Full-bleed background image */}
               <Image
-                src={loc.image}
+                src={assetPath(loc.image)}
                 alt={`C3 ${loc.name} campus`}
                 fill
                 className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.04]"

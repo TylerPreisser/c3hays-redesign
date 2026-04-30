@@ -5,6 +5,7 @@ import Image from "next/image";
 import { useEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { assetPath } from "@/lib/asset-path";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -94,7 +95,7 @@ export default function NT26Feature() {
             style={{ aspectRatio: "4/3", minHeight: 280, borderRadius: 0 }}
           >
             <Image
-              src="/images/nt26.webp"
+              src={assetPath("/images/nt26.webp")}
               alt="NT26 Bible Reading Plan"
               fill
               className="object-cover"

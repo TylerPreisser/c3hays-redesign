@@ -5,6 +5,7 @@ import Image from "next/image";
 import { useEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { assetPath } from "@/lib/asset-path";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -42,7 +43,7 @@ export default function GiveSection() {
       {/* Background image — absolute, z-0 */}
       <div className="absolute inset-0 z-0">
         <Image
-          src="/images/worship.webp"
+          src={assetPath("/images/worship.webp")}
           alt=""
           fill
           className="object-cover"

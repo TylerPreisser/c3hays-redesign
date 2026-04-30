@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { assetPath } from "@/lib/asset-path";
 
 /**
  * Logo — C3 brand mark using real PNG assets.
@@ -18,7 +19,7 @@ interface LogoProps {
 }
 
 export default function Logo({ variant = "dark", size = 40, className = "" }: LogoProps) {
-  const src = variant === "light" ? "/brand/logo-light.png" : "/brand/logo-dark.png";
+  const src = variant === "light" ? assetPath("/brand/logo-light.png") : assetPath("/brand/logo-dark.png");
   return (
     <Image
       src={src}

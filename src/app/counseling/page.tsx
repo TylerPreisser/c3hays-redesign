@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Phone, DollarSign, CheckCircle } from "lucide-react";
 import { counselors } from "@/data/counselors";
+import { assetPath } from "@/lib/asset-path";
 
 export const metadata: Metadata = {
   title: "Counseling",
@@ -17,7 +18,7 @@ export default function CounselingPage() {
       <section className="relative flex items-end overflow-hidden" style={{ minHeight: "50vh" }}>
         <div className="absolute inset-0">
           <Image
-            src="/images/congregation.webp"
+            src={assetPath("/images/congregation.webp")}
             alt="C3 congregation"
             fill
             className="object-cover"

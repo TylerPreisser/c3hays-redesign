@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Navigation } from "lucide-react";
 import { locations } from "@/data/locations";
+import { assetPath } from "@/lib/asset-path";
 
 export const metadata: Metadata = {
   title: "Locations",
@@ -17,7 +18,7 @@ export default function LocationsPage() {
       <section className="relative flex items-end overflow-hidden" style={{ minHeight: "50vh" }}>
         <div className="absolute inset-0">
           <Image
-            src="/images/exterior.webp"
+            src={assetPath("/images/exterior.webp")}
             alt="C3 Hays campus exterior"
             fill
             className="object-cover"
@@ -52,7 +53,7 @@ export default function LocationsPage() {
                 style={{ height: 480 }}
               >
                 <Image
-                  src={loc.image}
+                  src={assetPath(loc.image)}
                   alt={`C3 ${loc.name} campus`}
                   fill
                   className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.03]"

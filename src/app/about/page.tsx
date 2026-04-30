@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { site } from "@/data/site";
+import { assetPath } from "@/lib/asset-path";
 
 export const metadata: Metadata = {
   title: "About",
@@ -42,7 +43,7 @@ export default function AboutPage() {
       <section className="relative flex items-end overflow-hidden" style={{ minHeight: "56vh" }}>
         <div className="absolute inset-0">
           <Image
-            src="/images/congregation.webp"
+            src={assetPath("/images/congregation.webp")}
             alt="C3 congregation"
             fill
             className="object-cover"
@@ -101,7 +102,7 @@ export default function AboutPage() {
             </div>
             <div className="relative overflow-hidden" style={{ height: 480, borderRadius: 0 }}>
               <Image
-                src="/images/gather.webp"
+                src={assetPath("/images/gather.webp")}
                 alt="Church gathering"
                 fill
                 className="object-cover"

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";
+import { assetPath } from "@/lib/asset-path";
 
 /* ─────────────────────────────────────────────
    LIVE STREAM CONFIG
@@ -48,7 +49,7 @@ export default function Hero() {
       {/* ── Background — B&W worship moment with subtle gradient ── */}
       <div className="absolute inset-0 z-0">
         <Image
-          src="/images/worship.webp"
+          src={assetPath("/images/worship.webp")}
           alt=""
           fill
           priority

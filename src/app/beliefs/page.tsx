@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { beliefs } from "@/data/beliefs";
+import { assetPath } from "@/lib/asset-path";
 
 export const metadata: Metadata = {
   title: "What We Believe",
@@ -16,7 +17,7 @@ export default function BeliefsPage() {
       <section className="relative flex items-end overflow-hidden" style={{ minHeight: "50vh" }}>
         <div className="absolute inset-0">
           <Image
-            src="/images/building.webp"
+            src={assetPath("/images/building.webp")}
             alt="Worship service"
             fill
             className="object-cover"

@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useState } from "react";
+import { assetPath } from "@/lib/asset-path";
 
 const campuses = ["Hays", "Colby", "Online"];
 const howHeard = [
@@ -43,7 +44,7 @@ export default function ConnectPage() {
       <section className="relative flex items-end overflow-hidden" style={{ minHeight: "50vh" }}>
         <div className="absolute inset-0">
           <Image
-            src="/images/congregation.webp"
+            src={assetPath("/images/congregation.webp")}
             alt="C3 congregation"
             fill
             className="object-cover"

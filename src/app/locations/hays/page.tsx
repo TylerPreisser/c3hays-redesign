@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { MapPin, Clock, Navigation, Phone, Mail } from "lucide-react";
 import { site } from "@/data/site";
+import { assetPath } from "@/lib/asset-path";
 
 export const metadata: Metadata = {
   title: "Hays Campus",
@@ -17,7 +18,7 @@ export default function HaysCampusPage() {
       <section className="relative flex items-end overflow-hidden" style={{ minHeight: "56vh" }}>
         <div className="absolute inset-0">
           <Image
-            src="/images/exterior.webp"
+            src={assetPath("/images/exterior.webp")}
             alt="C3 Hays campus"
             fill
             className="object-cover"

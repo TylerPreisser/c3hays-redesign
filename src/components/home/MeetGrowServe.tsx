@@ -5,6 +5,7 @@ import Image from "next/image";
 import { useEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { assetPath } from "@/lib/asset-path";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -113,7 +114,7 @@ export default function MeetGrowServe() {
               {/* Image — 4:5 portrait ratio, clip-path wipe, scale on hover */}
               <div className="pillar-img-wrap relative overflow-hidden mb-6" style={{ aspectRatio: "4/5", minHeight: 320 }}>
                 <Image
-                  src={pillar.image}
+                  src={assetPath(pillar.image)}
                   alt={pillar.headline}
                   fill
                   className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.04]"
