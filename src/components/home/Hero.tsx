@@ -70,7 +70,7 @@ export default function Hero() {
         className="relative z-10 flex-1 flex flex-col items-center justify-center container-c3 text-center"
         style={{ paddingTop: "6rem", paddingBottom: "6rem" }}
       >
-        {/* H1 — word-by-word stagger, Bricolage display font */}
+        {/* H1 — word-by-word stagger */}
         <h1 className="display-hero text-white mb-16 md:mb-20">
           {"Welcome home.".split(" ").map((word, wi) => (
             <motion.span

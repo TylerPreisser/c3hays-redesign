@@ -31,7 +31,7 @@
 
   /* ── Typography ──────────────────────────── */
   --font-sans:        var(--font-hanken), "Hanken Grotesk", "Helvetica Neue", Helvetica, Arial, sans-serif;
-  --font-display:     var(--font-bricolage), var(--font-hanken), "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --font-display:     var(--font-hanken), "Helvetica Neue", Helvetica, Arial, sans-serif;
 
   /* ── Radii (keep sharp) ───────────────────── */
   --radius-sm:        0.25rem;
