@@ -50,8 +50,8 @@ export default function VisitPage() {
       <section className="relative flex items-end overflow-hidden" style={{ minHeight: "60vh" }}>
         <div className="absolute inset-0">
           <Image
-            src="/images/hero-1.webp"
-            alt="Welcoming church lobby"
+            src="/images/hero-2.webp"
+            alt="Family arriving at C3"
             fill
             className="object-cover"
             priority

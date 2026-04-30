@@ -9,42 +9,43 @@ export default function Footer() {
   return (
     <footer style={{ backgroundColor: "#1b1c1c", color: "rgba(255,255,255,0.75)" }}>
       {/* ── Main footer grid ── */}
-      <div className="container-c3" style={{ paddingTop: "5rem", paddingBottom: "5rem" }}>
+      <div className="container-c3" style={{ paddingTop: "5rem", paddingBottom: "3rem" }}>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 lg:gap-10">
 
           {/* Col 1 — Logo + contact */}
           <div>
-            {/* Logo — white on dark background */}
-            <Link href="/" className="inline-block mb-5" aria-label="C3 Home">
+            <Link href="/" className="inline-block mb-4" aria-label="C3 Home">
               <Logo size={40} variant="light" />
             </Link>
-            <p className="text-sm font-semibold mb-4" style={{ color: "rgba(255,255,255,0.80)" }}>
+            <p className="text-sm font-semibold mb-4" style={{ color: "rgba(255,255,255,0.85)" }}>
               Celebration Community Church
             </p>
-            <address className="not-italic text-sm leading-relaxed mb-1" style={{ color: "rgba(255,255,255,0.50)" }}>
+            <address className="not-italic text-sm leading-snug mb-4" style={{ color: "rgba(255,255,255,0.50)" }}>
               {site.address.street}<br />
               {site.address.city}, {site.address.state} {site.address.zip}
             </address>
-            <a
-              href={`tel:${site.phone.replace(/\D/g, "")}`}
-              className="block text-sm mt-3 mb-1 hover:text-white transition-colors duration-150"
-              style={{ color: "rgba(255,255,255,0.50)" }}
-            >
-              {site.phone}
-            </a>
-            <a
-              href={`mailto:${site.email}`}
-              className="block text-sm hover:text-white transition-colors duration-150"
-              style={{ color: "rgba(255,255,255,0.50)" }}
-            >
-              {site.email}
-            </a>
+            <div className="flex flex-col gap-1">
+              <a
+                href={`tel:${site.phone.replace(/\D/g, "")}`}
+                className="text-sm hover:text-white transition-colors duration-150"
+                style={{ color: "rgba(255,255,255,0.50)" }}
+              >
+                {site.phone}
+              </a>
+              <a
+                href={`mailto:${site.email}`}
+                className="text-sm hover:text-white transition-colors duration-150"
+                style={{ color: "rgba(255,255,255,0.50)" }}
+              >
+                {site.email}
+              </a>
+            </div>
           </div>
 
           {/* Col 2 — Explore nav links */}
           <div>
             <p className="overline mb-5" style={{ color: "rgba(255,255,255,0.35)" }}>Explore</p>
-            <ul className="flex flex-col gap-3">
+            <ul className="flex flex-col gap-2.5">
               {[
                 { label: "About", href: "/about/" },
                 { label: "Locations", href: "/locations/" },
@@ -53,7 +54,6 @@ export default function Footer() {
                 { label: "Counseling", href: "/counseling/" },
                 { label: "Plan a Visit", href: "/visit/" },
                 { label: "Connect", href: "/connect/" },
-                { label: "What We Believe", href: "/beliefs/" },
               ].map((link) => (
                 <li key={link.href}>
                   <Link
@@ -68,11 +68,12 @@ export default function Footer() {
               <li className="pt-2">
                 <Link
                   href="/give/"
-                  className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.18em] transition-colors duration-200 hover:bg-[#179c8c]"
+                  className="inline-flex items-center gap-2 font-bold uppercase tracking-[0.18em] transition-colors duration-200 hover:bg-[#179c8c]"
                   style={{
                     backgroundColor: "#1cc3af",
                     color: "#ffffff",
-                    padding: "0.625rem 1rem",
+                    fontSize: "0.6875rem",
+                    padding: "0.5rem 0.875rem",
                   }}
                 >
                   Give <span aria-hidden>→</span>
@@ -86,11 +87,11 @@ export default function Footer() {
             <p className="overline mb-5" style={{ color: "rgba(255,255,255,0.35)" }}>Worship With Us</p>
 
             {/* Hays */}
-            <div className="mb-6">
+            <div className="mb-5">
               <p className="text-sm font-bold mb-1" style={{ color: "rgba(255,255,255,0.85)" }}>
                 Hays Campus
               </p>
-              <address className="not-italic text-sm mb-2" style={{ color: "rgba(255,255,255,0.45)" }}>
+              <address className="not-italic text-sm leading-snug mb-2" style={{ color: "rgba(255,255,255,0.45)" }}>
                 {site.address.street}<br />
                 {site.address.city}, {site.address.state} {site.address.zip}
               </address>
@@ -100,12 +101,14 @@ export default function Footer() {
               </div>
             </div>
 
+            <div className="border-t my-5" style={{ borderColor: "rgba(255,255,255,0.08)" }} />
+
             {/* Colby */}
             <div>
               <p className="text-sm font-bold mb-1" style={{ color: "rgba(255,255,255,0.85)" }}>
                 Colby Campus
               </p>
-              <address className="not-italic text-sm mb-2" style={{ color: "rgba(255,255,255,0.45)" }}>
+              <address className="not-italic text-sm leading-snug mb-2" style={{ color: "rgba(255,255,255,0.45)" }}>
                 1923 S Range<br />
                 Colby, KS 67701
               </address>
@@ -118,14 +121,13 @@ export default function Footer() {
           {/* Col 4 — Stay Close: newsletter + social */}
           <div>
             <p className="overline mb-5" style={{ color: "rgba(255,255,255,0.35)" }}>Stay Close</p>
-            <p className="text-sm mb-5" style={{ color: "rgba(255,255,255,0.55)", lineHeight: 1.65 }}>
+            <p className="text-sm mb-5" style={{ color: "rgba(255,255,255,0.70)", lineHeight: 1.65 }}>
               Sermon notes, announcements, and what&apos;s happening at C3 — in your inbox.
             </p>
-            {/* Newsletter — stacked input + button, no side-by-side overflow */}
             <NewsletterForm />
 
             {/* Social icons */}
-            <div className="flex items-center gap-2.5 mt-6">
+            <div className="flex items-center gap-3 mt-6">
               <SocialLink href={site.social.facebook} label="Facebook">
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
                   <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/>
@@ -163,10 +165,15 @@ export default function Footer() {
       </div>
 
       {/* ── Bottom bar ── */}
-      <div style={{ borderTop: "1px solid rgba(255,255,255,0.08)" }}>
+      <div
+        style={{
+          borderTop: "1px solid rgba(255,255,255,0.10)",
+          paddingTop: "2rem",
+        }}
+      >
         <div
-          className="container-c3 py-5 flex flex-col md:flex-row items-center justify-between gap-3 text-xs"
-          style={{ color: "rgba(255,255,255,0.30)" }}
+          className="container-c3 pb-8 flex flex-col md:flex-row items-center justify-between gap-2 text-xs"
+          style={{ color: "rgba(255,255,255,0.40)" }}
         >
           <p>© {year} Celebration Community Church</p>
           <p>Built with care by Tyler Preisser</p>
@@ -192,7 +199,7 @@ function SocialLink({
       target="_blank"
       rel="noopener noreferrer"
       aria-label={label}
-      className="footer-social w-9 h-9 flex items-center justify-center"
+      className="footer-social w-10 h-10 flex items-center justify-center"
     >
       {children}
     </a>

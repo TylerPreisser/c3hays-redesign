@@ -16,8 +16,8 @@ export default function BeliefsPage() {
       <section className="relative flex items-end overflow-hidden" style={{ minHeight: "50vh" }}>
         <div className="absolute inset-0">
           <Image
-            src="/images/bg-1.webp"
-            alt="Open Bible"
+            src="/images/building.webp"
+            alt="Worship service"
             fill
             className="object-cover"
             priority

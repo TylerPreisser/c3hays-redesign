@@ -36,14 +36,14 @@ const recentMessages = [
     series: "Luke 15",
     speaker: "Lead Pastor",
     date: "April 6, 2026",
-    image: "/images/bg-2.webp",
+    image: "/images/worship.webp",
   },
   {
     title: "Resurrection Power",
     series: "Easter 2026",
     speaker: "Lead Pastor",
     date: "March 29, 2026",
-    image: "/images/hero-1.webp",
+    image: "/images/exterior.webp",
   },
   {
     title: "When God Speaks",

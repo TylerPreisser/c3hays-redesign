@@ -27,7 +27,7 @@ const pillars = [
     word: "Serve",
     headline: "Serve through Him",
     body: "We were made to give ourselves away. Serving the church and the community is how we live out the love of Christ.",
-    image: "/images/bg-1.webp",
+    image: "/images/exterior.webp",
     href: "/connect/",
   },
 ];

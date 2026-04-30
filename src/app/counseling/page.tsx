@@ -17,8 +17,8 @@ export default function CounselingPage() {
       <section className="relative flex items-end overflow-hidden" style={{ minHeight: "50vh" }}>
         <div className="absolute inset-0">
           <Image
-            src="/images/bg-2.webp"
-            alt="Peaceful counseling setting"
+            src="/images/congregation.webp"
+            alt="C3 congregation"
             fill
             className="object-cover"
             priority

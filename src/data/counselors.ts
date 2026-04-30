@@ -15,12 +15,12 @@ export const counselors: Counselor[] = [
     name: "Richard Carter",
     credentials: "",
     title: "Pastoral Counselor & Life Coach",
-    bio: "Richard brings 12 years of Youth Pastor experience and 5 years of private practice from Denver. He combines cognitive/behavioral methods with deep faith-based care to help people find wholeness in Christ.",
+    bio: "Richard brings experience as an At Risk Youth teacher, 12 years as Youth Pastor, and 5 years of private practice in Denver. He combines cognitive/behavioral methods with deep faith-based care to help people find wholeness in Christ.",
     specialties: [
-      "Life transitions",
-      "Faith and identity",
-      "Youth and family",
-      "Cognitive/behavioral approaches",
+      "Men's sexual addiction",
+      "Anger issues",
+      "Self-worth",
+      "Couples recovery",
     ],
     approach: "Integrating cognitive/behavioral therapy with a Christ-centered foundation.",
     education: [
@@ -34,10 +34,10 @@ export const counselors: Counselor[] = [
     name: "Clayton Howard",
     credentials: "M.S., LMLP",
     title: "Licensed Master's Level Psychologist",
-    bio: "With nearly a decade of counseling experience, Clayton brings clinical skill and genuine compassion to every session. He earned his M.S. from Fort Hays State University and is deeply committed to Christ-centered, solution-focused care.",
+    bio: "With nearly a decade of counseling experience and a background as a military veteran, Clayton brings clinical skill and genuine compassion to every session. He earned his M.S. from Fort Hays State University and is committed to Christ-centered, solution-focused care.",
     specialties: [
       "Anxiety & depression",
-      "Relationship dynamics",
+      "Relationship issues",
       "Life transitions",
       "Faith struggles",
     ],
@@ -49,7 +49,7 @@ export const counselors: Counselor[] = [
     name: "Patrick McGinnis",
     credentials: "M.S., LMSW",
     title: "Licensed Master's Social Worker",
-    bio: "Patrick's mission is to help people reach their God-given potential. He works primarily with young adults, couples, and families using CBT, DBT, and solution-focused approaches.",
+    bio: "Patrick's mission is to help people reach their God-given potential. Founder of Dialogue Ministries and Breathe Coffee House, he works with young adults, couples, and families using CBT, DBT, and solution-focused approaches.",
     specialties: [
       "Young adults",
       "Couples & marriage",
@@ -58,6 +58,6 @@ export const counselors: Counselor[] = [
     ],
     approach:
       "Using CBT, DBT, and solution-focused therapy to help clients reach their God-given potential.",
-    education: ["M.S. — Licensed Master's Social Work"],
+    education: ["M.S. — Licensed Master's Social Work (2022)"],
   },
 ];

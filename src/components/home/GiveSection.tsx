@@ -34,35 +34,35 @@ export default function GiveSection() {
   }, []);
 
   return (
-    /* Full-bleed dark image section */
     <section
       ref={sectionRef}
-      className="relative overflow-hidden flex flex-col items-center justify-center"
-      style={{ minHeight: "60vh" }}
+      className="relative overflow-hidden"
+      style={{ minHeight: "70vh" }}
     >
-      {/* Background */}
+      {/* Background image — absolute, z-0 */}
       <div className="absolute inset-0 z-0">
         <Image
           src="/images/worship.webp"
-          alt="Worship service"
+          alt=""
           fill
           className="object-cover"
         />
         <div
           className="absolute inset-0"
           style={{
-            background: "linear-gradient(180deg, rgba(0,0,0,0.72) 0%, rgba(0,0,0,0.82) 100%)",
+            background:
+              "linear-gradient(180deg, rgba(0,0,0,0.72) 0%, rgba(0,0,0,0.82) 100%)",
           }}
         />
       </div>
 
-      {/* Content — dead-centered both axes */}
+      {/* Centering wrapper — section class for vertical padding + flex for centering */}
       <div
-        className="relative z-10 flex items-center justify-center text-center section"
-        style={{ width: "100%" }}
+        className="relative z-10 section flex items-center justify-center"
+        style={{ minHeight: "inherit" }}
       >
-        <div className="give-content w-full max-w-2xl mx-auto px-6">
-          <p className="overline mb-6" style={{ color: "rgba(255,255,255,0.45)" }}>
+        <div className="give-content w-full max-w-2xl mx-auto px-6 text-center">
+          <p className="overline mb-6" style={{ color: "rgba(255,255,255,0.55)" }}>
             Generosity
           </p>
           <h2 className="display-2 text-white mb-6 text-balance">
@@ -70,15 +70,23 @@ export default function GiveSection() {
             <em style={{ color: "#1cc3af", fontStyle: "italic" }}>changing</em>{" "}
             the world.
           </h2>
-          <p className="mb-10 mx-auto" style={{ fontSize: "1.125rem", color: "rgba(255,255,255,0.85)", lineHeight: 1.65, maxWidth: "32rem" }}>
+          <p
+            className="mb-10"
+            style={{
+              fontSize: "1.125rem",
+              color: "rgba(255,255,255,0.88)",
+              lineHeight: 1.65,
+              maxWidth: "32rem",
+              marginLeft: "auto",
+              marginRight: "auto",
+            }}
+          >
             At C3 we understand that God owns everything. We invite you to join
             us in stewardship — generously giving toward what God values.
           </p>
-          <div className="flex justify-center">
-            <Link href="/give/" className="btn btn-primary btn-lg">
-              Give Now
-            </Link>
-          </div>
+          <Link href="/give/" className="btn btn-primary btn-lg">
+            Give Now
+          </Link>
         </div>
       </div>
     </section>
