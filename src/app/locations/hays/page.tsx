@@ -14,7 +14,7 @@ export default function HaysCampusPage() {
   return (
     <>
       {/* Hero */}
-      <section className="relative min-h-72 md:min-h-96 flex items-end overflow-hidden">
+      <section className="relative flex items-end overflow-hidden" style={{ minHeight: "56vh" }}>
         <div className="absolute inset-0">
           <Image
             src="/images/exterior.webp"
@@ -23,42 +23,43 @@ export default function HaysCampusPage() {
             className="object-cover"
             priority
           />
+          <div className="absolute inset-0" style={{ background: "rgba(10,10,10,0.58)" }} />
           <div
             className="absolute inset-0"
             style={{
               background:
-                "linear-gradient(to top, rgba(10,31,46,0.92) 0%, rgba(10,31,46,0.5) 60%, rgba(10,31,46,0.2) 100%)",
+                "linear-gradient(to top, rgba(10,10,10,0.88) 0%, rgba(10,10,10,0.2) 60%, transparent 100%)",
             }}
           />
         </div>
-        <div className="relative z-10 container-c3 pb-14 pt-28">
+        <div className="relative z-10 container-c3 pb-16 pt-40">
           <Link
             href="/locations/"
-            className="inline-flex items-center gap-1.5 text-sm text-white/60 hover:text-white mb-5 transition-colors"
+            className="back-link inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-widest mb-6"
           >
             ← Campuses
           </Link>
-          <p className="overline text-[#d4a056] mb-3">Campus</p>
+          <p className="overline mb-4" style={{ color: "rgba(255,255,255,0.55)" }}>Campus</p>
           <h1 className="display-1 text-white">Hays</h1>
         </div>
       </section>
 
       {/* Details */}
-      <section className="section bg-[#fdfcfb]">
+      <section className="section" style={{ backgroundColor: "#f2efed" }}>
         <div className="container-c3">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
             {/* Main info */}
             <div className="lg:col-span-2">
-              <h2 className="heading-1 text-[#0e1b26] mb-4">
+              <h2 className="heading-1 mb-5" style={{ color: "#232e2c" }}>
                 Our main campus
               </h2>
-              <p className="body-lg text-[#3d5566] mb-5">
+              <p className="body-lg mb-5" style={{ color: "rgba(35,46,44,0.65)" }}>
                 Our Hays campus is home base — where C3 began and where
                 we continue to grow. Four weekend services give you
                 options that fit your schedule. Whether you&apos;re a first-time
                 guest or a decades-long family, you belong here.
               </p>
-              <p className="body-base text-[#3d5566] mb-8">
+              <p className="body-base mb-10" style={{ color: "rgba(35,46,44,0.55)" }}>
                 Kids programming runs during all services for infants through
                 5th grade. Student ministry meets on Friday evenings. Come
                 check us out — we&apos;re glad you&apos;re here.
@@ -69,36 +70,38 @@ export default function HaysCampusPage() {
             </div>
 
             {/* Info sidebar */}
-            <div className="flex flex-col gap-5">
-              <div className="card p-6">
-                <h3 className="font-medium text-[#0e1b26] mb-4">
+            <div className="flex flex-col gap-4">
+              {/* Service times */}
+              <div className="p-7" style={{ backgroundColor: "#fff", border: "none" }}>
+                <h3 className="font-bold text-xs uppercase tracking-widest mb-5" style={{ color: "#232e2c" }}>
                   Service Times
                 </h3>
-                <div className="flex flex-col gap-2.5">
-                  <div className="flex items-start gap-2.5">
-                    <Clock size={14} className="text-[#10405d] mt-0.5 shrink-0" />
-                    <div className="text-sm text-[#3d5566]">
-                      <p className="font-medium text-[#0e1b26]">Saturday</p>
+                <div className="flex flex-col gap-3">
+                  <div className="flex items-start gap-3">
+                    <Clock size={14} style={{ color: "#e53539", marginTop: 2 }} className="shrink-0" />
+                    <div className="text-sm" style={{ color: "rgba(35,46,44,0.7)" }}>
+                      <p className="font-semibold" style={{ color: "#232e2c" }}>Saturday</p>
                       <p>5:00 PM</p>
                     </div>
                   </div>
-                  <div className="flex items-start gap-2.5">
-                    <Clock size={14} className="text-[#10405d] mt-0.5 shrink-0" />
-                    <div className="text-sm text-[#3d5566]">
-                      <p className="font-medium text-[#0e1b26]">Sunday</p>
+                  <div className="flex items-start gap-3">
+                    <Clock size={14} style={{ color: "#e53539", marginTop: 2 }} className="shrink-0" />
+                    <div className="text-sm" style={{ color: "rgba(35,46,44,0.7)" }}>
+                      <p className="font-semibold" style={{ color: "#232e2c" }}>Sunday</p>
                       <p>8:00 AM · 9:30 AM · 11:00 AM</p>
                     </div>
                   </div>
                 </div>
               </div>
 
-              <div className="card p-6">
-                <h3 className="font-medium text-[#0e1b26] mb-4">
+              {/* Location */}
+              <div className="p-7" style={{ backgroundColor: "#fff" }}>
+                <h3 className="font-bold text-xs uppercase tracking-widest mb-5" style={{ color: "#232e2c" }}>
                   Location
                 </h3>
-                <div className="flex items-start gap-2.5 mb-4">
-                  <MapPin size={14} className="text-[#10405d] mt-0.5 shrink-0" />
-                  <address className="not-italic text-sm text-[#3d5566]">
+                <div className="flex items-start gap-3 mb-5">
+                  <MapPin size={14} style={{ color: "#e53539", marginTop: 2 }} className="shrink-0" />
+                  <address className="not-italic text-sm" style={{ color: "rgba(35,46,44,0.65)" }}>
                     {site.address.street}
                     <br />
                     {site.address.city}, {site.address.state}{" "}
@@ -116,23 +119,26 @@ export default function HaysCampusPage() {
                 </a>
               </div>
 
-              <div className="card p-6">
-                <h3 className="font-medium text-[#0e1b26] mb-4">
+              {/* Contact */}
+              <div className="p-7" style={{ backgroundColor: "#fff" }}>
+                <h3 className="font-bold text-xs uppercase tracking-widest mb-5" style={{ color: "#232e2c" }}>
                   Contact
                 </h3>
                 <div className="flex flex-col gap-3">
                   <a
                     href={`tel:${site.phone.replace(/\D/g, "")}`}
-                    className="flex items-center gap-2.5 text-sm text-[#3d5566] hover:text-[#10405d] transition-colors"
+                    className="flex items-center gap-2.5 text-sm transition-colors duration-150"
+                    style={{ color: "rgba(35,46,44,0.65)" }}
                   >
-                    <Phone size={14} className="text-[#10405d]" />
+                    <Phone size={14} style={{ color: "#e53539" }} />
                     {site.phone}
                   </a>
                   <a
                     href={`mailto:${site.email}`}
-                    className="flex items-center gap-2.5 text-sm text-[#3d5566] hover:text-[#10405d] transition-colors"
+                    className="flex items-center gap-2.5 text-sm transition-colors duration-150"
+                    style={{ color: "rgba(35,46,44,0.65)" }}
                   >
-                    <Mail size={14} className="text-[#10405d]" />
+                    <Mail size={14} style={{ color: "#e53539" }} />
                     {site.email}
                   </a>
                 </div>
@@ -142,11 +148,12 @@ export default function HaysCampusPage() {
         </div>
       </section>
 
-      {/* Map embed placeholder */}
-      <section className="bg-[#f7f4ef] py-0">
-        <div className="container-c3 py-6">
+      {/* Map placeholder */}
+      <section style={{ backgroundColor: "#232e2c" }}>
+        <div className="container-c3 py-8">
           <div
-            className="rounded-2xl overflow-hidden h-72 bg-[#bdd9ea]/30 flex items-center justify-center"
+            className="flex items-center justify-center"
+            style={{ height: 280, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }}
             aria-label="Campus map"
           >
             <a

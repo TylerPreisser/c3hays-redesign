@@ -17,20 +17,18 @@ export default function NotFound() {
         />
         <div
           className="absolute inset-0"
-          style={{
-            background: "rgba(10,31,46,0.88)",
-          }}
+          style={{ background: "rgba(10,10,10,0.78)" }}
         />
       </div>
 
       <div className="relative z-10 container-c3 text-center py-20">
-        <p className="overline text-[#d4a056] mb-4">404</p>
-        <h1 className="display-1 text-white mb-4">Page not found</h1>
-        <p className="body-lg text-white/65 mb-10 max-w-md mx-auto">
+        <p className="overline mb-4" style={{ color: "#e53539" }}>404</p>
+        <h1 className="display-1 text-white mb-5">Page not found</h1>
+        <p className="body-lg mb-12 max-w-md mx-auto" style={{ color: "rgba(255,255,255,0.65)" }}>
           That page doesn&apos;t exist — but you&apos;re still welcome here.
         </p>
-        <div className="flex flex-wrap gap-3 justify-center">
-          <Link href="/" className="btn btn-gold btn-lg">
+        <div className="flex flex-wrap gap-4 justify-center">
+          <Link href="/" className="btn btn-primary btn-lg">
             Go Home
           </Link>
           <Link href="/visit/" className="btn btn-outline btn-lg">

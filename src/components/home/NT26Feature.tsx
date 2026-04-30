@@ -5,7 +5,6 @@ import Image from "next/image";
 import { useEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { BookOpen, ArrowRight } from "lucide-react";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -14,6 +13,7 @@ export default function NT26Feature() {
 
   useEffect(() => {
     const ctx = gsap.context(() => {
+      /* Text content stagger */
       gsap.fromTo(
         ".nt26-content > *",
         { opacity: 0, y: 32 },
@@ -25,7 +25,23 @@ export default function NT26Feature() {
           ease: "power3.out",
           scrollTrigger: {
             trigger: sectionRef.current,
-            start: "top 65%",
+            start: "top 70%",
+            once: true,
+          },
+        }
+      );
+
+      /* Image clip-path wipe */
+      gsap.fromTo(
+        ".nt26-img",
+        { clipPath: "inset(0 0 100% 0)" },
+        {
+          clipPath: "inset(0 0 0% 0)",
+          duration: 1.3,
+          ease: "power4.out",
+          scrollTrigger: {
+            trigger: ".nt26-img",
+            start: "top 75%",
             once: true,
           },
         }
@@ -35,59 +51,56 @@ export default function NT26Feature() {
   }, []);
 
   return (
-    <section ref={sectionRef} className="section bg-[#0a1f2e] overflow-hidden">
+    /* Dark evergreen section */
+    <section
+      ref={sectionRef}
+      className="section overflow-hidden"
+      style={{ backgroundColor: "#232e2c" }}
+    >
       <div className="container-c3">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
-          {/* Text */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
+
+          {/* Text left */}
           <div className="nt26-content">
-            <div className="flex items-center gap-2 mb-5">
-              <BookOpen size={16} className="text-[#d4a056]" />
-              <p className="overline text-[#d4a056]">Bible Reading Plan</p>
-            </div>
-            <h2 className="display-2 text-white mb-5 text-balance">
-              Have you read your Bible today?
+            <p className="overline mb-5" style={{ color: "rgba(255,255,255,0.45)" }}>
+              Bible Reading Plan
+            </p>
+            <h2 className="display-2 text-white mb-6 text-balance">
+              Have you read your{" "}
+              <em className="not-italic" style={{ color: "#e53539" }}>Bible</em>{" "}
+              today?
             </h2>
-            <p className="body-lg text-white/65 mb-6">
+            <p className="mb-5" style={{ fontSize: "1.125rem", color: "rgba(255,255,255,0.65)", lineHeight: 1.65 }}>
               The NT26 Reading Plan takes you through the entire New Testament
               in 2026 — one chapter at a time, together as a church family. No
               experience required. Just a willing heart.
             </p>
-            <p className="body-base text-white/50 mb-8">
+            <p className="mb-10" style={{ fontSize: "1rem", color: "rgba(255,255,255,0.45)", lineHeight: 1.65 }}>
               Join thousands reading alongside C3. We&apos;ll walk through every word
               Jesus spoke, every letter Paul wrote, and every vision John
               received — together.
             </p>
             <Link
               href="/messages/"
-              className="btn btn-gold btn-lg inline-flex items-center gap-2"
+              className="btn btn-primary btn-lg"
             >
-              Read More
-              <ArrowRight size={16} />
+              Start Reading
             </Link>
           </div>
 
-          {/* Image */}
-          <div className="relative">
-            <div className="relative h-80 lg:h-[480px] rounded-2xl overflow-hidden">
-              <Image
-                src="/images/nt26.webp"
-                alt="NT26 Bible Reading Plan"
-                fill
-                className="object-cover"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-[#0a1f2e]/60 to-transparent" />
-            </div>
-            {/* Floating badge — absolute on lg+ (where overflow is safe inside
-                the wider grid container), but hidden on mobile to avoid overflow
-                clipping on narrow viewports. Still shows at md+ breakpoint
-                where the container is wide enough to absorb the -4 offset. */}
-            <div
-              className="hidden md:block absolute -bottom-4 -left-4 card-glass px-5 py-4"
-              style={{ borderRadius: "1rem" }}
-            >
-              <p className="text-xs font-medium text-white/60 mb-0.5">Reading Plan</p>
-              <p className="text-lg font-medium text-white leading-none">NT 2026</p>
-            </div>
+          {/* Image right — sharp corners, clip-path reveal.
+              Use aspect-ratio on mobile (single col) so the image scales with width;
+              lock to 480px on the lg two-column layout. */}
+          <div
+            className="nt26-img relative overflow-hidden"
+            style={{ aspectRatio: "4/3", minHeight: 280, borderRadius: 0 }}
+          >
+            <Image
+              src="/images/nt26.webp"
+              alt="NT26 Bible Reading Plan"
+              fill
+              className="object-cover"
+            />
           </div>
         </div>
       </div>

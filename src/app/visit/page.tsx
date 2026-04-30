@@ -19,7 +19,7 @@ const whatToExpect = [
   {
     icon: Shirt,
     title: "What should I wear?",
-    body: "Come as you are — seriously. You'll see jeans, boots, and dress clothes all in the same row. There&apos;s no dress code at C3.",
+    body: "Come as you are — seriously. You'll see jeans, boots, and dress clothes all in the same row. There is no dress code at C3.",
   },
   {
     icon: Baby,
@@ -28,18 +28,18 @@ const whatToExpect = [
   },
   {
     icon: Smile,
-    title: "What if I&apos;m not a Christian?",
-    body: "Perfect — come anyway. We&apos;re a church full of imperfect people on a journey. You won&apos;t be called out, embarrassed, or pressured.",
+    title: "What if I'm not a Christian?",
+    body: "Perfect — come anyway. We're a church full of imperfect people on a journey. You won't be called out, embarrassed, or pressured.",
   },
   {
     icon: Users,
     title: "Can I bring a friend?",
-    body: "Please do. There&apos;s always room for one more. C3 is at its best when it&apos;s full of people experiencing Jesus for the first time.",
+    body: "Please do. There's always room for one more. C3 is at its best when it's full of people experiencing Jesus for the first time.",
   },
   {
     icon: MapPin,
     title: "Where do I park?",
-    body: "Ample free parking at both campuses. Look for first-time guest parking spots near the main entrance — they&apos;re saved for you.",
+    body: "Ample free parking at both campuses. Look for first-time guest parking spots near the main entrance — they're saved for you.",
   },
 ];
 
@@ -47,7 +47,7 @@ export default function VisitPage() {
   return (
     <>
       {/* Hero */}
-      <section className="relative min-h-72 md:min-h-96 flex items-end overflow-hidden">
+      <section className="relative flex items-end overflow-hidden" style={{ minHeight: "60vh" }}>
         <div className="absolute inset-0">
           <Image
             src="/images/hero-1.webp"
@@ -56,18 +56,19 @@ export default function VisitPage() {
             className="object-cover"
             priority
           />
+          <div className="absolute inset-0" style={{ background: "rgba(10,10,10,0.55)" }} />
           <div
             className="absolute inset-0"
             style={{
               background:
-                "linear-gradient(to top, rgba(10,31,46,0.95) 0%, rgba(10,31,46,0.6) 55%, rgba(10,31,46,0.2) 100%)",
+                "linear-gradient(to top, rgba(10,10,10,0.88) 0%, rgba(10,10,10,0.2) 60%, transparent 100%)",
             }}
           />
         </div>
-        <div className="relative z-10 container-c3 pb-14 pt-28">
-          <p className="overline text-[#d4a056] mb-3">First Visit</p>
-          <h1 className="display-1 text-white">Plan Your Visit</h1>
-          <p className="body-lg text-white/65 mt-4 max-w-lg">
+        <div className="relative z-10 container-c3 pb-20 pt-40">
+          <p className="overline mb-4" style={{ color: "rgba(255,255,255,0.55)" }}>First Visit</p>
+          <h1 className="display-1 text-white text-balance">Plan Your Visit</h1>
+          <p className="body-lg mt-5 max-w-lg" style={{ color: "rgba(255,255,255,0.65)" }}>
             We want your first visit to feel easy. Here&apos;s everything you need to
             know before you walk through the door.
           </p>
@@ -75,29 +76,27 @@ export default function VisitPage() {
       </section>
 
       {/* What to expect */}
-      <section className="section bg-[#fdfcfb]">
+      <section className="section" style={{ backgroundColor: "#f2efed" }}>
         <div className="container-c3">
-          <div className="max-w-xl mb-14">
-            <p className="overline text-[#10405d]/60 mb-3">What to Expect</p>
-            <h2 className="display-2 text-[#0e1b26]">
-              No surprises.
-              <br />
-              Just welcome.
+          <div className="max-w-xl mb-16">
+            <p className="overline mb-4" style={{ color: "rgba(35,46,44,0.45)" }}>What to Expect</p>
+            <h2 className="display-2 text-balance" style={{ color: "#232e2c" }}>
+              No surprises. Just welcome.
             </h2>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10 md:gap-8">
             {whatToExpect.map((item) => {
               const Icon = item.icon;
               return (
-                <div key={item.title} className="card p-7">
-                  <div className="w-11 h-11 rounded-xl bg-[#10405d]/8 flex items-center justify-center mb-5">
-                    <Icon size={19} className="text-[#10405d]" strokeWidth={1.75} />
+                <div key={item.title}>
+                  <div className="mb-5">
+                    <Icon size={28} style={{ color: "#e53539" }} strokeWidth={1.5} />
                   </div>
-                  <h3 className="font-medium text-[#0e1b26] mb-2 leading-snug">
+                  <h3 className="heading-3 mb-3" style={{ color: "#232e2c" }}>
                     {item.title}
                   </h3>
-                  <p className="text-sm text-[#3d5566] leading-relaxed">
+                  <p className="text-sm leading-relaxed" style={{ color: "rgba(35,46,44,0.65)" }}>
                     {item.body}
                   </p>
                 </div>
@@ -107,32 +106,37 @@ export default function VisitPage() {
         </div>
       </section>
 
-      {/* Service times by campus */}
-      <section className="section bg-[#f7f4ef]">
+      {/* Service times */}
+      <section className="section" style={{ backgroundColor: "#232e2c" }}>
         <div className="container-c3">
           <div className="max-w-xl mb-12">
-            <p className="overline text-[#10405d]/60 mb-3">Times &amp; Locations</p>
-            <h2 className="heading-1 text-[#0e1b26]">When do services meet?</h2>
+            <p className="overline mb-4" style={{ color: "rgba(255,255,255,0.35)" }}>Times &amp; Locations</p>
+            <h2 className="heading-1 text-white">When do services meet?</h2>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {locations.map((loc) => (
-              <div key={loc.id} className="card p-7">
-                <h3 className="heading-3 text-[#0e1b26] mb-4">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-0 max-w-3xl"
+            style={{ border: "1px solid rgba(255,255,255,0.1)" }}>
+            {locations.map((loc, i) => (
+              <div
+                key={loc.id}
+                className="p-8"
+                style={{ borderRight: i === 0 ? "1px solid rgba(255,255,255,0.1)" : "none" }}
+              >
+                <h3 className="font-bold text-sm uppercase tracking-widest mb-5" style={{ color: "#e53539" }}>
                   {loc.name} Campus
                 </h3>
-                <div className="flex items-start gap-2.5 mb-4">
-                  <MapPin size={15} className="text-[#10405d] mt-0.5 shrink-0" />
-                  <address className="not-italic text-sm text-[#3d5566]">
+                <div className="flex items-start gap-3 mb-4">
+                  <MapPin size={14} style={{ color: "rgba(255,255,255,0.4)", marginTop: 2 }} className="shrink-0" />
+                  <address className="not-italic text-sm" style={{ color: "rgba(255,255,255,0.55)" }}>
                     {loc.street}, {loc.city}, {loc.state} {loc.zip}
                   </address>
                 </div>
                 <div className="flex flex-col gap-2 mb-6">
                   {loc.services.map((s) => (
                     <div key={s.day} className="flex items-center gap-2.5">
-                      <Clock size={13} className="text-[#10405d]" />
-                      <span className="text-sm text-[#3d5566]">
-                        <strong className="text-[#0e1b26]">{s.day}:</strong>{" "}
+                      <Clock size={13} style={{ color: "rgba(255,255,255,0.35)" }} />
+                      <span className="text-sm" style={{ color: "rgba(255,255,255,0.65)" }}>
+                        <strong className="text-white font-semibold">{s.day}:</strong>{" "}
                         {s.times.join(" · ")}
                       </span>
                     </div>
@@ -142,10 +146,10 @@ export default function VisitPage() {
                   href={loc.mapsUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="btn btn-outline-navy btn-sm inline-flex items-center gap-1.5"
+                  className="btn btn-outline btn-sm inline-flex items-center gap-1.5"
                 >
                   <MapPin size={13} />
-                  Get Directions
+                  Directions
                 </a>
               </div>
             ))}
@@ -154,28 +158,28 @@ export default function VisitPage() {
       </section>
 
       {/* Connect CTA */}
-      <section className="section bg-[#0a1f2e]">
+      <section className="section" style={{ backgroundColor: "#f2efed" }}>
         <div className="container-c3">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div>
-              <p className="overline text-[#d4a056] mb-4">Let Us Know You&apos;re Coming</p>
-              <h2 className="display-2 text-white mb-5">
+              <p className="overline mb-4" style={{ color: "rgba(35,46,44,0.45)" }}>Let Us Know You&apos;re Coming</p>
+              <h2 className="display-2 mb-5 text-balance" style={{ color: "#232e2c" }}>
                 We&apos;re saving you a seat.
               </h2>
-              <p className="body-lg text-white/65 mb-8">
+              <p className="body-lg mb-10" style={{ color: "rgba(35,46,44,0.65)" }}>
                 Fill out a quick connect card and we&apos;ll send you everything
                 you need to know before Sunday. No spam, ever.
               </p>
-              <div className="flex flex-wrap gap-3">
-                <Link href="/connect/" className="btn btn-gold btn-lg">
+              <div className="flex flex-wrap gap-4">
+                <Link href="/connect/" className="btn btn-primary btn-lg">
                   Fill Out a Connect Card
                 </Link>
-                <Link href="/messages/" className="btn btn-outline btn-lg">
+                <Link href="/messages/" className="btn btn-outline-navy btn-lg">
                   Watch Online First
                 </Link>
               </div>
             </div>
-            <div className="relative h-64 lg:h-80 rounded-2xl overflow-hidden">
+            <div className="relative overflow-hidden" style={{ height: 400 }}>
               <Image
                 src="/images/congregation.webp"
                 alt="Warm welcome at C3"

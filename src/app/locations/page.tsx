@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import { MapPin, Clock, Navigation } from "lucide-react";
+import { Navigation } from "lucide-react";
 import { locations } from "@/data/locations";
 
 export const metadata: Metadata = {
@@ -14,7 +14,7 @@ export default function LocationsPage() {
   return (
     <>
       {/* Hero */}
-      <section className="relative min-h-64 md:min-h-80 flex items-end overflow-hidden">
+      <section className="relative flex items-end overflow-hidden" style={{ minHeight: "50vh" }}>
         <div className="absolute inset-0">
           <Image
             src="/images/exterior.webp"
@@ -23,76 +23,61 @@ export default function LocationsPage() {
             className="object-cover"
             priority
           />
+          <div className="absolute inset-0" style={{ background: "rgba(10,10,10,0.58)" }} />
           <div
             className="absolute inset-0"
             style={{
               background:
-                "linear-gradient(to top, rgba(10,31,46,0.92) 0%, rgba(10,31,46,0.55) 60%, rgba(10,31,46,0.2) 100%)",
+                "linear-gradient(to top, rgba(10,10,10,0.85) 0%, rgba(10,10,10,0.2) 60%, transparent 100%)",
             }}
           />
         </div>
-        <div className="relative z-10 container-c3 pb-14 pt-28">
-          <p className="overline text-[#d4a056] mb-3">Find Us</p>
+        <div className="relative z-10 container-c3 pb-16 pt-40">
+          <p className="overline mb-4" style={{ color: "rgba(255,255,255,0.55)" }}>Find Us</p>
           <h1 className="display-1 text-white">Our Campuses</h1>
-          <p className="body-lg text-white/65 mt-4 max-w-lg">
+          <p className="body-lg mt-4 max-w-lg" style={{ color: "rgba(255,255,255,0.65)" }}>
             Two campuses. One church family. You&apos;re welcome at both.
           </p>
         </div>
       </section>
 
-      {/* Campus cards */}
-      <section className="section bg-[#fdfcfb]">
+      {/* Campus cards — 2-up full-bleed */}
+      <section className="section" style={{ backgroundColor: "#f2efed" }}>
         <div className="container-c3">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {locations.map((loc) => (
-              <div key={loc.id} className="card group overflow-hidden">
-                <div className="relative h-56 overflow-hidden">
-                  <Image
-                    src={loc.image}
-                    alt={`C3 ${loc.name} campus`}
-                    fill
-                    className="object-cover transition-transform duration-700 group-hover:scale-105"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#0a1f2e]/70 to-transparent" />
-                  <div className="absolute bottom-4 left-5">
-                    <span
-                      className="px-3 py-1 text-xs font-medium text-white bg-[#10405d]/80 backdrop-blur-sm"
-                      style={{ borderRadius: "9999px" }}
-                    >
-                      {loc.name}
-                    </span>
-                  </div>
-                </div>
-                <div className="p-7">
-                  <h2 className="heading-2 text-[#0e1b26] mb-2">
+              <div
+                key={loc.id}
+                className="group relative overflow-hidden"
+                style={{ height: 480 }}
+              >
+                <Image
+                  src={loc.image}
+                  alt={`C3 ${loc.name} campus`}
+                  fill
+                  className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.03]"
+                />
+                <div
+                  className="absolute inset-0"
+                  style={{
+                    background:
+                      "linear-gradient(to top, rgba(10,10,10,0.88) 0%, rgba(10,10,10,0.4) 55%, rgba(10,10,10,0.1) 100%)",
+                  }}
+                />
+                <div className="absolute inset-0 flex flex-col justify-end p-8 md:p-10">
+                  <p className="overline mb-3" style={{ color: "rgba(255,255,255,0.5)" }}>
                     {loc.name} Campus
-                  </h2>
-                  <p className="body-base text-[#3d5566] mb-6">
-                    {loc.description}
                   </p>
-                  <div className="flex items-start gap-2.5 mb-3">
-                    <MapPin
-                      size={15}
-                      className="text-[#10405d] mt-0.5 shrink-0"
-                    />
-                    <address className="not-italic text-sm text-[#3d5566]">
-                      {loc.street}
-                      <br />
-                      {loc.city}, {loc.state} {loc.zip}
-                    </address>
-                  </div>
-                  <div className="flex items-start gap-2.5 mb-7">
-                    <Clock
-                      size={15}
-                      className="text-[#10405d] mt-0.5 shrink-0"
-                    />
-                    <div className="text-sm text-[#3d5566]">
-                      {loc.services.map((s) => (
-                        <p key={s.day}>
-                          {s.day}: {s.times.join(" · ")}
-                        </p>
-                      ))}
-                    </div>
+                  <h2 className="heading-1 text-white mb-2">{loc.name}</h2>
+                  <p className="text-sm mb-2" style={{ color: "rgba(255,255,255,0.65)" }}>
+                    {loc.street}, {loc.city}, {loc.state} {loc.zip}
+                  </p>
+                  <div className="text-sm mb-6" style={{ color: "rgba(255,255,255,0.55)" }}>
+                    {loc.services.map((s) => (
+                      <p key={s.day}>
+                        {s.day}: {s.times.join(" · ")}
+                      </p>
+                    ))}
                   </div>
                   <div className="flex flex-wrap gap-3">
                     <Link
@@ -105,10 +90,10 @@ export default function LocationsPage() {
                       href={loc.mapsUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="btn btn-outline-navy btn-sm inline-flex items-center gap-1.5"
+                      className="btn btn-outline btn-sm inline-flex items-center gap-2"
                     >
                       <Navigation size={13} />
-                      Get Directions
+                      Directions
                     </a>
                   </div>
                 </div>

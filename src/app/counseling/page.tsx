@@ -14,7 +14,7 @@ export default function CounselingPage() {
   return (
     <>
       {/* Hero */}
-      <section className="relative min-h-64 md:min-h-80 flex items-end overflow-hidden">
+      <section className="relative flex items-end overflow-hidden" style={{ minHeight: "50vh" }}>
         <div className="absolute inset-0">
           <Image
             src="/images/bg-2.webp"
@@ -23,92 +23,96 @@ export default function CounselingPage() {
             className="object-cover"
             priority
           />
+          <div className="absolute inset-0" style={{ background: "rgba(10,10,10,0.60)" }} />
           <div
             className="absolute inset-0"
             style={{
               background:
-                "linear-gradient(to top, rgba(10,31,46,0.94) 0%, rgba(10,31,46,0.55) 60%, rgba(10,31,46,0.2) 100%)",
+                "linear-gradient(to top, rgba(10,10,10,0.85) 0%, rgba(10,10,10,0.2) 60%, transparent 100%)",
             }}
           />
         </div>
-        <div className="relative z-10 container-c3 pb-14 pt-28">
-          <p className="overline text-[#d4a056] mb-3">Care</p>
+        <div className="relative z-10 container-c3 pb-16 pt-40">
+          <p className="overline mb-4" style={{ color: "rgba(255,255,255,0.55)" }}>Care</p>
           <h1 className="display-1 text-white">Counseling</h1>
         </div>
       </section>
 
-      {/* Vision */}
-      <section className="section bg-[#fdfcfb]">
+      {/* Vision + counselors */}
+      <section className="section" style={{ backgroundColor: "#f2efed" }}>
         <div className="container-c3">
           <div className="max-w-3xl mb-16">
-            <p className="overline text-[#10405d]/60 mb-4">Our Vision</p>
-            <h2 className="display-2 text-[#0e1b26] mb-6 text-balance">
-              Whole people,
-              <br />
-              through Christ.
+            <p className="overline mb-4" style={{ color: "rgba(35,46,44,0.45)" }}>Our Vision</p>
+            <h2 className="display-2 mb-6 text-balance" style={{ color: "#232e2c" }}>
+              Whole people, through Christ.
             </h2>
-            <p className="body-lg text-[#3d5566]">
+            <p className="body-lg" style={{ color: "rgba(35,46,44,0.65)" }}>
               Helping people develop spiritually healthy relationships with God
               through Jesus Christ — and supporting emotional and relational
               wellness with a team of trained, Bible-based counselors.
             </p>
           </div>
 
-          {/* Crisis callout */}
-          <div
-            className="flex items-start gap-4 p-5 rounded-xl mb-14 border"
-            style={{
-              background: "rgba(16,64,93,0.04)",
-              borderColor: "rgba(16,64,93,0.12)",
-            }}
-          >
-            <AlertCircle size={20} className="text-[#10405d] mt-0.5 shrink-0" />
+          {/* Crisis callout — high-visibility crimson card */}
+          <div className="crisis-card flex items-start gap-5 mb-16">
+            <AlertCircle size={28} style={{ color: "#e53539" }} className="shrink-0 mt-0.5" />
             <div>
-              <p className="font-medium text-[#0e1b26] mb-1">
+              <p className="font-bold mb-2" style={{ color: "#232e2c", fontSize: "1.125rem" }}>
                 In crisis? You&apos;re not alone.
               </p>
-              <p className="text-sm text-[#3d5566]">
-                Call or text{" "}
+              <p className="mb-3" style={{ color: "rgba(35,46,44,0.75)", fontSize: "1rem", lineHeight: 1.6 }}>
+                If you or someone you know is in immediate danger, please reach out now:
+              </p>
+              <div className="flex flex-wrap gap-3">
                 <a
                   href="tel:988"
-                  className="font-medium text-[#10405d] hover:underline"
+                  className="btn btn-primary btn-sm"
                 >
-                  988
-                </a>{" "}
-                (Suicide &amp; Crisis Lifeline) — available 24/7.
-              </p>
+                  Call or Text 988
+                </a>
+                <span className="flex items-center text-sm font-medium" style={{ color: "rgba(35,46,44,0.65)" }}>
+                  Suicide &amp; Crisis Lifeline — available 24/7
+                </span>
+              </div>
             </div>
           </div>
 
           {/* Counselor cards */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-7">
+          <div className="grid grid-cols-1 md:grid-cols-3"
+            style={{ border: "1px solid rgba(35,46,44,0.1)" }}>
             {counselors.map((c) => (
-              <div key={c.id} className="card p-7">
+              <div
+                key={c.id}
+                className="counselor-card p-8"
+              >
                 {/* Monogram avatar */}
-                <div className="w-14 h-14 rounded-full bg-[#10405d]/8 flex items-center justify-center mb-5">
-                  <span className="text-xl font-medium text-[#10405d]">
+                <div
+                  className="w-14 h-14 flex items-center justify-center mb-6"
+                  style={{ background: "#232e2c" }}
+                >
+                  <span className="text-lg font-bold text-white">
                     {c.name.split(" ").map((n) => n[0]).join("")}
                   </span>
                 </div>
-                <h3 className="font-medium text-[#0e1b26] leading-snug mb-0.5">
+                <h3 className="font-bold leading-snug mb-0.5" style={{ color: "#232e2c", fontSize: "1rem" }}>
                   {c.name}
                   {c.credentials && (
-                    <span className="text-[#7a9aac] font-normal text-sm ml-1">
+                    <span className="font-normal text-sm ml-1" style={{ color: "rgba(35,46,44,0.5)" }}>
                       {c.credentials}
                     </span>
                   )}
                 </h3>
-                <p className="text-sm text-[#10405d] font-medium mb-4">{c.title}</p>
-                <p className="body-sm text-[#3d5566] mb-5">{c.bio}</p>
+                <p className="text-sm font-semibold mb-4" style={{ color: "#e53539" }}>{c.title}</p>
+                <p className="text-sm leading-relaxed mb-5" style={{ color: "rgba(35,46,44,0.65)" }}>{c.bio}</p>
                 {/* Specialties */}
                 <div className="mb-4">
-                  <p className="text-xs font-medium text-[#10405d]/60 uppercase tracking-wider mb-2">
+                  <p className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: "rgba(35,46,44,0.4)" }}>
                     Specialties
                   </p>
                   <ul className="flex flex-col gap-1.5">
                     {c.specialties.map((s) => (
-                      <li key={s} className="flex items-center gap-2 text-sm text-[#3d5566]">
-                        <CheckCircle size={13} className="text-[#d4a056] shrink-0" />
+                      <li key={s} className="flex items-center gap-2 text-sm" style={{ color: "rgba(35,46,44,0.65)" }}>
+                        <CheckCircle size={12} style={{ color: "#e53539" }} className="shrink-0" />
                         {s}
                       </li>
                     ))}
@@ -116,12 +120,12 @@ export default function CounselingPage() {
                 </div>
                 {/* Education */}
                 <div>
-                  <p className="text-xs font-medium text-[#10405d]/60 uppercase tracking-wider mb-2">
+                  <p className="text-xs font-bold uppercase tracking-widest mb-2" style={{ color: "rgba(35,46,44,0.4)" }}>
                     Education
                   </p>
                   <ul className="flex flex-col gap-1">
                     {c.education.map((e) => (
-                      <li key={e} className="text-xs text-[#7a9aac]">
+                      <li key={e} className="text-xs" style={{ color: "rgba(35,46,44,0.45)" }}>
                         {e}
                       </li>
                     ))}
@@ -134,47 +138,43 @@ export default function CounselingPage() {
       </section>
 
       {/* Fees & policies */}
-      <section className="section bg-[#f7f4ef]">
+      <section className="section" style={{ backgroundColor: "#232e2c" }}>
         <div className="container-c3">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-3xl">
-            <div className="card p-7">
-              <div className="w-10 h-10 rounded-lg bg-[#d4a056]/10 flex items-center justify-center mb-5">
-                <DollarSign size={18} className="text-[#d4a056]" />
-              </div>
-              <h3 className="font-medium text-[#0e1b26] mb-3">Fees</h3>
-              <ul className="flex flex-col gap-2 text-sm text-[#3d5566]">
+          <p className="overline mb-8" style={{ color: "rgba(255,255,255,0.35)" }}>Policies</p>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-0 max-w-2xl"
+            style={{ border: "1px solid rgba(255,255,255,0.1)" }}>
+            <div className="p-8" style={{ borderRight: "1px solid rgba(255,255,255,0.1)" }}>
+              <DollarSign size={24} style={{ color: "#e53539" }} className="mb-5" />
+              <h3 className="font-bold text-white mb-4">Fees</h3>
+              <ul className="flex flex-col gap-2.5 text-sm" style={{ color: "rgba(255,255,255,0.6)" }}>
                 <li className="flex items-start gap-2">
-                  <CheckCircle size={13} className="text-[#d4a056] mt-0.5 shrink-0" />
+                  <CheckCircle size={13} style={{ color: "#e53539", marginTop: 2 }} className="shrink-0" />
                   <span>$75 / session (reduced rate)</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <CheckCircle size={13} className="text-[#d4a056] mt-0.5 shrink-0" />
+                  <CheckCircle size={13} style={{ color: "#e53539", marginTop: 2 }} className="shrink-0" />
                   <span>Cash, check; some counselors accept credit / Venmo</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <CheckCircle size={13} className="text-[#d4a056] mt-0.5 shrink-0" />
+                  <CheckCircle size={13} style={{ color: "#e53539", marginTop: 2 }} className="shrink-0" />
                   <span>Payment due at appointment</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <CheckCircle size={13} className="text-[#d4a056] mt-0.5 shrink-0" />
+                  <CheckCircle size={13} style={{ color: "#e53539", marginTop: 2 }} className="shrink-0" />
                   <span>Scholarships available on a case-by-case basis</span>
                 </li>
               </ul>
             </div>
-            <div className="card p-7">
-              <div className="w-10 h-10 rounded-lg bg-[#10405d]/8 flex items-center justify-center mb-5">
-                <Phone size={18} className="text-[#10405d]" />
-              </div>
-              <h3 className="font-medium text-[#0e1b26] mb-3">
-                Cancellation Policy
-              </h3>
-              <ul className="flex flex-col gap-2 text-sm text-[#3d5566]">
+            <div className="p-8">
+              <Phone size={24} style={{ color: "#e53539" }} className="mb-5" />
+              <h3 className="font-bold text-white mb-4">Cancellation Policy</h3>
+              <ul className="flex flex-col gap-2.5 text-sm" style={{ color: "rgba(255,255,255,0.6)" }}>
                 <li className="flex items-start gap-2">
-                  <CheckCircle size={13} className="text-[#10405d]/40 mt-0.5 shrink-0" />
+                  <CheckCircle size={13} style={{ color: "rgba(255,255,255,0.3)", marginTop: 2 }} className="shrink-0" />
                   <span>24-hour notice required for cancellations</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <CheckCircle size={13} className="text-[#10405d]/40 mt-0.5 shrink-0" />
+                  <CheckCircle size={13} style={{ color: "rgba(255,255,255,0.3)", marginTop: 2 }} className="shrink-0" />
                   <span>No-shows are charged the $75 session fee</span>
                 </li>
               </ul>
@@ -184,17 +184,17 @@ export default function CounselingPage() {
       </section>
 
       {/* Connect CTA */}
-      <section className="section bg-[#0a1f2e]">
+      <section className="section" style={{ backgroundColor: "#f2efed" }}>
         <div className="container-c3 text-center max-w-xl">
-          <p className="overline text-[#d4a056] mb-4">Take the First Step</p>
-          <h2 className="display-2 text-white mb-5">
+          <p className="overline mb-4" style={{ color: "rgba(35,46,44,0.45)" }}>Take the First Step</p>
+          <h2 className="display-2 mb-5 text-balance" style={{ color: "#232e2c" }}>
             You don&apos;t have to carry it alone.
           </h2>
-          <p className="body-lg text-white/65 mb-8">
+          <p className="body-lg mb-10" style={{ color: "rgba(35,46,44,0.65)" }}>
             Reach out to our team and we&apos;ll connect you with the right counselor
             for your needs.
           </p>
-          <Link href="/connect/" className="btn btn-gold btn-lg">
+          <Link href="/connect/" className="btn btn-primary btn-lg">
             Get Connected
           </Link>
         </div>

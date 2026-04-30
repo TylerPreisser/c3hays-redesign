@@ -8,15 +8,13 @@ import { site } from "@/data/site";
 
 gsap.registerPlugin(ScrollTrigger);
 
-const connectCards = [
+const connectItems = [
   {
     icon: Mail,
     title: "Email Us",
     body: "Questions? We'd love to hear from you.",
     cta: "Write to us",
     href: `mailto:${site.email}`,
-    color: "#d4a056",
-    colorBg: "rgba(212,160,86,0.1)",
   },
   {
     icon: Phone,
@@ -24,8 +22,6 @@ const connectCards = [
     body: "Prefer to talk? Give our office a ring.",
     cta: site.phone,
     href: `tel:${site.phone.replace(/\D/g, "")}`,
-    color: "#10405d",
-    colorBg: "rgba(16,64,93,0.08)",
   },
   {
     icon: Smartphone,
@@ -33,8 +29,6 @@ const connectCards = [
     body: "Sermons, notes, giving — all in your pocket.",
     cta: "Download the app",
     href: site.appStore,
-    color: "#3a89b8",
-    colorBg: "rgba(58,137,184,0.1)",
   },
   {
     icon: Video,
@@ -42,8 +36,6 @@ const connectCards = [
     body: "Catch up on any message, any time.",
     cta: "Browse messages",
     href: "/messages/",
-    color: "#185577",
-    colorBg: "rgba(24,85,119,0.08)",
   },
 ];
 
@@ -53,7 +45,23 @@ export default function StayConnected() {
   useEffect(() => {
     const ctx = gsap.context(() => {
       gsap.fromTo(
-        ".connect-card",
+        ".connect-heading",
+        { opacity: 0, y: 28 },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 0.9,
+          ease: "power3.out",
+          scrollTrigger: {
+            trigger: sectionRef.current,
+            start: "top 75%",
+            once: true,
+          },
+        }
+      );
+
+      gsap.fromTo(
+        ".connect-item",
         { opacity: 0, y: 32 },
         {
           opacity: 1,
@@ -62,8 +70,8 @@ export default function StayConnected() {
           duration: 0.85,
           ease: "power3.out",
           scrollTrigger: {
-            trigger: sectionRef.current,
-            start: "top 68%",
+            trigger: ".connect-grid",
+            start: "top 75%",
             once: true,
           },
         }
@@ -73,42 +81,54 @@ export default function StayConnected() {
   }, []);
 
   return (
-    <section ref={sectionRef} className="section bg-[#f7f4ef]">
+    /* Dark evergreen section */
+    <section ref={sectionRef} className="section" style={{ backgroundColor: "#232e2c" }}>
       <div className="container-c3">
-        <div className="max-w-xl mb-14">
-          <p className="overline text-[#10405d]/60 mb-3">Get Connected</p>
-          <h2 className="display-2 text-[#0e1b26]">Stay close.</h2>
-          <p className="body-lg text-[#3d5566] mt-4">
-            However you like to connect — we&apos;re here.
+        {/* Header */}
+        <div className="connect-heading mb-16">
+          <p className="overline mb-4" style={{ color: "rgba(255,255,255,0.35)" }}>
+            Get Connected
+          </p>
+          <h2 className="display-2 text-white">
+            We&apos;re here.
+          </h2>
+          <p className="mt-4 max-w-md" style={{ fontSize: "1.125rem", color: "rgba(255,255,255,0.55)", lineHeight: 1.6 }}>
+            However you like to connect — we&apos;re ready.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-          {connectCards.map((card) => {
-            const Icon = card.icon;
+        {/* 4-up grid — no card chrome, just icon + text */}
+        <div className="connect-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 lg:gap-6">
+          {connectItems.map((item) => {
+            const Icon = item.icon;
             return (
               <a
-                key={card.title}
-                href={card.href}
-                target={card.href.startsWith("http") ? "_blank" : undefined}
-                rel={card.href.startsWith("http") ? "noopener noreferrer" : undefined}
-                className="connect-card card p-6 block group"
+                key={item.title}
+                href={item.href}
+                target={item.href.startsWith("http") ? "_blank" : undefined}
+                rel={item.href.startsWith("http") ? "noopener noreferrer" : undefined}
+                className="connect-item group block"
               >
-                <div
-                  className="w-11 h-11 rounded-xl flex items-center justify-center mb-5"
-                  style={{ background: card.colorBg }}
-                >
-                  <Icon size={20} style={{ color: card.color }} strokeWidth={1.75} />
+                {/* Icon — no background, just line icon */}
+                <div className="mb-5">
+                  <Icon
+                    size={28}
+                    className="transition-colors duration-200"
+                    style={{ color: "rgba(255,255,255,0.5)" }}
+                    strokeWidth={1.5}
+                  />
                 </div>
-                <h3 className="font-medium text-[#0e1b26] mb-2">{card.title}</h3>
-                <p className="text-sm text-[#3d5566] leading-relaxed mb-4">
-                  {card.body}
-                </p>
-                <span
-                  className="text-sm font-medium transition-colors duration-150"
-                  style={{ color: card.color }}
+                <h3
+                  className="font-bold mb-2 uppercase tracking-wide text-sm transition-colors duration-200 group-hover:text-white"
+                  style={{ color: "rgba(255,255,255,0.85)", letterSpacing: "0.06em" }}
                 >
-                  {card.cta} →
+                  {item.title}
+                </h3>
+                <p className="text-sm mb-4" style={{ color: "rgba(255,255,255,0.45)", lineHeight: 1.65 }}>
+                  {item.body}
+                </p>
+                <span className="arrow-link" style={{ color: "#e53539" }}>
+                  {item.cta} <span className="arrow">→</span>
                 </span>
               </a>
             );

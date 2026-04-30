@@ -42,7 +42,7 @@ export default function ConnectPage() {
   return (
     <>
       {/* Hero */}
-      <section className="relative min-h-56 md:min-h-72 flex items-end overflow-hidden">
+      <section className="relative flex items-end overflow-hidden" style={{ minHeight: "50vh" }}>
         <div className="absolute inset-0">
           <Image
             src="/images/congregation.webp"
@@ -51,37 +51,41 @@ export default function ConnectPage() {
             className="object-cover"
             priority
           />
+          <div className="absolute inset-0" style={{ background: "rgba(10,10,10,0.60)" }} />
           <div
             className="absolute inset-0"
             style={{
               background:
-                "linear-gradient(to top, rgba(10,31,46,0.94) 0%, rgba(10,31,46,0.55) 60%, rgba(10,31,46,0.2) 100%)",
+                "linear-gradient(to top, rgba(10,10,10,0.88) 0%, rgba(10,10,10,0.2) 60%, transparent 100%)",
             }}
           />
         </div>
-        <div className="relative z-10 container-c3 pb-12 pt-28">
-          <p className="overline text-[#d4a056] mb-3">New Here?</p>
+        <div className="relative z-10 container-c3 pb-16 pt-40">
+          <p className="overline mb-4" style={{ color: "rgba(255,255,255,0.55)" }}>New Here?</p>
           <h1 className="display-1 text-white">Connect Card</h1>
-          <p className="body-lg text-white/65 mt-3 max-w-lg">
+          <p className="body-lg mt-3 max-w-lg" style={{ color: "rgba(255,255,255,0.65)" }}>
             Let us know you&apos;re here. We&apos;d love to reach out and say hello.
           </p>
         </div>
       </section>
 
       {/* Form */}
-      <section className="section bg-[#fdfcfb]">
+      <section className="section" style={{ backgroundColor: "#f2efed" }}>
         <div className="container-c3">
           <div className="max-w-2xl mx-auto">
             {submitted ? (
               /* Success state */
               <div className="text-center py-16">
-                <div className="w-16 h-16 rounded-full bg-[#d4a056]/15 flex items-center justify-center mx-auto mb-6">
-                  <CheckCircle size={28} className="text-[#d4a056]" />
+                <div
+                  className="w-16 h-16 flex items-center justify-center mx-auto mb-6"
+                  style={{ background: "#e53539" }}
+                >
+                  <CheckCircle size={28} className="text-white" />
                 </div>
-                <h2 className="heading-1 text-[#0e1b26] mb-3">
+                <h2 className="heading-1 mb-3" style={{ color: "#232e2c" }}>
                   Thanks for connecting!
                 </h2>
-                <p className="body-lg text-[#3d5566] mb-8">
+                <p className="body-lg mb-10" style={{ color: "rgba(35,46,44,0.65)" }}>
                   We&apos;ll be in touch soon. In the meantime, we&apos;d love to see
                   you on Sunday.
                 </p>
@@ -90,15 +94,15 @@ export default function ConnectPage() {
                 </Link>
               </div>
             ) : (
-              <form onSubmit={handleSubmit} className="flex flex-col gap-7">
+              <form onSubmit={handleSubmit} className="flex flex-col gap-8">
                 <div>
-                  <p className="overline text-[#10405d]/60 mb-6">
+                  <p className="overline mb-6" style={{ color: "rgba(35,46,44,0.45)" }}>
                     Your Information
                   </p>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-[#0e1b26] mb-1.5" htmlFor="first-name">
-                        First name <span className="text-[#d4a056]">*</span>
+                      <label className="block text-sm font-semibold mb-2" htmlFor="first-name" style={{ color: "#232e2c" }}>
+                        First name <span style={{ color: "#e53539" }}>*</span>
                       </label>
                       <input
                         id="first-name"
@@ -111,8 +115,8 @@ export default function ConnectPage() {
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-[#0e1b26] mb-1.5" htmlFor="last-name">
-                        Last name <span className="text-[#d4a056]">*</span>
+                      <label className="block text-sm font-semibold mb-2" htmlFor="last-name" style={{ color: "#232e2c" }}>
+                        Last name <span style={{ color: "#e53539" }}>*</span>
                       </label>
                       <input
                         id="last-name"
@@ -125,8 +129,8 @@ export default function ConnectPage() {
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-[#0e1b26] mb-1.5" htmlFor="email">
-                        Email <span className="text-[#d4a056]">*</span>
+                      <label className="block text-sm font-semibold mb-2" htmlFor="email" style={{ color: "#232e2c" }}>
+                        Email <span style={{ color: "#e53539" }}>*</span>
                       </label>
                       <input
                         id="email"
@@ -139,10 +143,9 @@ export default function ConnectPage() {
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-[#0e1b26] mb-1.5" htmlFor="phone">
+                      <label className="block text-sm font-semibold mb-2" htmlFor="phone" style={{ color: "#232e2c" }}>
                         Phone
                       </label>
-                      {/* inputMode="tel" shows the numeric phone keyboard on iOS/Android */}
                       <input
                         id="phone"
                         type="tel"
@@ -157,10 +160,20 @@ export default function ConnectPage() {
 
                 {/* Campus */}
                 <div>
-                  <label className="block text-sm font-medium text-[#0e1b26] mb-1.5" htmlFor="campus">
+                  <label className="block text-sm font-semibold mb-2" htmlFor="campus" style={{ color: "#232e2c" }}>
                     Which campus do you attend?
                   </label>
-                  <select id="campus" className="input-c3" style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%237a9aac' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E\")", backgroundRepeat: "no-repeat", backgroundPosition: "right 0.75rem center", appearance: "none", paddingRight: "2.5rem" }}>
+                  <select
+                    id="campus"
+                    className="input-c3"
+                    style={{
+                      backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23232e2c' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E\")",
+                      backgroundRepeat: "no-repeat",
+                      backgroundPosition: "right 0.75rem center",
+                      appearance: "none",
+                      paddingRight: "2.5rem",
+                    }}
+                  >
                     <option value="">Select a campus…</option>
                     {campuses.map((c) => (
                       <option key={c} value={c}>{c}</option>
@@ -170,10 +183,20 @@ export default function ConnectPage() {
 
                 {/* How did you hear */}
                 <div>
-                  <label className="block text-sm font-medium text-[#0e1b26] mb-1.5" htmlFor="how-heard">
+                  <label className="block text-sm font-semibold mb-2" htmlFor="how-heard" style={{ color: "#232e2c" }}>
                     How did you hear about C3?
                   </label>
-                  <select id="how-heard" className="input-c3" style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%237a9aac' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E\")", backgroundRepeat: "no-repeat", backgroundPosition: "right 0.75rem center", appearance: "none", paddingRight: "2.5rem" }}>
+                  <select
+                    id="how-heard"
+                    className="input-c3"
+                    style={{
+                      backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23232e2c' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E\")",
+                      backgroundRepeat: "no-repeat",
+                      backgroundPosition: "right 0.75rem center",
+                      appearance: "none",
+                      paddingRight: "2.5rem",
+                    }}
+                  >
                     <option value="">Select…</option>
                     {howHeard.map((h) => (
                       <option key={h} value={h}>{h}</option>
@@ -183,21 +206,23 @@ export default function ConnectPage() {
 
                 {/* Interests */}
                 <div>
-                  <p className="text-sm font-medium text-[#0e1b26] mb-3">
-                    I&apos;m interested in… <span className="font-normal text-[#7a9aac]">(select all that apply)</span>
+                  <p className="text-sm font-semibold mb-3" style={{ color: "#232e2c" }}>
+                    I&apos;m interested in…{" "}
+                    <span className="font-normal" style={{ color: "rgba(35,46,44,0.45)" }}>(select all that apply)</span>
                   </p>
                   <div className="flex flex-wrap gap-2">
-                    {/* py-2.5 + min-h-[44px] ensures Apple HIG 44px minimum touch target */}
                     {interests.map((item) => (
                       <button
                         key={item}
                         type="button"
                         onClick={() => toggleInterest(item)}
-                        className={`px-3.5 py-2.5 min-h-[44px] rounded-full text-sm font-medium border transition-all duration-150 ${
-                          selected.includes(item)
-                            ? "bg-[#10405d] text-white border-[#10405d]"
-                            : "bg-white text-[#3d5566] border-[#10405d]/20 hover:border-[#10405d]/40"
-                        }`}
+                        className="px-4 py-2.5 min-h-[44px] text-sm font-semibold border-2 transition-all duration-150 uppercase tracking-wider"
+                        style={{
+                          borderRadius: 0,
+                          backgroundColor: selected.includes(item) ? "#232e2c" : "transparent",
+                          color: selected.includes(item) ? "#fff" : "#232e2c",
+                          borderColor: selected.includes(item) ? "#232e2c" : "rgba(35,46,44,0.25)",
+                        }}
                       >
                         {item}
                       </button>
@@ -207,7 +232,7 @@ export default function ConnectPage() {
 
                 {/* Message */}
                 <div>
-                  <label className="block text-sm font-medium text-[#0e1b26] mb-1.5" htmlFor="message">
+                  <label className="block text-sm font-semibold mb-2" htmlFor="message" style={{ color: "#232e2c" }}>
                     Anything else you&apos;d like us to know?
                   </label>
                   <textarea
@@ -217,7 +242,7 @@ export default function ConnectPage() {
                   />
                 </div>
 
-                <button type="submit" className="btn btn-gold btn-lg self-start">
+                <button type="submit" className="btn btn-primary btn-lg self-start">
                   Send Connect Card
                 </button>
               </form>

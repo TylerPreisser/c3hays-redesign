@@ -14,7 +14,7 @@ export default function Header() {
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 60);
+    const onScroll = () => setScrolled(window.scrollY > 80);
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
@@ -28,20 +28,42 @@ export default function Header() {
   }, []);
 
   useEffect(() => {
-    document.body.style.overflow = mobileOpen ? "hidden" : "";
+    // Lock scroll on iOS: overflow:hidden alone doesn't prevent bounce-scroll.
+    // Adding position:fixed + capturing scrollY prevents the page from jumping
+    // when the drawer opens, then restores scroll position on close.
+    if (mobileOpen) {
+      const scrollY = window.scrollY;
+      document.body.style.overflow = "hidden";
+      document.body.style.position = "fixed";
+      document.body.style.top = `-${scrollY}px`;
+      document.body.style.width = "100%";
+    } else {
+      const scrollY = parseInt(document.body.style.top || "0", 10) * -1;
+      document.body.style.overflow = "";
+      document.body.style.position = "";
+      document.body.style.top = "";
+      document.body.style.width = "";
+      if (scrollY) window.scrollTo(0, scrollY);
+    }
     return () => {
       document.body.style.overflow = "";
+      document.body.style.position = "";
+      document.body.style.top = "";
+      document.body.style.width = "";
     };
   }, [mobileOpen]);
 
+  /* nav text color depends on scroll state:
+     - transparent over hero → white text
+     - solid off-white → evergreen text */
+  const textColor = scrolled ? "#232e2c" : "#ffffff";
+  const textMutedColor = scrolled ? "rgba(35,46,44,0.65)" : "rgba(255,255,255,0.8)";
+
   return (
     <>
-      {/* The header uses padding-top: env(safe-area-inset-top) so the nav bar
-          clears the Dynamic Island / notch on iPhone 14 Pro+. The fixed
-          positioning + viewport-fit=cover in layout.tsx makes this necessary. */}
       <header
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-          scrolled ? "nav-glass" : "nav-transparent"
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-200 ${
+          scrolled ? "nav-solid" : "nav-transparent"
         }`}
         style={{ paddingTop: "env(safe-area-inset-top)" }}
       >
@@ -49,8 +71,9 @@ export default function Header() {
           {/* Logo */}
           <Link
             href="/"
-            className="flex items-center gap-3 text-white shrink-0"
+            className="flex items-center gap-3 shrink-0"
             aria-label={site.name}
+            style={{ color: textColor, transition: "color 200ms cubic-bezier(0.33, 0, 0.19, 1)" }}
           >
             <Image
               src="/brand/logo.png"
@@ -60,13 +83,16 @@ export default function Header() {
               className="w-9 h-9 object-contain"
               priority
             />
-            <span className="hidden sm:block text-base font-medium text-white">
+            <span
+              className="hidden sm:block text-sm font-bold tracking-widest uppercase"
+              style={{ fontWeight: 700, letterSpacing: "0.12em" }}
+            >
               C3
             </span>
           </Link>
 
           {/* Desktop Nav */}
-          <ul className="hidden lg:flex items-center gap-1" role="list">
+          <ul className="hidden lg:flex items-center gap-2" role="list">
             {navItems.map((item) => (
               <li key={item.href} className="relative">
                 {item.children ? (
@@ -76,13 +102,19 @@ export default function Header() {
                     onMouseLeave={() => setOpenDropdown(null)}
                   >
                     <button
-                      className="flex items-center gap-1 px-3.5 py-2 text-sm font-medium text-white/85 hover:text-white transition-colors duration-150 rounded-md"
+                      className="flex items-center gap-1 px-4 py-2 text-xs font-600 uppercase tracking-widest transition-colors duration-200"
+                      style={{
+                        color: openDropdown === item.href ? textColor : textMutedColor,
+                        fontWeight: 600,
+                        letterSpacing: "0.12em",
+                        transition: "color 200ms cubic-bezier(0.33, 0, 0.19, 1)",
+                      }}
                       aria-expanded={openDropdown === item.href}
                       aria-haspopup="true"
                     >
                       {item.label}
                       <ChevronDown
-                        size={14}
+                        size={12}
                         className={`transition-transform duration-200 ${
                           openDropdown === item.href ? "rotate-180" : ""
                         }`}
@@ -95,13 +127,14 @@ export default function Header() {
                           animate={{ opacity: 1, y: 0 }}
                           exit={{ opacity: 0, y: -4 }}
                           transition={{ duration: 0.15 }}
-                          className="absolute top-full left-0 mt-1 min-w-44 bg-[#0a1f2e] border border-white/10 rounded-xl shadow-2xl overflow-hidden"
+                          className="absolute top-full left-0 mt-0 min-w-44 bg-[#232e2c] overflow-hidden"
+                          style={{ borderRadius: 0 }}
                         >
                           {item.children.map((child) => (
                             <Link
                               key={child.href}
                               href={child.href}
-                              className="block px-4 py-2.5 text-sm text-white/80 hover:text-white hover:bg-white/8 transition-colors duration-150"
+                              className="block px-5 py-3 text-xs font-semibold uppercase tracking-widest text-white/70 hover:text-white hover:bg-white/10 transition-colors duration-150"
                             >
                               {child.label}
                             </Link>
@@ -113,7 +146,13 @@ export default function Header() {
                 ) : (
                   <Link
                     href={item.href}
-                    className="block px-3.5 py-2 text-sm font-medium text-white/85 hover:text-white transition-colors duration-150 rounded-md"
+                    className="block px-4 py-2 text-xs font-semibold uppercase tracking-widest transition-colors duration-200"
+                    style={{
+                      color: textMutedColor,
+                      transition: "color 200ms cubic-bezier(0.33, 0, 0.19, 1)",
+                    }}
+                    onMouseEnter={(e) => { e.currentTarget.style.color = textColor; }}
+                    onMouseLeave={(e) => { e.currentTarget.style.color = textMutedColor; }}
                   >
                     {item.label}
                   </Link>
@@ -123,48 +162,59 @@ export default function Header() {
           </ul>
 
           {/* Desktop CTA */}
-          <div className="hidden lg:flex items-center gap-3">
+          <div className="hidden lg:flex items-center gap-4">
             <Link
               href="/visit/"
-              className="text-sm font-medium text-white/80 hover:text-white transition-colors px-3.5 py-2"
+              className="text-xs font-semibold uppercase tracking-widest transition-colors duration-200"
+              style={{
+                color: textMutedColor,
+                transition: "color 200ms cubic-bezier(0.33, 0, 0.19, 1)",
+              }}
+              onMouseEnter={(e) => { e.currentTarget.style.color = textColor; }}
+              onMouseLeave={(e) => { e.currentTarget.style.color = textMutedColor; }}
             >
               Plan a Visit
             </Link>
-            <Link href={ctaItem.href} className="btn btn-gold btn-sm">
+            <Link
+              href={ctaItem.href}
+              className="btn btn-primary btn-sm"
+            >
               {ctaItem.label}
             </Link>
           </div>
 
-          {/* Mobile Hamburger — min 44x44px touch target per Apple HIG */}
+          {/* Mobile Hamburger */}
           <button
-            className="lg:hidden flex items-center justify-center w-11 h-11 text-white/90 hover:text-white transition-colors"
+            className="lg:hidden flex items-center justify-center w-11 h-11 transition-colors duration-200"
             onClick={() => setMobileOpen(!mobileOpen)}
             aria-label={mobileOpen ? "Close menu" : "Open menu"}
             aria-expanded={mobileOpen}
+            style={{ color: textColor }}
           >
             {mobileOpen ? <X size={22} /> : <Menu size={22} />}
           </button>
         </nav>
       </header>
 
-      {/* Mobile Menu */}
+      {/* Mobile Menu — full-screen evergreen overlay */}
       <AnimatePresence>
         {mobileOpen && (
           <motion.div
             initial={{ opacity: 0, x: "100%" }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: "100%" }}
-            transition={{ duration: 0.3, ease: "easeOut" }}
-            className="fixed inset-0 z-40 bg-[#0a1f2e] flex flex-col"
+            transition={{ duration: 0.28, ease: "easeOut" }}
+            className="fixed inset-0 z-40 flex flex-col"
             style={{
-              // Pad the drawer for Dynamic Island (top) and home indicator (bottom)
+              backgroundColor: "#232e2c",
               paddingTop: "env(safe-area-inset-top)",
               paddingBottom: "env(safe-area-inset-bottom)",
             }}
             aria-modal="true"
             aria-label="Mobile navigation"
           >
-            <div className="flex items-center justify-between h-16 container-c3 border-b border-white/8">
+            {/* Mobile header row */}
+            <div className="flex items-center justify-between h-16 container-c3 border-b border-white/10">
               <Link
                 href="/"
                 className="flex items-center gap-2.5 text-white"
@@ -177,35 +227,41 @@ export default function Header() {
                   height={32}
                   className="w-8 h-8 object-contain"
                 />
-                <span className="font-medium text-sm">C3</span>
+                <span className="font-bold text-xs tracking-widest uppercase">C3</span>
               </Link>
               <button
                 onClick={() => setMobileOpen(false)}
-                className="flex items-center justify-center w-11 h-11 text-white/80 hover:text-white"
+                className="flex items-center justify-center w-11 h-11 text-white/70 hover:text-white transition-colors"
                 aria-label="Close menu"
               >
                 <X size={22} />
               </button>
             </div>
 
-            <nav className="flex-1 overflow-y-auto container-c3 py-8">
-              <ul className="flex flex-col gap-1" role="list">
-                {navItems.map((item) => (
-                  <li key={item.href}>
+            {/* Nav links — stagger in */}
+            <nav className="flex-1 overflow-y-auto container-c3 py-10">
+              <ul className="flex flex-col" role="list">
+                {navItems.map((item, i) => (
+                  <motion.li
+                    key={item.href}
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: i * 0.05 + 0.1, duration: 0.3, ease: "easeOut" }}
+                  >
                     <Link
                       href={item.href}
-                      className="block py-3 text-lg font-medium text-white/85 hover:text-white transition-colors border-b border-white/6"
+                      className="block py-4 text-2xl font-bold text-white/80 hover:text-white transition-colors border-b border-white/8"
                       onClick={() => setMobileOpen(false)}
                     >
                       {item.label}
                     </Link>
                     {item.children && (
-                      <ul className="pl-4 mt-1 mb-2">
+                      <ul className="pl-4 pb-2">
                         {item.children.map((child) => (
                           <li key={child.href}>
                             <Link
                               href={child.href}
-                              className="block py-2 text-sm text-white/60 hover:text-white/90 transition-colors"
+                              className="block py-2 text-sm font-semibold uppercase tracking-wider text-white/45 hover:text-white/80 transition-colors"
                               onClick={() => setMobileOpen(false)}
                             >
                               {child.label}
@@ -214,28 +270,37 @@ export default function Header() {
                         ))}
                       </ul>
                     )}
-                  </li>
+                  </motion.li>
                 ))}
-                <li>
+                <motion.li
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: navItems.length * 0.05 + 0.1, duration: 0.3, ease: "easeOut" }}
+                >
                   <Link
                     href="/visit/"
-                    className="block py-3 text-lg font-medium text-white/85 hover:text-white transition-colors border-b border-white/6"
+                    className="block py-4 text-2xl font-bold text-white/80 hover:text-white transition-colors border-b border-white/8"
                     onClick={() => setMobileOpen(false)}
                   >
                     Plan a Visit
                   </Link>
-                </li>
+                </motion.li>
               </ul>
 
-              <div className="mt-8 flex flex-col gap-3">
+              <motion.div
+                className="mt-10"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.45, duration: 0.3 }}
+              >
                 <Link
                   href={ctaItem.href}
-                  className="btn btn-gold btn-lg text-center"
+                  className="btn btn-primary btn-lg w-full text-center"
                   onClick={() => setMobileOpen(false)}
                 >
                   {ctaItem.label}
                 </Link>
-              </div>
+              </motion.div>
             </nav>
           </motion.div>
         )}

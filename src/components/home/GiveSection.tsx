@@ -5,7 +5,6 @@ import Image from "next/image";
 import { useEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { Heart, ArrowRight } from "lucide-react";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -16,7 +15,7 @@ export default function GiveSection() {
     const ctx = gsap.context(() => {
       gsap.fromTo(
         ".give-content > *",
-        { opacity: 0, y: 28 },
+        { opacity: 0, y: 32 },
         {
           opacity: 1,
           y: 0,
@@ -35,7 +34,12 @@ export default function GiveSection() {
   }, []);
 
   return (
-    <section ref={sectionRef} className="relative overflow-hidden min-h-80">
+    /* Full-bleed dark image section */
+    <section
+      ref={sectionRef}
+      className="relative overflow-hidden"
+      style={{ minHeight: "60vh" }}
+    >
       {/* Background */}
       <div className="absolute inset-0 z-0">
         <Image
@@ -47,31 +51,28 @@ export default function GiveSection() {
         <div
           className="absolute inset-0"
           style={{
-            background:
-              "linear-gradient(105deg, rgba(10,31,46,0.96) 0%, rgba(10,31,46,0.88) 45%, rgba(16,64,93,0.75) 100%)",
+            background: "rgba(10, 10, 10, 0.72)",
           }}
         />
       </div>
 
-      <div className="relative z-10 section container-c3">
-        <div className="give-content max-w-xl">
-          <div className="flex items-center gap-2 mb-5">
-            <Heart size={16} className="text-[#d4a056]" strokeWidth={1.75} />
-            <p className="overline text-[#d4a056]">Generosity</p>
-          </div>
-          <h2 className="display-2 text-white mb-5 text-balance">
-            Your giving is changing the world.
+      {/* Content — centered vertically */}
+      <div className="relative z-10 section container-c3 flex flex-col items-center justify-center text-center">
+        <div className="give-content max-w-2xl">
+          <p className="overline mb-6" style={{ color: "rgba(255,255,255,0.45)" }}>
+            Generosity
+          </p>
+          <h2 className="display-2 text-white mb-6 text-balance">
+            Your giving is{" "}
+            <em className="not-italic" style={{ color: "#e53539" }}>changing</em>{" "}
+            the world.
           </h2>
-          <p className="body-lg text-white/65 mb-8 max-w-md">
+          <p className="mb-10 max-w-lg mx-auto" style={{ fontSize: "1.125rem", color: "rgba(255,255,255,0.6)", lineHeight: 1.65 }}>
             At C3 we understand that God owns everything. We invite you to join
             us in stewardship — generously giving toward what God values.
           </p>
-          <Link
-            href="/give/"
-            className="btn btn-gold btn-lg inline-flex items-center gap-2"
-          >
+          <Link href="/give/" className="btn btn-primary btn-lg">
             Give Now
-            <ArrowRight size={16} />
           </Link>
         </div>
       </div>

@@ -5,7 +5,6 @@ import Image from "next/image";
 import { useEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { MapPin, Clock, Navigation } from "lucide-react";
 import { locations } from "@/data/locations";
 
 gsap.registerPlugin(ScrollTrigger);
@@ -15,90 +14,94 @@ export default function LocationsSection() {
 
   useEffect(() => {
     const ctx = gsap.context(() => {
+      /* Section header */
       gsap.fromTo(
-        ".location-card",
-        { opacity: 0, y: 40 },
+        ".locations-heading",
+        { opacity: 0, y: 28 },
         {
           opacity: 1,
           y: 0,
-          stagger: 0.2,
-          duration: 1,
+          duration: 0.9,
           ease: "power3.out",
           scrollTrigger: {
             trigger: sectionRef.current,
-            start: "top 65%",
+            start: "top 75%",
+            once: true,
+          },
+        }
+      );
+
+      /* Campus cards stagger */
+      gsap.fromTo(
+        ".campus-card",
+        { opacity: 0, y: 48 },
+        {
+          opacity: 1,
+          y: 0,
+          stagger: 0.15,
+          duration: 1,
+          ease: "power3.out",
+          scrollTrigger: {
+            trigger: ".campus-grid",
+            start: "top 75%",
             once: true,
           },
         }
       );
     }, sectionRef);
+
     return () => ctx.revert();
   }, []);
 
   return (
-    <section ref={sectionRef} className="section bg-[#fdfcfb]">
+    /* Light off-white section */
+    <section ref={sectionRef} className="section" style={{ backgroundColor: "#f2efed" }}>
       <div className="container-c3">
         {/* Header */}
-        <div className="max-w-xl mb-14">
-          <p className="overline text-[#10405d]/60 mb-3">Our Campuses</p>
-          <h2 className="display-2 text-[#0e1b26]">
-            Find a location
-            <br />
-            near you.
+        <div className="locations-heading mb-14 md:mb-16">
+          <p className="overline mb-4" style={{ color: "rgba(35,46,44,0.45)" }}>Our Campuses</p>
+          <h2 className="display-2" style={{ color: "#232e2c" }}>
+            Find a location near you.
           </h2>
-          <p className="body-lg text-[#3d5566] mt-4">
+          <p className="mt-4 max-w-md" style={{ fontSize: "1.125rem", color: "rgba(35,46,44,0.65)", lineHeight: 1.6 }}>
             Two campuses, one church family. Come as you are.
           </p>
         </div>
 
-        {/* Location cards */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
+        {/* Campus grid — 2-up full bleed image cards */}
+        <div className="campus-grid grid grid-cols-1 lg:grid-cols-2 gap-6">
           {locations.map((loc) => (
-            <div key={loc.id} className="location-card card group overflow-hidden">
-              {/* Image */}
-              <div className="relative h-52 lg:h-64 overflow-hidden">
-                <Image
-                  src={loc.image}
-                  alt={`C3 ${loc.name} campus`}
-                  fill
-                  className="object-cover transition-transform duration-700 group-hover:scale-105"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#0a1f2e]/70 to-transparent" />
-                <div className="absolute bottom-4 left-5">
-                  <span
-                    className="px-3 py-1 text-xs font-medium text-white bg-[#10405d]/80 backdrop-blur-sm"
-                    style={{ borderRadius: "9999px" }}
-                  >
-                    {loc.name} Campus
-                  </span>
-                </div>
-              </div>
+            <div
+              key={loc.id}
+              className="campus-card group relative overflow-hidden"
+              style={{ height: 480, borderRadius: 0 }}
+            >
+              {/* Full-bleed background image */}
+              <Image
+                src={loc.image}
+                alt={`C3 ${loc.name} campus`}
+                fill
+                className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.04]"
+              />
 
-              {/* Content */}
-              <div className="p-7">
-                <h3 className="heading-2 text-[#0e1b26] mb-3">{loc.name}</h3>
-                <p className="body-base text-[#3d5566] mb-5">{loc.description}</p>
+              {/* Dark overlay */}
+              <div
+                className="absolute inset-0"
+                style={{
+                  background:
+                    "linear-gradient(to top, rgba(10,10,10,0.85) 0%, rgba(10,10,10,0.45) 50%, rgba(10,10,10,0.15) 100%)",
+                }}
+              />
 
-                {/* Address */}
-                <div className="flex items-start gap-2.5 mb-3">
-                  <MapPin size={15} className="text-[#10405d] mt-0.5 shrink-0" />
-                  <p className="text-sm text-[#3d5566]">
-                    {loc.street}, {loc.city}, {loc.state} {loc.zip}
-                  </p>
-                </div>
-
-                {/* Service times */}
-                <div className="flex items-start gap-2.5 mb-7">
-                  <Clock size={15} className="text-[#10405d] mt-0.5 shrink-0" />
-                  <div className="text-sm text-[#3d5566]">
-                    {loc.services.map((s) => (
-                      <p key={s.day}>
-                        {s.day}: {s.times.join(" · ")}
-                      </p>
-                    ))}
-                  </div>
-                </div>
-
+              {/* Content — positioned at bottom */}
+              <div className="absolute inset-0 flex flex-col justify-end p-8 md:p-10">
+                <p className="overline mb-3" style={{ color: "rgba(255,255,255,0.55)" }}>
+                  {loc.name} Campus
+                </p>
+                <h3 className="heading-1 text-white mb-2">{loc.name}</h3>
+                <p className="text-white/70 mb-6" style={{ fontSize: "1rem", lineHeight: 1.6 }}>
+                  {loc.description}
+                </p>
                 <div className="flex flex-wrap gap-3">
                   <Link
                     href={`/locations/${loc.slug}/`}
@@ -110,10 +113,9 @@ export default function LocationsSection() {
                     href={loc.mapsUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="btn btn-outline-navy btn-sm inline-flex items-center gap-1.5"
+                    className="btn btn-outline btn-sm"
                   >
-                    <Navigation size={13} />
-                    Directions
+                    Get Directions
                   </a>
                 </div>
               </div>

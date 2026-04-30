@@ -3,21 +3,23 @@
 export default function NewsletterForm() {
   return (
     <form
-      className="flex flex-col sm:flex-row gap-3"
+      className="flex flex-col sm:flex-row gap-0"
       onSubmit={(e) => e.preventDefault()}
     >
-      {/* inputMode="email" opens the email keyboard on iOS/Android.
-          font-size must be ≥16px (set via input-c3 class) to prevent iOS Safari
-          from auto-zooming the page when the input is focused. */}
       <input
         type="email"
         inputMode="email"
         autoComplete="email"
-        placeholder="you@example.com"
-        className="input-c3 sm:flex-1"
+        placeholder="your@email.com"
+        className="flex-1 px-4 py-3 text-sm bg-white/8 border border-white/15 text-white placeholder:text-white/35 outline-none focus:border-white/40 transition-colors duration-150"
+        style={{ fontSize: "max(1rem, 16px)", borderRadius: 0 }}
         aria-label="Email address"
       />
-      <button type="submit" className="btn btn-gold shrink-0">
+      <button
+        type="submit"
+        className="btn btn-primary btn-sm shrink-0"
+        style={{ borderRadius: 0 }}
+      >
         Subscribe
       </button>
     </form>

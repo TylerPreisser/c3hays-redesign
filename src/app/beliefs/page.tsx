@@ -13,7 +13,7 @@ export default function BeliefsPage() {
   return (
     <>
       {/* Hero */}
-      <section className="relative min-h-64 md:min-h-80 flex items-end overflow-hidden">
+      <section className="relative flex items-end overflow-hidden" style={{ minHeight: "50vh" }}>
         <div className="absolute inset-0">
           <Image
             src="/images/bg-1.webp"
@@ -22,29 +22,30 @@ export default function BeliefsPage() {
             className="object-cover"
             priority
           />
+          <div className="absolute inset-0" style={{ background: "rgba(10,10,10,0.65)" }} />
           <div
             className="absolute inset-0"
             style={{
               background:
-                "linear-gradient(to top, rgba(10,31,46,0.95) 0%, rgba(10,31,46,0.6) 60%, rgba(10,31,46,0.3) 100%)",
+                "linear-gradient(to top, rgba(10,10,10,0.85) 0%, rgba(10,10,10,0.2) 60%, transparent 100%)",
             }}
           />
         </div>
-        <div className="relative z-10 container-c3 pb-14 pt-28">
-          <p className="overline text-[#d4a056] mb-3">Doctrine</p>
+        <div className="relative z-10 container-c3 pb-16 pt-40">
+          <p className="overline mb-4" style={{ color: "rgba(255,255,255,0.55)" }}>Doctrine</p>
           <h1 className="display-1 text-white">What We Believe</h1>
-          <p className="body-lg text-white/65 mt-4 max-w-lg">
+          <p className="body-lg mt-4 max-w-lg" style={{ color: "rgba(255,255,255,0.65)" }}>
             These are the convictions that anchor everything we do at C3 —
             rooted in Scripture, centered on Jesus.
           </p>
         </div>
       </section>
 
-      {/* Beliefs */}
-      <section className="section bg-[#fdfcfb]">
+      {/* Beliefs list */}
+      <section className="section" style={{ backgroundColor: "#f2efed" }}>
         <div className="container-c3">
           <div className="max-w-3xl">
-            <p className="body-lg text-[#3d5566] mb-12">
+            <p className="body-lg mb-14" style={{ color: "rgba(35,46,44,0.65)" }}>
               At Celebration Community Church, we hold to the historic,
               orthodox Christian faith as revealed in Scripture. These
               beliefs are not negotiable — they are the foundation of
@@ -55,21 +56,25 @@ export default function BeliefsPage() {
               {beliefs.map((belief, i) => (
                 <div
                   key={belief.id}
-                  className="py-8 border-b border-[#10405d]/8 last:border-none"
+                  className="py-10"
+                  style={{ borderBottom: "1px solid rgba(35,46,44,0.1)" }}
                 >
-                  <div className="flex gap-5 md:gap-8">
+                  <div className="flex gap-6 md:gap-10">
                     {/* Number */}
-                    <div className="shrink-0 mt-0.5">
-                      <span className="text-sm font-medium text-[#7a9aac]">
+                    <div className="shrink-0 mt-1">
+                      <span
+                        className="text-sm font-bold"
+                        style={{ color: "#e53539" }}
+                      >
                         {String(i + 1).padStart(2, "0")}
                       </span>
                     </div>
                     {/* Content */}
                     <div>
-                      <h2 className="heading-2 text-[#0e1b26] mb-3">
+                      <h2 className="heading-2 mb-4" style={{ color: "#232e2c" }}>
                         {belief.title}
                       </h2>
-                      <p className="body-lg text-[#3d5566]">{belief.body}</p>
+                      <p className="body-lg" style={{ color: "rgba(35,46,44,0.65)" }}>{belief.body}</p>
                     </div>
                   </div>
                 </div>
@@ -80,18 +85,18 @@ export default function BeliefsPage() {
       </section>
 
       {/* Bottom CTA */}
-      <section className="section bg-[#0a1f2e]">
+      <section className="section" style={{ backgroundColor: "#232e2c" }}>
         <div className="container-c3 text-center max-w-xl">
-          <p className="overline text-[#d4a056] mb-4">Questions?</p>
+          <p className="overline mb-4" style={{ color: "rgba(255,255,255,0.35)" }}>Questions?</p>
           <h2 className="display-2 text-white mb-5">
             We&apos;d love to talk.
           </h2>
-          <p className="body-lg text-white/65 mb-8">
+          <p className="body-lg mb-10" style={{ color: "rgba(255,255,255,0.6)" }}>
             Theology matters — and so do your questions. Reach out, or
             come visit us on a Sunday.
           </p>
-          <div className="flex flex-wrap gap-3 justify-center">
-            <Link href="/connect/" className="btn btn-gold btn-lg">
+          <div className="flex flex-wrap gap-4 justify-center">
+            <Link href="/connect/" className="btn btn-primary btn-lg">
               Connect With Us
             </Link>
             <Link href="/visit/" className="btn btn-outline btn-lg">

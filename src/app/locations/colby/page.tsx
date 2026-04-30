@@ -13,7 +13,7 @@ export default function ColbyCampusPage() {
   return (
     <>
       {/* Hero */}
-      <section className="relative min-h-72 md:min-h-96 flex items-end overflow-hidden">
+      <section className="relative flex items-end overflow-hidden" style={{ minHeight: "56vh" }}>
         <div className="absolute inset-0">
           <Image
             src="/images/building.webp"
@@ -22,42 +22,43 @@ export default function ColbyCampusPage() {
             className="object-cover"
             priority
           />
+          <div className="absolute inset-0" style={{ background: "rgba(10,10,10,0.58)" }} />
           <div
             className="absolute inset-0"
             style={{
               background:
-                "linear-gradient(to top, rgba(10,31,46,0.92) 0%, rgba(10,31,46,0.5) 60%, rgba(10,31,46,0.2) 100%)",
+                "linear-gradient(to top, rgba(10,10,10,0.88) 0%, rgba(10,10,10,0.2) 60%, transparent 100%)",
             }}
           />
         </div>
-        <div className="relative z-10 container-c3 pb-14 pt-28">
+        <div className="relative z-10 container-c3 pb-16 pt-40">
           <Link
             href="/locations/"
-            className="inline-flex items-center gap-1.5 text-sm text-white/60 hover:text-white mb-5 transition-colors"
+            className="back-link inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-widest mb-6"
           >
             ← Campuses
           </Link>
-          <p className="overline text-[#d4a056] mb-3">Campus</p>
+          <p className="overline mb-4" style={{ color: "rgba(255,255,255,0.55)" }}>Campus</p>
           <h1 className="display-1 text-white">Colby</h1>
         </div>
       </section>
 
       {/* Details */}
-      <section className="section bg-[#fdfcfb]">
+      <section className="section" style={{ backgroundColor: "#f2efed" }}>
         <div className="container-c3">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
             {/* Main */}
             <div className="lg:col-span-2">
-              <h2 className="heading-1 text-[#0e1b26] mb-4">
+              <h2 className="heading-1 mb-5" style={{ color: "#232e2c" }}>
                 Northwest Kansas, welcome home.
               </h2>
-              <p className="body-lg text-[#3d5566] mb-5">
+              <p className="body-lg mb-5" style={{ color: "rgba(35,46,44,0.65)" }}>
                 The Colby campus brings the same heart, the same vision, and
                 the same Jesus-centered community that defines C3 — to
                 northwest Kansas. One service on Sunday morning, with
                 everything you&apos;d expect from a full C3 experience.
               </p>
-              <p className="body-base text-[#3d5566] mb-8">
+              <p className="body-base mb-10" style={{ color: "rgba(35,46,44,0.55)" }}>
                 Kids programming runs during Sunday service. We&apos;d love to see you.
               </p>
               <Link href="/visit/" className="btn btn-primary btn-lg">
@@ -66,27 +67,27 @@ export default function ColbyCampusPage() {
             </div>
 
             {/* Sidebar */}
-            <div className="flex flex-col gap-5">
-              <div className="card p-6">
-                <h3 className="font-medium text-[#0e1b26] mb-4">
+            <div className="flex flex-col gap-4">
+              <div className="p-7" style={{ backgroundColor: "#fff" }}>
+                <h3 className="font-bold text-xs uppercase tracking-widest mb-5" style={{ color: "#232e2c" }}>
                   Service Times
                 </h3>
-                <div className="flex items-start gap-2.5">
-                  <Clock size={14} className="text-[#10405d] mt-0.5 shrink-0" />
-                  <div className="text-sm text-[#3d5566]">
-                    <p className="font-medium text-[#0e1b26]">Sunday</p>
+                <div className="flex items-start gap-3">
+                  <Clock size={14} style={{ color: "#e53539", marginTop: 2 }} className="shrink-0" />
+                  <div className="text-sm" style={{ color: "rgba(35,46,44,0.7)" }}>
+                    <p className="font-semibold" style={{ color: "#232e2c" }}>Sunday</p>
                     <p>10:00 AM</p>
                   </div>
                 </div>
               </div>
 
-              <div className="card p-6">
-                <h3 className="font-medium text-[#0e1b26] mb-4">
+              <div className="p-7" style={{ backgroundColor: "#fff" }}>
+                <h3 className="font-bold text-xs uppercase tracking-widest mb-5" style={{ color: "#232e2c" }}>
                   Location
                 </h3>
-                <div className="flex items-start gap-2.5 mb-4">
-                  <MapPin size={14} className="text-[#10405d] mt-0.5 shrink-0" />
-                  <address className="not-italic text-sm text-[#3d5566]">
+                <div className="flex items-start gap-3 mb-5">
+                  <MapPin size={14} style={{ color: "#e53539", marginTop: 2 }} className="shrink-0" />
+                  <address className="not-italic text-sm" style={{ color: "rgba(35,46,44,0.65)" }}>
                     1923 S Range
                     <br />
                     Colby, KS 67701
@@ -108,10 +109,11 @@ export default function ColbyCampusPage() {
       </section>
 
       {/* Map placeholder */}
-      <section className="bg-[#f7f4ef] py-0">
-        <div className="container-c3 py-6">
+      <section style={{ backgroundColor: "#232e2c" }}>
+        <div className="container-c3 py-8">
           <div
-            className="rounded-2xl overflow-hidden h-72 bg-[#bdd9ea]/30 flex items-center justify-center"
+            className="flex items-center justify-center"
+            style={{ height: 280, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }}
             aria-label="Campus map"
           >
             <a

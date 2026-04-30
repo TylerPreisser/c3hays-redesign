@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Hero from "@/components/home/Hero";
+import MissionBlock from "@/components/home/MissionBlock";
 import MeetGrowServe from "@/components/home/MeetGrowServe";
 import NT26Feature from "@/components/home/NT26Feature";
 import LocationsSection from "@/components/home/LocationsSection";
@@ -16,9 +17,18 @@ export default function HomePage() {
   return (
     <>
       <Hero />
+      <MissionBlock />
+      {/* Crimson accent rule: dark MissionBlock → light MeetGrowServe */}
+      <div className="section-rule" style={{ backgroundColor: "#f2efed" }} />
       <MeetGrowServe />
+      {/* Crimson accent rule: light MeetGrowServe → dark NT26Feature */}
+      <div className="section-rule" style={{ backgroundColor: "#232e2c" }} />
       <NT26Feature />
+      {/* Crimson accent rule: dark NT26Feature → light LocationsSection */}
+      <div className="section-rule" style={{ backgroundColor: "#f2efed" }} />
       <LocationsSection />
+      {/* Crimson accent rule: light LocationsSection → dark StayConnected */}
+      <div className="section-rule" style={{ backgroundColor: "#232e2c" }} />
       <StayConnected />
       <GiveSection />
     </>

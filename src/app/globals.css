@@ -1,88 +1,33 @@
 @import "tailwindcss";
 
 /* ─────────────────────────────────────────────
-   C3 Design System — Tailwind v4 Theme Tokens
+   C3 Design System — CotM-inspired palette
    ───────────────────────────────────────────── */
 @theme {
-  /* ── Colors ─────────────────────────────── */
+  /* ── Brand Colors ─────────────────────────── */
+  --color-crimson:    #e53539;
+  --color-sunset:     #ed9d79;
+  --color-sky:        #18aecb;
+  --color-seafoam:    #60c0af;
+  --color-gold:       #d5a56b;
+  --color-evergreen:  #232e2c;
+  --color-navy:       #10405D;
+  --color-black:      #0a0a0a;
+  --color-off-white:  #f2efed;
+  --color-white:      #ffffff;
+  --color-gray:       #dadada;
 
-  /* Navy ramp  (primary brand) */
-  --color-navy-950: #050f16;
-  --color-navy-900: #0a1f2e;
-  --color-navy-800: #0d2a3e;
-  --color-navy-700: #103550;
-  --color-navy-600: #10405d;
-  --color-navy-500: #185577;
-  --color-navy-400: #226a94;
-  --color-navy-300: #3a89b8;
-  --color-navy-200: #7ab6d6;
-  --color-navy-100: #bdd9ea;
-  --color-navy-50: #e8f3f9;
-
-  /* Gold / amber accent */
-  --color-gold-900: #3d2800;
-  --color-gold-800: #6b4500;
-  --color-gold-700: #9a6300;
-  --color-gold-600: #b87e20;
-  --color-gold-500: #d4a056;
-  --color-gold-400: #e0b878;
-  --color-gold-300: #ebcd9f;
-  --color-gold-200: #f3e1c5;
-  --color-gold-100: #f9f0e3;
-  --color-gold-50: #fdf8f1;
-
-  /* Surface neutrals */
-  --color-surface-dark: #0a1f2e;
-  --color-surface-mid: #132d42;
-  --color-surface-light: #f7f4ef;
-  --color-surface-white: #fdfcfb;
-
-  /* Text */
-  --color-text-primary: #0e1b26;
-  --color-text-secondary: #3d5566;
-  --color-text-muted: #7a9aac;
-  --color-text-inverse: #f5f1ea;
-  --color-text-inverse-muted: rgba(245, 241, 234, 0.7);
+  /* ── Semantic Tokens ─────────────────────── */
+  --color-bg:         #f2efed;
+  --color-text:       #232e2c;
 
   /* ── Typography ──────────────────────────── */
-  --font-sans: "Untitled Sans", system-ui, -apple-system, sans-serif;
-  --font-display: "Untitled Sans", system-ui, -apple-system, sans-serif;
+  --font-sans:        var(--font-inter), "Inter", system-ui, -apple-system, sans-serif;
 
-  /* ── Radii ───────────────────────────────── */
-  --radius-sm: 0.25rem;
-  --radius: 0.5rem;
-  --radius-md: 0.75rem;
-  --radius-lg: 1rem;
-  --radius-xl: 1.5rem;
-  --radius-2xl: 2rem;
-  --radius-full: 9999px;
-}
-
-/* ─────────────────────────────────────────────
-   Font Face Declarations
-   ───────────────────────────────────────────── */
-@font-face {
-  font-family: "Untitled Sans";
-  src: url("/fonts/untitled-sans-regular.woff2") format("woff2");
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: "Untitled Sans";
-  src: url("/fonts/untitled-sans-medium.woff2") format("woff2");
-  font-weight: 500;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: "Untitled Sans";
-  src: url("/fonts/untitled-sans-medium-italic.woff2") format("woff2");
-  font-weight: 500;
-  font-style: italic;
-  font-display: swap;
+  /* ── Radii (keep sharp) ───────────────────── */
+  --radius-sm:        0.25rem;
+  --radius:           0.25rem;
+  --radius-md:        0.25rem;
 }
 
 /* ─────────────────────────────────────────────
@@ -99,19 +44,17 @@ html {
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
   font-feature-settings: "kern" 1, "liga" 1, "calt" 1;
-  /* Prevent iOS Safari from adjusting font sizes after orientation change */
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
 }
 
 body {
   font-family: var(--font-sans);
-  font-size: clamp(1rem, 0.95rem + 0.25vw, 1.0625rem);
-  line-height: 1.65;
-  color: var(--color-text-primary);
-  background-color: var(--color-surface-white);
+  font-size: 1.125rem;
+  line-height: 1.55;
+  color: var(--color-text);
+  background-color: var(--color-off-white);
   overflow-x: hidden;
-  /* Prevent tap highlight flash on iOS links/buttons */
   -webkit-tap-highlight-color: transparent;
 }
 
@@ -126,78 +69,84 @@ img, video, svg {
 }
 
 :focus-visible {
-  outline: 2px solid var(--color-gold-500);
+  outline: 2px solid var(--color-crimson);
   outline-offset: 3px;
-  border-radius: 0.25rem;
 }
 
 /* ─────────────────────────────────────────────
-   Typography Classes
+   Typography Scale
    ───────────────────────────────────────────── */
+
+/* Hero H1 — 56–80px */
 .display-hero {
-  font-family: var(--font-display);
-  font-size: clamp(3.25rem, 2rem + 5vw, 6.5rem);
-  font-weight: 500;
-  line-height: 1.08;
-  letter-spacing: -0.04em;
-}
-
-.display-1 {
-  font-family: var(--font-display);
-  font-size: clamp(2.75rem, 2rem + 3.5vw, 5.25rem);
-  font-weight: 500;
-  line-height: 1.1;
-  letter-spacing: -0.03em;
-}
-
-.display-2 {
-  font-family: var(--font-display);
-  font-size: clamp(2.25rem, 1.75rem + 2.5vw, 4rem);
-  font-weight: 500;
-  line-height: 1.15;
-  letter-spacing: -0.025em;
-}
-
-.heading-1 {
-  font-size: clamp(1.875rem, 1.5rem + 1.5vw, 3rem);
-  font-weight: 500;
-  line-height: 1.2;
+  font-family: var(--font-sans);
+  font-size: clamp(3.5rem, 7vw, 5rem);
+  font-weight: 700;
+  line-height: 1.05;
   letter-spacing: -0.02em;
 }
 
-.heading-2 {
-  font-size: clamp(1.5rem, 1.25rem + 1vw, 2.25rem);
-  font-weight: 500;
-  line-height: 1.25;
+/* Section H2 — 40–60px */
+.display-1 {
+  font-family: var(--font-sans);
+  font-size: clamp(2.5rem, 5vw, 3.75rem);
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+
+/* Section H2 alt — slightly smaller */
+.display-2 {
+  font-family: var(--font-sans);
+  font-size: clamp(2.25rem, 4.5vw, 3.5rem);
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+
+/* H3 — 24–32px */
+.heading-1 {
+  font-size: clamp(1.75rem, 3vw, 2.5rem);
+  font-weight: 700;
+  line-height: 1.15;
   letter-spacing: -0.015em;
 }
 
-.heading-3 {
-  font-size: clamp(1.25rem, 1.1rem + 0.5vw, 1.75rem);
-  font-weight: 500;
-  line-height: 1.3;
+.heading-2 {
+  font-size: clamp(1.5rem, 2.5vw, 2rem);
+  font-weight: 600;
+  line-height: 1.2;
   letter-spacing: -0.01em;
 }
 
+.heading-3 {
+  font-size: clamp(1.25rem, 2vw, 1.5rem);
+  font-weight: 600;
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+}
+
+/* Body */
 .body-lg {
-  font-size: clamp(1.125rem, 1rem + 0.5vw, 1.3125rem);
-  line-height: 1.65;
+  font-size: 1.125rem;
+  line-height: 1.6;
 }
 
 .body-base {
-  font-size: clamp(1rem, 0.95rem + 0.2vw, 1.0625rem);
-  line-height: 1.65;
+  font-size: 1rem;
+  line-height: 1.6;
 }
 
 .body-sm {
-  font-size: clamp(0.875rem, 0.85rem + 0.15vw, 0.9375rem);
+  font-size: 0.9375rem;
   line-height: 1.55;
 }
 
+/* Overline — above section titles */
 .overline {
-  font-size: 0.6875rem;
-  font-weight: 500;
-  letter-spacing: 0.12em;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
   text-transform: uppercase;
 }
 
@@ -206,7 +155,7 @@ img, video, svg {
    ───────────────────────────────────────────── */
 .container-c3 {
   width: 100%;
-  max-width: 1200px;
+  max-width: 1280px;
   margin-inline: auto;
   padding-inline: 1.5rem;
 }
@@ -219,21 +168,22 @@ img, video, svg {
   .container-c3 { padding-inline: 3rem; }
 }
 
+/* Section vertical padding — generous CotM scale */
 .section {
-  padding-top: 5rem;
-  padding-bottom: 5rem;
+  padding-top: 6rem;
+  padding-bottom: 6rem;
 }
 
 @media (min-width: 768px) {
-  .section { padding-top: 7rem; padding-bottom: 7rem; }
+  .section { padding-top: 8rem; padding-bottom: 8rem; }
 }
 
 @media (min-width: 1024px) {
-  .section { padding-top: 9rem; padding-bottom: 9rem; }
+  .section { padding-top: 10rem; padding-bottom: 10rem; }
 }
 
 /* ─────────────────────────────────────────────
-   Buttons
+   Buttons — sharp-edged CotM style
    ───────────────────────────────────────────── */
 .btn {
   display: inline-flex;
@@ -241,127 +191,117 @@ img, video, svg {
   justify-content: center;
   gap: 0.5rem;
   font-family: var(--font-sans);
-  font-size: 0.9375rem;
-  font-weight: 500;
+  font-size: 0.875rem;
+  font-weight: 700;
   line-height: 1;
   text-decoration: none;
-  border: none;
+  border: 2px solid transparent;
   cursor: pointer;
-  transition: all 250ms cubic-bezier(0.16, 1, 0.3, 1);
-  border-radius: 9999px;
+  transition: background-color 250ms cubic-bezier(0.33, 0, 0.19, 1),
+              color 250ms cubic-bezier(0.33, 0, 0.19, 1),
+              border-color 250ms cubic-bezier(0.33, 0, 0.19, 1);
+  border-radius: 0;
   white-space: nowrap;
-  padding: 0.8125rem 1.75rem;
+  padding: 1.125rem 2rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
 }
 
+/* Primary — crimson fill → white hover */
 .btn-primary {
-  background-color: var(--color-navy-600);
+  background-color: var(--color-crimson);
   color: #fff;
-  box-shadow: 0 1px 2px rgba(16,64,93,0.08), 0 8px 24px -4px rgba(16,64,93,0.18);
+  border-color: var(--color-crimson);
 }
 
 .btn-primary:hover {
-  background-color: var(--color-navy-700);
-  transform: translateY(-1px);
-  box-shadow: 0 1px 2px rgba(16,64,93,0.1), 0 12px 32px -4px rgba(16,64,93,0.24);
+  background-color: #fff;
+  color: var(--color-crimson);
+  border-color: var(--color-crimson);
 }
 
-.btn-primary:active { transform: translateY(0); }
-
+/* Gold — for Give/donate emphasis */
 .btn-gold {
-  background-color: var(--color-gold-500);
-  color: var(--color-navy-900);
-  box-shadow: 0 1px 2px rgba(16,64,93,0.08), 0 8px 24px -4px rgba(212,160,86,0.3);
+  background-color: var(--color-crimson);
+  color: #fff;
+  border-color: var(--color-crimson);
 }
 
 .btn-gold:hover {
-  background-color: var(--color-gold-400);
-  transform: translateY(-1px);
-  box-shadow: 0 1px 2px rgba(16,64,93,0.1), 0 12px 32px -4px rgba(212,160,86,0.4);
+  background-color: #fff;
+  color: var(--color-crimson);
+  border-color: var(--color-crimson);
 }
 
+/* Outline white — on dark sections */
 .btn-outline {
   background-color: transparent;
-  color: var(--color-text-inverse);
-  border: 1.5px solid rgba(245, 241, 234, 0.35);
+  color: #fff;
+  border: 2px solid #fff;
 }
 
 .btn-outline:hover {
-  background-color: rgba(245, 241, 234, 0.1);
-  border-color: rgba(245, 241, 234, 0.6);
-  transform: translateY(-1px);
+  background-color: #fff;
+  color: var(--color-evergreen);
 }
 
+/* Outline dark — on light sections */
 .btn-outline-navy {
   background-color: transparent;
-  color: var(--color-navy-600);
-  border: 1.5px solid var(--color-navy-200);
+  color: var(--color-evergreen);
+  border: 2px solid var(--color-evergreen);
 }
 
 .btn-outline-navy:hover {
-  background-color: var(--color-navy-50);
-  border-color: var(--color-navy-400);
-  transform: translateY(-1px);
+  background-color: var(--color-evergreen);
+  color: #fff;
 }
 
 .btn-lg {
-  padding: 1rem 2.25rem;
-  font-size: 1rem;
+  padding: 1.125rem 2rem;
+  font-size: 0.875rem;
 }
 
 .btn-sm {
-  padding: 0.5rem 1.25rem;
+  padding: 0.75rem 1.25rem;
   font-size: 0.8125rem;
 }
 
 /* ─────────────────────────────────────────────
-   Cards
+   Cards — flat, no shadows on default
    ───────────────────────────────────────────── */
 .card {
   background: #fff;
-  border-radius: 1rem;
-  box-shadow: 0 1px 2px rgba(16,64,93,0.05), 0 8px 24px -4px rgba(16,64,93,0.12), 0 24px 48px -16px rgba(16,64,93,0.08);
-  transition: transform 250ms cubic-bezier(0.16, 1, 0.3, 1),
-              box-shadow 250ms cubic-bezier(0.16, 1, 0.3, 1);
+  border-radius: 0;
   overflow: hidden;
+  transition: transform 300ms cubic-bezier(0.33, 0, 0.19, 1);
 }
 
-.card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 2px 4px rgba(16,64,93,0.06), 0 16px 40px -6px rgba(16,64,93,0.18), 0 40px 80px -20px rgba(16,64,93,0.14);
-}
-
+/* Card glass — remove; treat as flat dark surface */
 .card-glass {
-  background: rgba(255, 255, 255, 0.07);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 1rem;
-  backdrop-filter: blur(20px) saturate(180%);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
-  transition: transform 250ms cubic-bezier(0.16, 1, 0.3, 1),
-              background 250ms cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.card-glass:hover {
-  background: rgba(255, 255, 255, 0.12);
-  transform: translateY(-3px);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 0;
 }
 
 /* ─────────────────────────────────────────────
-   Nav
+   Nav states
    ───────────────────────────────────────────── */
 .nav-transparent {
   background: transparent;
+  border-bottom: 1px solid transparent;
 }
 
-.nav-glass {
-  backdrop-filter: blur(20px) saturate(180%);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
-  background: rgba(10, 31, 46, 0.8);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
-}
-
+/* Solid off-white on scroll */
 .nav-solid {
-  background: var(--color-surface-dark);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  background: var(--color-off-white);
+  border-bottom: 1px solid rgba(35, 46, 44, 0.12);
+}
+
+/* Keep glass as an alias for nav-solid (legacy class) */
+.nav-glass {
+  background: var(--color-off-white);
+  border-bottom: 1px solid rgba(35, 46, 44, 0.12);
 }
 
 /* ─────────────────────────────────────────────
@@ -379,12 +319,12 @@ img, video, svg {
 
 @keyframes kenBurns {
   from { transform: scale(1.0); }
-  to   { transform: scale(1.1); }
+  to   { transform: scale(1.05); }
 }
 
-@keyframes floatUp {
-  0%, 100% { transform: translateY(0); }
-  50%       { transform: translateY(-8px); }
+@keyframes arrowSlide {
+  0%, 100% { transform: translateX(0); }
+  50%       { transform: translateX(4px); }
 }
 
 .animate-fade-in-up {
@@ -396,14 +336,11 @@ img, video, svg {
 }
 
 .animate-ken-burns {
-  animation: kenBurns 18s ease-in-out infinite alternate;
+  animation: kenBurns 20s ease-in-out infinite alternate;
   transform-origin: center center;
 }
 
-.animate-float {
-  animation: floatUp 6s ease-in-out infinite;
-}
-
+/* Delay utilities */
 .delay-100  { animation-delay: 100ms; }
 .delay-200  { animation-delay: 200ms; }
 .delay-300  { animation-delay: 300ms; }
@@ -414,8 +351,7 @@ img, video, svg {
 .delay-800  { animation-delay: 800ms; }
 
 /* ─────────────────────────────────────────────
-   Scroll Reveal (GSAP will override opacity/transform,
-   but we set the initial state via CSS)
+   Scroll Reveal (GSAP overrides these)
    ───────────────────────────────────────────── */
 .reveal {
   opacity: 0;
@@ -427,6 +363,11 @@ img, video, svg {
   transform: translateY(0);
   transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1),
               transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Image clip-path wipe reveal initial state */
+.img-reveal {
+  clip-path: inset(0 0 100% 0);
 }
 
 /* ─────────────────────────────────────────────
@@ -446,29 +387,94 @@ html.lenis body {
 }
 
 /* ─────────────────────────────────────────────
+   Hover utilities (CSS-only, server component safe)
+   ───────────────────────────────────────────── */
+
+/* Back link hover — used on campus detail pages */
+.back-link {
+  color: rgba(255, 255, 255, 0.55);
+  transition: color 150ms ease;
+}
+.back-link:hover {
+  color: #ffffff;
+}
+
+/* Campus giving row hover */
+.giving-row {
+  color: #232e2c;
+  transition: background-color 150ms ease;
+}
+.giving-row:hover {
+  background-color: rgba(35, 46, 44, 0.04);
+}
+
+/* Icon color on info sidebar links */
+.info-link {
+  color: rgba(35, 46, 44, 0.65);
+  transition: color 150ms ease;
+}
+.info-link:hover {
+  color: #232e2c;
+}
+
+/* Footer social icon */
+.footer-social {
+  color: rgba(242, 239, 237, 0.45);
+  border: 1px solid rgba(242, 239, 237, 0.15);
+  transition: color 150ms ease;
+}
+.footer-social:hover {
+  color: #ffffff;
+}
+
+/* ─────────────────────────────────────────────
+   Arrow link with hover animation
+   ───────────────────────────────────────────── */
+.arrow-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  text-decoration: none;
+  transition: color 200ms cubic-bezier(0.33, 0, 0.19, 1);
+}
+
+.arrow-link .arrow {
+  display: inline-block;
+  transition: transform 200ms cubic-bezier(0.33, 0, 0.19, 1);
+}
+
+.arrow-link:hover .arrow {
+  transform: translateX(4px);
+}
+
+/* ─────────────────────────────────────────────
    Form Elements
    ───────────────────────────────────────────── */
 .input-c3 {
   width: 100%;
-  padding: 0.8125rem 1rem;
+  padding: 0.875rem 1rem;
+  min-height: 48px;
   font-family: var(--font-sans);
-  font-size: 1rem;
-  color: var(--color-text-primary);
+  font-size: max(1rem, 16px);
+  color: var(--color-evergreen);
   background: #fff;
-  border: 1.5px solid #d1dfe8;
-  border-radius: 0.5rem;
-  transition: border-color 150ms ease, box-shadow 150ms ease;
+  border: 1.5px solid #c8c3bf;
+  border-radius: 0;
+  transition: border-color 150ms ease;
   outline: none;
   -webkit-appearance: none;
 }
 
 .input-c3:focus {
-  border-color: var(--color-navy-400);
-  box-shadow: 0 0 0 3px rgba(16, 64, 93, 0.1);
+  border-color: var(--color-evergreen);
 }
 
 .input-c3::placeholder {
-  color: var(--color-text-muted);
+  color: #9b9792;
 }
 
 .textarea-c3 {
@@ -477,21 +483,20 @@ html.lenis body {
 }
 
 /* ─────────────────────────────────────────────
-   Utility
+   Prose
    ───────────────────────────────────────────── */
 .text-balance { text-wrap: balance; }
 
 .prose-c3 h2 {
   font-size: clamp(1.25rem, 1.1rem + 0.5vw, 1.625rem);
-  font-weight: 500;
-  color: var(--color-navy-600);
+  font-weight: 700;
+  color: var(--color-evergreen);
   margin-top: 2.5rem;
   margin-bottom: 0.875rem;
-  letter-spacing: -0.01em;
 }
 
 .prose-c3 p {
-  color: var(--color-text-secondary);
+  color: rgba(35, 46, 44, 0.7);
   line-height: 1.65;
   margin-bottom: 1rem;
 }
@@ -502,7 +507,7 @@ html.lenis body {
 }
 
 .prose-c3 li {
-  color: var(--color-text-secondary);
+  color: rgba(35, 46, 44, 0.7);
   line-height: 1.65;
   margin-bottom: 0.375rem;
 }
@@ -510,19 +515,14 @@ html.lenis body {
 /* ─────────────────────────────────────────────
    Mobile Safari Utilities
    ───────────────────────────────────────────── */
-
-/* Hide scrollbar while preserving scroll functionality.
-   Used on horizontal pill rows to avoid a visible scrollbar on desktop. */
 .no-scrollbar {
-  scrollbar-width: none;           /* Firefox */
-  -ms-overflow-style: none;       /* IE/Edge */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
 .no-scrollbar::-webkit-scrollbar {
-  display: none;                   /* Chrome/Safari/iOS */
+  display: none;
 }
 
-/* Safe area padding utilities for notched/Dynamic Island devices.
-   Requires viewport-fit=cover in the viewport meta tag. */
 .pb-safe {
   padding-bottom: env(safe-area-inset-bottom);
 }
@@ -530,18 +530,102 @@ html.lenis body {
   padding-top: env(safe-area-inset-top);
 }
 
-/* iOS Safari: force GPU compositing layer on backdrop-filter elements.
-   Without this, backdrop-filter can flicker on scroll. */
-.nav-glass,
-.card-glass {
-  -webkit-backface-visibility: hidden;
-  backface-visibility: hidden;
-  /* Will-change keeps the layer promoted but is memory-intensive — only
-     use on elements that are persistently composited like the sticky header */
+/* ─────────────────────────────────────────────
+   Section alternating pattern
+   ───────────────────────────────────────────── */
+/* Light section */
+.section-light {
+  background-color: var(--color-off-white);
+  color: var(--color-evergreen);
 }
 
-/* input-c3: explicit 16px minimum prevents iOS Safari zoom-on-focus.
-   iOS zooms in when an input's font-size is below 16px. */
-.input-c3 {
-  font-size: max(1rem, 16px);
+/* Dark section */
+.section-dark {
+  background-color: var(--color-evergreen);
+  color: #fff;
+}
+
+/* Black section */
+.section-black {
+  background-color: var(--color-black);
+  color: #fff;
+}
+
+/* Pure white section */
+.section-white {
+  background-color: #fff;
+  color: var(--color-evergreen);
+}
+
+/* ─────────────────────────────────────────────
+   Section transition accent — 2px crimson rule
+   Rendered as a centered pill rule that appears
+   as a deliberate seam between dark/light sections.
+   ───────────────────────────────────────────── */
+.section-rule {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem 0;
+}
+
+.section-rule::after {
+  content: "";
+  display: block;
+  width: 3rem;
+  height: 2px;
+  background-color: var(--color-crimson);
+  opacity: 0.5;
+}
+
+/* ─────────────────────────────────────────────
+   Give page — equal sibling cards
+   ───────────────────────────────────────────── */
+.give-card {
+  display: flex;
+  flex-direction: column;
+  padding: 2rem;
+}
+
+.give-card .give-card-body {
+  flex: 1;
+}
+
+/* On md+ columns, swap bottom border for right border */
+@media (min-width: 768px) {
+  .give-card {
+    border-bottom: none !important;
+    border-right: 1.5px solid rgba(35, 46, 44, 0.1);
+  }
+  .give-card:last-child {
+    border-right: none;
+  }
+}
+
+/* ─────────────────────────────────────────────
+   Crisis callout — prominent crimson card
+   ───────────────────────────────────────────── */
+.crisis-card {
+  border: 2px solid var(--color-crimson);
+  background-color: rgba(229, 53, 57, 0.04);
+  padding: 1.5rem 2rem;
+}
+
+/* ─────────────────────────────────────────────
+   Counselor cards — stacks on mobile, splits on md
+   ───────────────────────────────────────────── */
+.counselor-card {
+  border-bottom: 1px solid rgba(35, 46, 44, 0.1);
+}
+.counselor-card:last-child {
+  border-bottom: none;
+}
+@media (min-width: 768px) {
+  .counselor-card {
+    border-bottom: none;
+    border-right: 1px solid rgba(35, 46, 44, 0.1);
+  }
+  .counselor-card:last-child {
+    border-right: none;
+  }
 }

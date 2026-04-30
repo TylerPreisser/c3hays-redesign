@@ -39,7 +39,7 @@ export default function AboutPage() {
   return (
     <>
       {/* Hero */}
-      <section className="relative min-h-72 md:min-h-96 flex items-end overflow-hidden">
+      <section className="relative flex items-end overflow-hidden" style={{ minHeight: "56vh" }}>
         <div className="absolute inset-0">
           <Image
             src="/images/congregation.webp"
@@ -50,40 +50,44 @@ export default function AboutPage() {
           />
           <div
             className="absolute inset-0"
+            style={{ background: "rgba(10,10,10,0.58)" }}
+          />
+          <div
+            className="absolute inset-0"
             style={{
               background:
-                "linear-gradient(to top, rgba(10,31,46,0.92) 0%, rgba(10,31,46,0.55) 60%, rgba(10,31,46,0.25) 100%)",
+                "linear-gradient(to top, rgba(10,10,10,0.80) 0%, rgba(10,10,10,0.2) 60%, transparent 100%)",
             }}
           />
         </div>
-        <div className="relative z-10 container-c3 pb-14 pt-32">
-          <p className="overline text-[#d4a056] mb-3">Our Story</p>
+        <div className="relative z-10 container-c3 pb-16 pt-40">
+          <p className="overline mb-4" style={{ color: "rgba(255,255,255,0.55)" }}>Our Story</p>
           <h1 className="display-1 text-white text-balance">About C3</h1>
         </div>
       </section>
 
       {/* Mission */}
-      <section className="section bg-[#fdfcfb]">
+      <section className="section" style={{ backgroundColor: "#f2efed" }}>
         <div className="container-c3">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
             <div>
-              <p className="overline text-[#10405d]/60 mb-4">Our Mission</p>
-              <h2 className="display-2 text-[#0e1b26] mb-6 text-balance">
+              <p className="overline mb-4" style={{ color: "rgba(35,46,44,0.45)" }}>Our Mission</p>
+              <h2 className="display-2 mb-6 text-balance" style={{ color: "#232e2c" }}>
                 We exist to{" "}
-                <span className="text-[#10405d]">Meet.</span>{" "}
-                <span className="text-[#10405d]">Grow.</span>{" "}
-                <span className="text-[#10405d]">Serve.</span>
+                <em className="not-italic" style={{ color: "#e53539" }}>Meet.</em>{" "}
+                <em className="not-italic" style={{ color: "#e53539" }}>Grow.</em>{" "}
+                <em className="not-italic" style={{ color: "#e53539" }}>Serve.</em>
               </h2>
-              <p className="body-lg text-[#3d5566] mb-5">
+              <p className="body-lg mb-5" style={{ color: "rgba(35,46,44,0.7)" }}>
                 {site.mission}
               </p>
-              <p className="body-base text-[#3d5566] mb-5">
+              <p className="body-base mb-5" style={{ color: "rgba(35,46,44,0.65)" }}>
                 Celebration Community Church began with a simple conviction: that
                 the local church matters. That when people gather in the name of
                 Jesus, lives change. Families are restored. Communities are
                 transformed.
               </p>
-              <p className="body-base text-[#3d5566] mb-8">
+              <p className="body-base mb-10" style={{ color: "rgba(35,46,44,0.65)" }}>
                 From our roots in Hays, Kansas, we&apos;ve grown into a multi-campus
                 church family that spans northwest Kansas — with one vision, one
                 mission, and one King.
@@ -92,7 +96,7 @@ export default function AboutPage() {
                 What We Believe
               </Link>
             </div>
-            <div className="relative h-80 lg:h-[480px] rounded-2xl overflow-hidden">
+            <div className="relative overflow-hidden" style={{ height: 480, borderRadius: 0 }}>
               <Image
                 src="/images/gather.webp"
                 alt="Church gathering"
@@ -105,22 +109,32 @@ export default function AboutPage() {
       </section>
 
       {/* Values */}
-      <section className="section bg-[#f7f4ef]">
+      <section className="section" style={{ backgroundColor: "#232e2c" }}>
         <div className="container-c3">
           <div className="max-w-xl mb-14">
-            <p className="overline text-[#10405d]/60 mb-3">What Drives Us</p>
-            <h2 className="display-2 text-[#0e1b26]">Our Values</h2>
+            <p className="overline mb-4" style={{ color: "rgba(255,255,255,0.35)" }}>What Drives Us</p>
+            <h2 className="display-2 text-white">Our Values</h2>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {/* Values grid — outline container, inner cell borders */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"
+            style={{ border: "1px solid rgba(255,255,255,0.08)" }}>
             {values.map((v, i) => (
-              <div key={i} className="card p-7">
-                <div className="w-8 h-8 rounded-lg bg-[#10405d]/8 flex items-center justify-center mb-5">
-                  <span className="text-sm font-medium text-[#10405d]">
-                    {String(i + 1).padStart(2, "0")}
-                  </span>
-                </div>
-                <h3 className="font-medium text-[#0e1b26] mb-2">{v.title}</h3>
-                <p className="text-sm text-[#3d5566] leading-relaxed">{v.body}</p>
+              <div
+                key={i}
+                className="p-8"
+                style={{
+                  borderBottom: i < values.length - 3 ? "1px solid rgba(255,255,255,0.08)" : undefined,
+                  borderRight: "1px solid rgba(255,255,255,0.08)",
+                }}
+              >
+                <span
+                  className="block text-xs font-bold uppercase tracking-widest mb-5"
+                  style={{ color: "#e53539" }}
+                >
+                  {String(i + 1).padStart(2, "0")}
+                </span>
+                <h3 className="heading-3 text-white mb-3">{v.title}</h3>
+                <p className="text-sm leading-relaxed" style={{ color: "rgba(255,255,255,0.55)" }}>{v.body}</p>
               </div>
             ))}
           </div>
@@ -128,18 +142,18 @@ export default function AboutPage() {
       </section>
 
       {/* CTA */}
-      <section className="section bg-[#0a1f2e]">
+      <section className="section" style={{ backgroundColor: "#f2efed" }}>
         <div className="container-c3 text-center max-w-2xl">
-          <p className="overline text-[#d4a056] mb-4">Come As You Are</p>
-          <h2 className="display-2 text-white mb-5">Ready to visit?</h2>
-          <p className="body-lg text-white/65 mb-8">
+          <p className="overline mb-4" style={{ color: "rgba(35,46,44,0.45)" }}>Come As You Are</p>
+          <h2 className="display-2 mb-5" style={{ color: "#232e2c" }}>Ready to visit?</h2>
+          <p className="body-lg mb-10" style={{ color: "rgba(35,46,44,0.65)" }}>
             We&apos;d love to meet you. No pressure, no dress code — just come.
           </p>
-          <div className="flex flex-wrap gap-3 justify-center">
-            <Link href="/visit/" className="btn btn-gold btn-lg">
+          <div className="flex flex-wrap gap-4 justify-center">
+            <Link href="/visit/" className="btn btn-primary btn-lg">
               Plan Your Visit
             </Link>
-            <Link href="/connect/" className="btn btn-outline btn-lg">
+            <Link href="/connect/" className="btn btn-outline-navy btn-lg">
               Fill Out a Connect Card
             </Link>
           </div>
