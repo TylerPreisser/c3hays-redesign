@@ -96,31 +96,39 @@ export default function StayConnected() {
         </div>
 
         {/*
-          Mobile: horizontal-scroll carousel with snap points
-          Desktop (lg+): 4-up grid with hairline separators
+          Mobile (< lg): horizontal-scroll carousel with snap points + per-tile borders
+          Desktop (lg+): clean 4-up grid, single outer border, internal hairlines via border-right
         */}
         <div
-          className="connect-grid lg:grid lg:grid-cols-4 lg:gap-0 flex lg:flex-none overflow-x-auto lg:overflow-visible -mx-6 lg:mx-0 px-6 lg:px-0 snap-x snap-mandatory lg:snap-none gap-6 lg:gap-0 no-scrollbar"
-          style={{ border: "none" }}
+          className="
+            connect-grid
+            flex overflow-x-auto snap-x snap-mandatory gap-6 -mx-6 px-6 no-scrollbar
+            lg:grid lg:grid-cols-4 lg:gap-0 lg:overflow-visible lg:mx-0 lg:px-0
+            lg:border lg:border-solid
+          "
+          style={{ borderColor: "rgba(27,28,28,0.1)" }}
         >
-          {connectItems.map((item, i) => {
+          {connectItems.map((item) => {
             const Icon = item.icon;
-            const isLastInRow = i === connectItems.length - 1;
             return (
               <a
                 key={item.title}
                 href={item.href}
                 target={item.href.startsWith("http") ? "_blank" : undefined}
                 rel={item.href.startsWith("http") ? "noopener noreferrer" : undefined}
-                className="connect-item group block transition-colors duration-200 shrink-0 lg:shrink snap-start"
+                className="
+                  connect-item group block transition-colors duration-200
+                  shrink-0 lg:shrink-1 snap-start
+                  w-[280px] lg:w-auto
+                  border border-solid lg:border-0
+                  lg:border-r lg:last:border-r-0
+                "
                 style={{
                   padding: "3.5rem 2rem",
                   minHeight: "420px",
-                  width: "min(85vw, 320px)",
                   display: "flex",
                   flexDirection: "column",
-                  border: "1px solid rgba(27,28,28,0.1)",
-                  borderRight: isLastInRow ? "1px solid rgba(27,28,28,0.1)" : undefined,
+                  borderColor: "rgba(27,28,28,0.1)",
                 }}
               >
                 {/* Icon */}

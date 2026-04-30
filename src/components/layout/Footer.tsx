@@ -44,7 +44,6 @@ export default function Footer() {
 
           {/* Col 2 — Explore nav links */}
           <div>
-            <p className="overline mb-5" style={{ color: "rgba(255,255,255,0.35)" }}>Explore</p>
             <ul className="flex flex-col gap-2.5">
               {[
                 { label: "About", href: "/about/" },
@@ -84,8 +83,6 @@ export default function Footer() {
 
           {/* Col 3 — Worship with Us (both campuses) */}
           <div>
-            <p className="overline mb-5" style={{ color: "rgba(255,255,255,0.35)" }}>Worship With Us</p>
-
             {/* Hays */}
             <div className="mb-5">
               <p className="text-sm font-bold mb-1" style={{ color: "rgba(255,255,255,0.85)" }}>
@@ -120,7 +117,6 @@ export default function Footer() {
 
           {/* Col 4 — Stay Close: newsletter + social */}
           <div>
-            <p className="overline mb-5" style={{ color: "rgba(255,255,255,0.35)" }}>Stay Close</p>
             <p className="text-sm mb-5" style={{ color: "rgba(255,255,255,0.70)", lineHeight: 1.65 }}>
               Sermon notes, announcements, and what&apos;s happening at C3 — in your inbox.
             </p>
