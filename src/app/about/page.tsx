@@ -5,7 +5,7 @@ import { site } from "@/data/site";
 
 export const metadata: Metadata = {
   title: "About",
-  description: `Learn about the story, mission, and values of Celebration Community Church — ${site.mission}`,
+  description: "Learn about the story, values, and people of Celebration Community Church — a church family in western Kansas.",
 };
 
 const values = [
@@ -62,32 +62,35 @@ export default function AboutPage() {
         </div>
         <div className="relative z-10 container-c3 pb-16 pt-40">
           <p className="overline mb-4" style={{ color: "rgba(255,255,255,0.55)" }}>Our Story</p>
-          <h1 className="display-1 text-white text-balance">About C3</h1>
+          <h1 className="display-1 text-white text-balance">Who we are.</h1>
+          <p className="body-lg mt-4 max-w-lg" style={{ color: "rgba(255,255,255,0.65)" }}>
+            A people on a mission — to meet Jesus, grow with Him, and serve our community.
+          </p>
         </div>
       </section>
 
       {/* Mission */}
-      <section className="section" style={{ backgroundColor: "#f2efed" }}>
+      <section className="section" style={{ backgroundColor: "#ffffff" }}>
         <div className="container-c3">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
             <div>
-              <p className="overline mb-4" style={{ color: "rgba(35,46,44,0.45)" }}>Our Mission</p>
-              <h2 className="display-2 mb-6 text-balance" style={{ color: "#232e2c" }}>
+              <p className="overline mb-4" style={{ color: "rgba(27,28,28,0.4)" }}>Our Mission</p>
+              <h2 className="display-2 mb-6 text-balance" style={{ color: "#1b1c1c" }}>
                 We exist to{" "}
-                <em className="not-italic" style={{ color: "#10405D" }}>Meet.</em>{" "}
-                <em className="not-italic" style={{ color: "#10405D" }}>Grow.</em>{" "}
-                <em className="not-italic" style={{ color: "#10405D" }}>Serve.</em>
+                <em className="not-italic" style={{ color: "#1cc3af" }}>Meet.</em>{" "}
+                <em className="not-italic" style={{ color: "#1cc3af" }}>Grow.</em>{" "}
+                <em className="not-italic" style={{ color: "#1cc3af" }}>Serve.</em>
               </h2>
-              <p className="body-lg mb-5" style={{ color: "rgba(35,46,44,0.7)" }}>
+              <p className="body-lg mb-5" style={{ color: "rgba(27,28,28,0.70)" }}>
                 {site.mission}
               </p>
-              <p className="body-base mb-5" style={{ color: "rgba(35,46,44,0.65)" }}>
+              <p className="body-base mb-5" style={{ color: "rgba(27,28,28,0.65)" }}>
                 Celebration Community Church began with a simple conviction: that
                 the local church matters. That when people gather in the name of
                 Jesus, lives change. Families are restored. Communities are
                 transformed.
               </p>
-              <p className="body-base mb-10" style={{ color: "rgba(35,46,44,0.65)" }}>
+              <p className="body-base mb-10" style={{ color: "rgba(27,28,28,0.65)" }}>
                 From our roots in Hays, Kansas, we&apos;ve grown into a multi-campus
                 church family that spans northwest Kansas — with one vision, one
                 mission, and one King.
@@ -109,7 +112,7 @@ export default function AboutPage() {
       </section>
 
       {/* Values */}
-      <section className="section" style={{ backgroundColor: "#232e2c" }}>
+      <section className="section" style={{ backgroundColor: "#1b1c1c" }}>
         <div className="container-c3">
           <div className="max-w-xl mb-14">
             <p className="overline mb-4" style={{ color: "rgba(255,255,255,0.35)" }}>What Drives Us</p>
@@ -129,7 +132,7 @@ export default function AboutPage() {
               >
                 <span
                   className="block text-xs font-bold uppercase tracking-widest mb-5"
-                  style={{ color: "#10405D" }}
+                  style={{ color: "#1cc3af" }}
                 >
                   {String(i + 1).padStart(2, "0")}
                 </span>
@@ -142,11 +145,11 @@ export default function AboutPage() {
       </section>
 
       {/* CTA */}
-      <section className="section" style={{ backgroundColor: "#f2efed" }}>
+      <section className="section" style={{ backgroundColor: "#ffffff" }}>
         <div className="container-c3 text-center max-w-2xl">
-          <p className="overline mb-4" style={{ color: "rgba(35,46,44,0.45)" }}>Come As You Are</p>
-          <h2 className="display-2 mb-5" style={{ color: "#232e2c" }}>Ready to visit?</h2>
-          <p className="body-lg mb-10" style={{ color: "rgba(35,46,44,0.65)" }}>
+          <p className="overline mb-4" style={{ color: "rgba(27,28,28,0.4)" }}>Come As You Are</p>
+          <h2 className="display-2 mb-5" style={{ color: "#1b1c1c" }}>Ready to visit?</h2>
+          <p className="body-lg mb-10" style={{ color: "rgba(27,28,28,0.65)" }}>
             We&apos;d love to meet you. No pressure, no dress code — just come.
           </p>
           <div className="flex flex-wrap gap-4 justify-center">

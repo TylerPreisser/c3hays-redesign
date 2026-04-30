@@ -6,6 +6,11 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 gsap.registerPlugin(ScrollTrigger);
 
+/**
+ * MissionBlock — the ONE place on the site the mission statement lives.
+ * "We exist to meet Him, grow in Him, and serve through Him."
+ * Do NOT add this sentence anywhere else in the codebase.
+ */
 export default function MissionBlock() {
   const sectionRef = useRef<HTMLElement>(null);
 
@@ -32,12 +37,12 @@ export default function MissionBlock() {
   }, []);
 
   return (
-    /* Full-width evergreen — centered massive italic headline */
+    /* Full-width ink-dark — centered massive headline */
     <section
       ref={sectionRef}
       className="flex items-center justify-center text-center"
       style={{
-        backgroundColor: "#232e2c",
+        backgroundColor: "#1b1c1c",
         minHeight: "60vh",
         paddingTop: "8rem",
         paddingBottom: "8rem",
@@ -58,14 +63,14 @@ export default function MissionBlock() {
             }}
           >
             We exist to{" "}
-            <em className="not-italic" style={{ color: "#10405D" }}>meet</em>{" "}
+            <em className="not-italic" style={{ color: "#1cc3af" }}>meet</em>{" "}
             Him, grow in Him, and{" "}
-            <em className="not-italic" style={{ color: "#10405D" }}>serve</em>{" "}
+            <em className="not-italic" style={{ color: "#1cc3af" }}>serve</em>{" "}
             through Him.
           </h2>
           <div
             className="mt-10 w-12 mx-auto"
-            style={{ height: 2, backgroundColor: "#10405D" }}
+            style={{ height: 2, backgroundColor: "#1cc3af" }}
           />
         </div>
       </div>

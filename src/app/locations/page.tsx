@@ -42,7 +42,7 @@ export default function LocationsPage() {
       </section>
 
       {/* Campus cards — 2-up full-bleed */}
-      <section className="section" style={{ backgroundColor: "#f2efed" }}>
+      <section className="section" style={{ backgroundColor: "#ffffff" }}>
         <div className="container-c3">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {locations.map((loc) => (

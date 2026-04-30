@@ -78,7 +78,7 @@ export default function MessagesPage() {
         </div>
         <div className="relative z-10 container-c3 pb-16 pt-40">
           <p className="overline mb-4" style={{ color: "rgba(255,255,255,0.55)" }}>Sermons</p>
-          <h1 className="display-1 text-white">Watch &amp; Listen Anytime</h1>
+          <h1 className="display-1 text-white">Watch &amp; Listen</h1>
           <p className="body-lg mt-4 max-w-lg" style={{ color: "rgba(255,255,255,0.65)" }}>
             Miss a Sunday? Browse our full sermon archive on Vimeo, or tune
             in live this weekend.
@@ -87,7 +87,7 @@ export default function MessagesPage() {
       </section>
 
       {/* Live times banner */}
-      <div style={{ backgroundColor: "#232e2c" }}>
+      <div style={{ backgroundColor: "#1b1c1c" }}>
         <div className="container-c3 py-4 flex flex-wrap items-center justify-between gap-4">
           <div className="flex flex-wrap items-center gap-4 text-sm" style={{ color: "rgba(255,255,255,0.65)" }}>
             <span className="font-semibold text-white">Join us live:</span>
@@ -101,12 +101,12 @@ export default function MessagesPage() {
       </div>
 
       {/* Messages grid */}
-      <section className="section" style={{ backgroundColor: "#f2efed" }}>
+      <section className="section" style={{ backgroundColor: "#ffffff" }}>
         <div className="container-c3">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5 mb-14">
             <div>
-              <p className="overline mb-2" style={{ color: "rgba(35,46,44,0.45)" }}>Archive</p>
-              <h2 className="heading-1" style={{ color: "#232e2c" }}>Recent Messages</h2>
+              <p className="overline mb-2" style={{ color: "rgba(27,28,28,0.4)" }}>Archive</p>
+              <h2 className="heading-1" style={{ color: "#1b1c1c" }}>Recent Messages</h2>
             </div>
             <div className="flex gap-3">
               <a
@@ -133,13 +133,16 @@ export default function MessagesPage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {recentMessages.map((msg) => (
               <div key={msg.title} className="group cursor-pointer">
-                {/* Thumbnail — sharp corners, clip-path hover */}
-                <div className="relative overflow-hidden mb-5" style={{ height: 200 }}>
+                {/* Thumbnail — 4:5 portrait, sharp corners */}
+                <div
+                  className="relative overflow-hidden mb-5"
+                  style={{ aspectRatio: "4/5" }}
+                >
                   <Image
                     src={msg.image}
                     alt={msg.title}
                     fill
-                    className="object-cover transition-transform duration-600 ease-out group-hover:scale-[1.04]"
+                    className="object-cover transition-transform duration-500 ease-out group-hover:scale-[1.04]"
                   />
                   <div
                     className="absolute inset-0 transition-colors duration-300"
@@ -158,17 +161,17 @@ export default function MessagesPage() {
                   <div className="absolute top-3 left-3">
                     <span
                       className="px-2.5 py-1 text-xs font-bold uppercase tracking-wider"
-                      style={{ background: "#10405D", color: "#fff" }}
+                      style={{ background: "#1cc3af", color: "#fff" }}
                     >
                       {msg.series}
                     </span>
                   </div>
                 </div>
                 {/* Info */}
-                <h3 className="font-bold mb-1.5 leading-snug" style={{ color: "#232e2c", fontSize: "1rem" }}>
+                <h3 className="font-bold mb-1.5 leading-snug" style={{ color: "#1b1c1c", fontSize: "1rem" }}>
                   {msg.title}
                 </h3>
-                <p className="text-sm" style={{ color: "rgba(35,46,44,0.5)" }}>
+                <p className="text-sm" style={{ color: "rgba(27,28,28,0.5)" }}>
                   {msg.speaker} · {msg.date}
                 </p>
               </div>

@@ -44,21 +44,21 @@ export default function ColbyCampusPage() {
       </section>
 
       {/* Details */}
-      <section className="section" style={{ backgroundColor: "#f2efed" }}>
+      <section className="section" style={{ backgroundColor: "#ffffff" }}>
         <div className="container-c3">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
             {/* Main */}
             <div className="lg:col-span-2">
-              <h2 className="heading-1 mb-5" style={{ color: "#232e2c" }}>
+              <h2 className="heading-1 mb-5" style={{ color: "#1b1c1c" }}>
                 Northwest Kansas, welcome home.
               </h2>
-              <p className="body-lg mb-5" style={{ color: "rgba(35,46,44,0.65)" }}>
+              <p className="body-lg mb-5" style={{ color: "rgba(27,28,28,0.65)" }}>
                 The Colby campus brings the same heart, the same vision, and
                 the same Jesus-centered community that defines C3 — to
                 northwest Kansas. One service on Sunday morning, with
                 everything you&apos;d expect from a full C3 experience.
               </p>
-              <p className="body-base mb-10" style={{ color: "rgba(35,46,44,0.55)" }}>
+              <p className="body-base mb-10" style={{ color: "rgba(27,28,28,0.55)" }}>
                 Kids programming runs during Sunday service. We&apos;d love to see you.
               </p>
               <Link href="/visit/" className="btn btn-primary btn-lg">
@@ -68,26 +68,26 @@ export default function ColbyCampusPage() {
 
             {/* Sidebar */}
             <div className="flex flex-col gap-4">
-              <div className="p-7" style={{ backgroundColor: "#fff" }}>
-                <h3 className="font-bold text-xs uppercase tracking-widest mb-5" style={{ color: "#232e2c" }}>
+              <div className="p-7" style={{ backgroundColor: "#f6f6f6" }}>
+                <h3 className="font-bold text-xs uppercase tracking-widest mb-5" style={{ color: "#1b1c1c" }}>
                   Service Times
                 </h3>
                 <div className="flex items-start gap-3">
-                  <Clock size={14} style={{ color: "#10405D", marginTop: 2 }} className="shrink-0" />
-                  <div className="text-sm" style={{ color: "rgba(35,46,44,0.7)" }}>
-                    <p className="font-semibold" style={{ color: "#232e2c" }}>Sunday</p>
+                  <Clock size={14} style={{ color: "#1cc3af", marginTop: 2 }} className="shrink-0" />
+                  <div className="text-sm" style={{ color: "rgba(27,28,28,0.70)" }}>
+                    <p className="font-semibold" style={{ color: "#1b1c1c" }}>Sunday</p>
                     <p>10:00 AM</p>
                   </div>
                 </div>
               </div>
 
-              <div className="p-7" style={{ backgroundColor: "#fff" }}>
-                <h3 className="font-bold text-xs uppercase tracking-widest mb-5" style={{ color: "#232e2c" }}>
+              <div className="p-7" style={{ backgroundColor: "#f6f6f6" }}>
+                <h3 className="font-bold text-xs uppercase tracking-widest mb-5" style={{ color: "#1b1c1c" }}>
                   Location
                 </h3>
                 <div className="flex items-start gap-3 mb-5">
-                  <MapPin size={14} style={{ color: "#10405D", marginTop: 2 }} className="shrink-0" />
-                  <address className="not-italic text-sm" style={{ color: "rgba(35,46,44,0.65)" }}>
+                  <MapPin size={14} style={{ color: "#1cc3af", marginTop: 2 }} className="shrink-0" />
+                  <address className="not-italic text-sm" style={{ color: "rgba(27,28,28,0.65)" }}>
                     1923 S Range
                     <br />
                     Colby, KS 67701
@@ -109,7 +109,7 @@ export default function ColbyCampusPage() {
       </section>
 
       {/* Map placeholder */}
-      <section style={{ backgroundColor: "#232e2c" }}>
+      <section style={{ backgroundColor: "#1b1c1c" }}>
         <div className="container-c3 py-8">
           <div
             className="flex items-center justify-center"

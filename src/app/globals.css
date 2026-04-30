@@ -1,28 +1,33 @@
 @import "tailwindcss";
 
 /* ─────────────────────────────────────────────
-   C3 Design System — CotM-inspired palette
+   C3 Design System — B&W+Teal editorial palette
+   Extracted from celebratejesus.org brand CSS
    ───────────────────────────────────────────── */
 @theme {
   /* ── Brand Colors ─────────────────────────── */
-  --color-crimson:    #e53539;   /* defined but NOT used as primary accent */
-  --color-navy:       #10405D;   /* C3 brand navy — PRIMARY accent */
-  --color-navy-hover: #0a2d44;   /* darker navy for hover states */
-  --color-ink-deep:   #0a1f2e;   /* sophisticated near-black-navy for dark sections */
-  --color-sunset:     #ed9d79;
-  --color-sky:        #18aecb;
-  --color-seafoam:    #60c0af;
-  --color-gold:       #d5a56b;
-  --color-evergreen:  #232e2c;
+  --color-ink:        #1b1c1c;   /* near-black — primary text + dark sections */
+  --color-ink-soft:   #2a2929;   /* secondary dark surface */
+  --color-bone:       #ffffff;   /* white — primary background */
+  --color-mist:       #f6f6f6;   /* off-white surface */
+  --color-haze:       #f8f8f8;   /* lightest tint */
+  --color-rule:       #cccccc;   /* divider line */
+  --color-rule-soft:  #c5c5c5;   /* lighter divider */
+  --color-mute:       #494a4a;   /* muted text */
+
+  /* ── TEAL — the ONLY chromatic accent ────── */
+  --color-teal:       #1cc3af;   /* PRIMARY ACCENT */
+  --color-teal-soft:  #4acfbf;   /* hover/lighter teal */
+  --color-teal-deep:  #179c8c;   /* pressed/darker teal */
+
+  /* ── Legacy fallbacks (do not use for new code) */
   --color-black:      #0a0a0a;
-  --color-off-white:  #f2efed;
   --color-white:      #ffffff;
-  --color-gray:       #dadada;
 
   /* ── Semantic Tokens ─────────────────────── */
-  --color-accent:     #10405D;   /* alias — primary accent = navy */
-  --color-bg:         #f2efed;
-  --color-text:       #232e2c;
+  --color-accent:     #1cc3af;   /* alias — primary accent = teal */
+  --color-bg:         #ffffff;
+  --color-text:       #1b1c1c;
 
   /* ── Typography ──────────────────────────── */
   --font-sans:        var(--font-hanken), "Hanken Grotesk", "Helvetica Neue", Helvetica, Arial, sans-serif;
@@ -56,7 +61,7 @@ body {
   font-size: 1.125rem;
   line-height: 1.55;
   color: var(--color-text);
-  background-color: var(--color-off-white);
+  background-color: var(--color-bone);
   overflow-x: hidden;
   -webkit-tap-highlight-color: transparent;
 }
@@ -72,7 +77,7 @@ img, video, svg {
 }
 
 :focus-visible {
-  outline: 2px solid var(--color-navy);
+  outline: 2px solid var(--color-teal);
   outline-offset: 3px;
 }
 
@@ -210,30 +215,30 @@ img, video, svg {
   text-transform: uppercase;
 }
 
-/* Primary — navy fill → white hover */
+/* Primary — teal fill */
 .btn-primary {
-  background-color: var(--color-navy);
+  background-color: var(--color-teal);
   color: #fff;
-  border-color: var(--color-navy);
+  border-color: var(--color-teal);
 }
 
 .btn-primary:hover {
-  background-color: var(--color-navy-hover);
+  background-color: var(--color-teal-deep);
   color: #fff;
-  border-color: var(--color-navy-hover);
+  border-color: var(--color-teal-deep);
 }
 
-/* Gold — for Give/donate emphasis (also navy for brand consistency) */
+/* Gold alias → teal for brand consistency */
 .btn-gold {
-  background-color: var(--color-navy);
+  background-color: var(--color-teal);
   color: #fff;
-  border-color: var(--color-navy);
+  border-color: var(--color-teal);
 }
 
 .btn-gold:hover {
-  background-color: var(--color-navy-hover);
+  background-color: var(--color-teal-deep);
   color: #fff;
-  border-color: var(--color-navy-hover);
+  border-color: var(--color-teal-deep);
 }
 
 /* Outline white — on dark sections */
@@ -245,18 +250,30 @@ img, video, svg {
 
 .btn-outline:hover {
   background-color: #fff;
-  color: var(--color-evergreen);
+  color: var(--color-ink);
 }
 
 /* Outline dark — on light sections */
+.btn-outline-ink {
+  background-color: transparent;
+  color: var(--color-ink);
+  border: 2px solid var(--color-ink);
+}
+
+.btn-outline-ink:hover {
+  background-color: var(--color-ink);
+  color: #fff;
+}
+
+/* Legacy alias — keep so existing page code doesn't break */
 .btn-outline-navy {
   background-color: transparent;
-  color: var(--color-evergreen);
-  border: 2px solid var(--color-evergreen);
+  color: var(--color-ink);
+  border: 2px solid var(--color-ink);
 }
 
 .btn-outline-navy:hover {
-  background-color: var(--color-evergreen);
+  background-color: var(--color-ink);
   color: #fff;
 }
 
@@ -280,7 +297,7 @@ img, video, svg {
   transition: transform 300ms cubic-bezier(0.33, 0, 0.19, 1);
 }
 
-/* Card glass — remove; treat as flat dark surface */
+/* Card glass — flat dark surface */
 .card-glass {
   background: rgba(255, 255, 255, 0.08);
   border: 1px solid rgba(255, 255, 255, 0.15);
@@ -295,16 +312,15 @@ img, video, svg {
   border-bottom: 1px solid transparent;
 }
 
-/* Solid off-white on scroll */
+/* Solid white on scroll */
 .nav-solid {
-  background: var(--color-off-white);
-  border-bottom: 1px solid rgba(35, 46, 44, 0.12);
+  background: var(--color-bone);
+  border-bottom: 1px solid rgba(27, 28, 28, 0.12);
 }
 
-/* Keep glass as an alias for nav-solid (legacy class) */
 .nav-glass {
-  background: var(--color-off-white);
-  border-bottom: 1px solid rgba(35, 46, 44, 0.12);
+  background: var(--color-bone);
+  border-bottom: 1px solid rgba(27, 28, 28, 0.12);
 }
 
 /* ─────────────────────────────────────────────
@@ -330,6 +346,11 @@ img, video, svg {
   50%       { transform: translateX(4px); }
 }
 
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%       { opacity: 0.6; transform: scale(0.85); }
+}
+
 .animate-fade-in-up {
   animation: fadeInUp 0.9s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
@@ -341,6 +362,10 @@ img, video, svg {
 .animate-ken-burns {
   animation: kenBurns 20s ease-in-out infinite alternate;
   transform-origin: center center;
+}
+
+.animate-pulse-dot {
+  animation: pulse-dot 1.5s ease-in-out infinite;
 }
 
 /* Delay utilities */
@@ -404,30 +429,32 @@ html.lenis body {
 
 /* Campus giving row hover */
 .giving-row {
-  color: #232e2c;
+  color: var(--color-ink);
   transition: background-color 150ms ease;
 }
 .giving-row:hover {
-  background-color: rgba(35, 46, 44, 0.04);
+  background-color: rgba(27, 28, 28, 0.04);
 }
 
 /* Icon color on info sidebar links */
 .info-link {
-  color: rgba(35, 46, 44, 0.65);
+  color: rgba(27, 28, 28, 0.65);
   transition: color 150ms ease;
 }
 .info-link:hover {
-  color: #232e2c;
+  color: var(--color-ink);
 }
 
 /* Footer social icon */
 .footer-social {
-  color: rgba(242, 239, 237, 0.45);
-  border: 1px solid rgba(242, 239, 237, 0.15);
-  transition: color 150ms ease;
+  color: rgba(255, 255, 255, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  transition: background-color 150ms ease, color 150ms ease;
 }
 .footer-social:hover {
-  color: #ffffff;
+  background-color: var(--color-teal);
+  color: var(--color-ink);
+  border-color: var(--color-teal);
 }
 
 /* ─────────────────────────────────────────────
@@ -463,9 +490,10 @@ html.lenis body {
   min-height: 48px;
   font-family: var(--font-sans);
   font-size: max(1rem, 16px);
-  color: var(--color-evergreen);
+  color: var(--color-ink);
   background: #fff;
-  border: 1.5px solid #c8c3bf;
+  border: none;
+  border-bottom: 1.5px solid rgba(27, 28, 28, 0.18);
   border-radius: 0;
   transition: border-color 150ms ease;
   outline: none;
@@ -473,11 +501,12 @@ html.lenis body {
 }
 
 .input-c3:focus {
-  border-color: var(--color-evergreen);
+  border-bottom-color: var(--color-teal);
+  border-bottom-width: 2px;
 }
 
 .input-c3::placeholder {
-  color: #9b9792;
+  color: rgba(27, 28, 28, 0.35);
 }
 
 .textarea-c3 {
@@ -493,13 +522,13 @@ html.lenis body {
 .prose-c3 h2 {
   font-size: clamp(1.25rem, 1.1rem + 0.5vw, 1.625rem);
   font-weight: 700;
-  color: var(--color-evergreen);
+  color: var(--color-ink);
   margin-top: 2.5rem;
   margin-bottom: 0.875rem;
 }
 
 .prose-c3 p {
-  color: rgba(35, 46, 44, 0.7);
+  color: rgba(27, 28, 28, 0.7);
   line-height: 1.65;
   margin-bottom: 1rem;
 }
@@ -510,7 +539,7 @@ html.lenis body {
 }
 
 .prose-c3 li {
-  color: rgba(35, 46, 44, 0.7);
+  color: rgba(27, 28, 28, 0.7);
   line-height: 1.65;
   margin-bottom: 0.375rem;
 }
@@ -536,34 +565,38 @@ html.lenis body {
 /* ─────────────────────────────────────────────
    Section alternating pattern
    ───────────────────────────────────────────── */
-/* Light section */
+/* Light section — pure white */
 .section-light {
-  background-color: var(--color-off-white);
-  color: var(--color-evergreen);
+  background-color: var(--color-bone);
+  color: var(--color-ink);
 }
 
-/* Dark section */
+/* Mist section — off-white */
+.section-mist {
+  background-color: var(--color-mist);
+  color: var(--color-ink);
+}
+
+/* Dark section — near-black */
 .section-dark {
-  background-color: var(--color-evergreen);
+  background-color: var(--color-ink);
   color: #fff;
 }
 
 /* Black section */
 .section-black {
-  background-color: var(--color-black);
+  background-color: #0a0a0a;
   color: #fff;
 }
 
 /* Pure white section */
 .section-white {
   background-color: #fff;
-  color: var(--color-evergreen);
+  color: var(--color-ink);
 }
 
 /* ─────────────────────────────────────────────
-   Section transition accent — 2px navy rule
-   Centered pill rule that reads as a deliberate
-   seam between dark/light sections.
+   Section transition accent — 2px teal rule
    ───────────────────────────────────────────── */
 .section-rule {
   display: flex;
@@ -577,8 +610,8 @@ html.lenis body {
   display: block;
   width: 3rem;
   height: 2px;
-  background-color: var(--color-navy);
-  opacity: 0.5;
+  background-color: var(--color-teal);
+  opacity: 0.6;
 }
 
 /* ─────────────────────────────────────────────
@@ -598,7 +631,7 @@ html.lenis body {
 @media (min-width: 768px) {
   .give-card {
     border-bottom: none !important;
-    border-right: 1.5px solid rgba(35, 46, 44, 0.1);
+    border-right: 1.5px solid rgba(27, 28, 28, 0.1);
   }
   .give-card:last-child {
     border-right: none;
@@ -606,19 +639,10 @@ html.lenis body {
 }
 
 /* ─────────────────────────────────────────────
-   Crisis callout — prominent navy card
-   ───────────────────────────────────────────── */
-.crisis-card {
-  border: 2px solid var(--color-navy);
-  background-color: rgba(16, 64, 93, 0.04);
-  padding: 1.5rem 2rem;
-}
-
-/* ─────────────────────────────────────────────
    Counselor cards — stacks on mobile, splits on md
    ───────────────────────────────────────────── */
 .counselor-card {
-  border-bottom: 1px solid rgba(35, 46, 44, 0.1);
+  border-bottom: 1px solid rgba(27, 28, 28, 0.1);
 }
 .counselor-card:last-child {
   border-bottom: none;
@@ -626,9 +650,29 @@ html.lenis body {
 @media (min-width: 768px) {
   .counselor-card {
     border-bottom: none;
-    border-right: 1px solid rgba(35, 46, 44, 0.1);
+    border-right: 1px solid rgba(27, 28, 28, 0.1);
   }
   .counselor-card:last-child {
     border-right: none;
   }
+}
+
+/* ─────────────────────────────────────────────
+   Nav underline animation — desktop nav links
+   ───────────────────────────────────────────── */
+.nav-link-underline {
+  position: relative;
+}
+.nav-link-underline::after {
+  content: "";
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background-color: var(--color-teal);
+  transition: width 220ms cubic-bezier(0.33, 0, 0.19, 1);
+}
+.nav-link-underline:hover::after {
+  width: 100%;
 }

@@ -42,10 +42,10 @@ export default function BeliefsPage() {
       </section>
 
       {/* Beliefs list */}
-      <section className="section" style={{ backgroundColor: "#f2efed" }}>
+      <section className="section" style={{ backgroundColor: "#ffffff" }}>
         <div className="container-c3">
           <div className="max-w-3xl">
-            <p className="body-lg mb-14" style={{ color: "rgba(35,46,44,0.65)" }}>
+            <p className="body-lg mb-14" style={{ color: "rgba(27,28,28,0.65)" }}>
               At Celebration Community Church, we hold to the historic,
               orthodox Christian faith as revealed in Scripture. These
               beliefs are not negotiable — they are the foundation of
@@ -57,24 +57,24 @@ export default function BeliefsPage() {
                 <div
                   key={belief.id}
                   className="py-10"
-                  style={{ borderBottom: "1px solid rgba(35,46,44,0.1)" }}
+                  style={{ borderBottom: "1px solid rgba(27,28,28,0.1)" }}
                 >
                   <div className="flex gap-6 md:gap-10">
                     {/* Number */}
                     <div className="shrink-0 mt-1">
                       <span
                         className="text-sm font-bold"
-                        style={{ color: "#10405D" }}
+                        style={{ color: "#1cc3af" }}
                       >
                         {String(i + 1).padStart(2, "0")}
                       </span>
                     </div>
                     {/* Content */}
                     <div>
-                      <h2 className="heading-2 mb-4" style={{ color: "#232e2c" }}>
+                      <h2 className="heading-2 mb-4" style={{ color: "#1b1c1c" }}>
                         {belief.title}
                       </h2>
-                      <p className="body-lg" style={{ color: "rgba(35,46,44,0.65)" }}>{belief.body}</p>
+                      <p className="body-lg" style={{ color: "rgba(27,28,28,0.65)" }}>{belief.body}</p>
                     </div>
                   </div>
                 </div>
@@ -85,13 +85,13 @@ export default function BeliefsPage() {
       </section>
 
       {/* Bottom CTA */}
-      <section className="section" style={{ backgroundColor: "#232e2c" }}>
+      <section className="section" style={{ backgroundColor: "#1b1c1c" }}>
         <div className="container-c3 text-center max-w-xl">
           <p className="overline mb-4" style={{ color: "rgba(255,255,255,0.35)" }}>Questions?</p>
           <h2 className="display-2 text-white mb-5">
             We&apos;d love to talk.
           </h2>
-          <p className="body-lg mb-10" style={{ color: "rgba(255,255,255,0.6)" }}>
+          <p className="body-lg mb-10" style={{ color: "rgba(255,255,255,0.60)" }}>
             Theology matters — and so do your questions. Reach out, or
             come visit us on a Sunday.
           </p>

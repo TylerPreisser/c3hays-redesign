@@ -67,20 +67,19 @@ export default function VisitPage() {
         </div>
         <div className="relative z-10 container-c3 pb-20 pt-40">
           <p className="overline mb-4" style={{ color: "rgba(255,255,255,0.55)" }}>First Visit</p>
-          <h1 className="display-1 text-white text-balance">Plan Your Visit</h1>
+          <h1 className="display-1 text-white text-balance">Plan your first visit.</h1>
           <p className="body-lg mt-5 max-w-lg" style={{ color: "rgba(255,255,255,0.65)" }}>
-            We want your first visit to feel easy. Here&apos;s everything you need to
-            know before you walk through the door.
+            What to expect when you walk through our doors.
           </p>
         </div>
       </section>
 
       {/* What to expect */}
-      <section className="section" style={{ backgroundColor: "#f2efed" }}>
+      <section className="section" style={{ backgroundColor: "#ffffff" }}>
         <div className="container-c3">
           <div className="max-w-xl mb-16">
-            <p className="overline mb-4" style={{ color: "rgba(35,46,44,0.45)" }}>What to Expect</p>
-            <h2 className="display-2 text-balance" style={{ color: "#232e2c" }}>
+            <p className="overline mb-4" style={{ color: "rgba(27,28,28,0.4)" }}>What to Expect</p>
+            <h2 className="display-2 text-balance" style={{ color: "#1b1c1c" }}>
               No surprises. Just welcome.
             </h2>
           </div>
@@ -91,12 +90,12 @@ export default function VisitPage() {
               return (
                 <div key={item.title}>
                   <div className="mb-5">
-                    <Icon size={28} style={{ color: "#10405D" }} strokeWidth={1.5} />
+                    <Icon size={28} style={{ color: "#1cc3af" }} strokeWidth={1.5} />
                   </div>
-                  <h3 className="heading-3 mb-3" style={{ color: "#232e2c" }}>
+                  <h3 className="heading-3 mb-3" style={{ color: "#1b1c1c" }}>
                     {item.title}
                   </h3>
-                  <p className="text-sm leading-relaxed" style={{ color: "rgba(35,46,44,0.65)" }}>
+                  <p className="text-sm leading-relaxed" style={{ color: "rgba(27,28,28,0.65)" }}>
                     {item.body}
                   </p>
                 </div>
@@ -107,7 +106,7 @@ export default function VisitPage() {
       </section>
 
       {/* Service times */}
-      <section className="section" style={{ backgroundColor: "#232e2c" }}>
+      <section className="section" style={{ backgroundColor: "#1b1c1c" }}>
         <div className="container-c3">
           <div className="max-w-xl mb-12">
             <p className="overline mb-4" style={{ color: "rgba(255,255,255,0.35)" }}>Times &amp; Locations</p>
@@ -122,7 +121,7 @@ export default function VisitPage() {
                 className="p-8"
                 style={{ borderRight: i === 0 ? "1px solid rgba(255,255,255,0.1)" : "none" }}
               >
-                <h3 className="font-bold text-sm uppercase tracking-widest mb-5" style={{ color: "#10405D" }}>
+                <h3 className="font-bold text-sm uppercase tracking-widest mb-5" style={{ color: "#1cc3af" }}>
                   {loc.name} Campus
                 </h3>
                 <div className="flex items-start gap-3 mb-4">
@@ -158,15 +157,15 @@ export default function VisitPage() {
       </section>
 
       {/* Connect CTA */}
-      <section className="section" style={{ backgroundColor: "#f2efed" }}>
+      <section className="section" style={{ backgroundColor: "#ffffff" }}>
         <div className="container-c3">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div>
-              <p className="overline mb-4" style={{ color: "rgba(35,46,44,0.45)" }}>Let Us Know You&apos;re Coming</p>
-              <h2 className="display-2 mb-5 text-balance" style={{ color: "#232e2c" }}>
+              <p className="overline mb-4" style={{ color: "rgba(27,28,28,0.4)" }}>Let Us Know You&apos;re Coming</p>
+              <h2 className="display-2 mb-5 text-balance" style={{ color: "#1b1c1c" }}>
                 We&apos;re saving you a seat.
               </h2>
-              <p className="body-lg mb-10" style={{ color: "rgba(35,46,44,0.65)" }}>
+              <p className="body-lg mb-10" style={{ color: "rgba(27,28,28,0.65)" }}>
                 Fill out a quick connect card and we&apos;ll send you everything
                 you need to know before Sunday. No spam, ever.
               </p>

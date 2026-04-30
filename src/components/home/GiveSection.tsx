@@ -64,10 +64,10 @@ export default function GiveSection() {
           </p>
           <h2 className="display-2 text-white mb-6 text-balance">
             Your giving is{" "}
-            <em className="not-italic" style={{ color: "#10405D" }}>changing</em>{" "}
+            <em className="not-italic" style={{ color: "#1cc3af" }}>changing</em>{" "}
             the world.
           </h2>
-          <p className="mb-10 max-w-lg mx-auto" style={{ fontSize: "1.125rem", color: "rgba(255,255,255,0.88)", lineHeight: 1.65 }}>
+          <p className="mb-10 max-w-lg mx-auto" style={{ fontSize: "1.125rem", color: "rgba(255,255,255,0.85)", lineHeight: 1.65 }}>
             At C3 we understand that God owns everything. We invite you to join
             us in stewardship — generously giving toward what God values.
           </p>

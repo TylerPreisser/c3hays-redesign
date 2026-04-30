@@ -1,0 +1,1 @@
+- [Legacy navy class is harmless](legacy-navy-class.md) — `.btn-outline-navy` is a CSS alias mapping to `var(--color-ink)`, not actual navy

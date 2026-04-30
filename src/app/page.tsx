@@ -10,7 +10,7 @@ import GiveSection from "@/components/home/GiveSection";
 export const metadata: Metadata = {
   title: "Celebration Community Church | Welcome Home.",
   description:
-    "Jesus is central to everything we do at C3. We exist to meet with Him, grow in Him, and serve through Him. Services in Hays and Colby, Kansas.",
+    "A church family in Hays and Colby, Kansas — for everyone, just as you are. Services Saturday and Sunday.",
 };
 
 export default function HomePage() {
@@ -18,17 +18,17 @@ export default function HomePage() {
     <>
       <Hero />
       <MissionBlock />
-      {/* Crimson accent rule: dark MissionBlock → light MeetGrowServe */}
-      <div className="section-rule" style={{ backgroundColor: "#f2efed" }} />
+      {/* Teal accent rule: dark MissionBlock → white MeetGrowServe */}
+      <div className="section-rule" style={{ backgroundColor: "#ffffff" }} />
       <MeetGrowServe />
-      {/* Crimson accent rule: light MeetGrowServe → dark NT26Feature */}
-      <div className="section-rule" style={{ backgroundColor: "#232e2c" }} />
+      {/* Teal accent rule: white MeetGrowServe → ink NT26Feature */}
+      <div className="section-rule" style={{ backgroundColor: "#1b1c1c" }} />
       <NT26Feature />
-      {/* Crimson accent rule: dark NT26Feature → light LocationsSection */}
-      <div className="section-rule" style={{ backgroundColor: "#f2efed" }} />
+      {/* Teal accent rule: ink NT26Feature → mist LocationsSection */}
+      <div className="section-rule" style={{ backgroundColor: "#f6f6f6" }} />
       <LocationsSection />
-      {/* Crimson accent rule: light LocationsSection → dark StayConnected */}
-      <div className="section-rule" style={{ backgroundColor: "#232e2c" }} />
+      {/* Teal accent rule: mist LocationsSection → white StayConnected */}
+      <div className="section-rule" style={{ backgroundColor: "#ffffff" }} />
       <StayConnected />
       <GiveSection />
     </>

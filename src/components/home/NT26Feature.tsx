@@ -51,31 +51,31 @@ export default function NT26Feature() {
   }, []);
 
   return (
-    /* Dark evergreen section */
+    /* Dark ink section */
     <section
       ref={sectionRef}
       className="section overflow-hidden"
-      style={{ backgroundColor: "#232e2c" }}
+      style={{ backgroundColor: "#1b1c1c" }}
     >
       <div className="container-c3">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
 
           {/* Text left */}
           <div className="nt26-content">
-            <p className="overline mb-5" style={{ color: "rgba(255,255,255,0.6)" }}>
+            <p className="overline mb-5" style={{ color: "rgba(255,255,255,0.55)" }}>
               Bible Reading Plan
             </p>
             <h2 className="display-2 text-white mb-6 text-balance">
               Have you read your{" "}
-              <em className="not-italic" style={{ color: "#10405D" }}>Bible</em>{" "}
+              <em className="not-italic" style={{ color: "#1cc3af" }}>Bible</em>{" "}
               today?
             </h2>
-            <p className="mb-5" style={{ fontSize: "1.125rem", color: "rgba(255,255,255,0.88)", lineHeight: 1.65 }}>
+            <p className="mb-5" style={{ fontSize: "1.125rem", color: "rgba(255,255,255,0.85)", lineHeight: 1.65 }}>
               The NT26 Reading Plan takes you through the entire New Testament
               in 2026 — one chapter at a time, together as a church family. No
               experience required. Just a willing heart.
             </p>
-            <p className="mb-10" style={{ fontSize: "1rem", color: "rgba(255,255,255,0.72)", lineHeight: 1.65 }}>
+            <p className="mb-10" style={{ fontSize: "1rem", color: "rgba(255,255,255,0.70)", lineHeight: 1.65 }}>
               Join thousands reading alongside C3. We&apos;ll walk through every word
               Jesus spoke, every letter Paul wrote, and every vision John
               received — together.
@@ -88,9 +88,7 @@ export default function NT26Feature() {
             </Link>
           </div>
 
-          {/* Image right — sharp corners, clip-path reveal.
-              Use aspect-ratio on mobile (single col) so the image scales with width;
-              lock to 480px on the lg two-column layout. */}
+          {/* Image right — sharp corners, clip-path reveal */}
           <div
             className="nt26-img relative overflow-hidden"
             style={{ aspectRatio: "4/3", minHeight: 280, borderRadius: 0 }}

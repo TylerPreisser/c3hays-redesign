@@ -79,7 +79,7 @@ export default function WatchPage() {
             <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-6 pointer-events-none">
               <div
                 className="w-16 h-16 flex items-center justify-center mb-5"
-                style={{ background: "rgba(229,53,57,0.2)", border: "1px solid rgba(229,53,57,0.4)" }}
+                style={{ background: "rgba(28,195,175,0.15)", border: "1px solid rgba(28,195,175,0.35)" }}
               >
                 <Play size={24} className="text-white ml-1" />
               </div>
@@ -107,14 +107,13 @@ export default function WatchPage() {
       </section>
 
       {/* Service times */}
-      <section className="py-16" style={{ backgroundColor: "#232e2c", borderTop: "1px solid rgba(255,255,255,0.08)" }}>
+      <section className="py-16" style={{ backgroundColor: "#1b1c1c", borderTop: "1px solid rgba(255,255,255,0.08)" }}>
         <div className="container-c3">
           <p className="overline mb-8" style={{ color: "rgba(255,255,255,0.35)" }}>Service Times</p>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-0 max-w-2xl"
             style={{ border: "1px solid rgba(255,255,255,0.1)" }}>
-            {/* On mobile (single column) use a bottom border; on md+ it becomes a right border between columns */}
             <div className="p-8 border-b border-white/10 md:border-b-0 md:border-r md:border-white/10">
-              <p className="font-bold text-xs uppercase tracking-widest mb-5" style={{ color: "#10405D" }}>Hays</p>
+              <p className="font-bold text-xs uppercase tracking-widest mb-5" style={{ color: "#1cc3af" }}>Hays</p>
               <div className="flex flex-col gap-2 text-sm" style={{ color: "rgba(255,255,255,0.65)" }}>
                 <p>Saturday — 5:00 PM</p>
                 <p>Sunday — 8:00 AM</p>
@@ -123,7 +122,7 @@ export default function WatchPage() {
               </div>
             </div>
             <div className="p-8">
-              <p className="font-bold text-xs uppercase tracking-widest mb-5" style={{ color: "#10405D" }}>Colby</p>
+              <p className="font-bold text-xs uppercase tracking-widest mb-5" style={{ color: "#1cc3af" }}>Colby</p>
               <div className="flex flex-col gap-2 text-sm" style={{ color: "rgba(255,255,255,0.65)" }}>
                 <p>Sunday — 10:00 AM</p>
               </div>
@@ -133,11 +132,11 @@ export default function WatchPage() {
       </section>
 
       {/* Recent messages */}
-      <section className="section" style={{ backgroundColor: "#f2efed" }}>
+      <section className="section" style={{ backgroundColor: "#ffffff" }}>
         <div className="container-c3">
           <div className="mb-12">
-            <p className="overline mb-2" style={{ color: "rgba(35,46,44,0.45)" }}>Recent</p>
-            <h2 className="heading-1" style={{ color: "#232e2c" }}>Catch Up</h2>
+            <p className="overline mb-2" style={{ color: "rgba(27,28,28,0.4)" }}>Recent</p>
+            <h2 className="heading-1" style={{ color: "#1b1c1c" }}>Catch Up</h2>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
             {recentMessages.map((msg) => (
@@ -147,7 +146,7 @@ export default function WatchPage() {
                     src={msg.image}
                     alt={msg.title}
                     fill
-                    className="object-cover transition-transform duration-600 group-hover:scale-[1.04]"
+                    className="object-cover transition-transform duration-500 group-hover:scale-[1.04]"
                   />
                   <div
                     className="absolute inset-0 flex items-center justify-center"
@@ -161,8 +160,8 @@ export default function WatchPage() {
                     </div>
                   </div>
                 </div>
-                <h3 className="font-bold mb-1" style={{ color: "#232e2c", fontSize: "1rem" }}>{msg.title}</h3>
-                <p className="text-sm" style={{ color: "rgba(35,46,44,0.5)" }}>
+                <h3 className="font-bold mb-1" style={{ color: "#1b1c1c", fontSize: "1rem" }}>{msg.title}</h3>
+                <p className="text-sm" style={{ color: "rgba(27,28,28,0.5)" }}>
                   {msg.series} · {msg.date}
                 </p>
               </div>

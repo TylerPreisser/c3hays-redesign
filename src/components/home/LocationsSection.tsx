@@ -54,16 +54,16 @@ export default function LocationsSection() {
   }, []);
 
   return (
-    /* Light off-white section */
-    <section ref={sectionRef} className="section" style={{ backgroundColor: "#f2efed" }}>
+    /* Mist off-white section */
+    <section ref={sectionRef} className="section" style={{ backgroundColor: "#f6f6f6" }}>
       <div className="container-c3">
         {/* Header */}
         <div className="locations-heading mb-14 md:mb-16">
-          <p className="overline mb-4" style={{ color: "rgba(35,46,44,0.45)" }}>Our Campuses</p>
-          <h2 className="display-2" style={{ color: "#232e2c" }}>
+          <p className="overline mb-4" style={{ color: "rgba(27,28,28,0.4)" }}>Our Campuses</p>
+          <h2 className="display-2" style={{ color: "#1b1c1c" }}>
             Find a location near you.
           </h2>
-          <p className="mt-4 max-w-md" style={{ fontSize: "1.125rem", color: "rgba(35,46,44,0.82)", lineHeight: 1.6 }}>
+          <p className="mt-4 max-w-md" style={{ fontSize: "1.125rem", color: "rgba(27,28,28,0.80)", lineHeight: 1.6 }}>
             Two campuses, one church family. Come as you are.
           </p>
         </div>

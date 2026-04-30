@@ -66,7 +66,7 @@ export default function GivePage() {
           <p className="overline mb-4" style={{ color: "rgba(255,255,255,0.55)" }}>Generosity</p>
           <h1 className="display-1 text-white text-balance">
             Your giving is{" "}
-            <em className="not-italic" style={{ color: "#10405D" }}>changing</em>{" "}
+            <em className="not-italic" style={{ color: "#1cc3af" }}>changing</em>{" "}
             the world.
           </h1>
           <p className="body-lg mt-6 max-w-lg" style={{ color: "rgba(255,255,255,0.65)" }}>
@@ -77,15 +77,15 @@ export default function GivePage() {
       </section>
 
       {/* Ways to give */}
-      <section className="section" style={{ backgroundColor: "#f2efed" }}>
+      <section className="section" style={{ backgroundColor: "#ffffff" }}>
         <div className="container-c3">
           <div className="max-w-xl mb-14">
-            <p className="overline mb-4" style={{ color: "rgba(35,46,44,0.45)" }}>Stewardship</p>
-            <h2 className="display-2" style={{ color: "#232e2c" }}>Three ways to give</h2>
+            <p className="overline mb-4" style={{ color: "rgba(27,28,28,0.4)" }}>Stewardship</p>
+            <h2 className="display-2" style={{ color: "#1b1c1c" }}>Three ways to give</h2>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 mb-16"
-            style={{ border: "1.5px solid rgba(35,46,44,0.1)" }}>
+            style={{ border: "1.5px solid rgba(27,28,28,0.1)" }}>
             {givingOptions.map((opt, i) => {
               const Icon = opt.icon;
               return (
@@ -93,18 +93,18 @@ export default function GivePage() {
                   key={opt.title}
                   className="give-card"
                   style={{
-                    borderBottom: i < givingOptions.length - 1 ? "1.5px solid rgba(35,46,44,0.1)" : "none",
+                    borderBottom: i < givingOptions.length - 1 ? "1.5px solid rgba(27,28,28,0.1)" : "none",
                   }}
                 >
                   <div className="mb-6">
                     <Icon
                       size={28}
-                      style={{ color: "#10405D" }}
+                      style={{ color: "#1cc3af" }}
                       strokeWidth={1.5}
                     />
                   </div>
-                  <h3 className="heading-3 mb-3" style={{ color: "#232e2c" }}>{opt.title}</h3>
-                  <p className="give-card-body text-sm leading-relaxed mb-6" style={{ color: "rgba(35,46,44,0.65)" }}>
+                  <h3 className="heading-3 mb-3" style={{ color: "#1b1c1c" }}>{opt.title}</h3>
+                  <p className="give-card-body text-sm leading-relaxed mb-6" style={{ color: "rgba(27,28,28,0.65)" }}>
                     {opt.body}
                   </p>
                   {opt.href && opt.cta ? (
@@ -117,7 +117,7 @@ export default function GivePage() {
                       {opt.cta} →
                     </a>
                   ) : (
-                    <span className="text-xs font-semibold uppercase tracking-widest" style={{ color: "rgba(35,46,44,0.35)" }}>
+                    <span className="text-xs font-semibold uppercase tracking-widest" style={{ color: "rgba(27,28,28,0.35)" }}>
                       In-person
                     </span>
                   )}
@@ -127,12 +127,12 @@ export default function GivePage() {
           </div>
 
           {/* Divider */}
-          <div style={{ borderTop: "1px solid rgba(35,46,44,0.1)", marginBottom: "3.5rem" }} />
+          <div style={{ borderTop: "1px solid rgba(27,28,28,0.1)", marginBottom: "3.5rem" }} />
 
           {/* Campus giving links */}
           <div className="max-w-lg">
-            <h3 className="heading-3 mb-8" style={{ color: "#232e2c" }}>Give by campus</h3>
-            <div className="flex flex-col gap-0" style={{ border: "1px solid rgba(35,46,44,0.12)" }}>
+            <h3 className="heading-3 mb-8" style={{ color: "#1b1c1c" }}>Give by campus</h3>
+            <div className="flex flex-col gap-0" style={{ border: "1px solid rgba(27,28,28,0.12)" }}>
               {campusGiving.map((cg, i) => (
                 <a
                   key={cg.name}
@@ -141,13 +141,13 @@ export default function GivePage() {
                   rel="noopener noreferrer"
                   className="giving-row flex items-center justify-between p-5"
                   style={{
-                    borderBottom: i < campusGiving.length - 1 ? "1px solid rgba(35,46,44,0.12)" : "none",
+                    borderBottom: i < campusGiving.length - 1 ? "1px solid rgba(27,28,28,0.12)" : "none",
                   }}
                 >
-                  <span className="font-semibold text-sm uppercase tracking-wider" style={{ color: "#232e2c" }}>
+                  <span className="font-semibold text-sm uppercase tracking-wider" style={{ color: "#1b1c1c" }}>
                     {cg.name} Campus
                   </span>
-                  <ExternalLink size={15} style={{ color: "rgba(35,46,44,0.4)" }} />
+                  <ExternalLink size={15} style={{ color: "rgba(27,28,28,0.4)" }} />
                 </a>
               ))}
             </div>
@@ -156,7 +156,7 @@ export default function GivePage() {
       </section>
 
       {/* Scripture quote */}
-      <section className="section" style={{ backgroundColor: "#232e2c" }}>
+      <section className="section" style={{ backgroundColor: "#1b1c1c" }}>
         <div className="container-c3 text-center max-w-2xl">
           <p className="overline mb-6" style={{ color: "rgba(255,255,255,0.35)" }}>Scripture</p>
           <blockquote
@@ -172,7 +172,7 @@ export default function GivePage() {
             give, not reluctantly or under compulsion, for God loves a
             cheerful giver.&rdquo;
           </blockquote>
-          <p className="text-sm font-semibold uppercase tracking-widest" style={{ color: "#10405D" }}>
+          <p className="text-sm font-semibold uppercase tracking-widest" style={{ color: "#1cc3af" }}>
             2 Corinthians 9:7
           </p>
           <div className="mt-12">
