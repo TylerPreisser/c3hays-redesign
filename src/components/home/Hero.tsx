@@ -45,22 +45,23 @@ export default function Hero() {
         </div>
       )}
 
-      {/* ── Background — full-bleed photo with cinematic dim overlay ── */}
+      {/* ── Background — B&W worship moment with subtle gradient ── */}
       <div className="absolute inset-0 z-0">
         <Image
-          src="/images/congregation.webp"
+          src="/images/building.webp"
           alt=""
           fill
           priority
           sizes="100vw"
           className="object-cover animate-ken-burns"
+          style={{ objectPosition: "center 30%" }}
         />
-        {/* Cinematic gradient overlay — dark at top + bottom, slightly lighter middle */}
+        {/* Lighter overlay — image is already dark/B&W, no need to crush it */}
         <div
           className="absolute inset-0"
           style={{
             background:
-              "linear-gradient(180deg, rgba(10,10,10,0.72) 0%, rgba(10,10,10,0.55) 45%, rgba(10,10,10,0.78) 100%)",
+              "linear-gradient(180deg, rgba(10,10,10,0.55) 0%, rgba(10,10,10,0.35) 40%, rgba(10,10,10,0.65) 100%)",
           }}
         />
       </div>
