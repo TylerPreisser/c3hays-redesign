@@ -65,7 +65,7 @@ export default function HaysCampusPage() {
                 5th grade. Student ministry meets on Friday evenings. Come
                 check us out — we&apos;re glad you&apos;re here.
               </p>
-              <Link href="/visit/" className="btn btn-primary btn-lg">
+              <Link href="/visit/" className="btn btn-primary">
                 Plan Your Visit
               </Link>
             </div>
@@ -161,7 +161,7 @@ export default function HaysCampusPage() {
               href="https://maps.google.com/?q=5790+230th+Ave,+Hays,+KS+67601"
               target="_blank"
               rel="noopener noreferrer"
-              className="btn btn-primary btn-lg inline-flex items-center gap-2"
+              className="btn btn-primary inline-flex items-center gap-2"
             >
               <Navigation size={16} />
               Open in Google Maps

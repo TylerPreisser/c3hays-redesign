@@ -102,7 +102,7 @@ export default function StayConnected() {
         </div>
 
         {/* 4-up flat tile grid — no phone mockup, no glassy effects */}
-        <div className="connect-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-0"
+        <div className="connect-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8"
           style={{ border: "1px solid rgba(27,28,28,0.1)" }}>
           {connectItems.map((item, i) => {
             const Icon = item.icon;
@@ -116,14 +116,14 @@ export default function StayConnected() {
                 className="connect-item group block transition-colors duration-200"
                 style={{
                   padding: "3rem 2rem",
-                  minHeight: "280px",
+                  minHeight: "360px",
                   display: "flex",
                   flexDirection: "column",
                   borderRight: isLastInRow ? "none" : "1px solid rgba(27,28,28,0.1)",
                 }}
               >
                 {/* Icon */}
-                <div className="mb-5">
+                <div className="mb-8">
                   <Icon
                     size={26}
                     strokeWidth={1.5}
@@ -138,14 +138,14 @@ export default function StayConnected() {
 
                 {/* Title */}
                 <h3
-                  className="font-bold mb-2 transition-colors duration-200 group-hover:text-[#1cc3af]"
+                  className="font-bold mb-4 transition-colors duration-200 group-hover:text-[#1cc3af]"
                   style={{ color: "#1b1c1c", fontSize: "1.125rem", lineHeight: 1.3 }}
                 >
                   {item.title}
                 </h3>
 
                 {/* Body */}
-                <p className="text-sm mb-5" style={{ color: "rgba(27,28,28,0.65)", lineHeight: 1.65, flex: 1 }}>
+                <p className="text-sm mb-8" style={{ color: "rgba(27,28,28,0.65)", lineHeight: 1.65, flex: 1 }}>
                   {item.body}
                 </p>
 

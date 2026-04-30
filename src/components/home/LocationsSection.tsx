@@ -70,7 +70,7 @@ export default function LocationsSection() {
         </div>
 
         {/* Campus grid — 2-up full bleed image cards */}
-        <div className="campus-grid grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="campus-grid grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-10">
           {locations.map((loc) => (
             <div
               key={loc.id}
@@ -95,12 +95,12 @@ export default function LocationsSection() {
               />
 
               {/* Content — positioned at bottom */}
-              <div className="absolute inset-0 flex flex-col justify-end p-8 md:p-10">
+              <div className="absolute inset-0 flex flex-col justify-end p-10 md:p-12">
                 <p className="overline mb-3" style={{ color: "rgba(255,255,255,0.55)" }}>
                   {loc.name} Campus
                 </p>
-                <h3 className="heading-1 text-white mb-2">{loc.name}</h3>
-                <p className="text-white/70 mb-6" style={{ fontSize: "1rem", lineHeight: 1.6 }}>
+                <h3 className="heading-1 text-white mb-4">{loc.name}</h3>
+                <p className="text-white/70 mb-10" style={{ fontSize: "1rem", lineHeight: 1.6 }}>
                   {loc.description}
                 </p>
                 <div className="flex flex-wrap gap-3">

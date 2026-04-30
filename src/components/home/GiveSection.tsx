@@ -38,7 +38,7 @@ export default function GiveSection() {
     <section
       ref={sectionRef}
       className="relative overflow-hidden"
-      style={{ minHeight: "70vh" }}
+      style={{ minHeight: "85vh" }}
     >
       {/* Background image — absolute, z-0 */}
       <div className="absolute inset-0 z-0">
@@ -63,20 +63,20 @@ export default function GiveSection() {
         style={{ minHeight: "inherit" }}
       >
         <div className="give-content w-full max-w-2xl mx-auto px-6 text-center">
-          <p className="overline mb-6" style={{ color: "rgba(255,255,255,0.55)" }}>
+          <p className="overline mb-10" style={{ color: "rgba(255,255,255,0.55)" }}>
             Generosity
           </p>
-          <h2 className="display-2 text-white mb-6 text-balance">
+          <h2 className="display-2 text-white mb-10 text-balance">
             Your giving is{" "}
             <em style={{ color: "#1cc3af", fontStyle: "italic" }}>changing</em>{" "}
             the world.
           </h2>
           <p
-            className="mb-10"
+            className="mb-14"
             style={{
               fontSize: "1.125rem",
               color: "rgba(255,255,255,0.88)",
-              lineHeight: 1.65,
+              lineHeight: 1.75,
               maxWidth: "32rem",
               marginLeft: "auto",
               marginRight: "auto",
@@ -85,7 +85,7 @@ export default function GiveSection() {
             At C3 we understand that God owns everything. We invite you to join
             us in stewardship — generously giving toward what God values.
           </p>
-          <Link href="/give/" className="btn btn-primary btn-lg">
+          <Link href="/give/" className="btn btn-primary">
             Give Now
           </Link>
         </div>

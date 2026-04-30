@@ -62,7 +62,7 @@ export default function ColbyCampusPage() {
               <p className="body-base mb-10" style={{ color: "rgba(27,28,28,0.55)" }}>
                 Kids programming runs during Sunday service. We&apos;d love to see you.
               </p>
-              <Link href="/visit/" className="btn btn-primary btn-lg">
+              <Link href="/visit/" className="btn btn-primary">
                 Plan Your Visit
               </Link>
             </div>
@@ -121,7 +121,7 @@ export default function ColbyCampusPage() {
               href="https://maps.google.com/?q=1923+S+Range,+Colby,+KS+67701"
               target="_blank"
               rel="noopener noreferrer"
-              className="btn btn-primary btn-lg inline-flex items-center gap-2"
+              className="btn btn-primary inline-flex items-center gap-2"
             >
               <Navigation size={16} />
               Open in Google Maps
