@@ -1,0 +1,15 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": "nextjs",
+  "buildCommand": "next build",
+  "build": {
+    "env": {
+      "CMS_LIVE": "1",
+      "NEXT_PUBLIC_CMS_URL": "https://studio.c3hays.com"
+    }
+  },
+  "env": {
+    "CMS_LIVE": "1",
+    "NEXT_PUBLIC_CMS_URL": "https://studio.c3hays.com"
+  }
+}
