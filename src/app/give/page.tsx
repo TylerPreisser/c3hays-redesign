@@ -126,29 +126,64 @@ export default function GivePage() {
           </div>
 
           {/* Divider */}
-          <div style={{ borderTop: "1px solid rgba(27,28,28,0.1)", marginBottom: "3.5rem" }} />
+          <div style={{ borderTop: "1px solid rgba(27,28,28,0.1)", marginBottom: "4rem" }} />
 
-          {/* Campus giving links */}
-          <div className="max-w-lg">
-            <h3 className="heading-3 mb-8" style={{ color: "#1b1c1c" }}>Give by campus</h3>
-            <div className="flex flex-col gap-0" style={{ border: "1px solid rgba(27,28,28,0.12)" }}>
-              {campusGiving.map((cg, i) => (
-                <a
-                  key={cg.name}
-                  href={cg.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="giving-row flex items-center justify-between p-5"
-                  style={{
-                    borderBottom: i < campusGiving.length - 1 ? "1px solid rgba(27,28,28,0.12)" : "none",
-                  }}
-                >
-                  <span className="font-semibold text-sm uppercase tracking-wider" style={{ color: "#1b1c1c" }}>
-                    {cg.name} Campus
-                  </span>
-                  <ExternalLink size={15} style={{ color: "rgba(27,28,28,0.4)" }} />
-                </a>
-              ))}
+          {/* Campus giving + where it goes — balanced 2-col */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-start">
+            {/* Left — campus links */}
+            <div>
+              <h3 className="heading-3 mb-3" style={{ color: "#1b1c1c" }}>Give by campus</h3>
+              <p className="text-sm mb-8 max-w-sm" style={{ color: "rgba(27,28,28,0.6)" }}>
+                Choose your home campus so your gift reaches the right community.
+              </p>
+              <div className="flex flex-col gap-0" style={{ border: "1px solid rgba(27,28,28,0.12)" }}>
+                {campusGiving.map((cg, i) => (
+                  <a
+                    key={cg.name}
+                    href={cg.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="giving-row flex items-center justify-between p-5"
+                    style={{
+                      borderBottom: i < campusGiving.length - 1 ? "1px solid rgba(27,28,28,0.12)" : "none",
+                    }}
+                  >
+                    <span className="font-semibold text-sm uppercase tracking-wider" style={{ color: "#1b1c1c" }}>
+                      {cg.name} Campus
+                    </span>
+                    <ExternalLink size={15} style={{ color: "rgba(27,28,28,0.4)" }} />
+                  </a>
+                ))}
+              </div>
+            </div>
+
+            {/* Right — where your giving goes */}
+            <div className="lg:pt-1">
+              <h3 className="heading-3 mb-3" style={{ color: "#1b1c1c" }}>Where your giving goes</h3>
+              <p className="text-sm mb-8 max-w-sm" style={{ color: "rgba(27,28,28,0.6)" }}>
+                Every gift, across every campus, fuels one mission.
+              </p>
+              <ul className="flex flex-col">
+                {[
+                  ["Right here at home", "Weekend gatherings, kids & students, and care for our Hays and Colby communities."],
+                  ["The next generation", "Investing in young families and raising up the church Jesus is building."],
+                  ["Beyond our walls", "Local outreach and global missions — the love of Christ to the ends of the earth."],
+                ].map(([title, body], i) => (
+                  <li
+                    key={title}
+                    className="flex gap-4 py-5"
+                    style={{ borderTop: i === 0 ? "none" : "1px solid rgba(27,28,28,0.1)" }}
+                  >
+                    <span className="shrink-0 text-xs font-bold tabular-nums pt-1" style={{ color: "#1cc3af" }}>
+                      0{i + 1}
+                    </span>
+                    <div>
+                      <p className="font-semibold mb-1" style={{ color: "#1b1c1c", fontSize: "1rem" }}>{title}</p>
+                      <p className="text-sm leading-relaxed" style={{ color: "rgba(27,28,28,0.6)" }}>{body}</p>
+                    </div>
+                  </li>
+                ))}
+              </ul>
             </div>
           </div>
         </div>

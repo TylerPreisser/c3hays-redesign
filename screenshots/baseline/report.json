@@ -1,0 +1,1077 @@
+{
+  "label": "baseline",
+  "base": "http://localhost:4321",
+  "started": "2026-06-28T16:42:58.374Z",
+  "pages": [
+    {
+      "route": "/",
+      "name": "home",
+      "breakpoint": "mobile",
+      "status": 200,
+      "errors": [],
+      "failed": [
+        "net::ERR_ABORTED http://localhost:4321/watch/",
+        "net::ERR_ABORTED http://localhost:4321/visit/",
+        "net::ERR_ABORTED http://localhost:4321/about/",
+        "net::ERR_ABORTED http://localhost:4321/messages/",
+        "net::ERR_ABORTED http://localhost:4321/connect/",
+        "net::ERR_ABORTED http://localhost:4321/locations/hays/",
+        "net::ERR_ABORTED http://localhost:4321/locations/colby/"
+      ],
+      "harness": [],
+      "overflow": {
+        "scrollW": 390,
+        "clientW": 390,
+        "overflowing": false,
+        "offenders": []
+      },
+      "links": [],
+      "shot": "screenshots/baseline/mobile/home.png"
+    },
+    {
+      "route": "/about",
+      "name": "about",
+      "breakpoint": "mobile",
+      "status": 200,
+      "errors": [],
+      "failed": [
+        "net::ERR_ABORTED http://localhost:4321/",
+        "net::ERR_ABORTED http://localhost:4321/beliefs/",
+        "net::ERR_ABORTED http://localhost:4321/visit/",
+        "net::ERR_ABORTED http://localhost:4321/connect/",
+        "net::ERR_ABORTED http://localhost:4321/about/",
+        "net::ERR_ABORTED http://localhost:4321/locations/",
+        "net::ERR_ABORTED http://localhost:4321/messages/",
+        "net::ERR_ABORTED http://localhost:4321/watch/",
+        "net::ERR_ABORTED http://localhost:4321/counseling/",
+        "net::ERR_ABORTED http://localhost:4321/give/"
+      ],
+      "harness": [],
+      "overflow": {
+        "scrollW": 390,
+        "clientW": 390,
+        "overflowing": false,
+        "offenders": []
+      },
+      "links": [],
+      "shot": "screenshots/baseline/mobile/about.png"
+    },
+    {
+      "route": "/visit",
+      "name": "visit",
+      "breakpoint": "mobile",
+      "status": 200,
+      "errors": [],
+      "failed": [
+        "net::ERR_ABORTED http://localhost:4321/",
+        "net::ERR_ABORTED http://localhost:4321/connect/",
+        "net::ERR_ABORTED http://localhost:4321/messages/",
+        "net::ERR_ABORTED http://localhost:4321/about/",
+        "net::ERR_ABORTED http://localhost:4321/locations/",
+        "net::ERR_ABORTED http://localhost:4321/watch/",
+        "net::ERR_ABORTED http://localhost:4321/counseling/",
+        "net::ERR_ABORTED http://localhost:4321/visit/",
+        "net::ERR_ABORTED http://localhost:4321/give/"
+      ],
+      "harness": [],
+      "overflow": {
+        "scrollW": 390,
+        "clientW": 390,
+        "overflowing": false,
+        "offenders": []
+      },
+      "links": [],
+      "shot": "screenshots/baseline/mobile/visit.png"
+    },
+    {
+      "route": "/beliefs",
+      "name": "beliefs",
+      "breakpoint": "mobile",
+      "status": 200,
+      "errors": [],
+      "failed": [
+        "net::ERR_ABORTED http://localhost:4321/",
+        "net::ERR_ABORTED http://localhost:4321/connect/",
+        "net::ERR_ABORTED http://localhost:4321/visit/",
+        "net::ERR_ABORTED http://localhost:4321/about/",
+        "net::ERR_ABORTED http://localhost:4321/locations/",
+        "net::ERR_ABORTED http://localhost:4321/messages/",
+        "net::ERR_ABORTED http://localhost:4321/watch/",
+        "net::ERR_ABORTED http://localhost:4321/counseling/",
+        "net::ERR_ABORTED http://localhost:4321/give/"
+      ],
+      "harness": [],
+      "overflow": {
+        "scrollW": 390,
+        "clientW": 390,
+        "overflowing": false,
+        "offenders": []
+      },
+      "links": [],
+      "shot": "screenshots/baseline/mobile/beliefs.png"
+    },
+    {
+      "route": "/locations",
+      "name": "locations",
+      "breakpoint": "mobile",
+      "status": 200,
+      "errors": [],
+      "failed": [
+        "net::ERR_ABORTED http://localhost:4321/",
+        "net::ERR_ABORTED http://localhost:4321/locations/hays/",
+        "net::ERR_ABORTED http://localhost:4321/locations/colby/",
+        "net::ERR_ABORTED http://localhost:4321/about/",
+        "net::ERR_ABORTED http://localhost:4321/locations/",
+        "net::ERR_ABORTED http://localhost:4321/messages/",
+        "net::ERR_ABORTED http://localhost:4321/watch/",
+        "net::ERR_ABORTED http://localhost:4321/counseling/",
+        "net::ERR_ABORTED http://localhost:4321/visit/",
+        "net::ERR_ABORTED http://localhost:4321/connect/",
+        "net::ERR_ABORTED http://localhost:4321/give/"
+      ],
+      "harness": [],
+      "overflow": {
+        "scrollW": 390,
+        "clientW": 390,
+        "overflowing": false,
+        "offenders": []
+      },
+      "links": [],
+      "shot": "screenshots/baseline/mobile/locations.png"
+    },
+    {
+      "route": "/locations/hays",
+      "name": "locations-hays",
+      "breakpoint": "mobile",
+      "status": 200,
+      "errors": [],
+      "failed": [
+        "net::ERR_ABORTED http://localhost:4321/",
+        "net::ERR_ABORTED http://localhost:4321/locations/",
+        "net::ERR_ABORTED http://localhost:4321/visit/",
+        "net::ERR_ABORTED http://localhost:4321/about/",
+        "net::ERR_ABORTED http://localhost:4321/messages/",
+        "net::ERR_ABORTED http://localhost:4321/watch/",
+        "net::ERR_ABORTED http://localhost:4321/counseling/",
+        "net::ERR_ABORTED http://localhost:4321/connect/",
+        "net::ERR_ABORTED http://localhost:4321/give/"
+      ],
+      "harness": [],
+      "overflow": {
+        "scrollW": 390,
+        "clientW": 390,
+        "overflowing": false,
+        "offenders": []
+      },
+      "links": [],
+      "shot": "screenshots/baseline/mobile/locations-hays.png"
+    },
+    {
+      "route": "/locations/colby",
+      "name": "locations-colby",
+      "breakpoint": "mobile",
+      "status": 200,
+      "errors": [],
+      "failed": [
+        "net::ERR_ABORTED http://localhost:4321/locations/",
+        "net::ERR_ABORTED http://localhost:4321/visit/",
+        "net::ERR_ABORTED http://localhost:4321/",
+        "net::ERR_ABORTED http://localhost:4321/about/",
+        "net::ERR_ABORTED http://localhost:4321/messages/",
+        "net::ERR_ABORTED http://localhost:4321/watch/",
+        "net::ERR_ABORTED http://localhost:4321/counseling/",
+        "net::ERR_ABORTED http://localhost:4321/connect/",
+        "net::ERR_ABORTED http://localhost:4321/give/"
+      ],
+      "harness": [],
+      "overflow": {
+        "scrollW": 390,
+        "clientW": 390,
+        "overflowing": false,
+        "offenders": []
+      },
+      "links": [],
+      "shot": "screenshots/baseline/mobile/locations-colby.png"
+    },
+    {
+      "route": "/messages",
+      "name": "messages",
+      "breakpoint": "mobile",
+      "status": 200,
+      "errors": [],
+      "failed": [
+        "net::ERR_ABORTED http://localhost:4321/watch/",
+        "net::ERR_ABORTED http://localhost:4321/",
+        "net::ERR_ABORTED http://localhost:4321/about/",
+        "net::ERR_ABORTED http://localhost:4321/locations/",
+        "net::ERR_ABORTED http://localhost:4321/messages/",
+        "net::ERR_ABORTED http://localhost:4321/counseling/",
+        "net::ERR_ABORTED http://localhost:4321/visit/",
+        "net::ERR_ABORTED http://localhost:4321/connect/",
+        "net::ERR_ABORTED http://localhost:4321/give/"
+      ],
+      "harness": [],
+      "overflow": {
+        "scrollW": 390,
+        "clientW": 390,
+        "overflowing": false,
+        "offenders": []
+      },
+      "links": [],
+      "shot": "screenshots/baseline/mobile/messages.png"
+    },
+    {
+      "route": "/watch",
+      "name": "watch",
+      "breakpoint": "mobile",
+      "status": 200,
+      "errors": [],
+      "failed": [
+        "net::ERR_ABORTED http://localhost:4321/",
+        "net::ERR_ABORTED http://localhost:4321/messages/",
+        "net::ERR_ABORTED http://localhost:4321/about/",
+        "net::ERR_ABORTED http://localhost:4321/locations/",
+        "net::ERR_ABORTED http://localhost:4321/watch/",
+        "net::ERR_ABORTED http://localhost:4321/counseling/",
+        "net::ERR_ABORTED http://localhost:4321/visit/",
+        "net::ERR_ABORTED http://localhost:4321/connect/",
+        "net::ERR_ABORTED http://localhost:4321/give/"
+      ],
+      "harness": [],
+      "overflow": {
+        "scrollW": 390,
+        "clientW": 390,
+        "overflowing": false,
+        "offenders": []
+      },
+      "links": [],
+      "shot": "screenshots/baseline/mobile/watch.png"
+    },
+    {
+      "route": "/counseling",
+      "name": "counseling",
+      "breakpoint": "mobile",
+      "status": 200,
+      "errors": [],
+      "failed": [
+        "net::ERR_ABORTED http://localhost:4321/",
+        "net::ERR_ABORTED http://localhost:4321/connect/",
+        "net::ERR_ABORTED http://localhost:4321/about/",
+        "net::ERR_ABORTED http://localhost:4321/locations/",
+        "net::ERR_ABORTED http://localhost:4321/messages/",
+        "net::ERR_ABORTED http://localhost:4321/watch/",
+        "net::ERR_ABORTED http://localhost:4321/counseling/",
+        "net::ERR_ABORTED http://localhost:4321/visit/",
+        "net::ERR_ABORTED http://localhost:4321/give/"
+      ],
+      "harness": [],
+      "overflow": {
+        "scrollW": 390,
+        "clientW": 390,
+        "overflowing": false,
+        "offenders": []
+      },
+      "links": [],
+      "shot": "screenshots/baseline/mobile/counseling.png"
+    },
+    {
+      "route": "/connect",
+      "name": "connect",
+      "breakpoint": "mobile",
+      "status": 200,
+      "errors": [],
+      "failed": [
+        "net::ERR_ABORTED http://localhost:4321/",
+        "net::ERR_ABORTED http://localhost:4321/about/",
+        "net::ERR_ABORTED http://localhost:4321/locations/",
+        "net::ERR_ABORTED http://localhost:4321/messages/",
+        "net::ERR_ABORTED http://localhost:4321/watch/",
+        "net::ERR_ABORTED http://localhost:4321/counseling/",
+        "net::ERR_ABORTED http://localhost:4321/visit/",
+        "net::ERR_ABORTED http://localhost:4321/connect/",
+        "net::ERR_ABORTED http://localhost:4321/give/"
+      ],
+      "harness": [],
+      "overflow": {
+        "scrollW": 390,
+        "clientW": 390,
+        "overflowing": false,
+        "offenders": []
+      },
+      "links": [],
+      "shot": "screenshots/baseline/mobile/connect.png"
+    },
+    {
+      "route": "/give",
+      "name": "give",
+      "breakpoint": "mobile",
+      "status": 200,
+      "errors": [],
+      "failed": [
+        "net::ERR_ABORTED http://localhost:4321/",
+        "net::ERR_ABORTED http://localhost:4321/connect/",
+        "net::ERR_ABORTED http://localhost:4321/about/",
+        "net::ERR_ABORTED http://localhost:4321/locations/",
+        "net::ERR_ABORTED http://localhost:4321/messages/",
+        "net::ERR_ABORTED http://localhost:4321/watch/",
+        "net::ERR_ABORTED http://localhost:4321/counseling/",
+        "net::ERR_ABORTED http://localhost:4321/visit/",
+        "net::ERR_ABORTED http://localhost:4321/give/"
+      ],
+      "harness": [],
+      "overflow": {
+        "scrollW": 390,
+        "clientW": 390,
+        "overflowing": false,
+        "offenders": []
+      },
+      "links": [],
+      "shot": "screenshots/baseline/mobile/give.png"
+    },
+    {
+      "route": "/this-page-does-not-exist",
+      "name": "not-found",
+      "breakpoint": "mobile",
+      "status": 404,
+      "errors": [
+        "Failed to load resource: the server responded with a status of 404 (Not Found)"
+      ],
+      "failed": [
+        "net::ERR_ABORTED http://localhost:4321/",
+        "net::ERR_ABORTED http://localhost:4321/visit/",
+        "net::ERR_ABORTED http://localhost:4321/about/",
+        "net::ERR_ABORTED http://localhost:4321/locations/",
+        "net::ERR_ABORTED http://localhost:4321/messages/",
+        "net::ERR_ABORTED http://localhost:4321/watch/",
+        "net::ERR_ABORTED http://localhost:4321/counseling/",
+        "net::ERR_ABORTED http://localhost:4321/connect/",
+        "net::ERR_ABORTED http://localhost:4321/give/"
+      ],
+      "harness": [],
+      "overflow": {
+        "scrollW": 390,
+        "clientW": 390,
+        "overflowing": false,
+        "offenders": []
+      },
+      "links": [],
+      "shot": "screenshots/baseline/mobile/not-found.png"
+    },
+    {
+      "route": "/",
+      "name": "home",
+      "breakpoint": "tablet",
+      "status": 200,
+      "errors": [],
+      "failed": [
+        "net::ERR_ABORTED http://localhost:4321/watch/",
+        "net::ERR_ABORTED http://localhost:4321/visit/",
+        "net::ERR_ABORTED http://localhost:4321/about/",
+        "net::ERR_ABORTED http://localhost:4321/messages/",
+        "net::ERR_ABORTED http://localhost:4321/connect/",
+        "net::ERR_ABORTED http://localhost:4321/locations/hays/",
+        "net::ERR_ABORTED http://localhost:4321/locations/colby/"
+      ],
+      "harness": [],
+      "overflow": {
+        "scrollW": 834,
+        "clientW": 834,
+        "overflowing": false,
+        "offenders": []
+      },
+      "links": [],
+      "shot": "screenshots/baseline/tablet/home.png"
+    },
+    {
+      "route": "/about",
+      "name": "about",
+      "breakpoint": "tablet",
+      "status": 200,
+      "errors": [],
+      "failed": [
+        "net::ERR_ABORTED http://localhost:4321/",
+        "net::ERR_ABORTED http://localhost:4321/beliefs/",
+        "net::ERR_ABORTED http://localhost:4321/visit/",
+        "net::ERR_ABORTED http://localhost:4321/connect/",
+        "net::ERR_ABORTED http://localhost:4321/about/",
+        "net::ERR_ABORTED http://localhost:4321/locations/",
+        "net::ERR_ABORTED http://localhost:4321/messages/",
+        "net::ERR_ABORTED http://localhost:4321/watch/",
+        "net::ERR_ABORTED http://localhost:4321/counseling/",
+        "net::ERR_ABORTED http://localhost:4321/give/"
+      ],
+      "harness": [],
+      "overflow": {
+        "scrollW": 834,
+        "clientW": 834,
+        "overflowing": false,
+        "offenders": []
+      },
+      "links": [],
+      "shot": "screenshots/baseline/tablet/about.png"
+    },
+    {
+      "route": "/visit",
+      "name": "visit",
+      "breakpoint": "tablet",
+      "status": 200,
+      "errors": [],
+      "failed": [
+        "net::ERR_ABORTED http://localhost:4321/",
+        "net::ERR_ABORTED http://localhost:4321/connect/",
+        "net::ERR_ABORTED http://localhost:4321/messages/",
+        "net::ERR_ABORTED http://localhost:4321/about/",
+        "net::ERR_ABORTED http://localhost:4321/locations/",
+        "net::ERR_ABORTED http://localhost:4321/watch/",
+        "net::ERR_ABORTED http://localhost:4321/counseling/",
+        "net::ERR_ABORTED http://localhost:4321/visit/",
+        "net::ERR_ABORTED http://localhost:4321/give/"
+      ],
+      "harness": [],
+      "overflow": {
+        "scrollW": 834,
+        "clientW": 834,
+        "overflowing": false,
+        "offenders": []
+      },
+      "links": [],
+      "shot": "screenshots/baseline/tablet/visit.png"
+    },
+    {
+      "route": "/beliefs",
+      "name": "beliefs",
+      "breakpoint": "tablet",
+      "status": 200,
+      "errors": [],
+      "failed": [
+        "net::ERR_ABORTED http://localhost:4321/",
+        "net::ERR_ABORTED http://localhost:4321/visit/",
+        "net::ERR_ABORTED http://localhost:4321/connect/",
+        "net::ERR_ABORTED http://localhost:4321/about/",
+        "net::ERR_ABORTED http://localhost:4321/locations/",
+        "net::ERR_ABORTED http://localhost:4321/messages/",
+        "net::ERR_ABORTED http://localhost:4321/watch/",
+        "net::ERR_ABORTED http://localhost:4321/counseling/",
+        "net::ERR_ABORTED http://localhost:4321/give/"
+      ],
+      "harness": [],
+      "overflow": {
+        "scrollW": 834,
+        "clientW": 834,
+        "overflowing": false,
+        "offenders": []
+      },
+      "links": [],
+      "shot": "screenshots/baseline/tablet/beliefs.png"
+    },
+    {
+      "route": "/locations",
+      "name": "locations",
+      "breakpoint": "tablet",
+      "status": 200,
+      "errors": [],
+      "failed": [
+        "net::ERR_ABORTED http://localhost:4321/locations/hays/",
+        "net::ERR_ABORTED http://localhost:4321/",
+        "net::ERR_ABORTED http://localhost:4321/locations/colby/",
+        "net::ERR_ABORTED http://localhost:4321/about/",
+        "net::ERR_ABORTED http://localhost:4321/locations/",
+        "net::ERR_ABORTED http://localhost:4321/messages/",
+        "net::ERR_ABORTED http://localhost:4321/watch/",
+        "net::ERR_ABORTED http://localhost:4321/counseling/",
+        "net::ERR_ABORTED http://localhost:4321/visit/",
+        "net::ERR_ABORTED http://localhost:4321/connect/",
+        "net::ERR_ABORTED http://localhost:4321/give/"
+      ],
+      "harness": [],
+      "overflow": {
+        "scrollW": 834,
+        "clientW": 834,
+        "overflowing": false,
+        "offenders": []
+      },
+      "links": [],
+      "shot": "screenshots/baseline/tablet/locations.png"
+    },
+    {
+      "route": "/locations/hays",
+      "name": "locations-hays",
+      "breakpoint": "tablet",
+      "status": 200,
+      "errors": [],
+      "failed": [
+        "net::ERR_ABORTED http://localhost:4321/visit/",
+        "net::ERR_ABORTED http://localhost:4321/locations/",
+        "net::ERR_ABORTED http://localhost:4321/",
+        "net::ERR_ABORTED http://localhost:4321/about/",
+        "net::ERR_ABORTED http://localhost:4321/messages/",
+        "net::ERR_ABORTED http://localhost:4321/watch/",
+        "net::ERR_ABORTED http://localhost:4321/counseling/",
+        "net::ERR_ABORTED http://localhost:4321/connect/",
+        "net::ERR_ABORTED http://localhost:4321/give/"
+      ],
+      "harness": [],
+      "overflow": {
+        "scrollW": 834,
+        "clientW": 834,
+        "overflowing": false,
+        "offenders": []
+      },
+      "links": [],
+      "shot": "screenshots/baseline/tablet/locations-hays.png"
+    },
+    {
+      "route": "/locations/colby",
+      "name": "locations-colby",
+      "breakpoint": "tablet",
+      "status": 200,
+      "errors": [],
+      "failed": [
+        "net::ERR_ABORTED http://localhost:4321/visit/",
+        "net::ERR_ABORTED http://localhost:4321/locations/",
+        "net::ERR_ABORTED http://localhost:4321/",
+        "net::ERR_ABORTED http://localhost:4321/about/",
+        "net::ERR_ABORTED http://localhost:4321/messages/",
+        "net::ERR_ABORTED http://localhost:4321/watch/",
+        "net::ERR_ABORTED http://localhost:4321/counseling/",
+        "net::ERR_ABORTED http://localhost:4321/connect/",
+        "net::ERR_ABORTED http://localhost:4321/give/"
+      ],
+      "harness": [],
+      "overflow": {
+        "scrollW": 834,
+        "clientW": 834,
+        "overflowing": false,
+        "offenders": []
+      },
+      "links": [],
+      "shot": "screenshots/baseline/tablet/locations-colby.png"
+    },
+    {
+      "route": "/messages",
+      "name": "messages",
+      "breakpoint": "tablet",
+      "status": 200,
+      "errors": [],
+      "failed": [
+        "net::ERR_ABORTED http://localhost:4321/watch/",
+        "net::ERR_ABORTED http://localhost:4321/",
+        "net::ERR_ABORTED http://localhost:4321/about/",
+        "net::ERR_ABORTED http://localhost:4321/locations/",
+        "net::ERR_ABORTED http://localhost:4321/messages/",
+        "net::ERR_ABORTED http://localhost:4321/counseling/",
+        "net::ERR_ABORTED http://localhost:4321/visit/",
+        "net::ERR_ABORTED http://localhost:4321/connect/",
+        "net::ERR_ABORTED http://localhost:4321/give/"
+      ],
+      "harness": [],
+      "overflow": {
+        "scrollW": 834,
+        "clientW": 834,
+        "overflowing": false,
+        "offenders": []
+      },
+      "links": [],
+      "shot": "screenshots/baseline/tablet/messages.png"
+    },
+    {
+      "route": "/watch",
+      "name": "watch",
+      "breakpoint": "tablet",
+      "status": 200,
+      "errors": [],
+      "failed": [
+        "net::ERR_ABORTED http://localhost:4321/",
+        "net::ERR_ABORTED http://localhost:4321/messages/"
+      ],
+      "harness": [],
+      "overflow": {
+        "scrollW": 834,
+        "clientW": 834,
+        "overflowing": false,
+        "offenders": []
+      },
+      "links": [],
+      "shot": "screenshots/baseline/tablet/watch.png"
+    },
+    {
+      "route": "/counseling",
+      "name": "counseling",
+      "breakpoint": "tablet",
+      "status": 200,
+      "errors": [],
+      "failed": [
+        "net::ERR_ABORTED http://localhost:4321/",
+        "net::ERR_ABORTED http://localhost:4321/connect/",
+        "net::ERR_ABORTED http://localhost:4321/about/",
+        "net::ERR_ABORTED http://localhost:4321/locations/",
+        "net::ERR_ABORTED http://localhost:4321/messages/",
+        "net::ERR_ABORTED http://localhost:4321/watch/",
+        "net::ERR_ABORTED http://localhost:4321/counseling/",
+        "net::ERR_ABORTED http://localhost:4321/visit/",
+        "net::ERR_ABORTED http://localhost:4321/give/"
+      ],
+      "harness": [],
+      "overflow": {
+        "scrollW": 834,
+        "clientW": 834,
+        "overflowing": false,
+        "offenders": []
+      },
+      "links": [],
+      "shot": "screenshots/baseline/tablet/counseling.png"
+    },
+    {
+      "route": "/connect",
+      "name": "connect",
+      "breakpoint": "tablet",
+      "status": 200,
+      "errors": [],
+      "failed": [
+        "net::ERR_ABORTED http://localhost:4321/",
+        "net::ERR_ABORTED http://localhost:4321/about/",
+        "net::ERR_ABORTED http://localhost:4321/locations/",
+        "net::ERR_ABORTED http://localhost:4321/messages/",
+        "net::ERR_ABORTED http://localhost:4321/watch/",
+        "net::ERR_ABORTED http://localhost:4321/counseling/",
+        "net::ERR_ABORTED http://localhost:4321/visit/",
+        "net::ERR_ABORTED http://localhost:4321/connect/",
+        "net::ERR_ABORTED http://localhost:4321/give/"
+      ],
+      "harness": [],
+      "overflow": {
+        "scrollW": 834,
+        "clientW": 834,
+        "overflowing": false,
+        "offenders": []
+      },
+      "links": [],
+      "shot": "screenshots/baseline/tablet/connect.png"
+    },
+    {
+      "route": "/give",
+      "name": "give",
+      "breakpoint": "tablet",
+      "status": 200,
+      "errors": [],
+      "failed": [
+        "net::ERR_ABORTED http://localhost:4321/",
+        "net::ERR_ABORTED http://localhost:4321/connect/",
+        "net::ERR_ABORTED http://localhost:4321/about/",
+        "net::ERR_ABORTED http://localhost:4321/locations/",
+        "net::ERR_ABORTED http://localhost:4321/messages/",
+        "net::ERR_ABORTED http://localhost:4321/watch/",
+        "net::ERR_ABORTED http://localhost:4321/counseling/",
+        "net::ERR_ABORTED http://localhost:4321/visit/",
+        "net::ERR_ABORTED http://localhost:4321/give/"
+      ],
+      "harness": [],
+      "overflow": {
+        "scrollW": 834,
+        "clientW": 834,
+        "overflowing": false,
+        "offenders": []
+      },
+      "links": [],
+      "shot": "screenshots/baseline/tablet/give.png"
+    },
+    {
+      "route": "/this-page-does-not-exist",
+      "name": "not-found",
+      "breakpoint": "tablet",
+      "status": 404,
+      "errors": [
+        "Failed to load resource: the server responded with a status of 404 (Not Found)"
+      ],
+      "failed": [
+        "net::ERR_ABORTED http://localhost:4321/",
+        "net::ERR_ABORTED http://localhost:4321/visit/",
+        "net::ERR_ABORTED http://localhost:4321/about/",
+        "net::ERR_ABORTED http://localhost:4321/locations/",
+        "net::ERR_ABORTED http://localhost:4321/messages/",
+        "net::ERR_ABORTED http://localhost:4321/watch/",
+        "net::ERR_ABORTED http://localhost:4321/counseling/",
+        "net::ERR_ABORTED http://localhost:4321/connect/",
+        "net::ERR_ABORTED http://localhost:4321/give/"
+      ],
+      "harness": [],
+      "overflow": {
+        "scrollW": 834,
+        "clientW": 834,
+        "overflowing": false,
+        "offenders": []
+      },
+      "links": [],
+      "shot": "screenshots/baseline/tablet/not-found.png"
+    },
+    {
+      "route": "/",
+      "name": "home",
+      "breakpoint": "desktop",
+      "status": 200,
+      "errors": [],
+      "failed": [
+        "net::ERR_ABORTED http://localhost:4321/watch/",
+        "net::ERR_ABORTED http://localhost:4321/visit/",
+        "net::ERR_ABORTED http://localhost:4321/give/",
+        "net::ERR_ABORTED http://localhost:4321/connect/",
+        "net::ERR_ABORTED http://localhost:4321/counseling/",
+        "net::ERR_ABORTED http://localhost:4321/messages/",
+        "net::ERR_ABORTED http://localhost:4321/locations/",
+        "net::ERR_ABORTED http://localhost:4321/about/",
+        "net::ERR_ABORTED http://localhost:4321/locations/hays/",
+        "net::ERR_ABORTED http://localhost:4321/locations/colby/"
+      ],
+      "harness": [],
+      "overflow": {
+        "scrollW": 1440,
+        "clientW": 1440,
+        "overflowing": false,
+        "offenders": []
+      },
+      "links": [
+        "/",
+        "/about/",
+        "/locations/",
+        "/messages/",
+        "/watch/",
+        "/counseling/",
+        "/connect/",
+        "/visit/",
+        "/give/",
+        "/locations/hays/",
+        "/locations/colby/"
+      ],
+      "shot": "screenshots/baseline/desktop/home.png"
+    },
+    {
+      "route": "/about",
+      "name": "about",
+      "breakpoint": "desktop",
+      "status": 200,
+      "errors": [],
+      "failed": [
+        "net::ERR_ABORTED http://localhost:4321/give/",
+        "net::ERR_ABORTED http://localhost:4321/connect/",
+        "net::ERR_ABORTED http://localhost:4321/visit/",
+        "net::ERR_ABORTED http://localhost:4321/beliefs/",
+        "net::ERR_ABORTED http://localhost:4321/counseling/",
+        "net::ERR_ABORTED http://localhost:4321/watch/",
+        "net::ERR_ABORTED http://localhost:4321/messages/",
+        "net::ERR_ABORTED http://localhost:4321/locations/",
+        "net::ERR_ABORTED http://localhost:4321/about/",
+        "net::ERR_ABORTED http://localhost:4321/"
+      ],
+      "harness": [],
+      "overflow": {
+        "scrollW": 1440,
+        "clientW": 1440,
+        "overflowing": false,
+        "offenders": []
+      },
+      "links": [],
+      "shot": "screenshots/baseline/desktop/about.png"
+    },
+    {
+      "route": "/visit",
+      "name": "visit",
+      "breakpoint": "desktop",
+      "status": 200,
+      "errors": [],
+      "failed": [
+        "net::ERR_ABORTED http://localhost:4321/visit/",
+        "net::ERR_ABORTED http://localhost:4321/give/",
+        "net::ERR_ABORTED http://localhost:4321/counseling/",
+        "net::ERR_ABORTED http://localhost:4321/connect/",
+        "net::ERR_ABORTED http://localhost:4321/watch/",
+        "net::ERR_ABORTED http://localhost:4321/messages/",
+        "net::ERR_ABORTED http://localhost:4321/locations/",
+        "net::ERR_ABORTED http://localhost:4321/about/",
+        "net::ERR_ABORTED http://localhost:4321/"
+      ],
+      "harness": [],
+      "overflow": {
+        "scrollW": 1440,
+        "clientW": 1440,
+        "overflowing": false,
+        "offenders": []
+      },
+      "links": [],
+      "shot": "screenshots/baseline/desktop/visit.png"
+    },
+    {
+      "route": "/beliefs",
+      "name": "beliefs",
+      "breakpoint": "desktop",
+      "status": 200,
+      "errors": [],
+      "failed": [
+        "net::ERR_ABORTED http://localhost:4321/counseling/",
+        "net::ERR_ABORTED http://localhost:4321/visit/",
+        "net::ERR_ABORTED http://localhost:4321/connect/",
+        "net::ERR_ABORTED http://localhost:4321/give/",
+        "net::ERR_ABORTED http://localhost:4321/watch/",
+        "net::ERR_ABORTED http://localhost:4321/locations/",
+        "net::ERR_ABORTED http://localhost:4321/messages/",
+        "net::ERR_ABORTED http://localhost:4321/about/",
+        "net::ERR_ABORTED http://localhost:4321/"
+      ],
+      "harness": [],
+      "overflow": {
+        "scrollW": 1440,
+        "clientW": 1440,
+        "overflowing": false,
+        "offenders": []
+      },
+      "links": [],
+      "shot": "screenshots/baseline/desktop/beliefs.png"
+    },
+    {
+      "route": "/locations",
+      "name": "locations",
+      "breakpoint": "desktop",
+      "status": 200,
+      "errors": [],
+      "failed": [
+        "net::ERR_ABORTED http://localhost:4321/locations/hays/",
+        "net::ERR_ABORTED http://localhost:4321/give/",
+        "net::ERR_ABORTED http://localhost:4321/locations/colby/",
+        "net::ERR_ABORTED http://localhost:4321/visit/",
+        "net::ERR_ABORTED http://localhost:4321/connect/",
+        "net::ERR_ABORTED http://localhost:4321/counseling/",
+        "net::ERR_ABORTED http://localhost:4321/watch/",
+        "net::ERR_ABORTED http://localhost:4321/messages/",
+        "net::ERR_ABORTED http://localhost:4321/locations/",
+        "net::ERR_ABORTED http://localhost:4321/about/",
+        "net::ERR_ABORTED http://localhost:4321/"
+      ],
+      "harness": [],
+      "overflow": {
+        "scrollW": 1440,
+        "clientW": 1440,
+        "overflowing": false,
+        "offenders": []
+      },
+      "links": [],
+      "shot": "screenshots/baseline/desktop/locations.png"
+    },
+    {
+      "route": "/locations/hays",
+      "name": "locations-hays",
+      "breakpoint": "desktop",
+      "status": 200,
+      "errors": [],
+      "failed": [
+        "net::ERR_ABORTED http://localhost:4321/visit/",
+        "net::ERR_ABORTED http://localhost:4321/connect/",
+        "net::ERR_ABORTED http://localhost:4321/give/",
+        "net::ERR_ABORTED http://localhost:4321/locations/",
+        "net::ERR_ABORTED http://localhost:4321/counseling/",
+        "net::ERR_ABORTED http://localhost:4321/watch/",
+        "net::ERR_ABORTED http://localhost:4321/messages/",
+        "net::ERR_ABORTED http://localhost:4321/about/",
+        "net::ERR_ABORTED http://localhost:4321/"
+      ],
+      "harness": [],
+      "overflow": {
+        "scrollW": 1440,
+        "clientW": 1440,
+        "overflowing": false,
+        "offenders": []
+      },
+      "links": [],
+      "shot": "screenshots/baseline/desktop/locations-hays.png"
+    },
+    {
+      "route": "/locations/colby",
+      "name": "locations-colby",
+      "breakpoint": "desktop",
+      "status": 200,
+      "errors": [],
+      "failed": [
+        "net::ERR_ABORTED http://localhost:4321/locations/",
+        "net::ERR_ABORTED http://localhost:4321/visit/",
+        "net::ERR_ABORTED http://localhost:4321/connect/",
+        "net::ERR_ABORTED http://localhost:4321/give/",
+        "net::ERR_ABORTED http://localhost:4321/counseling/",
+        "net::ERR_ABORTED http://localhost:4321/watch/",
+        "net::ERR_ABORTED http://localhost:4321/messages/",
+        "net::ERR_ABORTED http://localhost:4321/about/",
+        "net::ERR_ABORTED http://localhost:4321/"
+      ],
+      "harness": [],
+      "overflow": {
+        "scrollW": 1440,
+        "clientW": 1440,
+        "overflowing": false,
+        "offenders": []
+      },
+      "links": [],
+      "shot": "screenshots/baseline/desktop/locations-colby.png"
+    },
+    {
+      "route": "/messages",
+      "name": "messages",
+      "breakpoint": "desktop",
+      "status": 200,
+      "errors": [],
+      "failed": [
+        "net::ERR_ABORTED http://localhost:4321/connect/",
+        "net::ERR_ABORTED http://localhost:4321/give/",
+        "net::ERR_ABORTED http://localhost:4321/watch/",
+        "net::ERR_ABORTED http://localhost:4321/visit/",
+        "net::ERR_ABORTED http://localhost:4321/counseling/",
+        "net::ERR_ABORTED http://localhost:4321/messages/",
+        "net::ERR_ABORTED http://localhost:4321/locations/",
+        "net::ERR_ABORTED http://localhost:4321/about/",
+        "net::ERR_ABORTED http://localhost:4321/"
+      ],
+      "harness": [],
+      "overflow": {
+        "scrollW": 1440,
+        "clientW": 1440,
+        "overflowing": false,
+        "offenders": []
+      },
+      "links": [],
+      "shot": "screenshots/baseline/desktop/messages.png"
+    },
+    {
+      "route": "/watch",
+      "name": "watch",
+      "breakpoint": "desktop",
+      "status": 200,
+      "errors": [],
+      "failed": [
+        "net::ERR_ABORTED http://localhost:4321/give/",
+        "net::ERR_ABORTED http://localhost:4321/visit/",
+        "net::ERR_ABORTED http://localhost:4321/connect/",
+        "net::ERR_ABORTED http://localhost:4321/counseling/",
+        "net::ERR_ABORTED http://localhost:4321/watch/",
+        "net::ERR_ABORTED http://localhost:4321/messages/",
+        "net::ERR_ABORTED http://localhost:4321/locations/",
+        "net::ERR_ABORTED http://localhost:4321/about/",
+        "net::ERR_ABORTED http://localhost:4321/"
+      ],
+      "harness": [],
+      "overflow": {
+        "scrollW": 1440,
+        "clientW": 1440,
+        "overflowing": false,
+        "offenders": []
+      },
+      "links": [],
+      "shot": "screenshots/baseline/desktop/watch.png"
+    },
+    {
+      "route": "/counseling",
+      "name": "counseling",
+      "breakpoint": "desktop",
+      "status": 200,
+      "errors": [],
+      "failed": [
+        "net::ERR_ABORTED http://localhost:4321/give/",
+        "net::ERR_ABORTED http://localhost:4321/visit/",
+        "net::ERR_ABORTED http://localhost:4321/connect/",
+        "net::ERR_ABORTED http://localhost:4321/counseling/",
+        "net::ERR_ABORTED http://localhost:4321/watch/",
+        "net::ERR_ABORTED http://localhost:4321/messages/",
+        "net::ERR_ABORTED http://localhost:4321/locations/",
+        "net::ERR_ABORTED http://localhost:4321/about/",
+        "net::ERR_ABORTED http://localhost:4321/"
+      ],
+      "harness": [],
+      "overflow": {
+        "scrollW": 1440,
+        "clientW": 1440,
+        "overflowing": false,
+        "offenders": []
+      },
+      "links": [],
+      "shot": "screenshots/baseline/desktop/counseling.png"
+    },
+    {
+      "route": "/connect",
+      "name": "connect",
+      "breakpoint": "desktop",
+      "status": 200,
+      "errors": [],
+      "failed": [
+        "net::ERR_ABORTED http://localhost:4321/give/",
+        "net::ERR_ABORTED http://localhost:4321/connect/",
+        "net::ERR_ABORTED http://localhost:4321/visit/",
+        "net::ERR_ABORTED http://localhost:4321/counseling/",
+        "net::ERR_ABORTED http://localhost:4321/watch/",
+        "net::ERR_ABORTED http://localhost:4321/messages/",
+        "net::ERR_ABORTED http://localhost:4321/locations/",
+        "net::ERR_ABORTED http://localhost:4321/about/",
+        "net::ERR_ABORTED http://localhost:4321/"
+      ],
+      "harness": [],
+      "overflow": {
+        "scrollW": 1440,
+        "clientW": 1440,
+        "overflowing": false,
+        "offenders": []
+      },
+      "links": [],
+      "shot": "screenshots/baseline/desktop/connect.png"
+    },
+    {
+      "route": "/give",
+      "name": "give",
+      "breakpoint": "desktop",
+      "status": 200,
+      "errors": [],
+      "failed": [
+        "net::ERR_ABORTED http://localhost:4321/connect/",
+        "net::ERR_ABORTED http://localhost:4321/give/",
+        "net::ERR_ABORTED http://localhost:4321/visit/",
+        "net::ERR_ABORTED http://localhost:4321/counseling/",
+        "net::ERR_ABORTED http://localhost:4321/watch/",
+        "net::ERR_ABORTED http://localhost:4321/messages/",
+        "net::ERR_ABORTED http://localhost:4321/locations/",
+        "net::ERR_ABORTED http://localhost:4321/about/",
+        "net::ERR_ABORTED http://localhost:4321/"
+      ],
+      "harness": [],
+      "overflow": {
+        "scrollW": 1440,
+        "clientW": 1440,
+        "overflowing": false,
+        "offenders": []
+      },
+      "links": [],
+      "shot": "screenshots/baseline/desktop/give.png"
+    },
+    {
+      "route": "/this-page-does-not-exist",
+      "name": "not-found",
+      "breakpoint": "desktop",
+      "status": 404,
+      "errors": [
+        "Failed to load resource: the server responded with a status of 404 (Not Found)"
+      ],
+      "failed": [
+        "net::ERR_ABORTED http://localhost:4321/locations/",
+        "net::ERR_ABORTED http://localhost:4321/watch/",
+        "net::ERR_ABORTED http://localhost:4321/messages/",
+        "net::ERR_ABORTED http://localhost:4321/about/",
+        "net::ERR_ABORTED http://localhost:4321/",
+        "net::ERR_ABORTED http://localhost:4321/visit/",
+        "net::ERR_ABORTED http://localhost:4321/give/",
+        "net::ERR_ABORTED http://localhost:4321/connect/",
+        "net::ERR_ABORTED http://localhost:4321/counseling/"
+      ],
+      "harness": [],
+      "overflow": {
+        "scrollW": 1440,
+        "clientW": 1440,
+        "overflowing": false,
+        "offenders": []
+      },
+      "links": [],
+      "shot": "screenshots/baseline/desktop/not-found.png"
+    }
+  ]
+}

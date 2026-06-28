@@ -61,7 +61,7 @@ export default function LocationsPage() {
                   className="absolute inset-0"
                   style={{
                     background:
-                      "linear-gradient(to top, rgba(10,10,10,0.88) 0%, rgba(10,10,10,0.4) 55%, rgba(10,10,10,0.1) 100%)",
+                      "linear-gradient(to top, rgba(10,10,10,0.90) 0%, rgba(10,10,10,0.55) 45%, rgba(10,10,10,0.15) 80%, transparent 100%)",
                   }}
                 />
                 <div className="absolute inset-0 flex flex-col justify-end p-8 md:p-10">

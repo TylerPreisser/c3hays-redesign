@@ -51,7 +51,7 @@ const recentMessages = [
     series: "Hearing God",
     speaker: "Lead Pastor",
     date: "March 22, 2026",
-    image: "/images/nt26.webp",
+    image: "/images/bg-2.webp",
   },
 ];
 

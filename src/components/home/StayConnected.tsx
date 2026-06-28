@@ -96,17 +96,17 @@ export default function StayConnected() {
         </div>
 
         {/*
-          Mobile (< lg): horizontal-scroll carousel with snap points + per-tile borders
-          Desktop (lg+): clean 4-up grid, single outer border, internal hairlines via border-right
+          Mobile (< lg): vertical stack — every card fully visible, no swipe needed.
+          Desktop (lg+): clean 4-up grid, single outer border, internal hairlines via border-right.
         */}
         <div
           className="
             connect-grid
-            flex overflow-x-auto snap-x snap-mandatory gap-6 -mx-6 px-6 no-scrollbar
-            lg:grid lg:grid-cols-4 lg:gap-0 lg:overflow-visible lg:mx-0 lg:px-0
-            lg:border lg:border-solid
+            flex flex-col overflow-hidden
+            lg:grid lg:grid-cols-4 lg:gap-0
+            border border-solid
           "
-          style={{ borderColor: "rgba(27,28,28,0.1)" }}
+          style={{ borderColor: "rgba(27,28,28,0.1)", borderRadius: "var(--radius-md)" }}
         >
           {connectItems.map((item) => {
             const Icon = item.icon;
@@ -118,14 +118,11 @@ export default function StayConnected() {
                 rel={item.href.startsWith("http") ? "noopener noreferrer" : undefined}
                 className="
                   connect-item group block transition-colors duration-200
-                  shrink-0 lg:shrink-1 snap-start
-                  w-[280px] lg:w-auto
-                  border border-solid lg:border-0
-                  lg:border-r lg:last:border-r-0
+                  border-b border-solid last:border-b-0
+                  lg:border-b-0 lg:border-r lg:last:border-r-0
                 "
                 style={{
-                  padding: "3.5rem 2rem",
-                  minHeight: "420px",
+                  padding: "3rem 2rem",
                   display: "flex",
                   flexDirection: "column",
                   borderColor: "rgba(27,28,28,0.1)",
@@ -161,11 +158,6 @@ export default function StayConnected() {
             );
           })}
         </div>
-
-        {/* Mobile-only swipe hint */}
-        <p className="lg:hidden mt-6 text-xs uppercase tracking-[0.18em]" style={{ color: "rgba(27,28,28,0.35)" }}>
-          ← Swipe →
-        </p>
       </div>
     </section>
   );

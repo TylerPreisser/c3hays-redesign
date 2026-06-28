@@ -112,7 +112,7 @@ export default function MeetGrowServe() {
           {pillars.map((pillar) => (
             <div key={pillar.word} className="pillar-tile group">
               {/* Image — 4:5 portrait ratio, clip-path wipe, scale on hover */}
-              <div className="pillar-img-wrap relative overflow-hidden mb-6" style={{ aspectRatio: "4/5", minHeight: 320 }}>
+              <div className="pillar-img-wrap relative overflow-hidden mb-6" style={{ aspectRatio: "4/5", minHeight: 320, borderRadius: "var(--radius-md)" }}>
                 <Image
                   src={assetPath(pillar.image)}
                   alt={pillar.headline}

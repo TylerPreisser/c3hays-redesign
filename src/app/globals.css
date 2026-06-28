@@ -33,10 +33,11 @@
   --font-sans:        var(--font-hanken), "Hanken Grotesk", "Helvetica Neue", Helvetica, Arial, sans-serif;
   --font-display:     var(--font-hanken), "Helvetica Neue", Helvetica, Arial, sans-serif;
 
-  /* ── Radii (keep sharp) ───────────────────── */
-  --radius-sm:        0.25rem;
-  --radius:           0.25rem;
-  --radius-md:        0.25rem;
+  /* ── Radii — soft & rounded, Church-on-the-Move style ───── */
+  --radius-sm:        0.625rem;   /* inputs, small chips */
+  --radius:           1rem;       /* default cards */
+  --radius-md:        1.25rem;    /* large feature cards */
+  --radius-pill:      999px;      /* buttons + selects = pills */
 }
 
 /* ─────────────────────────────────────────────
@@ -192,7 +193,7 @@ img, video, svg {
 }
 
 /* ─────────────────────────────────────────────
-   Buttons — sharp-edged CotM style
+   Buttons — rounded PILL style, Church-on-the-Move energy
    ───────────────────────────────────────────── */
 .btn {
   display: inline-flex;
@@ -200,20 +201,21 @@ img, video, svg {
   justify-content: center;
   gap: 0.5rem;
   font-family: var(--font-sans);
-  font-size: 0.875rem;
+  font-size: 0.8125rem;
   font-weight: 700;
   line-height: 1;
   text-decoration: none;
   border: 2px solid transparent;
   cursor: pointer;
-  transition: background-color 250ms cubic-bezier(0.33, 0, 0.19, 1),
-              color 250ms cubic-bezier(0.33, 0, 0.19, 1),
-              border-color 250ms cubic-bezier(0.33, 0, 0.19, 1);
-  border-radius: 0;
+  transition: background-color 220ms cubic-bezier(0.33, 0, 0.19, 1),
+              color 220ms cubic-bezier(0.33, 0, 0.19, 1),
+              border-color 220ms cubic-bezier(0.33, 0, 0.19, 1),
+              transform 220ms cubic-bezier(0.33, 0, 0.19, 1);
+  border-radius: var(--radius-pill);
   white-space: nowrap;
-  padding: 1.125rem 2rem;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
+  padding: 1rem 1.85rem;
+  letter-spacing: 0.04em;
+  text-transform: none;
 }
 
 /* Primary — teal fill */
@@ -297,25 +299,29 @@ img, video, svg {
 }
 
 .btn-sm {
-  padding: 0.75rem 1.25rem;
+  padding: 0.7rem 1.35rem;
   font-size: 0.8125rem;
 }
 
+/* Gentle pill lift on hover (COTM friendliness) */
+.btn:hover { transform: translateY(-1px); }
+.btn:active { transform: translateY(0); }
+
 /* ─────────────────────────────────────────────
-   Cards — flat, no shadows on default
+   Cards — rounded, soft Church-on-the-Move style
    ───────────────────────────────────────────── */
 .card {
   background: #fff;
-  border-radius: 0;
+  border-radius: var(--radius-md);
   overflow: hidden;
   transition: transform 300ms cubic-bezier(0.33, 0, 0.19, 1);
 }
 
-/* Card glass — flat dark surface */
+/* Card glass — rounded dark surface */
 .card-glass {
   background: rgba(255, 255, 255, 0.08);
   border: 1px solid rgba(255, 255, 255, 0.15);
-  border-radius: 0;
+  border-radius: var(--radius-md);
 }
 
 /* ─────────────────────────────────────────────
@@ -526,6 +532,30 @@ html.lenis body {
 .textarea-c3 {
   resize: vertical;
   min-height: 130px;
+}
+
+/* Footer newsletter input — dark-surface variant.
+   Defined as a class (not inline styles) so server/client markup is
+   deterministic and never triggers a hydration mismatch. */
+.newsletter-input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  font-size: max(1rem, 16px);
+  line-height: 1.4;
+  color: #fff;
+  background-color: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: var(--radius-pill);
+  outline: none;
+  transition: border-color 150ms ease, background-color 150ms ease;
+  -webkit-appearance: none;
+}
+.newsletter-input::placeholder {
+  color: rgba(255, 255, 255, 0.35);
+}
+.newsletter-input:focus {
+  border-color: rgba(255, 255, 255, 0.45);
+  background-color: rgba(255, 255, 255, 0.1);
 }
 
 /* ─────────────────────────────────────────────

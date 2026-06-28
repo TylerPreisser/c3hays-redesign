@@ -45,7 +45,7 @@ export default function HaysCampusPage() {
       </section>
 
       {/* Details */}
-      <section className="section" style={{ backgroundColor: "#ffffff" }}>
+      <section className="section" style={{ backgroundColor: "#ffffff", paddingBottom: "4.5rem" }}>
         <div className="container-c3">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
             {/* Main info */}
@@ -148,23 +148,51 @@ export default function HaysCampusPage() {
         </div>
       </section>
 
-      {/* Map placeholder */}
+      {/* Campus location visual */}
       <section style={{ backgroundColor: "#1b1c1c" }}>
         <div className="container-c3 py-8">
           <div
-            className="flex items-center justify-center"
-            style={{ height: 280, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }}
-            aria-label="Campus map"
+            className="relative overflow-hidden"
+            style={{ height: 320 }}
           >
-            <a
-              href="https://maps.google.com/?q=5790+230th+Ave,+Hays,+KS+67601"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="btn btn-primary inline-flex items-center gap-2"
-            >
-              <Navigation size={16} />
-              Open in Google Maps
-            </a>
+            <Image
+              src={assetPath("/images/building.webp")}
+              alt="C3 Hays campus building"
+              fill
+              className="object-cover"
+            />
+            {/* Dark gradient scrim for text legibility */}
+            <div
+              className="absolute inset-0"
+              style={{
+                background:
+                  "linear-gradient(to top, rgba(10,10,10,0.92) 0%, rgba(10,10,10,0.55) 50%, rgba(10,10,10,0.20) 100%)",
+              }}
+            />
+            {/* Address + CTA overlaid at bottom */}
+            <div className="absolute inset-0 flex flex-col justify-end p-8 md:p-10">
+              <p
+                className="text-xs font-bold uppercase tracking-widest mb-2"
+                style={{ color: "#1cc3af" }}
+              >
+                Campus Location
+              </p>
+              <p
+                className="font-semibold text-white mb-1"
+                style={{ fontSize: "1.05rem" }}
+              >
+                5790 230th Ave, Hays, KS 67601
+              </p>
+              <a
+                href="https://maps.google.com/?q=5790+230th+Ave,+Hays,+KS+67601"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn btn-primary btn-sm inline-flex items-center gap-2 mt-4 self-start"
+              >
+                <Navigation size={13} />
+                Open in Google Maps
+              </a>
+            </div>
           </div>
         </div>
       </section>

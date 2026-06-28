@@ -63,12 +63,18 @@ export default function CounselingPage() {
                 key={c.id}
                 className="counselor-card p-8"
               >
-                {/* Monogram avatar */}
+                {/* Monogram avatar — intentional teal-tinted design token */}
                 <div
-                  className="w-14 h-14 flex items-center justify-center mb-6"
-                  style={{ background: "#1b1c1c" }}
+                  className="w-14 h-14 flex items-center justify-center mb-6 rounded-full shrink-0"
+                  style={{
+                    background: "rgba(28, 195, 175, 0.10)",
+                    border: "2px solid #1cc3af",
+                  }}
                 >
-                  <span className="text-lg font-bold text-white">
+                  <span
+                    className="text-base font-bold tracking-wide"
+                    style={{ color: "#1cc3af" }}
+                  >
                     {c.name.split(" ").map((n) => n[0]).join("")}
                   </span>
                 </div>
@@ -118,9 +124,9 @@ export default function CounselingPage() {
       {/* Fees & policies */}
       <section className="section" style={{ backgroundColor: "#1b1c1c" }}>
         <div className="container-c3">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-0 max-w-2xl"
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-0"
             style={{ border: "1px solid rgba(255,255,255,0.1)" }}>
-            <div className="p-8" style={{ borderRight: "1px solid rgba(255,255,255,0.1)" }}>
+            <div className="p-8" style={{ borderBottom: "1px solid rgba(255,255,255,0.1)" }}>
               <DollarSign size={24} style={{ color: "#1cc3af" }} className="mb-5" />
               <h3 className="font-bold text-white mb-4">Fees</h3>
               <ul className="flex flex-col gap-2.5 text-sm" style={{ color: "rgba(255,255,255,0.6)" }}>
@@ -142,17 +148,42 @@ export default function CounselingPage() {
                 </li>
               </ul>
             </div>
-            <div className="p-8">
+            <div
+              className="p-8"
+              style={{
+                borderBottom: "1px solid rgba(255,255,255,0.1)",
+                borderLeft: "1px solid rgba(255,255,255,0.1)",
+                borderRight: "1px solid rgba(255,255,255,0.1)",
+              }}
+            >
               <Phone size={24} style={{ color: "#1cc3af" }} className="mb-5" />
               <h3 className="font-bold text-white mb-4">Cancellation Policy</h3>
               <ul className="flex flex-col gap-2.5 text-sm" style={{ color: "rgba(255,255,255,0.6)" }}>
                 <li className="flex items-start gap-2">
-                  <CheckCircle size={13} style={{ color: "rgba(255,255,255,0.3)", marginTop: 2 }} className="shrink-0" />
+                  <CheckCircle size={13} style={{ color: "#1cc3af", marginTop: 2 }} className="shrink-0" />
                   <span>24-hour notice required for cancellations</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <CheckCircle size={13} style={{ color: "rgba(255,255,255,0.3)", marginTop: 2 }} className="shrink-0" />
+                  <CheckCircle size={13} style={{ color: "#1cc3af", marginTop: 2 }} className="shrink-0" />
                   <span>No-shows are charged the $75 session fee</span>
+                </li>
+              </ul>
+            </div>
+            <div className="p-8">
+              <CheckCircle size={24} style={{ color: "#1cc3af" }} className="mb-5" />
+              <h3 className="font-bold text-white mb-4">Getting Started</h3>
+              <ul className="flex flex-col gap-2.5 text-sm" style={{ color: "rgba(255,255,255,0.6)" }}>
+                <li className="flex items-start gap-2">
+                  <CheckCircle size={13} style={{ color: "#1cc3af", marginTop: 2 }} className="shrink-0" />
+                  <span>Reach out via our connect form or call the church office</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <CheckCircle size={13} style={{ color: "#1cc3af", marginTop: 2 }} className="shrink-0" />
+                  <span>We&apos;ll match you with the right counselor for your needs</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <CheckCircle size={13} style={{ color: "#1cc3af", marginTop: 2 }} className="shrink-0" />
+                  <span>Confidential — your privacy is always protected</span>
                 </li>
               </ul>
             </div>

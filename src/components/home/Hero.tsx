@@ -4,6 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { assetPath } from "@/lib/asset-path";
+import CampusChooser from "./CampusChooser";
 
 /* ─────────────────────────────────────────────
    LIVE STREAM CONFIG
@@ -49,20 +50,28 @@ export default function Hero() {
       {/* ── Background — B&W worship moment with subtle gradient ── */}
       <div className="absolute inset-0 z-0">
         <Image
-          src={assetPath("/images/worship.webp")}
+          src={assetPath("/images/building.webp")}
           alt=""
           fill
           priority
           sizes="100vw"
           className="object-cover animate-ken-burns"
-          style={{ objectPosition: "center 30%" }}
+          style={{ objectPosition: "center 35%" }}
         />
-        {/* Lighter overlay — image is already dark/B&W, no need to crush it */}
+        {/* Scrim — guarantees the centered white headline reads at AA over any
+            part of the photo (vertical gradient + a soft center vignette). */}
         <div
           className="absolute inset-0"
           style={{
             background:
-              "linear-gradient(180deg, rgba(10,10,10,0.55) 0%, rgba(10,10,10,0.35) 40%, rgba(10,10,10,0.65) 100%)",
+              "linear-gradient(180deg, rgba(10,10,10,0.6) 0%, rgba(10,10,10,0.42) 45%, rgba(10,10,10,0.8) 100%)",
+          }}
+        />
+        <div
+          className="absolute inset-0"
+          style={{
+            background:
+              "radial-gradient(ellipse 70% 55% at 50% 50%, rgba(10,10,10,0.45) 0%, transparent 70%)",
           }}
         />
       </div>
@@ -91,18 +100,16 @@ export default function Hero() {
           ))}
         </h1>
 
-        {/* CTAs — small + spaced */}
+        {/* CTAs — campus chooser leads (the COTM "Find a Church" move), then secondary links */}
         <motion.div
-          className="flex flex-wrap items-center justify-center gap-6 md:gap-8"
+          className="flex flex-wrap items-center justify-center gap-4 md:gap-5"
           initial={{ opacity: 0, y: 14 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, ease: "easeOut", delay: 0.7 }}
         >
-          <Link href="/visit/" className="btn btn-primary btn-sm">
+          <CampusChooser variant="light" />
+          <Link href="/visit/" className="btn btn-hero-ghost btn-sm">
             Plan Your Visit
-          </Link>
-          <Link href="/watch/" className="btn btn-hero-ghost btn-sm">
-            Watch Live
           </Link>
         </motion.div>
       </div>

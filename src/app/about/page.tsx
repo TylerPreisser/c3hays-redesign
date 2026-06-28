@@ -72,33 +72,46 @@ export default function AboutPage() {
       {/* Mission */}
       <section className="section" style={{ backgroundColor: "#ffffff" }}>
         <div className="container-c3">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
-            <div>
-              <h2 className="display-2 mb-6 text-balance" style={{ color: "#1b1c1c" }}>
+          {/* items-stretch so both columns fill the same height; image covers fully */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-stretch">
+            {/* Text column — flex column so content spreads with room to breathe */}
+            <div className="flex flex-col justify-center">
+              <h2 className="display-2 mb-8 text-balance" style={{ color: "#1b1c1c" }}>
                 We exist to{" "}
                 <em className="not-italic" style={{ color: "#1cc3af" }}>Meet.</em>{" "}
                 <em className="not-italic" style={{ color: "#1cc3af" }}>Grow.</em>{" "}
                 <em className="not-italic" style={{ color: "#1cc3af" }}>Serve.</em>
               </h2>
-              <p className="body-lg mb-5" style={{ color: "rgba(27,28,28,0.70)" }}>
+
+              {/* Lead sentence — slightly larger, more weight */}
+              <p className="body-lg mb-6" style={{ color: "rgba(27,28,28,0.80)", fontWeight: 500 }}>
                 {site.mission}
               </p>
-              <p className="body-base mb-5" style={{ color: "rgba(27,28,28,0.65)" }}>
+
+              {/* Supporting paragraph 1 */}
+              <p className="body-base mb-5" style={{ color: "rgba(27,28,28,0.65)", lineHeight: 1.75 }}>
                 Celebration Community Church began with a simple conviction: that
-                the local church matters. That when people gather in the name of
+                the local church matters. When people gather in the name of
                 Jesus, lives change. Families are restored. Communities are
                 transformed.
               </p>
-              <p className="body-base mb-10" style={{ color: "rgba(27,28,28,0.65)" }}>
+
+              {/* Supporting paragraph 2 */}
+              <p className="body-base mb-10" style={{ color: "rgba(27,28,28,0.65)", lineHeight: 1.75 }}>
                 From our roots in Hays, Kansas, we&apos;ve grown into a multi-campus
                 church family that spans northwest Kansas — with one vision, one
                 mission, and one King.
               </p>
-              <Link href="/beliefs/" className="btn btn-primary btn-lg">
-                What We Believe
-              </Link>
+
+              <div>
+                <Link href="/beliefs/" className="btn btn-primary btn-lg">
+                  What We Believe
+                </Link>
+              </div>
             </div>
-            <div className="relative overflow-hidden" style={{ height: 480, borderRadius: 0 }}>
+
+            {/* Image column — position:relative, no fixed height — stretches to match text */}
+            <div className="relative overflow-hidden lg:min-h-[480px]" style={{ borderRadius: "var(--radius-md)" }}>
               <Image
                 src={assetPath("/images/gather.webp")}
                 alt="Church gathering"

@@ -105,52 +105,97 @@ export default function VisitPage() {
       </section>
 
       {/* Service times */}
-      <section className="section" style={{ backgroundColor: "#1b1c1c" }}>
-        <div className="container-c3">
-          <div className="max-w-xl mb-12">
-            <h2 className="heading-1 text-white">When do services meet?</h2>
+      <section className="relative overflow-hidden" style={{ backgroundColor: "#1b1c1c" }}>
+        {/* Full-bleed two-column split: content left, photo right */}
+        <div className="flex flex-col lg:flex-row lg:min-h-[640px]">
+
+          {/* ── Left: heading + campus cards ────────────────── */}
+          <div className="flex-1 min-w-0 section lg:py-20 xl:py-24">
+            <div className="container-c3 lg:pr-0 xl:pr-0">
+              <div className="mb-12">
+                <p className="overline mb-4" style={{ color: "#1cc3af" }}>Join Us</p>
+                <h2 className="heading-1 text-white">When do services meet?</h2>
+              </div>
+
+              {/* Campus cards — always 2-col side-by-side from sm up */}
+              <div
+                className="grid grid-cols-1 sm:grid-cols-2 gap-0"
+                style={{ border: "1px solid rgba(255,255,255,0.1)" }}
+              >
+                {locations.map((loc, i) => (
+                  <div
+                    key={loc.id}
+                    className="p-8"
+                    style={{
+                      borderRight: i === 0 ? "1px solid rgba(255,255,255,0.1)" : "none",
+                    }}
+                  >
+                    <h3
+                      className="font-bold text-sm uppercase tracking-widest mb-5"
+                      style={{ color: "#1cc3af" }}
+                    >
+                      {loc.name} Campus
+                    </h3>
+                    <div className="flex items-start gap-3 mb-4">
+                      <MapPin
+                        size={14}
+                        style={{ color: "rgba(255,255,255,0.4)", marginTop: 2 }}
+                        className="shrink-0"
+                      />
+                      <address
+                        className="not-italic text-sm"
+                        style={{ color: "rgba(255,255,255,0.55)" }}
+                      >
+                        {loc.street}, {loc.city}, {loc.state} {loc.zip}
+                      </address>
+                    </div>
+                    <div className="flex flex-col gap-2 mb-6">
+                      {loc.services.map((s) => (
+                        <div key={s.day} className="flex items-center gap-2.5">
+                          <Clock size={13} style={{ color: "rgba(255,255,255,0.35)" }} />
+                          <span className="text-sm" style={{ color: "rgba(255,255,255,0.65)" }}>
+                            <strong className="text-white font-semibold">{s.day}:</strong>{" "}
+                            {s.times.join(" · ")}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                    <a
+                      href={loc.mapsUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="btn btn-outline btn-sm inline-flex items-center gap-1.5"
+                    >
+                      <MapPin size={13} />
+                      Directions
+                    </a>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-0 max-w-3xl"
-            style={{ border: "1px solid rgba(255,255,255,0.1)" }}>
-            {locations.map((loc, i) => (
-              <div
-                key={loc.id}
-                className="p-8"
-                style={{ borderRight: i === 0 ? "1px solid rgba(255,255,255,0.1)" : "none" }}
-              >
-                <h3 className="font-bold text-sm uppercase tracking-widest mb-5" style={{ color: "#1cc3af" }}>
-                  {loc.name} Campus
-                </h3>
-                <div className="flex items-start gap-3 mb-4">
-                  <MapPin size={14} style={{ color: "rgba(255,255,255,0.4)", marginTop: 2 }} className="shrink-0" />
-                  <address className="not-italic text-sm" style={{ color: "rgba(255,255,255,0.55)" }}>
-                    {loc.street}, {loc.city}, {loc.state} {loc.zip}
-                  </address>
-                </div>
-                <div className="flex flex-col gap-2 mb-6">
-                  {loc.services.map((s) => (
-                    <div key={s.day} className="flex items-center gap-2.5">
-                      <Clock size={13} style={{ color: "rgba(255,255,255,0.35)" }} />
-                      <span className="text-sm" style={{ color: "rgba(255,255,255,0.65)" }}>
-                        <strong className="text-white font-semibold">{s.day}:</strong>{" "}
-                        {s.times.join(" · ")}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-                <a
-                  href={loc.mapsUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="btn btn-outline btn-sm inline-flex items-center gap-1.5"
-                >
-                  <MapPin size={13} />
-                  Directions
-                </a>
-              </div>
-            ))}
+          {/* ── Right: worship photo column — desktop only ───── */}
+          <div
+            className="hidden lg:block lg:w-2/5 xl:w-1/2 relative shrink-0"
+            aria-hidden="true"
+          >
+            <Image
+              src={assetPath("/images/gather.webp")}
+              alt=""
+              fill
+              className="object-cover object-center"
+            />
+            {/* Left-edge fade to blend into the dark section */}
+            <div
+              className="absolute inset-0"
+              style={{
+                background:
+                  "linear-gradient(to right, rgba(27,28,28,0.85) 0%, rgba(27,28,28,0.25) 40%, transparent 100%)",
+              }}
+            />
           </div>
+
         </div>
       </section>
 

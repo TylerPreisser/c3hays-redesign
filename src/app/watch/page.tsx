@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Play } from "lucide-react";
 import { assetPath } from "@/lib/asset-path";
+import MockLiveStream from "@/components/watch/MockLiveStream";
 
 export const metadata: Metadata = {
   title: "Watch Live",
@@ -38,7 +39,7 @@ export default function WatchPage() {
       <section className="relative flex items-end overflow-hidden" style={{ minHeight: "50vh" }}>
         <div className="absolute inset-0">
           <Image
-            src={assetPath("/images/worship.webp")}
+            src={assetPath("/images/gather.webp")}
             alt="C3 live worship service"
             fill
             className="object-cover"
@@ -64,31 +65,9 @@ export default function WatchPage() {
       {/* Live player */}
       <section style={{ backgroundColor: "#0a0a0a", paddingTop: "2rem", paddingBottom: "3rem" }}>
         <div className="container-c3">
-          <div
-            className="relative w-full overflow-hidden"
-            style={{ paddingBottom: "56.25%", borderRadius: 0 }}
-          >
-            <iframe
-              src="https://vimeo.com/event/1/embed"
-              className="absolute inset-0 w-full h-full"
-              title="C3 Live Stream"
-              allow="autoplay; fullscreen; picture-in-picture"
-              allowFullScreen
-            />
-            {/* Offline fallback */}
-            <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-6 pointer-events-none">
-              <div
-                className="w-16 h-16 flex items-center justify-center mb-5"
-                style={{ background: "rgba(28,195,175,0.15)", border: "1px solid rgba(28,195,175,0.35)" }}
-              >
-                <Play size={24} className="text-white ml-1" />
-              </div>
-              <p className="text-sm max-w-sm" style={{ color: "rgba(255,255,255,0.45)" }}>
-                Join us live: Saturdays 5 PM · Sundays 8 AM, 9:30 AM &amp; 11 AM
-                (Hays) · Sundays 10 AM (Colby)
-              </p>
-            </div>
-          </div>
+          {/* Labeled MOCK live-stream adapter — zero external calls.
+              Production swaps this for the real Vimeo/Mux embed. */}
+          <MockLiveStream poster="/images/congregation.webp" isLive={false} nextService="Saturday · 5:00 PM" />
 
           <div className="mt-6 flex flex-wrap gap-3">
             <a

@@ -81,10 +81,10 @@ export default function NT26Feature() {
             </Link>
           </div>
 
-          {/* Image right — sharp corners, clip-path reveal */}
+          {/* Image right — rounded, clip-path reveal */}
           <div
             className="nt26-img relative overflow-hidden"
-            style={{ aspectRatio: "4/3", minHeight: 280, borderRadius: 0 }}
+            style={{ aspectRatio: "4/3", minHeight: 280, borderRadius: "var(--radius-md)" }}
           >
             <Image
               src={assetPath("/images/nt26.webp")}

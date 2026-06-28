@@ -46,7 +46,7 @@ export const locations: Location[] = [
     zip: "67701",
     services: [{ day: "Sunday", times: ["10:00 AM"] }],
     mapsUrl: "https://maps.google.com/?q=1923+S+Range,+Colby,+KS+67701",
-    image: "/images/building.webp",
+    image: "/images/hero-2.webp",
     description:
       "Bringing the same heart and vision to northwest Kansas. Join us Sunday morning at our Colby campus.",
   },

@@ -13,20 +13,10 @@ export default function NewsletterForm() {
         inputMode="email"
         autoComplete="email"
         placeholder="your@email.com"
-        className="w-full px-4 py-3 text-sm bg-white/8 border border-white/15 text-white placeholder:text-white/35 outline-none focus:border-white/40 transition-colors duration-150"
-        style={{
-          fontSize: "max(1rem, 16px)",
-          borderRadius: 0,
-          backgroundColor: "rgba(255,255,255,0.07)",
-          borderColor: "rgba(255,255,255,0.14)",
-        }}
+        className="newsletter-input"
         aria-label="Email address"
       />
-      <button
-        type="submit"
-        className="btn btn-primary w-full"
-        style={{ borderRadius: 0 }}
-      >
+      <button type="submit" className="btn btn-primary w-full">
         Subscribe
       </button>
     </form>
