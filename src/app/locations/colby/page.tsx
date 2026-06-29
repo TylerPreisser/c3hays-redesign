@@ -113,7 +113,7 @@ export default function ColbyCampusPage() {
         <div className="container-c3 py-8">
           <div
             className="relative overflow-hidden"
-            style={{ height: 320 }}
+            style={{ height: 320, borderRadius: "var(--radius-md)" }}
           >
             <Image
               src={assetPath("/images/congregation.webp")}

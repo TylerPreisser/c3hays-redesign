@@ -129,16 +129,16 @@ export default function AboutPage() {
           <div className="max-w-xl mb-14">
             <h2 className="display-2 text-white">Our Values</h2>
           </div>
-          {/* Values grid — outline container, inner cell borders */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"
-            style={{ border: "1px solid rgba(255,255,255,0.08)" }}>
+          {/* Values grid — separate rounded cards */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {values.map((v, i) => (
               <div
                 key={i}
                 className="p-8"
                 style={{
-                  borderBottom: i < values.length - 3 ? "1px solid rgba(255,255,255,0.08)" : undefined,
-                  borderRight: "1px solid rgba(255,255,255,0.08)",
+                  background: "rgba(255,255,255,0.04)",
+                  border: "1px solid rgba(255,255,255,0.10)",
+                  borderRadius: "var(--radius-md)",
                 }}
               >
                 <span

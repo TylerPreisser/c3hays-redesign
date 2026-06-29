@@ -7,3 +7,9 @@ out/
 _recon/
 _recon-favicon.png
 next-env.d.ts
+
+# QA artifacts (not part of the site)
+screenshots/
+_redesign-home-hero.png
+_preview*.png
+tsconfig.tsbuildinfo

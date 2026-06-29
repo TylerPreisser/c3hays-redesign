@@ -1,2 +1,0 @@
-baseline
-shots=39 consoleErrors=3 failedReq=350 overflowDefects=0

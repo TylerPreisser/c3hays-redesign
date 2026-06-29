@@ -81,7 +81,17 @@ export default function StayConnected() {
         }
       );
     }, sectionRef);
-    return () => ctx.revert();
+
+    // Fail-safe: if ScrollTrigger never fires (fast scroll, smooth-scroll quirks,
+    // headless capture), force the cards visible so this section is NEVER empty.
+    const failsafe = setTimeout(() => {
+      gsap.set([".connect-heading", ".connect-item"], { opacity: 1, y: 0 });
+    }, 1600);
+
+    return () => {
+      clearTimeout(failsafe);
+      ctx.revert();
+    };
   }, []);
 
   return (

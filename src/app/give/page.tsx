@@ -83,16 +83,18 @@ export default function GivePage() {
             <h2 className="display-2" style={{ color: "#1b1c1c" }}>Three ways to give</h2>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 mb-16"
-            style={{ border: "1.5px solid rgba(27,28,28,0.1)" }}>
-            {givingOptions.map((opt, i) => {
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
+            {givingOptions.map((opt) => {
               const Icon = opt.icon;
               return (
                 <div
                   key={opt.title}
-                  className="give-card"
+                  className="flex flex-col"
                   style={{
-                    borderBottom: i < givingOptions.length - 1 ? "1.5px solid rgba(27,28,28,0.1)" : "none",
+                    background: "#fff",
+                    border: "1px solid rgba(27,28,28,0.10)",
+                    borderRadius: "var(--radius-md)",
+                    padding: "2rem",
                   }}
                 >
                   <div className="mb-6">
@@ -103,7 +105,7 @@ export default function GivePage() {
                     />
                   </div>
                   <h3 className="heading-3 mb-3" style={{ color: "#1b1c1c" }}>{opt.title}</h3>
-                  <p className="give-card-body text-sm leading-relaxed mb-6" style={{ color: "rgba(27,28,28,0.65)" }}>
+                  <p className="flex-1 text-sm leading-relaxed mb-6" style={{ color: "rgba(27,28,28,0.65)" }}>
                     {opt.body}
                   </p>
                   {opt.href && opt.cta ? (
@@ -136,7 +138,7 @@ export default function GivePage() {
               <p className="text-sm mb-8 max-w-sm" style={{ color: "rgba(27,28,28,0.6)" }}>
                 Choose your home campus so your gift reaches the right community.
               </p>
-              <div className="flex flex-col gap-0" style={{ border: "1px solid rgba(27,28,28,0.12)" }}>
+              <div className="flex flex-col gap-0 overflow-hidden" style={{ background: "#fff", border: "1px solid rgba(27,28,28,0.10)", borderRadius: "var(--radius-md)" }}>
                 {campusGiving.map((cg, i) => (
                   <a
                     key={cg.name}

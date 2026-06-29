@@ -97,6 +97,7 @@ export default function MockLiveStream({
           style={{
             width: 84,
             height: 84,
+            borderRadius: 999,
             background: "rgba(28,195,175,0.16)",
             border: "1.5px solid rgba(28,195,175,0.6)",
           }}

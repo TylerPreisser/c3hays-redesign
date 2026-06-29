@@ -88,8 +88,8 @@ export default function WatchPage() {
       {/* Service times */}
       <section className="py-16" style={{ backgroundColor: "#1b1c1c", borderTop: "1px solid rgba(255,255,255,0.08)" }}>
         <div className="container-c3">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-0 max-w-2xl"
-            style={{ border: "1px solid rgba(255,255,255,0.1)" }}>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-0 max-w-2xl overflow-hidden"
+            style={{ border: "1px solid rgba(255,255,255,0.1)", borderRadius: "var(--radius-md)" }}>
             <div className="p-8 border-b border-white/10 md:border-b-0 md:border-r md:border-white/10">
               <p className="font-bold text-xs uppercase tracking-widest mb-5" style={{ color: "#1cc3af" }}>Hays</p>
               <div className="flex flex-col gap-2 text-sm" style={{ color: "rgba(255,255,255,0.65)" }}>

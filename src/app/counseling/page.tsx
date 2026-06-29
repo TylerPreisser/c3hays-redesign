@@ -56,12 +56,16 @@ export default function CounselingPage() {
           </div>
 
           {/* Counselor cards */}
-          <div className="grid grid-cols-1 md:grid-cols-3"
-            style={{ border: "1px solid rgba(27,28,28,0.1)" }}>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {counselors.map((c) => (
               <div
                 key={c.id}
-                className="counselor-card p-8"
+                className="p-8"
+                style={{
+                  background: "#fff",
+                  border: "1px solid rgba(27,28,28,0.10)",
+                  borderRadius: "var(--radius-md)",
+                }}
               >
                 {/* Monogram avatar — intentional teal-tinted design token */}
                 <div
@@ -124,9 +128,8 @@ export default function CounselingPage() {
       {/* Fees & policies */}
       <section className="section" style={{ backgroundColor: "#1b1c1c" }}>
         <div className="container-c3">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-0"
-            style={{ border: "1px solid rgba(255,255,255,0.1)" }}>
-            <div className="p-8" style={{ borderBottom: "1px solid rgba(255,255,255,0.1)" }}>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="p-8" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.10)", borderRadius: "var(--radius-md)" }}>
               <DollarSign size={24} style={{ color: "#1cc3af" }} className="mb-5" />
               <h3 className="font-bold text-white mb-4">Fees</h3>
               <ul className="flex flex-col gap-2.5 text-sm" style={{ color: "rgba(255,255,255,0.6)" }}>
@@ -150,11 +153,7 @@ export default function CounselingPage() {
             </div>
             <div
               className="p-8"
-              style={{
-                borderBottom: "1px solid rgba(255,255,255,0.1)",
-                borderLeft: "1px solid rgba(255,255,255,0.1)",
-                borderRight: "1px solid rgba(255,255,255,0.1)",
-              }}
+              style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.10)", borderRadius: "var(--radius-md)" }}
             >
               <Phone size={24} style={{ color: "#1cc3af" }} className="mb-5" />
               <h3 className="font-bold text-white mb-4">Cancellation Policy</h3>
@@ -169,7 +168,7 @@ export default function CounselingPage() {
                 </li>
               </ul>
             </div>
-            <div className="p-8">
+            <div className="p-8" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.10)", borderRadius: "var(--radius-md)" }}>
               <CheckCircle size={24} style={{ color: "#1cc3af" }} className="mb-5" />
               <h3 className="font-bold text-white mb-4">Getting Started</h3>
               <ul className="flex flex-col gap-2.5 text-sm" style={{ color: "rgba(255,255,255,0.6)" }}>

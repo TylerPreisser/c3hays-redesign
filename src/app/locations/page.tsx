@@ -49,7 +49,7 @@ export default function LocationsPage() {
               <div
                 key={loc.id}
                 className="group relative overflow-hidden"
-                style={{ height: 480 }}
+                style={{ height: 480, borderRadius: "var(--radius-md)" }}
               >
                 <Image
                   src={assetPath(loc.image)}

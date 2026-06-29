@@ -117,17 +117,16 @@ export default function VisitPage() {
                 <h2 className="heading-1 text-white">When do services meet?</h2>
               </div>
 
-              {/* Campus cards — always 2-col side-by-side from sm up */}
-              <div
-                className="grid grid-cols-1 sm:grid-cols-2 gap-0"
-                style={{ border: "1px solid rgba(255,255,255,0.1)" }}
-              >
-                {locations.map((loc, i) => (
+              {/* Campus cards — separate rounded cards from sm up */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                {locations.map((loc) => (
                   <div
                     key={loc.id}
                     className="p-8"
                     style={{
-                      borderRight: i === 0 ? "1px solid rgba(255,255,255,0.1)" : "none",
+                      background: "rgba(255,255,255,0.07)",
+                      border: "1px solid rgba(255,255,255,0.12)",
+                      borderRadius: "var(--radius-md)",
                     }}
                   >
                     <h3
@@ -220,7 +219,7 @@ export default function VisitPage() {
                 </Link>
               </div>
             </div>
-            <div className="relative overflow-hidden" style={{ height: 400 }}>
+            <div className="relative overflow-hidden" style={{ height: 400, borderRadius: "var(--radius-md)" }}>
               <Image
                 src={assetPath("/images/congregation.webp")}
                 alt="Warm welcome at C3"
