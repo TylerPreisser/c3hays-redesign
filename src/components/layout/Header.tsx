@@ -93,28 +93,10 @@ export default function Header() {
             ))}
           </ul>
 
-          {/* Desktop right: Plan a Visit link + Give button */}
-          <div className="hidden lg:flex items-center gap-4">
-            <Link
-              href="/visit/"
-              className="nav-link-underline text-xs font-semibold uppercase tracking-[0.12em] transition-colors duration-200"
-              style={{
-                color: isScrolled ? "rgba(27,28,28,0.7)" : "rgba(255,255,255,0.82)",
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.color = isScrolled ? "#1b1c1c" : "#ffffff";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.color = isScrolled ? "rgba(27,28,28,0.7)" : "rgba(255,255,255,0.82)";
-              }}
-            >
+          {/* Desktop right: single primary CTA — Plan a Visit (Give removed from nav) */}
+          <div className="hidden lg:flex items-center">
+            <Link href="/visit/" className="btn btn-primary btn-sm">
               Plan a Visit
-            </Link>
-            <Link
-              href="/give/"
-              className="btn btn-primary btn-sm"
-            >
-              Give
             </Link>
           </div>
 
@@ -189,19 +171,6 @@ export default function Header() {
                     </Link>
                   </motion.li>
                 ))}
-                <motion.li
-                  initial={{ opacity: 0, x: 20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: navItems.length * 0.05 + 0.1, duration: 0.3, ease: "easeOut" }}
-                >
-                  <Link
-                    href="/visit/"
-                    className="block py-4 text-2xl font-bold text-white/80 hover:text-white transition-colors border-b border-white/8"
-                    onClick={() => setMobileOpen(false)}
-                  >
-                    Plan a Visit
-                  </Link>
-                </motion.li>
               </ul>
 
               <motion.div
@@ -211,11 +180,11 @@ export default function Header() {
                 transition={{ delay: 0.45, duration: 0.3 }}
               >
                 <Link
-                  href="/give/"
+                  href="/visit/"
                   className="btn btn-primary btn-lg w-full text-center"
                   onClick={() => setMobileOpen(false)}
                 >
-                  Give
+                  Plan a Visit
                 </Link>
               </motion.div>
             </nav>

@@ -11,66 +11,67 @@ export default function Footer() {
       {/* ── Mobile-first stack — switches to 4-col grid at lg ── */}
       <div
         className="container-c3"
-        style={{ paddingTop: "5rem", paddingBottom: "3rem" }}
+        style={{ paddingTop: "6rem", paddingBottom: "4rem" }}
       >
         <div
           className="
-            flex flex-col items-center text-center gap-14
-            lg:grid lg:grid-cols-12 lg:items-start lg:text-left lg:gap-10
+            flex flex-col items-center text-center gap-16
+            lg:grid lg:grid-cols-12 lg:items-start lg:text-left lg:gap-x-10 lg:gap-y-0
           "
         >
           {/* Block 1 — Brand mark + church name + contact */}
           <div className="lg:col-span-4 max-w-xs lg:max-w-none">
             <Link
               href="/"
-              className="inline-block mb-5"
+              className="inline-block mb-6"
               aria-label="C3 Home"
             >
               <Logo size={48} variant="light" />
             </Link>
             <p
-              className="text-sm font-semibold mb-4"
-              style={{ color: "rgba(255,255,255,0.85)" }}
+              className="text-base font-semibold mb-4"
+              style={{ color: "rgba(255,255,255,0.92)" }}
             >
               Celebration Community Church
             </p>
-            <address
-              className="not-italic text-sm leading-snug mb-5"
-              style={{ color: "rgba(255,255,255,0.50)" }}
+            <p
+              className="text-sm leading-relaxed mb-6 mx-auto lg:mx-0"
+              style={{ color: "rgba(255,255,255,0.50)", maxWidth: "22rem" }}
             >
-              {site.address.street}
-              <br />
-              {site.address.city}, {site.address.state} {site.address.zip}
-            </address>
-            <div className="flex flex-col gap-1">
+              One church family in two places across northwest Kansas —
+              for everyone, just as you are.
+            </p>
+            <div className="flex flex-col gap-2">
               <a
                 href={`tel:${site.phone.replace(/\D/g, "")}`}
                 className="text-sm hover:text-white transition-colors duration-150"
-                style={{ color: "rgba(255,255,255,0.50)" }}
+                style={{ color: "rgba(255,255,255,0.55)" }}
               >
                 {site.phone}
               </a>
               <a
                 href={`mailto:${site.email}`}
                 className="text-sm hover:text-white transition-colors duration-150"
-                style={{ color: "rgba(255,255,255,0.50)" }}
+                style={{ color: "rgba(255,255,255,0.55)" }}
               >
                 {site.email}
               </a>
             </div>
           </div>
 
-          {/* Block 2 — Nav links + GIVE button */}
+          {/* Block 2 — Explore links (Give lives here only) */}
           <div className="lg:col-span-3">
-            <ul className="flex flex-col gap-3 lg:gap-2.5">
+            <FooterHeading>Explore</FooterHeading>
+            <ul className="flex flex-col gap-3">
               {[
                 { label: "About", href: "/about/" },
                 { label: "Locations", href: "/locations/" },
                 { label: "Messages", href: "/messages/" },
                 { label: "Watch Live", href: "/watch/" },
                 { label: "Counseling", href: "/counseling/" },
-                { label: "Plan a Visit", href: "/visit/" },
                 { label: "Connect", href: "/connect/" },
+                { label: "Plan a Visit", href: "/visit/" },
+                { label: "Give", href: "/give/" },
               ].map((link) => (
                 <li key={link.href}>
                   <Link
@@ -83,36 +84,21 @@ export default function Footer() {
                 </li>
               ))}
             </ul>
-            <Link
-              href="/give/"
-              className="
-                inline-flex items-center gap-2 font-bold uppercase tracking-[0.18em]
-                transition-colors duration-200 hover:bg-[#179c8c]
-                mt-7
-              "
-              style={{
-                backgroundColor: "#1cc3af",
-                color: "#ffffff",
-                fontSize: "0.6875rem",
-                padding: "0.6875rem 1.125rem",
-              }}
-            >
-              Give <span aria-hidden>→</span>
-            </Link>
           </div>
 
           {/* Block 3 — Both campuses */}
           <div className="lg:col-span-2 w-full max-w-xs lg:max-w-none">
+            <FooterHeading>Campuses</FooterHeading>
             <div className="mb-6">
               <p
                 className="text-sm font-bold mb-1.5"
-                style={{ color: "rgba(255,255,255,0.85)" }}
+                style={{ color: "rgba(255,255,255,0.90)" }}
               >
-                Hays Campus
+                Hays
               </p>
               <address
                 className="not-italic text-sm leading-snug mb-2"
-                style={{ color: "rgba(255,255,255,0.45)" }}
+                style={{ color: "rgba(255,255,255,0.48)" }}
               >
                 {site.address.street}
                 <br />
@@ -123,20 +109,20 @@ export default function Footer() {
                 style={{ color: "rgba(255,255,255,0.55)" }}
               >
                 <p>Sat 5:00 PM</p>
-                <p>Sun 8:00 · 9:30 · 11:00 AM</p>
+                <p>Sun 8 · 9:30 · 11 AM</p>
               </div>
             </div>
 
             <div>
               <p
                 className="text-sm font-bold mb-1.5"
-                style={{ color: "rgba(255,255,255,0.85)" }}
+                style={{ color: "rgba(255,255,255,0.90)" }}
               >
-                Colby Campus
+                Colby
               </p>
               <address
                 className="not-italic text-sm leading-snug mb-2"
-                style={{ color: "rgba(255,255,255,0.45)" }}
+                style={{ color: "rgba(255,255,255,0.48)" }}
               >
                 1923 S Range
                 <br />
@@ -153,12 +139,12 @@ export default function Footer() {
 
           {/* Block 4 — Newsletter + social */}
           <div className="lg:col-span-3 w-full max-w-sm lg:max-w-none">
+            <FooterHeading>Stay in the loop</FooterHeading>
             <p
               className="text-sm mb-5"
-              style={{ color: "rgba(255,255,255,0.70)", lineHeight: 1.65 }}
+              style={{ color: "rgba(255,255,255,0.65)", lineHeight: 1.65 }}
             >
-              Sermon notes, announcements, and what&apos;s happening at C3 — in
-              your inbox.
+              Sermon notes and what&apos;s happening at C3 — in your inbox.
             </p>
             <NewsletterForm />
 
@@ -261,6 +247,17 @@ export default function Footer() {
         </div>
       </div>
     </footer>
+  );
+}
+
+function FooterHeading({ children }: { children: React.ReactNode }) {
+  return (
+    <p
+      className="text-xs font-bold uppercase tracking-[0.16em] mb-5"
+      style={{ color: "rgba(255,255,255,0.40)" }}
+    >
+      {children}
+    </p>
   );
 }
 

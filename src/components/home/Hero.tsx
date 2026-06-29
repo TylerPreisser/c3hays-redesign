@@ -5,19 +5,13 @@ import Image from "next/image";
 import { motion } from "framer-motion";
 import { assetPath } from "@/lib/asset-path";
 import CampusChooser from "./CampusChooser";
-
-/* ─────────────────────────────────────────────
-   LIVE STREAM CONFIG
-   Set isLive = true when the service is broadcasting.
-   The teal strip will appear automatically at the top of the hero.
-   Set isLive = false (default) to hide the strip.
-   ───────────────────────────────────────────── */
-const isLive = false;
+import { HERO_DEFAULTS, type HeroContent } from "@/lib/home-content";
 
 /* Word-stagger easing — snappy pop-in */
 const WORD_EASE = [0.16, 1, 0.3, 1] as const;
 
-export default function Hero() {
+export default function Hero({ content = HERO_DEFAULTS }: { content?: HeroContent }) {
+  const isLive = content.isLive;
   return (
     <section
       className="relative flex flex-col overflow-hidden"
@@ -50,7 +44,7 @@ export default function Hero() {
       {/* ── Background — B&W worship moment with subtle gradient ── */}
       <div className="absolute inset-0 z-0">
         <Image
-          src={assetPath("/images/building.webp")}
+          src={assetPath(content.bgImage)}
           alt=""
           fill
           priority
@@ -83,7 +77,7 @@ export default function Hero() {
       >
         {/* H1 — word-by-word stagger */}
         <h1 className="display-hero text-white" style={{ marginBottom: "clamp(2rem, 5vh, 4rem)" }}>
-          {"Welcome home.".split(" ").map((word, wi) => (
+          {content.heading.split(" ").map((word, wi) => (
             <motion.span
               key={`hero-word-${wi}`}
               className="inline-block mr-[0.22em] last:mr-0"
@@ -108,8 +102,8 @@ export default function Hero() {
           transition={{ duration: 0.6, ease: "easeOut", delay: 0.7 }}
         >
           <CampusChooser variant="light" />
-          <Link href="/visit/" className="btn btn-hero-ghost btn-sm">
-            Plan Your Visit
+          <Link href={content.ctaHref} className="btn btn-hero-ghost btn-sm">
+            {content.ctaLabel}
           </Link>
         </motion.div>
       </div>

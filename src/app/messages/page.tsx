@@ -132,10 +132,10 @@ export default function MessagesPage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {recentMessages.map((msg) => (
               <div key={msg.title} className="group cursor-pointer">
-                {/* Thumbnail — 4:5 portrait, sharp corners */}
+                {/* Thumbnail — 4:5 portrait, rounded */}
                 <div
                   className="relative overflow-hidden mb-5"
-                  style={{ aspectRatio: "4/5" }}
+                  style={{ aspectRatio: "4/5", borderRadius: "var(--radius-md)" }}
                 >
                   <Image
                     src={assetPath(msg.image)}
@@ -150,17 +150,17 @@ export default function MessagesPage() {
                   {/* Play button */}
                   <div className="absolute inset-0 flex items-center justify-center">
                     <div
-                      className="w-12 h-12 flex items-center justify-center border border-white/40 transition-all duration-200 group-hover:bg-white/20"
-                      style={{ background: "rgba(255,255,255,0.12)" }}
+                      className="w-14 h-14 rounded-full flex items-center justify-center border border-white/40 transition-all duration-200 group-hover:bg-white/20 group-hover:scale-105"
+                      style={{ background: "rgba(255,255,255,0.14)" }}
                     >
                       <Play size={18} className="text-white ml-0.5" fill="white" />
                     </div>
                   </div>
-                  {/* Series tag */}
+                  {/* Series tag — pill */}
                   <div className="absolute top-3 left-3">
                     <span
-                      className="px-2.5 py-1 text-xs font-bold uppercase tracking-wider"
-                      style={{ background: "#1cc3af", color: "#fff" }}
+                      className="px-3 py-1 text-xs font-bold tracking-wide"
+                      style={{ background: "#1cc3af", color: "#fff", borderRadius: 999 }}
                     >
                       {msg.series}
                     </span>

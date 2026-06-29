@@ -465,11 +465,12 @@ html.lenis body {
   color: var(--color-ink);
 }
 
-/* Footer social icon */
+/* Footer social icon — round, soft */
 .footer-social {
   color: rgba(255, 255, 255, 0.6);
   border: 1px solid rgba(255, 255, 255, 0.15);
-  transition: background-color 150ms ease, color 150ms ease;
+  border-radius: 999px;
+  transition: background-color 150ms ease, color 150ms ease, border-color 150ms ease;
 }
 .footer-social:hover {
   background-color: var(--color-teal);

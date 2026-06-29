@@ -118,7 +118,7 @@ export default function WatchPage() {
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
             {recentMessages.map((msg) => (
               <div key={msg.title} className="group cursor-pointer">
-                <div className="relative overflow-hidden mb-5" style={{ height: 200 }}>
+                <div className="relative overflow-hidden mb-5" style={{ height: 200, borderRadius: "var(--radius-md)" }}>
                   <Image
                     src={assetPath(msg.image)}
                     alt={msg.title}
@@ -130,8 +130,8 @@ export default function WatchPage() {
                     style={{ background: "rgba(10,10,10,0.4)" }}
                   >
                     <div
-                      className="w-12 h-12 flex items-center justify-center border border-white/40"
-                      style={{ background: "rgba(255,255,255,0.12)" }}
+                      className="w-14 h-14 rounded-full flex items-center justify-center border border-white/40 transition-transform duration-200 group-hover:scale-105"
+                      style={{ background: "rgba(255,255,255,0.14)" }}
                     >
                       <Play size={18} className="text-white ml-0.5" fill="white" />
                     </div>

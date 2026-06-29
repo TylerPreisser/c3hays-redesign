@@ -6,10 +6,11 @@ import { useEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { assetPath } from "@/lib/asset-path";
+import { NT26_DEFAULTS, type NT26Content } from "@/lib/home-content";
 
 gsap.registerPlugin(ScrollTrigger);
 
-export default function NT26Feature() {
+export default function NT26Feature({ content = NT26_DEFAULTS }: { content?: NT26Content }) {
   const sectionRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
@@ -64,20 +65,18 @@ export default function NT26Feature() {
           {/* Text left */}
           <div className="nt26-content">
             <h2 className="display-2 text-white text-balance" style={{ marginBottom: "3rem" }}>
-              Have you read your{" "}
-              <em className="not-italic" style={{ color: "#1cc3af" }}>Bible</em>{" "}
-              today?
+              {content.pre}
+              {content.em && <em className="not-italic" style={{ color: "#1cc3af" }}>{content.em}</em>}
+              {content.post}
             </h2>
             <p style={{ fontSize: "1.125rem", color: "rgba(255,255,255,0.85)", lineHeight: 1.7, marginBottom: "3.5rem" }}>
-              The NT26 Reading Plan takes you through the entire New Testament
-              in 2026 — one chapter at a time, together as a church family. No
-              experience required. Just a willing heart.
+              {content.body}
             </p>
             <Link
-              href="/messages/"
+              href={content.ctaHref}
               className="btn btn-primary btn-sm"
             >
-              Start Reading
+              {content.ctaLabel}
             </Link>
           </div>
 
@@ -87,7 +86,7 @@ export default function NT26Feature() {
             style={{ aspectRatio: "4/3", minHeight: 280, borderRadius: "var(--radius-md)" }}
           >
             <Image
-              src={assetPath("/images/nt26.webp")}
+              src={assetPath(content.image)}
               alt="NT26 Bible Reading Plan"
               fill
               className="object-cover"

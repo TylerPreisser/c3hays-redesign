@@ -6,34 +6,12 @@ import { useEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { assetPath } from "@/lib/asset-path";
+import { MEET_GROW_SERVE_DEFAULTS, type MeetGrowServeContent } from "@/lib/home-content";
 
 gsap.registerPlugin(ScrollTrigger);
 
-const pillars = [
-  {
-    word: "About",
-    headline: "Who We Are",
-    body: "A church family in Hays and Colby, Kansas — where everyone is welcome, just as you are.",
-    image: "/images/congregation.webp",
-    href: "/about/",
-  },
-  {
-    word: "Messages",
-    headline: "Watch & Listen",
-    body: "Catch up on any message, any series — anytime, anywhere. New sermons every week.",
-    image: "/images/gather.webp",
-    href: "/messages/",
-  },
-  {
-    word: "Connect",
-    headline: "Connect with Us",
-    body: "Whether you're new or have been here a while, there's a place for you. Let us know how to help.",
-    image: "/images/exterior.webp",
-    href: "/connect/",
-  },
-];
-
-export default function MeetGrowServe() {
+export default function MeetGrowServe({ content = MEET_GROW_SERVE_DEFAULTS }: { content?: MeetGrowServeContent }) {
+  const pillars = content.pillars;
   const sectionRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
@@ -103,7 +81,7 @@ export default function MeetGrowServe() {
         {/* Header */}
         <div className="mgs-heading mb-16 md:mb-20">
           <h2 className="display-2" style={{ color: "#1b1c1c" }}>
-            Find your place at C3.
+            {content.heading}
           </h2>
         </div>
 

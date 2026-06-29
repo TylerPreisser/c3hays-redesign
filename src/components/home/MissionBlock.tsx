@@ -3,6 +3,7 @@
 import { useEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { MISSION_DEFAULTS, type MissionContent } from "@/lib/home-content";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -11,7 +12,7 @@ gsap.registerPlugin(ScrollTrigger);
  * "We exist to meet Him, grow in Him, and serve through Him."
  * Do NOT add this sentence anywhere else in the codebase.
  */
-export default function MissionBlock() {
+export default function MissionBlock({ content = MISSION_DEFAULTS }: { content?: MissionContent }) {
   const sectionRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
@@ -59,13 +60,13 @@ export default function MissionBlock() {
               letterSpacing: "-0.02em",
             }}
           >
-            We exist to{" "}
-            <em style={{ color: "#1cc3af", fontStyle: "italic" }}>meet</em>{" "}
-            Him,{" "}
-            <em style={{ color: "#1cc3af", fontStyle: "italic" }}>grow</em>{" "}
-            in Him, and{" "}
-            <em style={{ color: "#1cc3af", fontStyle: "italic" }}>serve</em>{" "}
-            through Him.
+            {content.segments.map((seg, i) =>
+              seg.em ? (
+                <em key={i} style={{ color: "#1cc3af", fontStyle: "italic" }}>{seg.text}</em>
+              ) : (
+                <span key={i}>{seg.text}</span>
+              )
+            )}
           </h2>
         </div>
       </div>
