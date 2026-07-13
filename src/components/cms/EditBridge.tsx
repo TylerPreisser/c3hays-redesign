@@ -57,6 +57,14 @@ export default function EditBridge() {
         background:#1cc3af; color:#042e29; font:700 12px/1 -apple-system,system-ui,sans-serif;
         padding:6px 11px; border-radius:999px; border:none; cursor:pointer; box-shadow:0 6px 18px rgba(0,0,0,.28); }
       #c3-sec-handle:hover{ background:#15b3a0; }
+      /* v4 R2: the floating "recolor this tile" handle. A packed tile has almost no
+         bare background to click, so the v3 click-empty-pixels path was undiscoverable
+         (a click landed a text caret). This EXPLICIT chip appears on hover over any
+         recolorable element ([data-cms-bg]) and opens the background picker. */
+      #c3-bg-handle{ position:fixed; z-index:2147483646; display:none; align-items:center; gap:6px;
+        background:#7c3aed; color:#fff; font:700 12px/1 -apple-system,system-ui,sans-serif;
+        padding:6px 11px; border-radius:999px; border:none; cursor:pointer; box-shadow:0 6px 18px rgba(0,0,0,.28); }
+      #c3-bg-handle:hover{ background:#6d28d9; }
       [data-cms-edit-badge]{ position:fixed; z-index:2147483646; background:#1cc3af; color:#042e29; font:700 11px/1 -apple-system,sans-serif;
         padding:4px 8px; border-radius:999px; pointer-events:none; transform:translateY(-50%); box-shadow:0 4px 12px rgba(0,0,0,.25); }
       #c3-toolbar{ position:fixed; z-index:2147483647; display:none; gap:2px; align-items:center;
@@ -177,6 +185,24 @@ export default function EditBridge() {
     });
     document.body.appendChild(secChip);
 
+    // ── v4 R2: floating "recolor this tile" chip ──
+    // The discoverable recolor affordance. Hovering ANY recolorable element
+    // ([data-cms-bg] — pillar/ministry tiles, contact cards, footer) reveals this
+    // chip; clicking it posts cms:select{kind:"bg",path} so the editor opens the
+    // background picker. Same stable message contract as the old bare-pixel click,
+    // but a human can actually find and hit it.
+    const bgChip = document.createElement("button");
+    bgChip.id = "c3-bg-handle";
+    bgChip.type = "button";
+    bgChip.setAttribute("data-cms-recolor", "");
+    bgChip.innerHTML = `<span aria-hidden="true">🎨</span> Recolor`;
+    let bgPath = "";
+    bgChip.addEventListener("mousedown", (e) => {
+      e.preventDefault(); e.stopPropagation();
+      if (bgPath) { post({ type: "cms:select", kind: "bg", path: bgPath }); log("select-bg-chip", { path: bgPath }); }
+    });
+    document.body.appendChild(bgChip);
+
     let activeEl: HTMLElement | null = null;
     const pathOf = (el: HTMLElement | null) => el?.getAttribute("data-cms") || "";
 
@@ -272,14 +298,28 @@ export default function EditBridge() {
       secChip.style.left = `${Math.max(6, r.left + 8)}px`;
       secChip.style.display = "inline-flex";
     };
+    // v4 R2: position the recolor chip at the top-RIGHT of the hovered tile (the
+    // section chip owns the top-left), so both are reachable without overlap.
+    const positionBgChip = (el: HTMLElement) => {
+      const r = el.getBoundingClientRect();
+      bgChip.style.top = `${Math.max(6, r.top + 8)}px`;
+      bgChip.style.left = `${Math.max(6, Math.min(window.innerWidth - 108, r.right - 108))}px`;
+      bgChip.style.display = "inline-flex";
+    };
     const onOver = (e: MouseEvent) => {
       const t = e.target as HTMLElement;
-      if (t === secChip) return;
+      // Keep whichever chip the pointer moved onto (so it can be clicked).
+      if (t === secChip || t === bgChip) return;
       const sec = t?.closest?.("[data-section]") as HTMLElement | null;
-      if (!sec) { secChip.style.display = "none"; secId = ""; return; }
-      secId = sec.getAttribute("data-section") || "";
-      secChip.innerHTML = `<span aria-hidden="true">▚</span> Edit section`;
-      positionSecChip(sec);
+      if (sec) {
+        secId = sec.getAttribute("data-section") || "";
+        secChip.innerHTML = `<span aria-hidden="true">▚</span> Edit section`;
+        positionSecChip(sec);
+      } else { secChip.style.display = "none"; secId = ""; }
+      // v4 R2: a recolorable element (tile / card / footer) → show the recolor chip.
+      const bgEl = t?.closest?.("[data-cms-bg]") as HTMLElement | null;
+      if (bgEl) { bgPath = bgEl.getAttribute("data-cms-bg") || ""; positionBgChip(bgEl); }
+      else { bgChip.style.display = "none"; bgPath = ""; }
     };
 
     document.addEventListener("focusin", onFocusIn, true);
@@ -288,7 +328,7 @@ export default function EditBridge() {
     document.addEventListener("click", onClick, true);
     document.addEventListener("mousedown", onDocClick, true);
     document.addEventListener("mouseover", onOver, true);
-    window.addEventListener("scroll", () => { if (bar.style.display === "flex") positionBar(); secChip.style.display = "none"; }, true);
+    window.addEventListener("scroll", () => { if (bar.style.display === "flex") positionBar(); secChip.style.display = "none"; bgChip.style.display = "none"; }, true);
 
     const onMsg = (e: MessageEvent) => {
       const d = e.data; if (!d || d.source !== "c3editor") return;
@@ -318,7 +358,7 @@ export default function EditBridge() {
       document.removeEventListener("mouseover", onOver, true);
       window.removeEventListener("message", onMsg);
       els.forEach((el) => el.removeAttribute("contenteditable"));
-      bar.remove(); fontMenu.remove(); style.remove(); secChip.remove(); shimStyle.remove();
+      bar.remove(); fontMenu.remove(); style.remove(); secChip.remove(); bgChip.remove(); shimStyle.remove();
       document.documentElement.removeAttribute("data-cms-edit");
     };
   }, []);
