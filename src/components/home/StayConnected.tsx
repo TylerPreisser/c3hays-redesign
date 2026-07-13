@@ -192,8 +192,11 @@ export default function StayConnected({
                     transition: "transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease",
                   }}
                   onMouseEnter={(e) => {
+                    // v3 R7/U9: churchonthemove renders shadow:none on every surface,
+                    // hover included. Keep the lift + teal border affordance; drop the
+                    // heavy box-shadow so the card reads flat/clean like the target.
                     e.currentTarget.style.transform = "translateY(-6px)";
-                    e.currentTarget.style.boxShadow = "0 18px 40px rgba(27,28,28,0.10)";
+                    e.currentTarget.style.boxShadow = "none";
                     e.currentTarget.style.borderColor = "rgba(28,195,175,0.55)";
                   }}
                   onMouseLeave={(e) => {
