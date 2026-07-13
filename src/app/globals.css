@@ -33,10 +33,13 @@
   --font-sans:        var(--font-hanken), "Hanken Grotesk", "Helvetica Neue", Helvetica, Arial, sans-serif;
   --font-display:     var(--font-hanken), "Helvetica Neue", Helvetica, Arial, sans-serif;
 
-  /* ── Radii — soft & rounded, Church-on-the-Move style ───── */
-  --radius-sm:        0.625rem;   /* inputs, small chips */
-  --radius:           1rem;       /* default cards */
-  --radius-md:        1.25rem;    /* large feature cards */
+  /* ── Radii — soft & rounded, Church-on-the-Move style ─────
+     v3 R7: pushed rounder toward churchonthemove.com's pill-and-rounded-tile
+     language. Every card/tile consumes these tokens, so the whole site rounds
+     up from one place (buttons/selects were already full pills). */
+  --radius-sm:        0.75rem;    /* inputs, small chips */
+  --radius:           1.5rem;     /* default cards ≈ 24px */
+  --radius-md:        1.875rem;   /* large feature cards = 30px rounded tiles */
   --radius-pill:      999px;      /* buttons + selects = pills */
 }
 
