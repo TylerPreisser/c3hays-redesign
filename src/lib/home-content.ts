@@ -1,48 +1,55 @@
 /**
  * HOME CONTENT CONTRACT — the hand-built homepage is the source of truth.
  *
- * Each premium home component renders from a typed content slice defined here.
- * DEFAULTS are the EXACT current hardcoded values, so when the CMS is absent or a
- * field is missing, the site looks identical to the hand-built original.
- *
- * `mapHomeContent()` maps C3 Studio's published home-screen blocks onto these
- * slices. Editing those blocks in the builder changes what the REAL components
- * render — never how they look. This is the inversion: CMS feeds the design, it
- * does not replace it.
+ * Every editable text field is an HTML string (so inline formatting from C3
+ * Studio — bold, color, size, font — is preserved and rendered verbatim by the
+ * real components). DEFAULTS are the exact canonical content, so with the CMS off
+ * the site looks identical to the hand-built original.
  */
-import type { CMSBlock } from "@/lib/cms";
+import type { StudioHome } from "@/lib/cms";
 
-/* ── Per-section content types ───────────────────────────── */
-export interface HeroContent {
-  heading: string;
-  bgImage: string;
-  ctaLabel: string;
-  ctaHref: string;
-  isLive: boolean;
-}
-export interface MissionSegment { text: string; em?: boolean }
-export interface MissionContent { segments: MissionSegment[] }
+const TEAL = "#1cc3af";
 
+/* ── Per-section content types (text fields hold HTML) ───────── */
+export interface HeroContent { heading: string; bgImage: string; ctaLabel: string; ctaHref: string; isLive: boolean }
+export interface MissionContent { html: string }
 export interface Pillar { word: string; headline: string; body: string; image: string; href: string }
 export interface MeetGrowServeContent { heading: string; pillars: Pillar[] }
+export interface NT26Content { heading: string; body: string; ctaLabel: string; ctaHref: string; image: string }
+/** A single editable "connect" tile in the StayConnected collection (camelCase, R2). */
+export interface StayCard { id: string; title: string; body: string; icon: string; href: string; cta?: string }
+/** StayConnected content. `cards` is OPTIONAL + ADDITIVE: absent/empty ⇒ legacy
+ *  connect-count rendering (byte-identical for existing published content). */
+export interface StayConnectedContent { cards?: StayCard[] }
+export interface GiveContent { heading: string; body: string; ctaLabel: string; ctaHref: string; bgImage: string }
+export interface BtnStyle { bg: string; color: string; radius: number; variant: "filled" | "outline"; font: string }
+export interface IconStyle { color: string; bg: string; name?: string }
+export interface SectionMeta { id: string; visible: boolean; bg?: string; variant?: string }
+export interface ImgStyle { pos?: string; scale?: number }
+export interface HomeContent { hero: HeroContent; mission: MissionContent; meetGrowServe: MeetGrowServeContent; nt26: NT26Content; give: GiveContent; stayConnected: StayConnectedContent; text: Record<string, string>; btn: Record<string, BtnStyle>; icon: Record<string, IconStyle>; sections: SectionMeta[]; img: Record<string, ImgStyle> }
 
-export interface NT26Content {
-  pre: string; em: string; post: string;
-  body: string; ctaLabel: string; ctaHref: string; image: string;
-}
-export interface GiveContent {
-  heading: string; body: string; ctaLabel: string; ctaHref: string; bgImage: string;
+/** Inline style for an editable image's framing (focal point + zoom). */
+export function imgCss(s?: ImgStyle): React.CSSProperties | undefined {
+  if (!s) return undefined;
+  return { objectPosition: s.pos || undefined, transform: s.scale && s.scale !== 1 ? `scale(${s.scale})` : undefined };
 }
 
-export interface HomeContent {
-  hero: HeroContent;
-  mission: MissionContent;
-  meetGrowServe: MeetGrowServeContent;
-  nt26: NT26Content;
-  give: GiveContent;
+/** Canonical section order — used when C3 Studio hasn't customized the layout. */
+export const SECTIONS_DEFAULT: SectionMeta[] = [
+  { id: "hero", visible: true },
+  { id: "mission", visible: true },
+  { id: "meetGrowServe", visible: true },
+  { id: "nt26", visible: true },
+  { id: "locations", visible: true },
+  { id: "stayConnected", visible: true },
+];
+
+/** Read a generic per-element text override (HTML) by its data-cms id, else fallback. */
+export function tx(text: Record<string, string> | undefined, key: string, fallback: string): string {
+  return text && typeof text[key] === "string" && text[key].trim() !== "" ? text[key] : fallback;
 }
 
-/* ── DEFAULTS = the hand-built site's exact current content ──── */
+/* ── DEFAULTS = the canonical site content ──── */
 export const HERO_DEFAULTS: HeroContent = {
   heading: "Welcome home.",
   bgImage: "/images/building.webp",
@@ -50,134 +57,83 @@ export const HERO_DEFAULTS: HeroContent = {
   ctaHref: "/visit/",
   isLive: false,
 };
-
 export const MISSION_DEFAULTS: MissionContent = {
-  segments: [
-    { text: "We exist to " },
-    { text: "meet", em: true },
-    { text: " Him, " },
-    { text: "grow", em: true },
-    { text: " in Him, and " },
-    { text: "serve", em: true },
-    { text: " through Him." },
-  ],
+  html: `We exist to <em style="color:${TEAL};font-style:italic">meet</em> Him, <em style="color:${TEAL};font-style:italic">grow</em> in Him, and <em style="color:${TEAL};font-style:italic">serve</em> through Him.`,
 };
-
 export const MEET_GROW_SERVE_DEFAULTS: MeetGrowServeContent = {
   heading: "Find your place at C3.",
   pillars: [
     { word: "About", headline: "Who We Are", body: "A church family in Hays and Colby, Kansas — where everyone is welcome, just as you are.", image: "/images/congregation.webp", href: "/about/" },
-    { word: "Messages", headline: "Watch & Listen", body: "Catch up on any message, any series — anytime, anywhere. New sermons every week.", image: "/images/gather.webp", href: "/messages/" },
+    { word: "Messages", headline: "Watch &amp; Listen", body: "Catch up on any message, any series — anytime, anywhere. New sermons every week.", image: "/images/gather.webp", href: "/messages/" },
     { word: "Connect", headline: "Connect with Us", body: "Whether you're new or have been here a while, there's a place for you. Let us know how to help.", image: "/images/exterior.webp", href: "/connect/" },
   ],
 };
-
 export const NT26_DEFAULTS: NT26Content = {
-  pre: "Have you read your ",
-  em: "Bible",
-  post: " today?",
+  heading: `Have you read your <span style="color:${TEAL}">Bible</span> today?`,
   body: "The NT26 Reading Plan takes you through the entire New Testament in 2026 — one chapter at a time, together as a church family. No experience required. Just a willing heart.",
   ctaLabel: "Start Reading",
   ctaHref: "/messages/",
   image: "/images/nt26.webp",
 };
-
 export const GIVE_DEFAULTS: GiveContent = {
-  heading: "Give.",
-  body: "Partner with what God is doing through C3.",
-  ctaLabel: "Give Now",
-  ctaHref: "/give/",
-  bgImage: "/images/building.webp",
+  heading: "Give.", body: "Partner with what God is doing through C3.", ctaLabel: "Give Now", ctaHref: "/give/", bgImage: "/images/building.webp",
 };
-
 export const HOME_DEFAULTS: HomeContent = {
-  hero: HERO_DEFAULTS,
-  mission: MISSION_DEFAULTS,
-  meetGrowServe: MEET_GROW_SERVE_DEFAULTS,
-  nt26: NT26_DEFAULTS,
-  give: GIVE_DEFAULTS,
+  hero: HERO_DEFAULTS, mission: MISSION_DEFAULTS, meetGrowServe: MEET_GROW_SERVE_DEFAULTS, nt26: NT26_DEFAULTS, give: GIVE_DEFAULTS, stayConnected: {}, text: {}, btn: {}, icon: {}, sections: SECTIONS_DEFAULT, img: {},
 };
 
-/* ── Map C3 Studio blocks → HomeContent (fallback to defaults per field) ── */
-const str = (v: unknown, fallback: string): string =>
-  typeof v === "string" && v.trim() !== "" ? v : fallback;
+const str = (v: unknown, fallback: string): string => (typeof v === "string" && v.trim() !== "" ? v : fallback);
 
-function byType(blocks: CMSBlock[] | null | undefined) {
-  const map = new Map<string, Record<string, unknown>>();
-  for (const b of blocks ?? []) {
-    if (b.visible !== false && !map.has(b.component_type)) map.set(b.component_type, b.content || {});
-  }
-  return map;
-}
-
-export function mapHomeContent(blocks: CMSBlock[] | null | undefined): HomeContent {
-  const m = byType(blocks);
-
-  const hero = m.get("hero");
-  const heroContent: HeroContent = hero
-    ? {
-        heading: str(hero.heading, HERO_DEFAULTS.heading),
-        bgImage: str(hero.image, HERO_DEFAULTS.bgImage),
-        ctaLabel: str(hero.cta_label, HERO_DEFAULTS.ctaLabel),
-        ctaHref: str(hero.cta_url, HERO_DEFAULTS.ctaHref),
-        isLive: HERO_DEFAULTS.isLive,
-      }
-    : HERO_DEFAULTS;
-
-  // Mission: a rich_text block whose heading carries the sentence. If the heading
-  // still contains the three verbs, keep teal emphasis on them; else render plain.
-  const rich = m.get("rich_text");
-  let mission: MissionContent = MISSION_DEFAULTS;
-  if (rich && typeof rich.heading === "string" && rich.heading.trim()) {
-    mission = { segments: emphasizeVerbs(rich.heading) };
-  }
-
-  const grid = m.get("card_grid");
-  let meetGrowServe: MeetGrowServeContent = MEET_GROW_SERVE_DEFAULTS;
-  if (grid) {
-    const cards = Array.isArray(grid.cards) ? (grid.cards as Record<string, unknown>[]) : [];
-    const pillars: Pillar[] = cards.length
-      ? cards.slice(0, 3).map((c, i) => ({
-          word: str(c.word ?? c.eyebrow, MEET_GROW_SERVE_DEFAULTS.pillars[i]?.word ?? ""),
-          headline: str(c.title ?? c.headline, MEET_GROW_SERVE_DEFAULTS.pillars[i]?.headline ?? ""),
-          body: str(c.body ?? c.text, MEET_GROW_SERVE_DEFAULTS.pillars[i]?.body ?? ""),
-          image: str(c.image, MEET_GROW_SERVE_DEFAULTS.pillars[i]?.image ?? "/images/congregation.webp"),
-          href: str(c.href ?? c.link, MEET_GROW_SERVE_DEFAULTS.pillars[i]?.href ?? "/"),
-        }))
-      : MEET_GROW_SERVE_DEFAULTS.pillars;
-    meetGrowServe = { heading: str(grid.heading, MEET_GROW_SERVE_DEFAULTS.heading), pillars };
-  }
-
-  const it = m.get("image_text");
-  const nt26: NT26Content = it
-    ? {
-        ...NT26_DEFAULTS,
-        // image_text has a single heading; show it whole (no forced emphasis word)
-        pre: str(it.heading, `${NT26_DEFAULTS.pre}${NT26_DEFAULTS.em}${NT26_DEFAULTS.post}`),
-        em: it.heading ? "" : NT26_DEFAULTS.em,
-        post: it.heading ? "" : NT26_DEFAULTS.post,
-        body: str(it.body, NT26_DEFAULTS.body),
-        image: str(it.image, NT26_DEFAULTS.image),
-      }
-    : NT26_DEFAULTS;
-
-  const g = m.get("give_cta");
-  const give: GiveContent = g
-    ? {
-        ...GIVE_DEFAULTS,
-        heading: str(g.heading, GIVE_DEFAULTS.heading),
-        ctaLabel: str(g.cta_label, GIVE_DEFAULTS.ctaLabel),
-        ctaHref: str(g.cta_url, GIVE_DEFAULTS.ctaHref),
-      }
-    : GIVE_DEFAULTS;
-
-  return { hero: heroContent, mission, meetGrowServe, nt26, give };
-}
-
-/** Split a sentence into segments, marking meet/grow/serve (whole words) for teal emphasis. */
-function emphasizeVerbs(sentence: string): MissionSegment[] {
-  const parts = sentence.split(/\b(meet|grow|serve)\b/gi);
-  return parts
-    .filter((p) => p !== "")
-    .map((p) => (/^(meet|grow|serve)$/i.test(p) ? { text: p, em: true } : { text: p }));
+/* ── Map C3 Studio's structured home content → HomeContent (per-field fallback) ── */
+export function fromStudioHome(raw: StudioHome | null | undefined): HomeContent {
+  if (!raw) return HOME_DEFAULTS;
+  const pillarsRaw = raw.meetGrowServe?.pillars;
+  return {
+    hero: {
+      heading: str(raw.hero?.heading, HERO_DEFAULTS.heading),
+      bgImage: str(raw.hero?.bgImage, HERO_DEFAULTS.bgImage),
+      ctaLabel: str(raw.hero?.ctaLabel, HERO_DEFAULTS.ctaLabel),
+      ctaHref: str(raw.hero?.ctaHref, HERO_DEFAULTS.ctaHref),
+      isLive: typeof raw.hero?.isLive === "boolean" ? raw.hero.isLive : HERO_DEFAULTS.isLive,
+    },
+    mission: { html: str(raw.mission?.html, MISSION_DEFAULTS.html) },
+    meetGrowServe: {
+      heading: str(raw.meetGrowServe?.heading, MEET_GROW_SERVE_DEFAULTS.heading),
+      pillars: Array.isArray(pillarsRaw) && pillarsRaw.length
+        ? pillarsRaw.map((p, i) => ({
+            word: str(p?.word, MEET_GROW_SERVE_DEFAULTS.pillars[i]?.word ?? `tile-${i}`),
+            headline: str(p?.headline, MEET_GROW_SERVE_DEFAULTS.pillars[i]?.headline ?? ""),
+            body: str(p?.body, MEET_GROW_SERVE_DEFAULTS.pillars[i]?.body ?? ""),
+            image: str(p?.image, MEET_GROW_SERVE_DEFAULTS.pillars[i]?.image ?? "/images/congregation.webp"),
+            href: str(p?.href, MEET_GROW_SERVE_DEFAULTS.pillars[i]?.href ?? "/"),
+          }))
+        : MEET_GROW_SERVE_DEFAULTS.pillars,
+    },
+    nt26: {
+      heading: str(raw.nt26?.heading, NT26_DEFAULTS.heading),
+      body: str(raw.nt26?.body, NT26_DEFAULTS.body),
+      ctaLabel: str(raw.nt26?.ctaLabel, NT26_DEFAULTS.ctaLabel),
+      ctaHref: str(raw.nt26?.ctaHref, NT26_DEFAULTS.ctaHref),
+      image: str(raw.nt26?.image, NT26_DEFAULTS.image),
+    },
+    give: GIVE_DEFAULTS,
+    // ADDITIVE (R2): only surface a cards array when C3 Studio actually sent valid
+    // cards; otherwise `undefined` ⇒ StayConnected keeps its legacy rendering.
+    stayConnected: {
+      cards: Array.isArray(raw.stayConnected?.cards)
+        ? raw.stayConnected!.cards!
+            .filter((c) => c && typeof c.id === "string" && typeof c.title === "string" && typeof c.body === "string" && typeof c.icon === "string" && typeof c.href === "string")
+            .map((c) => ({ id: c.id!, title: c.title!, body: c.body!, icon: c.icon!, href: c.href!, cta: typeof c.cta === "string" ? c.cta : undefined }))
+        : undefined,
+    },
+    text: (raw.text && typeof raw.text === "object" ? raw.text : {}) as Record<string, string>,
+    btn: (raw.btn && typeof raw.btn === "object" ? raw.btn : {}) as Record<string, BtnStyle>,
+    icon: (raw.icon && typeof raw.icon === "object" ? raw.icon : {}) as Record<string, IconStyle>,
+    sections: Array.isArray(raw.sections) && raw.sections.length
+      ? raw.sections
+          .filter((s) => s && typeof s.id === "string")
+          .map((s) => ({ id: s.id as string, visible: s.visible !== false, bg: typeof s.bg === "string" ? s.bg : undefined, variant: typeof s.variant === "string" ? s.variant : undefined }))
+      : SECTIONS_DEFAULT,
+    img: (raw.img && typeof raw.img === "object" ? raw.img : {}) as Record<string, ImgStyle>,
+  };
 }

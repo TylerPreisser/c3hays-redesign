@@ -7,7 +7,7 @@ import LocationsSection from "@/components/home/LocationsSection";
 import StayConnected from "@/components/home/StayConnected";
 import GiveSection from "@/components/home/GiveSection";
 import PromoBanner from "@/components/home/PromoBanner";
-import { getCMSHome } from "@/lib/cms";
+import { getHomeContent } from "@/lib/cms";
 import { fromStudioHome } from "@/lib/home-content";
 import { isExampleSection, renderExample, SECTION_EXAMPLE_IDS } from "@/lib/section-examples";
 
@@ -23,8 +23,20 @@ export const metadata: Metadata = {
  * Section ORDER + VISIBILITY + BACKGROUND come from `c.sections`, so dragging a
  * card / hiding a section / recoloring it in C3 Studio is a real edit here.
  */
-export default async function HomePage() {
-  const c = fromStudioHome(await getCMSHome());
+export default async function HomePage({
+  searchParams,
+}: {
+  // Preview mode (U6): the editor iframe carries `?cmsEdit=1&preview=<token>`.
+  // A tokenless/public request never receives a token here, so it never gets draft.
+  searchParams?: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  // Preview only exists in the CMS_LIVE server runtime. In the static-export build
+  // CMS_LIVE is unset, so we must NOT read searchParams (that forces dynamic
+  // rendering and breaks `output: export`). Export ⇒ published, byte-identical.
+  const cmsLive = process.env.CMS_LIVE === "1";
+  const sp = cmsLive && searchParams ? await searchParams : {};
+  const preview = typeof sp.preview === "string" ? sp.preview : undefined;
+  const c = fromStudioHome(await getHomeContent(preview));
 
   // Each section id → the component for it, given its chosen style `variant`.
   // Wrapped in <div data-section> so a per-section background can be painted.
@@ -35,7 +47,7 @@ export default async function HomePage() {
       case "meetGrowServe": return <MeetGrowServe content={c.meetGrowServe} img={c.img} variant={variant} />;
       case "nt26": return <NT26Feature content={c.nt26} btnStyle={c.btn["nt26.cta"]} img={c.img} variant={variant} />;
       case "locations": return <LocationsSection text={c.text} btn={c.btn} />;
-      case "stayConnected": return <StayConnected text={c.text} icon={c.icon} variant={variant} />;
+      case "stayConnected": return <StayConnected content={c.stayConnected} text={c.text} icon={c.icon} variant={variant} />;
       case "give": return <GiveSection />;
       case "promo": return <PromoBanner text={c.text} btnStyle={c.btn["promo.cta"]} variant={variant} />;
       // New addable example sections (R3 library) render from the shared registry.
