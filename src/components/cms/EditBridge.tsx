@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import { buildBgCss } from "@/lib/backgrounds";
 
 /**
  * EditBridge — turns the live site into an ON-PAGE editor when embedded in C3
@@ -69,6 +70,20 @@ export default function EditBridge() {
       #c3-toolbar select{ background:#2a2b2b; }
     `;
     document.head.appendChild(style);
+
+    // U10 preview shim (background): paint via an injected, !important STYLESHEET rule
+    // keyed by data-cms-bg (mirrors buildBgCss) — NOT an inline element style. A
+    // document stylesheet is not reset when React re-renders the tagged element, so
+    // the preview survives a client re-render (e.g. a client component re-rendering
+    // and re-applying its own inline background). Preview-only; no persistence.
+    const shimBg: Record<string, string> = {};
+    const shimStyle = document.createElement("style");
+    shimStyle.id = "c3-shim-bg";
+    document.head.appendChild(shimStyle);
+    const applyShimBg = (path: string, background: string) => {
+      if (background) shimBg[path] = background; else delete shimBg[path];
+      shimStyle.textContent = buildBgCss([], shimBg);
+    };
 
     // ── build the floating toolbar ──
     const bar = document.createElement("div");
@@ -287,11 +302,8 @@ export default function EditBridge() {
           if (img && typeof d.src === "string") { img.removeAttribute("srcset"); img.src = d.src; }
         });
       } else if (d.type === "cms:setStyle" && typeof d.path === "string") {
-        // U10 preview shim: live-paint a tagged element's background (footer/tile) so
-        // a background edit shows instantly; "" clears it back to the design default.
-        document.querySelectorAll<HTMLElement>(`[data-cms-bg="${d.path}"]`).forEach((el) => {
-          el.style.background = typeof d.background === "string" ? d.background : "";
-        });
+        // Update the shim stylesheet (survives re-render); "" clears the rule → default.
+        applyShimBg(d.path, typeof d.background === "string" ? d.background : "");
       }
     };
     window.addEventListener("message", onMsg);
@@ -306,7 +318,7 @@ export default function EditBridge() {
       document.removeEventListener("mouseover", onOver, true);
       window.removeEventListener("message", onMsg);
       els.forEach((el) => el.removeAttribute("contenteditable"));
-      bar.remove(); fontMenu.remove(); style.remove(); secChip.remove();
+      bar.remove(); fontMenu.remove(); style.remove(); secChip.remove(); shimStyle.remove();
       document.documentElement.removeAttribute("data-cms-edit");
     };
   }, []);
