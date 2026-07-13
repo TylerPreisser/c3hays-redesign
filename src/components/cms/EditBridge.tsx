@@ -15,7 +15,9 @@ import { useEffect } from "react";
  *   {type:"cms:focus", path}          // a region was focused (caret placed)
  *   {type:"cms:log", ev, ...}         // debug events for the live runner
  * From parent (source:"c3editor"):
- *   {type:"cms:setHtml", path, html}  // set a region's content (external update)
+ *   {type:"cms:setHtml", path, html}     // set a region's content (external update)
+ *   {type:"cms:setImg", path, src}       // U10: live-swap a tagged image (preview only)
+ *   {type:"cms:setStyle", path, background} // U10: live-paint a tagged element bg (preview only)
  */
 export default function EditBridge() {
   useEffect(() => {
@@ -277,6 +279,19 @@ export default function EditBridge() {
       const d = e.data; if (!d || d.source !== "c3editor") return;
       if (d.type === "cms:setHtml" && typeof d.path === "string") {
         document.querySelectorAll<HTMLElement>(`[data-cms="${d.path}"]`).forEach((el) => { if (el.innerHTML !== d.html) el.innerHTML = d.html; });
+      } else if (d.type === "cms:setImg" && typeof d.path === "string") {
+        // U10 preview shim: live-swap a tagged image (esp. the g:logo-* marks) so a
+        // global image edit shows in the preview without a Publish/reload round-trip.
+        document.querySelectorAll<HTMLElement>(`[data-cms-img="${d.path}"]`).forEach((el) => {
+          const img = (el.tagName === "IMG" ? el : el.querySelector("img")) as HTMLImageElement | null;
+          if (img && typeof d.src === "string") { img.removeAttribute("srcset"); img.src = d.src; }
+        });
+      } else if (d.type === "cms:setStyle" && typeof d.path === "string") {
+        // U10 preview shim: live-paint a tagged element's background (footer/tile) so
+        // a background edit shows instantly; "" clears it back to the design default.
+        document.querySelectorAll<HTMLElement>(`[data-cms-bg="${d.path}"]`).forEach((el) => {
+          el.style.background = typeof d.background === "string" ? d.background : "";
+        });
       }
     };
     window.addEventListener("message", onMsg);
