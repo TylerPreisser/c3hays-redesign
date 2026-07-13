@@ -93,6 +93,30 @@ export default function EditBridge() {
       shimStyle.textContent = buildBgCss([], shimBg);
     };
 
+    // Unit L: preview IMAGE swaps (esp. the per-variant logos g:logo-light/dark).
+    // Store the applied overrides and re-apply them whenever a matching data-cms-img
+    // (re)MOUNTS — a client re-render (e.g. the header swapping the light/dark logo
+    // on scroll) mounts a FRESH <img> with the DEFAULT src, which silently drops the
+    // preview swap. Unlike a background (a durable stylesheet rule), an <img> src is
+    // reset on remount, so we re-apply on mount via a MutationObserver — not only on
+    // cms:ready. Preview-only; never changes what Publish persists.
+    const shimImg: Record<string, string> = {};
+    const applyImgTo = (el: HTMLElement, src: string) => {
+      const img = (el.tagName === "IMG" ? el : el.querySelector("img")) as HTMLImageElement | null;
+      if (img && img.src !== src) { img.removeAttribute("srcset"); img.src = src; }
+    };
+    const applyShimImg = (path: string, src: string) => {
+      if (src) shimImg[path] = src; else delete shimImg[path];
+      if (src) document.querySelectorAll<HTMLElement>(`[data-cms-img="${path}"]`).forEach((el) => applyImgTo(el, src));
+    };
+    const reapplyShimImgs = () => {
+      for (const [path, src] of Object.entries(shimImg)) {
+        document.querySelectorAll<HTMLElement>(`[data-cms-img="${path}"]`).forEach((el) => applyImgTo(el, src));
+      }
+    };
+    const imgObserver = new MutationObserver(() => { if (Object.keys(shimImg).length) reapplyShimImgs(); });
+    imgObserver.observe(document.body, { childList: true, subtree: true });
+
     // ── build the floating toolbar ──
     const bar = document.createElement("div");
     bar.id = "c3-toolbar";
@@ -337,10 +361,8 @@ export default function EditBridge() {
       } else if (d.type === "cms:setImg" && typeof d.path === "string") {
         // U10 preview shim: live-swap a tagged image (esp. the g:logo-* marks) so a
         // global image edit shows in the preview without a Publish/reload round-trip.
-        document.querySelectorAll<HTMLElement>(`[data-cms-img="${d.path}"]`).forEach((el) => {
-          const img = (el.tagName === "IMG" ? el : el.querySelector("img")) as HTMLImageElement | null;
-          if (img && typeof d.src === "string") { img.removeAttribute("srcset"); img.src = d.src; }
-        });
+        // Unit L: stored + re-applied on remount (see applyShimImg / imgObserver).
+        applyShimImg(d.path, typeof d.src === "string" ? d.src : "");
       } else if (d.type === "cms:setStyle" && typeof d.path === "string") {
         // Update the shim stylesheet (survives re-render); "" clears the rule → default.
         applyShimBg(d.path, typeof d.background === "string" ? d.background : "");
@@ -358,6 +380,7 @@ export default function EditBridge() {
       document.removeEventListener("mouseover", onOver, true);
       window.removeEventListener("message", onMsg);
       els.forEach((el) => el.removeAttribute("contenteditable"));
+      imgObserver.disconnect();
       bar.remove(); fontMenu.remove(); style.remove(); secChip.remove(); bgChip.remove(); shimStyle.remove();
       document.documentElement.removeAttribute("data-cms-edit");
     };
