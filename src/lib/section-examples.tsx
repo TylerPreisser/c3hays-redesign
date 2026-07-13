@@ -29,6 +29,15 @@ import StatsBand from "@/components/home/StatsBand";
 import NextSteps from "@/components/home/NextSteps";
 import ScriptureVerse from "@/components/home/ScriptureVerse";
 import PromoBanner from "@/components/home/PromoBanner";
+// v5 R2: the six CORE home sections, so the shoot harness can render REAL previews
+// for them (they were icon-only in v4). These render from typed HomeContent fields,
+// IDENTICAL to how src/app/page.tsx renders the live homepage.
+import Hero from "@/components/home/Hero";
+import MissionBlock from "@/components/home/MissionBlock";
+import MeetGrowServe from "@/components/home/MeetGrowServe";
+import NT26Feature from "@/components/home/NT26Feature";
+import LocationsSection from "@/components/home/LocationsSection";
+import StayConnected from "@/components/home/StayConnected";
 
 export interface VariantDef { key: string; label: string }
 export interface SectionExampleDef {
@@ -48,6 +57,15 @@ export interface SectionExampleDef {
  * c3-backend HOME_SECTION_DEFS.
  */
 export const SECTION_EXAMPLES: SectionExampleDef[] = [
+  // v5 R2 — the six CORE home sections. `variants: []` → the shoot harness renders
+  // ONE real preview per id (their editor default look); renderExample feeds them
+  // exactly the props src/app/page.tsx uses, so the thumbnail matches the live page.
+  { id: "hero", label: "Hero", icon: "PanelTop", group: "Core", description: "Full-bleed welcome with headline and call to action.", variants: [] },
+  { id: "mission", label: "Mission statement", icon: "Quote", group: "Core", description: "One emphasized sentence — your why.", variants: [] },
+  { id: "meetGrowServe", label: "Find your place", icon: "LayoutGrid", group: "Core", description: "A grid of tiles linking people to next steps.", variants: [] },
+  { id: "nt26", label: "Bible reading feature", icon: "BookOpen", group: "Core", description: "Split feature with image, heading and CTA.", variants: [] },
+  { id: "locations", label: "Our churches", icon: "MapPin", group: "Core", description: "Campus cards with service times and directions.", variants: [] },
+  { id: "stayConnected", label: "Get in Touch", icon: "Mail", group: "Core", description: "Contact cards with recolorable icons.", variants: [] },
   { id: "serviceTimes", label: "Service Times", icon: "Clock", group: "Visit", description: "When & where you gather — campuses and weekend times.", variants: [{ key: "cards", label: "Campus cards" }, { key: "band", label: "Centered band" }] },
   { id: "sermonFeature", label: "Message Spotlight", icon: "PlayCircle", group: "Media", description: "Feature this weekend's message with a play thumbnail.", variants: [{ key: "spotlight", label: "Spotlight" }, { key: "split", label: "Split" }] },
   { id: "eventsStrip", label: "Upcoming Events", icon: "CalendarDays", group: "Connect", description: "A short list of what's coming up, with dates.", variants: [{ key: "cards", label: "Cards" }, { key: "list", label: "Agenda list" }] },
@@ -77,6 +95,14 @@ export const isExampleSection = (id: string): boolean => SECTION_EXAMPLE_IDS.inc
  */
 export function renderExample(id: string, c: HomeContent, variant?: string): React.ReactNode {
   switch (id) {
+    // v5 R2 — CORE home sections, rendered EXACTLY as src/app/page.tsx renders them
+    // (same typed fields + prop wiring) so the shoot thumbnail equals the live look.
+    case "hero": return <Hero content={c.hero} btnStyle={c.btn["hero.cta"]} text={c.text} btn={c.btn} variant={variant} />;
+    case "mission": return <MissionBlock content={c.mission} variant={variant} />;
+    case "meetGrowServe": return <MeetGrowServe content={c.meetGrowServe} img={c.img} variant={variant} />;
+    case "nt26": return <NT26Feature content={c.nt26} btnStyle={c.btn["nt26.cta"]} img={c.img} variant={variant} />;
+    case "locations": return <LocationsSection text={c.text} btn={c.btn} />;
+    case "stayConnected": return <StayConnected content={c.stayConnected} text={c.text} icon={c.icon} variant={variant} />;
     case "serviceTimes": return <ServiceTimes text={c.text} btnStyle={c.btn["svc.cta"]} variant={variant} />;
     case "sermonFeature": return <SermonFeature text={c.text} img={c.img} btnStyle={c.btn["sermon.cta"]} variant={variant} />;
     case "eventsStrip": return <EventsStrip text={c.text} btnStyle={c.btn["events.cta"]} variant={variant} />;
