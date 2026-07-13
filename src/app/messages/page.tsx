@@ -3,6 +3,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { Play, ExternalLink, Mic } from "lucide-react";
 import { assetPath } from "@/lib/asset-path";
+import { getCMSPage } from "@/lib/cms";
+import { tx, imgCss } from "@/lib/home-content";
 
 export const metadata: Metadata = {
   title: "Messages",
@@ -12,6 +14,7 @@ export const metadata: Metadata = {
 
 const recentMessages = [
   {
+    id: "msg-0",
     title: "The God Who Sees",
     series: "Genesis",
     speaker: "Lead Pastor",
@@ -19,6 +22,7 @@ const recentMessages = [
     image: "/images/worship.webp",
   },
   {
+    id: "msg-1",
     title: "Faith Over Fear",
     series: "Matthew",
     speaker: "Lead Pastor",
@@ -26,6 +30,7 @@ const recentMessages = [
     image: "/images/congregation.webp",
   },
   {
+    id: "msg-2",
     title: "What Love Looks Like",
     series: "1 Corinthians 13",
     speaker: "Guest Speaker",
@@ -33,6 +38,7 @@ const recentMessages = [
     image: "/images/gather.webp",
   },
   {
+    id: "msg-3",
     title: "The Prodigal Father",
     series: "Luke 15",
     speaker: "Lead Pastor",
@@ -40,6 +46,7 @@ const recentMessages = [
     image: "/images/worship.webp",
   },
   {
+    id: "msg-4",
     title: "Resurrection Power",
     series: "Easter 2026",
     speaker: "Lead Pastor",
@@ -47,6 +54,7 @@ const recentMessages = [
     image: "/images/exterior.webp",
   },
   {
+    id: "msg-5",
     title: "When God Speaks",
     series: "Hearing God",
     speaker: "Lead Pastor",
@@ -55,94 +63,215 @@ const recentMessages = [
   },
 ];
 
-export default function MessagesPage() {
+export default async function MessagesPage() {
+  const ov = (await getCMSPage("/messages")) || {};
+  const t = ov.text || {};
+  const media = ov.media || {};
+
   return (
     <>
-      {/* Hero */}
-      <section className="relative flex items-end overflow-hidden" style={{ minHeight: "50vh" }}>
-        <div className="absolute inset-0">
+      {/* ── Hero — full-bleed image + dark gradient ── */}
+      <section className="relative flex items-end overflow-hidden" style={{ minHeight: "56vh" }}>
+        {/* Background image — CMS-replaceable */}
+        <div
+          className="absolute inset-0"
+          data-cms-img="messages-hero-img"
+          style={{ borderRadius: 0 }}
+        >
           <Image
-            src={assetPath("/images/worship.webp")}
+            src={assetPath(media["messages-hero-img"] || "/images/worship.webp")}
             alt="Sunday worship service"
             fill
-            className="object-cover"
             priority
+            sizes="100vw"
+            className="object-cover animate-ken-burns"
+            style={imgCss(ov.img?.["messages-hero-img"])}
           />
-          <div className="absolute inset-0" style={{ background: "rgba(10,10,10,0.62)" }} />
+          {/* Base dark scrim */}
+          <div
+            className="absolute inset-0"
+            style={{ background: "rgba(10,10,10,0.55)" }}
+          />
+          {/* Bottom-up gradient for text legibility */}
           <div
             className="absolute inset-0"
             style={{
               background:
-                "linear-gradient(to top, rgba(10,10,10,0.88) 0%, rgba(10,10,10,0.2) 60%, transparent 100%)",
+                "linear-gradient(to top, rgba(10,10,10,0.92) 0%, rgba(10,10,10,0.3) 55%, transparent 100%)",
             }}
           />
         </div>
-        <div className="relative z-10 container-c3 pb-16 pt-40">
-          <h1 className="display-1 text-white">Watch &amp; Listen</h1>
-          <p className="body-lg mt-4 max-w-lg" style={{ color: "rgba(255,255,255,0.65)" }}>
-            Miss a Sunday? Browse our full sermon archive on Vimeo, or tune
-            in live this weekend.
-          </p>
+
+        {/* Hero text — bottom-anchored */}
+        <div className="relative z-10 container-c3 pb-16 pt-44">
+          {/* Eyebrow */}
+          <span
+            data-cms="t:messages-hero-eyebrow"
+            style={{
+              display: "inline-block",
+              textTransform: "uppercase",
+              letterSpacing: "0.16em",
+              fontSize: "0.75rem",
+              fontWeight: 700,
+              color: "#1cc3af",
+              marginBottom: "1rem",
+            }}
+            dangerouslySetInnerHTML={{
+              __html: tx(t, "messages-hero-eyebrow", "Sermons &amp; Teaching"),
+            }}
+          />
+          <h1
+            className="display-1 text-white text-balance"
+            data-cms="t:messages-hero-heading"
+            style={{ marginBottom: "1.25rem" }}
+            dangerouslySetInnerHTML={{
+              __html: tx(t, "messages-hero-heading", "Watch &amp; Listen"),
+            }}
+          />
+          <p
+            className="body-lg"
+            data-cms="t:messages-hero-body"
+            style={{ color: "rgba(255,255,255,0.65)", maxWidth: "38rem" }}
+            dangerouslySetInnerHTML={{
+              __html: tx(
+                t,
+                "messages-hero-body",
+                "Miss a Sunday? Browse our full sermon archive on Vimeo, or tune in live this weekend."
+              ),
+            }}
+          />
         </div>
       </section>
 
-      {/* Live times banner */}
+      {/* ── Live times banner ── */}
       <div style={{ backgroundColor: "#1b1c1c" }}>
         <div className="container-c3 py-4 flex flex-wrap items-center justify-between gap-4">
-          <div className="flex flex-wrap items-center gap-4 text-sm" style={{ color: "rgba(255,255,255,0.65)" }}>
-            <span className="font-semibold text-white">Join us live:</span>
-            <span>Hays — Sat 5pm · Sun 8am, 9:30am, 11am</span>
-            <span>Colby — Sun 10am</span>
+          <div
+            className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm"
+            style={{ color: "rgba(255,255,255,0.65)" }}
+          >
+            <span
+              className="font-semibold text-white"
+              data-cms="t:messages-banner-label"
+              dangerouslySetInnerHTML={{
+                __html: tx(t, "messages-banner-label", "Join us live:"),
+              }}
+            />
+            <span
+              data-cms="t:messages-banner-hays"
+              dangerouslySetInnerHTML={{
+                __html: tx(
+                  t,
+                  "messages-banner-hays",
+                  "Hays — Sat 5pm · Sun 8am, 9:30am, 11am"
+                ),
+              }}
+            />
+            <span
+              data-cms="t:messages-banner-colby"
+              dangerouslySetInnerHTML={{
+                __html: tx(t, "messages-banner-colby", "Colby — Sun 10am"),
+              }}
+            />
           </div>
-          <Link href="/watch/" className="btn btn-primary btn-sm">
-            Watch Live
+          <Link
+            href={t["messages-banner-cta-href"] || "/watch/"}
+            data-cms-link="messages-banner-cta"
+            className="btn btn-primary btn-sm"
+          >
+            <span data-cms-link-label>
+              {tx(t, "messages-banner-cta-label", "Watch Live")}
+            </span>
           </Link>
         </div>
       </div>
 
-      {/* Messages grid */}
+      {/* ── Recent Messages grid ── */}
       <section className="section" style={{ backgroundColor: "#ffffff" }}>
         <div className="container-c3">
+          {/* Section header */}
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5 mb-14">
             <div>
-              <h2 className="heading-1" style={{ color: "#1b1c1c" }}>Recent Messages</h2>
+              {/* Eyebrow */}
+              <span
+                data-cms="t:messages-grid-eyebrow"
+                style={{
+                  display: "inline-block",
+                  textTransform: "uppercase",
+                  letterSpacing: "0.16em",
+                  fontSize: "0.75rem",
+                  fontWeight: 700,
+                  color: "#1cc3af",
+                  marginBottom: "0.625rem",
+                }}
+                dangerouslySetInnerHTML={{
+                  __html: tx(t, "messages-grid-eyebrow", "This Month"),
+                }}
+              />
+              <h2
+                className="heading-1"
+                style={{ color: "#1b1c1c" }}
+                data-cms="t:messages-grid-heading"
+                dangerouslySetInnerHTML={{
+                  __html: tx(t, "messages-grid-heading", "Recent Messages"),
+                }}
+              />
             </div>
+
+            {/* External platform links */}
             <div className="flex gap-3">
               <a
-                href="https://vimeo.com/c3hays"
+                href={t["messages-vimeo-href"] || "https://vimeo.com/c3hays"}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="btn btn-outline-navy btn-sm inline-flex items-center gap-2"
               >
-                <ExternalLink size={14} />
-                All on Vimeo
+                <ExternalLink size={14} aria-hidden="true" />
+                <span
+                  data-cms="t:messages-vimeo-label"
+                  dangerouslySetInnerHTML={{
+                    __html: tx(t, "messages-vimeo-label", "All on Vimeo"),
+                  }}
+                />
               </a>
               <a
-                href="https://anchor.fm/c3pod"
+                href={t["messages-podcast-href"] || "https://anchor.fm/c3pod"}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="btn btn-outline-navy btn-sm inline-flex items-center gap-2"
               >
-                <Mic size={14} />
-                Podcast
+                <Mic size={14} aria-hidden="true" />
+                <span
+                  data-cms="t:messages-podcast-label"
+                  dangerouslySetInnerHTML={{
+                    __html: tx(t, "messages-podcast-label", "Podcast"),
+                  }}
+                />
               </a>
             </div>
           </div>
 
+          {/* Message cards — 3-column grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {recentMessages.map((msg) => (
-              <div key={msg.title} className="group cursor-pointer">
-                {/* Thumbnail — 4:5 portrait, rounded */}
+              <article key={msg.id} className="group cursor-pointer">
+                {/* Thumbnail — 4:5 portrait, rounded with play overlay */}
                 <div
                   className="relative overflow-hidden mb-5"
-                  style={{ aspectRatio: "4/5", borderRadius: "var(--radius-md)" }}
+                  data-cms-img={msg.id}
+                  style={{
+                    aspectRatio: "4/5",
+                    borderRadius: "var(--radius-md)",
+                  }}
                 >
                   <Image
-                    src={assetPath(msg.image)}
+                    src={assetPath(media[msg.id] || msg.image)}
                     alt={msg.title}
                     fill
                     className="object-cover transition-transform duration-500 ease-out group-hover:scale-[1.04]"
+                    style={imgCss(ov.img?.[msg.id])}
                   />
+                  {/* Dark overlay */}
                   <div
                     className="absolute inset-0 transition-colors duration-300"
                     style={{ background: "rgba(10,10,10,0.38)" }}
@@ -152,42 +281,183 @@ export default function MessagesPage() {
                     <div
                       className="w-14 h-14 rounded-full flex items-center justify-center border border-white/40 transition-all duration-200 group-hover:bg-white/20 group-hover:scale-105"
                       style={{ background: "rgba(255,255,255,0.14)" }}
+                      aria-hidden="true"
                     >
                       <Play size={18} className="text-white ml-0.5" fill="white" />
                     </div>
                   </div>
-                  {/* Series tag — pill */}
+                  {/* Series pill */}
                   <div className="absolute top-3 left-3">
                     <span
                       className="px-3 py-1 text-xs font-bold tracking-wide"
-                      style={{ background: "#1cc3af", color: "#fff", borderRadius: 999 }}
-                    >
-                      {msg.series}
-                    </span>
+                      data-cms={`t:${msg.id}-series`}
+                      style={{
+                        background: "#1cc3af",
+                        color: "#fff",
+                        borderRadius: 999,
+                      }}
+                      dangerouslySetInnerHTML={{
+                        __html: tx(t, `${msg.id}-series`, msg.series),
+                      }}
+                    />
                   </div>
                 </div>
-                {/* Info */}
-                <h3 className="font-bold mb-1.5 leading-snug" style={{ color: "#1b1c1c", fontSize: "1rem" }}>
-                  {msg.title}
-                </h3>
-                <p className="text-sm" style={{ color: "rgba(27,28,28,0.5)" }}>
-                  {msg.speaker} · {msg.date}
+
+                {/* Card info */}
+                <h3
+                  className="font-bold mb-1.5 leading-snug"
+                  data-cms={`t:${msg.id}-title`}
+                  style={{ color: "#1b1c1c", fontSize: "1rem" }}
+                  dangerouslySetInnerHTML={{
+                    __html: tx(t, `${msg.id}-title`, msg.title),
+                  }}
+                />
+                <p
+                  className="text-sm"
+                  style={{ color: "rgba(27,28,28,0.5)" }}
+                >
+                  <span
+                    data-cms={`t:${msg.id}-speaker`}
+                    dangerouslySetInnerHTML={{
+                      __html: tx(t, `${msg.id}-speaker`, msg.speaker),
+                    }}
+                  />
+                  <span aria-hidden="true"> · </span>
+                  <span
+                    data-cms={`t:${msg.id}-date`}
+                    dangerouslySetInnerHTML={{
+                      __html: tx(t, `${msg.id}-date`, msg.date),
+                    }}
+                  />
                 </p>
-              </div>
+              </article>
             ))}
           </div>
 
           {/* Full archive CTA */}
           <div className="mt-14 text-center">
             <a
-              href="https://vimeo.com/c3hays"
+              href={t["messages-archive-href"] || "https://vimeo.com/c3hays"}
               target="_blank"
               rel="noopener noreferrer"
               className="btn btn-primary btn-lg inline-flex items-center gap-2"
             >
-              <ExternalLink size={16} />
-              View Full Archive on Vimeo
+              <ExternalLink size={16} aria-hidden="true" />
+              <span
+                data-cms="t:messages-archive-label"
+                dangerouslySetInnerHTML={{
+                  __html: tx(
+                    t,
+                    "messages-archive-label",
+                    "View Full Archive on Vimeo"
+                  ),
+                }}
+              />
             </a>
+          </div>
+        </div>
+      </section>
+
+      {/* ── Podcast / App callout — dark section ── */}
+      <section className="section" style={{ backgroundColor: "#1b1c1c" }}>
+        <div className="container-c3">
+          <div
+            className="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-16 lg:gap-24 items-center"
+          >
+            {/* Text */}
+            <div>
+              <span
+                data-cms="t:messages-podcast-eyebrow"
+                style={{
+                  display: "inline-block",
+                  textTransform: "uppercase",
+                  letterSpacing: "0.16em",
+                  fontSize: "0.75rem",
+                  fontWeight: 700,
+                  color: "#1cc3af",
+                  marginBottom: "1rem",
+                }}
+                dangerouslySetInnerHTML={{
+                  __html: tx(t, "messages-podcast-eyebrow", "Take It With You"),
+                }}
+              />
+              <h2
+                className="display-2 text-white text-balance"
+                data-cms="t:messages-podcast-heading"
+                style={{ marginBottom: "clamp(1rem, 3vw, 1.75rem)" }}
+                dangerouslySetInnerHTML={{
+                  __html: tx(
+                    t,
+                    "messages-podcast-heading",
+                    "Listen on the Podcast"
+                  ),
+                }}
+              />
+              <p
+                data-cms="t:messages-podcast-body"
+                style={{
+                  fontSize: "1.125rem",
+                  color: "rgba(255,255,255,0.75)",
+                  lineHeight: 1.7,
+                  marginBottom: "clamp(1.75rem, 4vw, 2.75rem)",
+                }}
+                dangerouslySetInnerHTML={{
+                  __html: tx(
+                    t,
+                    "messages-podcast-body",
+                    "Every message from C3 is available as a podcast — subscribe once and never miss a week. Available on Spotify, Apple Podcasts, and anywhere you listen."
+                  ),
+                }}
+              />
+              <div className="flex flex-wrap gap-3">
+                <a
+                  href={t["messages-podcast-cta-href"] || "https://anchor.fm/c3pod"}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn btn-primary btn-sm inline-flex items-center gap-2"
+                >
+                  <Mic size={15} aria-hidden="true" />
+                  <span
+                    data-cms="t:messages-podcast-cta-label"
+                    dangerouslySetInnerHTML={{
+                      __html: tx(
+                        t,
+                        "messages-podcast-cta-label",
+                        "Subscribe to Podcast"
+                      ),
+                    }}
+                  />
+                </a>
+                <Link
+                  href={t["messages-watch-live-href"] || "/watch/"}
+                  data-cms-link="messages-watch-live"
+                  className="btn btn-outline btn-sm"
+                >
+                  <span data-cms-link-label>
+                    {tx(t, "messages-watch-live-label", "Watch Live")}
+                  </span>
+                </Link>
+              </div>
+            </div>
+
+            {/* Image */}
+            <div
+              className="relative overflow-hidden"
+              data-cms-img="messages-podcast-img"
+              style={{
+                aspectRatio: "4/3",
+                borderRadius: "var(--radius-md)",
+                minHeight: 240,
+              }}
+            >
+              <Image
+                src={assetPath(media["messages-podcast-img"] || "/images/gather.webp")}
+                alt="C3 podcast and messages"
+                fill
+                className="object-cover"
+                style={imgCss(ov.img?.["messages-podcast-img"])}
+              />
+            </div>
           </div>
         </div>
       </section>

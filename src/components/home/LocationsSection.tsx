@@ -7,6 +7,8 @@ import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { locations } from "@/data/locations";
 import { assetPath } from "@/lib/asset-path";
+import { tx, type BtnStyle } from "@/lib/home-content";
+import { btnCss } from "./Hero";
 import CampusChooser from "./CampusChooser";
 
 gsap.registerPlugin(ScrollTrigger);
@@ -14,7 +16,7 @@ gsap.registerPlugin(ScrollTrigger);
 /* "Our Churches" — Church-on-the-Move's campus-chooser pattern, reskinned to C3:
    a stylized northwest-Kansas map with Hays + Colby markers beside a teal
    "find your campus" card, then two rounded campus cards. */
-export default function LocationsSection() {
+export default function LocationsSection({ text = {}, btn = {} }: { text?: Record<string, string>; btn?: Record<string, BtnStyle> }) {
   const sectionRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
@@ -35,16 +37,13 @@ export default function LocationsSection() {
     <section ref={sectionRef} className="section" style={{ backgroundColor: "#f6f6f6" }}>
       <div className="container-c3">
         {/* Header */}
-        <div className="locations-heading" style={{ marginBottom: "3.5rem", maxWidth: 640 }}>
-          <h2 className="display-2" style={{ color: "#1b1c1c" }}>Our churches.</h2>
-          <p className="body-lg" style={{ color: "rgba(27,28,28,0.6)", marginTop: "1.25rem" }}>
-            We&apos;re one church family in two places across northwest Kansas. Find the
-            campus closest to you — and come just as you are this weekend.
-          </p>
+        <div className="locations-heading" style={{ marginBottom: "clamp(2rem, 4vw, 3.5rem)", maxWidth: 640 }}>
+          <h2 className="display-2" data-cms="t:our-churches-heading" style={{ color: "#1b1c1c" }} dangerouslySetInnerHTML={{ __html: tx(text, "our-churches-heading", "Our churches.") }} />
+          <p className="body-lg" data-cms="t:our-churches-intro" style={{ color: "rgba(27,28,28,0.6)", marginTop: "1.25rem" }} dangerouslySetInnerHTML={{ __html: tx(text, "our-churches-intro", "We're one church family in two places across northwest Kansas. Find the campus closest to you — and come just as you are this weekend.") }} />
         </div>
 
-        {/* Map + chooser card */}
-        <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 lg:gap-8 mb-8 items-stretch">
+        {/* Map + chooser card — 2-col from md (768px), 5-col weighting at lg */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 lg:gap-8 mb-8 items-stretch">
           {/* Stylized NW-Kansas map */}
           <div
             className="lg:col-span-3 relative overflow-hidden"
@@ -84,23 +83,19 @@ export default function LocationsSection() {
             className="lg:col-span-2 flex flex-col justify-center"
             style={{ background: "var(--color-ink)", borderRadius: "var(--radius-md)", padding: "2.5rem 2.25rem" }}
           >
-            <h3 className="heading-2 text-white" style={{ marginBottom: "0.875rem" }}>
-              Find your campus
-            </h3>
-            <p className="body-base" style={{ color: "rgba(255,255,255,0.6)", marginBottom: "1.75rem" }}>
-              Two campuses, one mission. Pick the one closest to you and we&apos;ll see you Sunday.
-            </p>
-            <CampusChooser variant="teal" />
+            <h3 className="heading-2 text-white" data-cms="t:findcampus-heading" style={{ marginBottom: "0.875rem" }} dangerouslySetInnerHTML={{ __html: tx(text, "findcampus-heading", "Find your campus") }} />
+            <p className="body-base" data-cms="t:findcampus-body" style={{ color: "rgba(255,255,255,0.6)", marginBottom: "1.75rem" }} dangerouslySetInnerHTML={{ __html: tx(text, "findcampus-body", "Two campuses, one mission. Pick the one closest to you and we'll see you Sunday.") }} />
+            <CampusChooser variant="teal" id="findcampus-locations" text={text} btn={btn} />
           </div>
         </div>
 
-        {/* Two rounded campus cards */}
-        <div className="campus-grid grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
+        {/* Two rounded campus cards — side-by-side from md (768px) */}
+        <div className="campus-grid grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
           {locations.map((loc) => (
             <div
               key={loc.id}
               className="campus-card group relative overflow-hidden"
-              style={{ height: 420, borderRadius: "var(--radius-md)" }}
+              style={{ aspectRatio: "4/3", minHeight: 260, width: "100%", borderRadius: "var(--radius-md)" }}
             >
               <Image
                 src={assetPath(loc.image)}
@@ -113,16 +108,14 @@ export default function LocationsSection() {
                 style={{ background: "linear-gradient(to top, rgba(10,10,10,0.9) 0%, rgba(10,10,10,0.4) 55%, rgba(10,10,10,0.12) 100%)" }}
               />
               <div className="absolute inset-0 flex flex-col justify-end" style={{ padding: "2.5rem" }}>
-                <h3 className="heading-1 text-white" style={{ marginBottom: "0.4rem" }}>{loc.name}</h3>
-                <p className="text-sm" style={{ color: "rgba(255,255,255,0.7)", marginBottom: "1.75rem" }}>
-                  {loc.street}, {loc.city}, {loc.state} · {loc.services[0]?.day} {loc.services[0]?.times.join(", ")}
-                </p>
+                <h3 className="heading-1 text-white" data-cms={`t:campus-${loc.id}-name`} style={{ marginBottom: "0.4rem" }} dangerouslySetInnerHTML={{ __html: tx(text, `campus-${loc.id}-name`, loc.name) }} />
+                <p className="text-sm" data-cms={`t:campus-${loc.id}-info`} style={{ color: "rgba(255,255,255,0.7)", marginBottom: "1.75rem" }} dangerouslySetInnerHTML={{ __html: tx(text, `campus-${loc.id}-info`, `${loc.street}, ${loc.city}, ${loc.state} · ${loc.services[0]?.day} ${loc.services[0]?.times.join(", ")}`) }} />
                 <div className="flex flex-wrap gap-3">
-                  <Link href={`/locations/${loc.slug}/`} className="btn btn-primary btn-sm">
-                    Campus Info
+                  <Link href={text[`campusbtn-${loc.id}-info-href`] || `/locations/${loc.slug}/`} data-cms-link={`campusbtn-${loc.id}-info`} className="btn btn-primary btn-sm" style={btnCss(btn[`campusbtn-${loc.id}-info`])}>
+                    <span data-cms-link-label>{text[`campusbtn-${loc.id}-info-label`] || "Campus Info"}</span>
                   </Link>
-                  <a href={loc.mapsUrl} target="_blank" rel="noopener noreferrer" className="btn btn-outline btn-sm">
-                    Get Directions
+                  <a href={text[`campusbtn-${loc.id}-dir-href`] || loc.mapsUrl} target="_blank" rel="noopener noreferrer" data-cms-link={`campusbtn-${loc.id}-dir`} className="btn btn-outline btn-sm" style={btnCss(btn[`campusbtn-${loc.id}-dir`])}>
+                    <span data-cms-link-label>{text[`campusbtn-${loc.id}-dir-label`] || "Get Directions"}</span>
                   </a>
                 </div>
               </div>

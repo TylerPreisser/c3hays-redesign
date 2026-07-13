@@ -9,8 +9,10 @@
  * basePath/assetPrefix treatment.
  */
 export const assetPath = (path: string): string => {
+  if (!path) return path;
+  // Already an absolute URL (http(s)://, protocol-relative, or data:) → leave it.
+  if (/^(https?:)?\/\//i.test(path) || path.startsWith("data:")) return path;
   const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
-  // Ensure single leading slash on path
   const normalized = path.startsWith("/") ? path : `/${path}`;
   return `${basePath}${normalized}`;
 };

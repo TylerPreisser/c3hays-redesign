@@ -6,12 +6,24 @@ import { useEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { assetPath } from "@/lib/asset-path";
-import { NT26_DEFAULTS, type NT26Content } from "@/lib/home-content";
+import { NT26_DEFAULTS, imgCss, type NT26Content, type BtnStyle, type ImgStyle } from "@/lib/home-content";
+import { btnCss } from "./Hero";
 
 gsap.registerPlugin(ScrollTrigger);
 
-export default function NT26Feature({ content = NT26_DEFAULTS }: { content?: NT26Content }) {
+export default function NT26Feature({
+  content = NT26_DEFAULTS,
+  btnStyle,
+  img = {},
+  variant,
+}: {
+  content?: NT26Content;
+  btnStyle?: BtnStyle;
+  img?: Record<string, ImgStyle>;
+  variant?: string;
+}) {
   const sectionRef = useRef<HTMLElement>(null);
+  const v = variant || "imageRight";
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -52,46 +64,205 @@ export default function NT26Feature({ content = NT26_DEFAULTS }: { content?: NT2
     return () => ctx.revert();
   }, []);
 
+  /* ─────────────────────────────────────────────────────────────
+     imageRight (default) — text left, image right
+  ───────────────────────────────────────────────────────────── */
+  if (v === "imageRight") {
+    return (
+      <section
+        ref={sectionRef}
+        className="section overflow-hidden"
+        style={{ backgroundColor: "#1b1c1c" }}
+      >
+        <div className="container-c3">
+          {/* Side-by-side from md (768px); stacked single-col on phones */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-12 lg:gap-20 items-center">
+
+            {/* Text left */}
+            <div className="nt26-content">
+              <h2
+                className="display-2 text-white text-balance"
+                data-cms="nt26.heading"
+                style={{ marginBottom: "clamp(1.5rem, 4vw, 3rem)" }}
+                dangerouslySetInnerHTML={{ __html: content.heading }}
+              />
+              <p
+                data-cms="nt26.body"
+                style={{ fontSize: "1.125rem", color: "rgba(255,255,255,0.85)", lineHeight: 1.7, marginBottom: "clamp(2rem, 4vw, 3.5rem)" }}
+                dangerouslySetInnerHTML={{ __html: content.body }}
+              />
+              <Link
+                href={content.ctaHref}
+                data-cms-link="nt26.cta"
+                className="btn btn-primary btn-sm"
+                style={btnCss(btnStyle)}
+              >
+                <span data-cms-link-label>{content.ctaLabel}</span>
+              </Link>
+            </div>
+
+            {/* Image right — rounded, clip-path reveal.
+                Phone: 4:3 landscape. md+ (side by side): 3:4 portrait to fill the column. */}
+            <div
+              className="nt26-img relative overflow-hidden nt26-img-wrap"
+              data-cms-img="nt26.image"
+              style={{ borderRadius: "var(--radius-md)", width: "100%" }}
+            >
+              <Image
+                src={assetPath(content.image)}
+                alt="NT26 Bible Reading Plan"
+                fill
+                className="object-cover"
+                style={imgCss(img["nt26.image"])}
+              />
+            </div>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  /* ─────────────────────────────────────────────────────────────
+     imageLeft — image left, text right (columns swapped)
+  ───────────────────────────────────────────────────────────── */
+  if (v === "imageLeft") {
+    return (
+      <section
+        ref={sectionRef}
+        className="section overflow-hidden"
+        style={{ backgroundColor: "#1b1c1c" }}
+      >
+        <div className="container-c3">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-12 lg:gap-20 items-center">
+
+            {/* Image left */}
+            <div
+              className="nt26-img relative overflow-hidden nt26-img-wrap order-last md:order-first"
+              data-cms-img="nt26.image"
+              style={{ borderRadius: "var(--radius-md)", width: "100%" }}
+            >
+              <Image
+                src={assetPath(content.image)}
+                alt="NT26 Bible Reading Plan"
+                fill
+                className="object-cover"
+                style={imgCss(img["nt26.image"])}
+              />
+            </div>
+
+            {/* Text right */}
+            <div className="nt26-content order-first md:order-last">
+              {/* Teal accent bar */}
+              <div
+                style={{
+                  width: "3rem",
+                  height: "4px",
+                  borderRadius: "2px",
+                  backgroundColor: "#1cc3af",
+                  marginBottom: "clamp(1rem, 2.5vw, 1.75rem)",
+                }}
+              />
+              <h2
+                className="display-2 text-white text-balance"
+                data-cms="nt26.heading"
+                style={{ marginBottom: "clamp(1.5rem, 4vw, 3rem)" }}
+                dangerouslySetInnerHTML={{ __html: content.heading }}
+              />
+              <p
+                data-cms="nt26.body"
+                style={{ fontSize: "1.125rem", color: "rgba(255,255,255,0.85)", lineHeight: 1.7, marginBottom: "clamp(2rem, 4vw, 3.5rem)" }}
+                dangerouslySetInnerHTML={{ __html: content.body }}
+              />
+              <Link
+                href={content.ctaHref}
+                data-cms-link="nt26.cta"
+                className="btn btn-primary btn-sm"
+                style={btnCss(btnStyle)}
+              >
+                <span data-cms-link-label>{content.ctaLabel}</span>
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  /* ─────────────────────────────────────────────────────────────
+     stacked — centered heading, full-width image, body + CTA centered
+  ───────────────────────────────────────────────────────────── */
   return (
-    /* Dark ink section */
     <section
       ref={sectionRef}
       className="section overflow-hidden"
       style={{ backgroundColor: "#1b1c1c" }}
     >
       <div className="container-c3">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
 
-          {/* Text left */}
-          <div className="nt26-content">
-            <h2 className="display-2 text-white text-balance" style={{ marginBottom: "3rem" }}>
-              {content.pre}
-              {content.em && <em className="not-italic" style={{ color: "#1cc3af" }}>{content.em}</em>}
-              {content.post}
-            </h2>
-            <p style={{ fontSize: "1.125rem", color: "rgba(255,255,255,0.85)", lineHeight: 1.7, marginBottom: "3.5rem" }}>
-              {content.body}
-            </p>
-            <Link
-              href={content.ctaHref}
-              className="btn btn-primary btn-sm"
-            >
-              {content.ctaLabel}
-            </Link>
-          </div>
-
-          {/* Image right — rounded, clip-path reveal */}
+        {/* Centered heading */}
+        <div
+          className="nt26-content"
+          style={{ textAlign: "center", maxWidth: "52rem", margin: "0 auto" }}
+        >
+          {/* Teal pill above heading */}
           <div
-            className="nt26-img relative overflow-hidden"
-            style={{ aspectRatio: "4/3", minHeight: 280, borderRadius: "var(--radius-md)" }}
+            style={{
+              display: "inline-block",
+              backgroundColor: "rgba(28,195,175,0.15)",
+              border: "1px solid rgba(28,195,175,0.4)",
+              borderRadius: "var(--radius-md)",
+              padding: "0.25rem 1rem",
+              marginBottom: "clamp(1rem, 2.5vw, 1.75rem)",
+            }}
           >
-            <Image
-              src={assetPath(content.image)}
-              alt="NT26 Bible Reading Plan"
-              fill
-              className="object-cover"
-            />
+            <span style={{ fontSize: "0.8125rem", fontWeight: 600, letterSpacing: "0.06em", color: "#1cc3af", textTransform: "uppercase" }}>
+              Reading Plan
+            </span>
           </div>
+
+          <h2
+            className="display-2 text-white text-balance"
+            data-cms="nt26.heading"
+            style={{ marginBottom: "clamp(1.5rem, 4vw, 3rem)" }}
+            dangerouslySetInnerHTML={{ __html: content.heading }}
+          />
+        </div>
+
+        {/* Full-width image */}
+        <div
+          className="nt26-img relative overflow-hidden"
+          data-cms-img="nt26.image"
+          style={{
+            borderRadius: "var(--radius-md)",
+            width: "100%",
+            aspectRatio: "16 / 7",
+            margin: "0 0 clamp(2rem, 4vw, 3.5rem)",
+          }}
+        >
+          <Image
+            src={assetPath(content.image)}
+            alt="NT26 Bible Reading Plan"
+            fill
+            className="object-cover"
+            style={imgCss(img["nt26.image"])}
+          />
+        </div>
+
+        {/* Centered body + CTA */}
+        <div style={{ textAlign: "center", maxWidth: "52rem", margin: "0 auto" }}>
+          <p
+            data-cms="nt26.body"
+            style={{ fontSize: "1.125rem", color: "rgba(255,255,255,0.85)", lineHeight: 1.7, marginBottom: "clamp(2rem, 4vw, 3.5rem)" }}
+            dangerouslySetInnerHTML={{ __html: content.body }}
+          />
+          <Link
+            href={content.ctaHref}
+            data-cms-link="nt26.cta"
+            className="btn btn-primary btn-sm"
+            style={btnCss(btnStyle)}
+          >
+            <span data-cms-link-label>{content.ctaLabel}</span>
+          </Link>
         </div>
       </div>
     </section>

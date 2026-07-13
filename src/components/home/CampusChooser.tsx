@@ -8,12 +8,21 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { ChevronDown, MapPin } from "lucide-react";
 import { locations } from "@/data/locations";
+import { btnCss } from "./Hero";
+import type { BtnStyle } from "@/lib/home-content";
 
 export default function CampusChooser({
   variant = "light",
+  id = "findcampus",
+  text = {},
+  btn = {},
 }: {
   /** "light" = white pill (on dark hero) · "teal" = filled accent pill */
   variant?: "light" | "teal";
+  /** unique CMS id (lets the hero + locations choosers be edited independently) */
+  id?: string;
+  text?: Record<string, string>;
+  btn?: Record<string, BtnStyle>;
 }) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -44,15 +53,17 @@ export default function CampusChooser({
         onClick={() => setOpen((o) => !o)}
         aria-haspopup="true"
         aria-expanded={open}
+        data-cms-link={id}
         className="inline-flex items-center gap-2 font-bold transition-transform duration-200 hover:-translate-y-0.5"
         style={{
           ...pill,
           borderRadius: 999,
           padding: "1rem 1.6rem",
           fontSize: "0.9375rem",
+          ...(btnCss(btn[id]) || {}),
         }}
       >
-        Find your campus
+        <span data-cms-link-label>{text[`${id}-label`] || "Find your campus"}</span>
         <ChevronDown
           size={18}
           style={{ transform: open ? "rotate(180deg)" : "none", transition: "transform 200ms ease" }}

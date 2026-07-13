@@ -22,6 +22,7 @@ export const navItems: NavItem[] = [
     ],
   },
   { label: "Messages", href: "/messages/" },
+  { label: "News", href: "/news/" },
   { label: "Watch", href: "/watch/" },
   { label: "Counseling", href: "/counseling/" },
   { label: "Connect", href: "/connect/" },

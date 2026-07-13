@@ -12,8 +12,15 @@ gsap.registerPlugin(ScrollTrigger);
  * "We exist to meet Him, grow in Him, and serve through Him."
  * Do NOT add this sentence anywhere else in the codebase.
  */
-export default function MissionBlock({ content = MISSION_DEFAULTS }: { content?: MissionContent }) {
+export default function MissionBlock({
+  content = MISSION_DEFAULTS,
+  variant,
+}: {
+  content?: MissionContent;
+  variant?: string;
+}) {
   const sectionRef = useRef<HTMLElement>(null);
+  const v = variant || "centered";
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -37,37 +44,132 @@ export default function MissionBlock({ content = MISSION_DEFAULTS }: { content?:
     return () => ctx.revert();
   }, []);
 
+  /* ── centered (default) ─────────────────────────────────────────────── */
+  if (v === "centered") {
+    return (
+      /* Full-width ink-dark — centered massive headline */
+      <section
+        ref={sectionRef}
+        className="flex items-center justify-center text-center"
+        style={{
+          backgroundColor: "#1b1c1c",
+          /* Fluid vertical padding: generous on desktop, proportionate on tablet/phone */
+          paddingTop: "clamp(5rem, 10vw, 10rem)",
+          paddingBottom: "clamp(5rem, 10vw, 10rem)",
+        }}
+      >
+        <div className="container-c3">
+          <div className="mission-text max-w-4xl mx-auto">
+            <h2
+              className="text-white text-balance"
+              data-cms="mission.html"
+              style={{
+                fontSize: "clamp(2.5rem, 6vw, 4.5rem)",
+                fontWeight: 700,
+                lineHeight: 1.15,
+                letterSpacing: "-0.02em",
+              }}
+              dangerouslySetInnerHTML={{ __html: content.html }}
+            />
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  /* ── left ───────────────────────────────────────────────────────────── */
+  /* Left-aligned layout: statement anchored to the left with a teal       */
+  /* accent bar, giving the section an editorial, magazine-style weight.   */
+  if (v === "left") {
+    return (
+      <section
+        ref={sectionRef}
+        style={{
+          backgroundColor: "#1b1c1c",
+          paddingTop: "clamp(5rem, 10vw, 10rem)",
+          paddingBottom: "clamp(5rem, 10vw, 10rem)",
+        }}
+      >
+        <div className="container-c3">
+          <div className="mission-text" style={{ maxWidth: "56rem" }}>
+            {/* teal accent bar */}
+            <div
+              aria-hidden="true"
+              style={{
+                width: "4rem",
+                height: "4px",
+                backgroundColor: "#1cc3af",
+                borderRadius: "var(--radius-md, 0.375rem)",
+                marginBottom: "2rem",
+              }}
+            />
+            <h2
+              className="text-white text-balance"
+              data-cms="mission.html"
+              style={{
+                fontSize: "clamp(2.75rem, 7vw, 5.5rem)",
+                fontWeight: 700,
+                lineHeight: 1.1,
+                letterSpacing: "-0.025em",
+              }}
+              dangerouslySetInnerHTML={{ __html: content.html }}
+            />
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  /* ── boxed ──────────────────────────────────────────────────────────── */
+  /* The mission statement floats inside a teal-bordered rounded panel     */
+  /* set against a slightly lighter charcoal field, drawing the eye and    */
+  /* giving the block a distinct, contained presence on the page.          */
   return (
-    /* Full-width ink-dark — centered massive headline */
     <section
       ref={sectionRef}
-      className="flex items-center justify-center text-center"
       style={{
-        backgroundColor: "#1b1c1c",
-        minHeight: "60vh",
-        paddingTop: "8rem",
-        paddingBottom: "8rem",
+        backgroundColor: "#252727",
+        paddingTop: "clamp(5rem, 10vw, 10rem)",
+        paddingBottom: "clamp(5rem, 10vw, 10rem)",
       }}
     >
       <div className="container-c3">
-        <div className="mission-text max-w-4xl mx-auto">
-          <h2
-            className="text-white text-balance"
+        <div className="mission-text flex justify-center">
+          <div
             style={{
-              fontSize: "clamp(2.5rem, 6vw, 4.5rem)",
-              fontWeight: 700,
-              lineHeight: 1.15,
-              letterSpacing: "-0.02em",
+              maxWidth: "52rem",
+              width: "100%",
+              border: "2px solid #1cc3af",
+              borderRadius: "var(--radius-md, 0.75rem)",
+              backgroundColor: "#1b1c1c",
+              padding: "clamp(2.5rem, 6vw, 5rem) clamp(2rem, 5vw, 4rem)",
+              textAlign: "center",
             }}
           >
-            {content.segments.map((seg, i) =>
-              seg.em ? (
-                <em key={i} style={{ color: "#1cc3af", fontStyle: "italic" }}>{seg.text}</em>
-              ) : (
-                <span key={i}>{seg.text}</span>
-              )
-            )}
-          </h2>
+            {/* teal glow accent above the text */}
+            <div
+              aria-hidden="true"
+              style={{
+                display: "inline-block",
+                width: "2.5rem",
+                height: "3px",
+                backgroundColor: "#1cc3af",
+                borderRadius: "var(--radius-md, 0.375rem)",
+                marginBottom: "1.75rem",
+              }}
+            />
+            <h2
+              className="text-white text-balance"
+              data-cms="mission.html"
+              style={{
+                fontSize: "clamp(2rem, 5vw, 3.75rem)",
+                fontWeight: 700,
+                lineHeight: 1.18,
+                letterSpacing: "-0.02em",
+              }}
+              dangerouslySetInnerHTML={{ __html: content.html }}
+            />
+          </div>
         </div>
       </div>
     </section>

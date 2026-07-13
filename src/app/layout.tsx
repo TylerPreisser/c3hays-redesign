@@ -3,9 +3,11 @@ import { Hanken_Grotesk } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
+import EditBridge from "@/components/cms/EditBridge";
 import SmoothScrollProvider from "@/providers/SmoothScrollProvider";
 import { site } from "@/data/site";
 import { assetPath } from "@/lib/asset-path";
+import { getCMSGlobals } from "@/lib/cms";
 
 const hankenGrotesk = Hanken_Grotesk({
   subsets: ["latin"],
@@ -78,24 +80,37 @@ const jsonLd = {
   ],
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // Fetch shared (footer/header/nav) overrides once and feed both bars.
+  const globals = (await getCMSGlobals()) || {};
   return (
     <html lang="en" suppressHydrationWarning className={hankenGrotesk.variable}>
       <head>
+        {/* Font library — selectable in the C3 Studio editor; loaded so the live
+            site renders whatever font staff choose. */}
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Bebas+Neue&family=Caveat:wght@400;700&family=DM+Serif+Display&family=Inter:wght@400;600;700&family=Lora:ital,wght@0,400;0,700;1,400&family=Merriweather:wght@400;700&family=Montserrat:wght@400;600;700&family=Oswald:wght@400;600&family=Pacifico&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Poppins:wght@400;600;700&family=Raleway:wght@400;600;700&family=Roboto+Slab:wght@400;700&family=Work+Sans:wght@400;600;700&display=swap"
+          rel="stylesheet"
+        />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
       </head>
       <body>
+        {/* On-page editor bridge — mounted globally so EVERY page (not just Home)
+            is click-to-edit when loaded in C3 Studio with ?cmsEdit=1. */}
+        <EditBridge />
         <SmoothScrollProvider>
-          <Header />
+          <Header globals={globals} />
           <main>{children}</main>
-          <Footer />
+          <Footer globals={globals} />
         </SmoothScrollProvider>
       </body>
     </html>

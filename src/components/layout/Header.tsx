@@ -6,10 +6,19 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X } from "lucide-react";
 import { navItems } from "@/data/navigation";
 import Logo from "@/components/brand/Logo";
+import type { CMSOverrides } from "@/lib/cms";
+import { tx } from "@/lib/home-content";
+import { btnCss } from "@/components/home/Hero";
 
-export default function Header() {
+const navKey = (href: string) => href.replace(/\//g, "") || "home";
+
+export default function Header({ globals = {} }: { globals?: CMSOverrides }) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const t = globals.text || {};
+  const nav = globals.nav || {};
+  // Nav items come from the editor's nav config when set, else the code defaults.
+  const navList = nav.items && nav.items.length ? nav.items : navItems.map((n) => ({ label: n.label, href: n.href }));
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 60);
@@ -19,7 +28,7 @@ export default function Header() {
 
   useEffect(() => {
     const onResize = () => {
-      if (window.innerWidth >= 1024) setMobileOpen(false);
+      if (window.innerWidth >= 768) setMobileOpen(false);
     };
     window.addEventListener("resize", onResize);
     return () => window.removeEventListener("resize", onResize);
@@ -49,7 +58,9 @@ export default function Header() {
     };
   }, [mobileOpen]);
 
-  const isScrolled = scrolled;
+  // Nav scroll effect override: auto (default) | always solid | always transparent.
+  const isScrolled = nav.effect === "solid" ? true : nav.effect === "transparent" ? false : scrolled;
+  const navColor = nav.color;
 
   return (
     <>
@@ -57,7 +68,11 @@ export default function Header() {
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-200 ${
           isScrolled ? "nav-solid" : "nav-transparent"
         }`}
-        style={{ paddingTop: "env(safe-area-inset-top)" }}
+        style={{
+          paddingTop: "env(safe-area-inset-top)",
+          ...(nav.font ? { fontFamily: nav.font } : {}),
+          ...(nav.bg && isScrolled ? { backgroundColor: nav.bg } : {}),
+        }}
       >
         <nav className="container-c3 flex items-center justify-between h-16 lg:h-[4.5rem]">
 
@@ -70,39 +85,38 @@ export default function Header() {
             <Logo size={38} variant={isScrolled ? "dark" : "light"} />
           </Link>
 
-          {/* Desktop Nav — centered text links */}
-          <ul className="hidden lg:flex items-center gap-1" role="list">
-            {navItems.map((item) => (
+          {/* Desktop Nav — visible from md (768px) up; tighter spacing at md, full at lg */}
+          <ul className="hidden md:flex items-center gap-0 lg:gap-1" role="list">
+            {navList.map((item) => {
+              const k = navKey(item.href);
+              const base = navColor || (isScrolled ? "rgba(27,28,28,0.7)" : "rgba(255,255,255,0.82)");
+              const hover = navColor || (isScrolled ? "#1b1c1c" : "#ffffff");
+              return (
               <li key={item.href}>
                 <Link
-                  href={item.href}
-                  className="nav-link-underline block px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] transition-colors duration-200"
-                  style={{
-                    color: isScrolled ? "rgba(27,28,28,0.7)" : "rgba(255,255,255,0.82)",
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.color = isScrolled ? "#1b1c1c" : "#ffffff";
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.color = isScrolled ? "rgba(27,28,28,0.7)" : "rgba(255,255,255,0.82)";
-                  }}
+                  href={t[`nav-${k}-href`] || item.href}
+                  data-cms-link={`g:nav-${k}`}
+                  className="nav-link-underline block px-2 py-2 lg:px-4 text-[0.65rem] lg:text-xs font-semibold uppercase tracking-[0.1em] lg:tracking-[0.12em] transition-colors duration-200"
+                  style={{ color: base }}
+                  onMouseEnter={(e) => { e.currentTarget.style.color = hover; }}
+                  onMouseLeave={(e) => { e.currentTarget.style.color = base; }}
                 >
-                  {item.label}
+                  <span data-cms-link-label>{tx(t, `nav-${k}-label`, item.label)}</span>
                 </Link>
               </li>
-            ))}
+            );})}
           </ul>
 
-          {/* Desktop right: single primary CTA — Plan a Visit (Give removed from nav) */}
-          <div className="hidden lg:flex items-center">
-            <Link href="/visit/" className="btn btn-primary btn-sm">
-              Plan a Visit
+          {/* Desktop right: single primary CTA — Plan a Visit */}
+          <div className="hidden md:flex items-center">
+            <Link href={t["nav-cta-href"] || "/visit/"} data-cms-link="g:nav-cta" className="btn btn-primary btn-sm text-[0.75rem] lg:text-[0.8125rem] px-4 lg:px-[1.85rem]" style={btnCss(globals.btn?.["nav-cta"] as never)}>
+              <span data-cms-link-label>{tx(t, "nav-cta-label", "Plan a Visit")}</span>
             </Link>
           </div>
 
-          {/* Mobile hamburger */}
+          {/* Mobile hamburger — only on small phones (below md/768px) */}
           <button
-            className="lg:hidden flex items-center justify-center w-11 h-11 transition-colors duration-200"
+            className="md:hidden flex items-center justify-center w-11 h-11 transition-colors duration-200"
             onClick={() => setMobileOpen(!mobileOpen)}
             aria-label={mobileOpen ? "Close menu" : "Open menu"}
             aria-expanded={mobileOpen}
@@ -116,7 +130,7 @@ export default function Header() {
         </nav>
       </header>
 
-      {/* Mobile drawer — full-screen ink overlay */}
+      {/* Mobile drawer — full-screen ink overlay (phones only, below md/768px) */}
       <AnimatePresence>
         {mobileOpen && (
           <motion.div
@@ -155,7 +169,9 @@ export default function Header() {
             {/* Nav links */}
             <nav className="flex-1 overflow-y-auto container-c3 py-10">
               <ul className="flex flex-col" role="list">
-                {navItems.map((item, i) => (
+                {navList.map((item, i) => {
+                  const k = navKey(item.href);
+                  return (
                   <motion.li
                     key={item.href}
                     initial={{ opacity: 0, x: 20 }}
@@ -163,14 +179,15 @@ export default function Header() {
                     transition={{ delay: i * 0.05 + 0.1, duration: 0.3, ease: "easeOut" }}
                   >
                     <Link
-                      href={item.href}
+                      href={t[`nav-${k}-href`] || item.href}
+                      data-cms-link={`g:nav-${k}`}
                       className="block py-4 text-2xl font-bold text-white/80 hover:text-white transition-colors border-b border-white/8"
                       onClick={() => setMobileOpen(false)}
                     >
-                      {item.label}
+                      <span data-cms-link-label>{tx(t, `nav-${k}-label`, item.label)}</span>
                     </Link>
                   </motion.li>
-                ))}
+                );})}
               </ul>
 
               <motion.div
@@ -180,11 +197,12 @@ export default function Header() {
                 transition={{ delay: 0.45, duration: 0.3 }}
               >
                 <Link
-                  href="/visit/"
+                  href={t["nav-cta-href"] || "/visit/"}
+                  data-cms-link="g:nav-cta"
                   className="btn btn-primary btn-lg w-full text-center"
                   onClick={() => setMobileOpen(false)}
                 >
-                  Plan a Visit
+                  <span data-cms-link-label>{tx(t, "nav-cta-label", "Plan a Visit")}</span>
                 </Link>
               </motion.div>
             </nav>
