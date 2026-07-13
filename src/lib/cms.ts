@@ -104,6 +104,8 @@ export interface CMSOverrides {
   icon?: Record<string, { color?: string; bg?: string; name?: string }>;
   img?: Record<string, { pos?: string; scale?: number }>;
   media?: Record<string, string>;
+  /** v3 (R4): per-element background fills keyed by data-cms-bg id (e.g. "g:footer"). */
+  bgFill?: Record<string, string>;
   nav?: { items?: { label: string; href: string }[]; bg?: string; color?: string; font?: string; effect?: "auto" | "solid" | "transparent" };
 }
 /** Per-page overrides (text/buttons/images) by slug, e.g. "/about/". */

@@ -17,6 +17,7 @@ export default function Header({ globals = {} }: { globals?: CMSOverrides }) {
   const [scrolled, setScrolled] = useState(false);
   const t = globals.text || {};
   const nav = globals.nav || {};
+  const m = globals.media || {}; // v3 (R4): editable logo sources by globals key
   // Nav items come from the editor's nav config when set, else the code defaults.
   const navList = nav.items && nav.items.length ? nav.items : navItems.map((n) => ({ label: n.label, href: n.href }));
 
@@ -82,7 +83,7 @@ export default function Header({ globals = {} }: { globals?: CMSOverrides }) {
             aria-label="C3 — Celebration Community Church — Home"
             className="shrink-0 flex items-center"
           >
-            <Logo size={38} variant={isScrolled ? "dark" : "light"} />
+            <Logo size={38} variant={isScrolled ? "dark" : "light"} cmsKey={`g:logo-${isScrolled ? "dark" : "light"}`} srcOverride={m[isScrolled ? "logo-dark" : "logo-light"]} />
           </Link>
 
           {/* Desktop Nav — visible from md (768px) up; tighter spacing at md, full at lg */}
@@ -155,7 +156,7 @@ export default function Header({ globals = {} }: { globals?: CMSOverrides }) {
                 onClick={() => setMobileOpen(false)}
                 aria-label="C3 Home"
               >
-                <Logo size={34} variant="light" />
+                <Logo size={34} variant="light" cmsKey="g:logo-light" srcOverride={m["logo-light"]} />
               </Link>
               <button
                 onClick={() => setMobileOpen(false)}

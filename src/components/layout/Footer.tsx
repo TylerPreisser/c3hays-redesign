@@ -15,6 +15,7 @@ import { tx } from "@/lib/home-content";
 export default function Footer({ globals = {} }: { globals?: CMSOverrides }) {
   const year = 2026;
   const t = globals.text || {};
+  const m = globals.media || {}; // v3 (R4): editable logo sources by globals key
 
   const exploreLinks = [
     { id: "footer-explore-0", label: "About", href: "/about/" },
@@ -47,7 +48,7 @@ export default function Footer({ globals = {} }: { globals?: CMSOverrides }) {
   );
 
   return (
-    <footer style={{ backgroundColor: "#1b1c1c", color: "rgba(255,255,255,0.75)" }}>
+    <footer data-cms-bg="g:footer" style={{ backgroundColor: "#1b1c1c", color: "rgba(255,255,255,0.75)" }}>
       <div aria-hidden style={{ height: 3, background: "linear-gradient(90deg, transparent, #1cc3af 30%, #1cc3af 70%, transparent)" }} />
       <div className="container-c3" style={{ paddingTop: "6rem", paddingBottom: "4rem" }}>
         <div
@@ -59,7 +60,7 @@ export default function Footer({ globals = {} }: { globals?: CMSOverrides }) {
         >
           {/* Block 1 — Brand */}
           <div className="lg:col-span-4 max-w-xs md:max-w-none">
-            <Link href="/" className="inline-block mb-6" aria-label="C3 Home"><Logo size={48} variant="light" /></Link>
+            <Link href="/" className="inline-block mb-6" aria-label="C3 Home"><Logo size={48} variant="light" cmsKey="g:logo-light" srcOverride={m["logo-light"]} /></Link>
             <p className="text-base font-semibold mb-4" data-cms="g:footer-brand" style={{ color: "rgba(255,255,255,0.92)" }} dangerouslySetInnerHTML={{ __html: tx(t, "footer-brand", "Celebration Community Church") }} />
             <p className="text-sm leading-relaxed mb-6 mx-auto md:mx-0" data-cms="g:footer-tagline" style={{ color: "rgba(255,255,255,0.50)", maxWidth: "22rem" }} dangerouslySetInnerHTML={{ __html: tx(t, "footer-tagline", "One church family in two places across northwest Kansas — for everyone, just as you are.") }} />
             <div className="flex flex-col gap-2">
@@ -103,10 +104,10 @@ export default function Footer({ globals = {} }: { globals?: CMSOverrides }) {
             <p className="text-sm mb-5" data-cms="g:footer-news-blurb" style={{ color: "rgba(255,255,255,0.65)", lineHeight: 1.65 }} dangerouslySetInnerHTML={{ __html: tx(t, "footer-news-blurb", "Sermon notes and what's happening at C3 — in your inbox.") }} />
             <NewsletterForm />
             <div className="flex items-center justify-center md:justify-start gap-3 mt-7">
-              <SocialLink href={site.social.facebook} label="Facebook"><svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" /></svg></SocialLink>
-              <SocialLink href={site.social.instagram} label="Instagram"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><rect width="20" height="20" x="2" y="2" rx="5" ry="5" /><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" /><line x1="17.5" x2="17.51" y1="6.5" y2="6.5" /></svg></SocialLink>
-              <SocialLink href={site.social.youtube} label="YouTube"><svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46a2.78 2.78 0 0 0-1.95 1.96A29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58A2.78 2.78 0 0 0 3.41 19.6C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 0 0 1.95-1.95A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z" /><polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02" fill="white" /></svg></SocialLink>
-              <SocialLink href={site.social.vimeo} label="Vimeo"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><polygon points="23 7 16 12 23 17 23 7" /><rect width="15" height="14" x="1" y="5" rx="2" ry="2" /></svg></SocialLink>
+              <SocialLink t={t} id="footer-social-facebook" href={site.social.facebook} label="Facebook"><svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" /></svg></SocialLink>
+              <SocialLink t={t} id="footer-social-instagram" href={site.social.instagram} label="Instagram"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><rect width="20" height="20" x="2" y="2" rx="5" ry="5" /><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" /><line x1="17.5" x2="17.51" y1="6.5" y2="6.5" /></svg></SocialLink>
+              <SocialLink t={t} id="footer-social-youtube" href={site.social.youtube} label="YouTube"><svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46a2.78 2.78 0 0 0-1.95 1.96A29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58A2.78 2.78 0 0 0 3.41 19.6C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 0 0 1.95-1.95A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z" /><polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02" fill="white" /></svg></SocialLink>
+              <SocialLink t={t} id="footer-social-vimeo" href={site.social.vimeo} label="Vimeo"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><polygon points="23 7 16 12 23 17 23 7" /><rect width="15" height="14" x="1" y="5" rx="2" ry="2" /></svg></SocialLink>
             </div>
           </div>
         </div>
@@ -135,9 +136,12 @@ function FooterHeading({ id, text, children }: { id: string; text: Record<string
   );
 }
 
-function SocialLink({ href, label, children }: { href: string; label: string; children: React.ReactNode }) {
+/** v3 (R4): social links are editable — the destination URL comes from the globals
+ *  override (t[`${id}-href`]) when set, and the anchor is tagged data-cms-link so
+ *  staff can point each icon at the church's real profile from the editor. */
+function SocialLink({ t, id, href, label, children }: { t: Record<string, string>; id: string; href: string; label: string; children: React.ReactNode }) {
   return (
-    <a href={href} target="_blank" rel="noopener noreferrer" aria-label={label} className="footer-social w-10 h-10 flex items-center justify-center">
+    <a href={t[`${id}-href`] || href} target="_blank" rel="noopener noreferrer" aria-label={label} data-cms-link={`g:${id}`} className="footer-social w-10 h-10 flex items-center justify-center">
       {children}
     </a>
   );

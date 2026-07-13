@@ -8,6 +8,7 @@ import SmoothScrollProvider from "@/providers/SmoothScrollProvider";
 import { site } from "@/data/site";
 import { assetPath } from "@/lib/asset-path";
 import { getCMSGlobals } from "@/lib/cms";
+import { buildBgCss } from "@/lib/backgrounds";
 
 const hankenGrotesk = Hanken_Grotesk({
   subsets: ["latin"],
@@ -104,6 +105,11 @@ export default async function RootLayout({
         />
       </head>
       <body>
+        {/* v3 (R4): global element backgrounds (footer, etc.) → one scoped stylesheet,
+            painted from the shared globals overrides (buildBgCss, !important). */}
+        {globals.bgFill && Object.keys(globals.bgFill).length > 0 && (
+          <style dangerouslySetInnerHTML={{ __html: buildBgCss([], globals.bgFill) }} />
+        )}
         {/* On-page editor bridge — mounted globally so EVERY page (not just Home)
             is click-to-edit when loaded in C3 Studio with ?cmsEdit=1. */}
         <EditBridge />
