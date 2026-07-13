@@ -18,8 +18,16 @@ import { getPageContent, getCMSScreen, getCMSBundle } from "@/lib/cms";
  * export/CI build is untouched.
  */
 
-// Slugs that already have a hand-built route — never render them generically.
-const STATIC_ROUTES = new Set([
+// Slugs that already have a hand-built route — never render them generically
+// (a published web screen with one of these slugs is excluded from the export set
+// to avoid a static-route build collision).
+//
+// FOLLOW-UP (tracked): derive this from the filesystem (the app/ route dirs) so it
+// can't drift. Until then, a deterministic drift-catch guards it:
+// c3-backend/tests/website-editor-v4-r5-static-routes.test.ts asserts this set
+// equals the actual hand-built routes and FAILS if a hand route is added/removed
+// without updating this list.
+export const STATIC_ROUTES = new Set([
   "about", "beliefs", "visit", "locations", "messages", "news", "watch", "counseling", "connect", "give",
 ]);
 
