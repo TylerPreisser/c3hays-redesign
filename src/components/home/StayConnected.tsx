@@ -180,6 +180,7 @@ export default function StayConnected({
                   target={external ? "_blank" : undefined}
                   rel={external ? "noopener noreferrer" : undefined}
                   className="connect-item group block"
+                  data-cms-bg={`tile:${rc.iconKey}`}
                   style={{
                     position: "relative",
                     display: "flex",

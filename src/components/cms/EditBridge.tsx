@@ -45,6 +45,15 @@ export default function EditBridge() {
       [data-cms-img].cms-sel, [data-cms-link].cms-sel, [data-cms-icon].cms-sel{ box-shadow:0 0 0 3px #1cc3af; }
       [data-cms-link]{ border-radius:8px; transition:box-shadow .12s ease; }
       [data-cms-link]:hover{ box-shadow:0 0 0 3px rgba(28,195,175,.55); }
+      /* v3 R3: a tile whose BACKGROUND is editable — click its non-text area to recolor. */
+      [data-cms-bg]{ cursor:pointer; transition:box-shadow .12s ease; }
+      [data-cms-bg]:hover{ box-shadow:0 0 0 3px rgba(28,195,175,.4); }
+      [data-cms-bg].cms-sel{ box-shadow:0 0 0 3px #1cc3af; }
+      /* v3 R2: the floating "select this section" handle (move/delete/background). */
+      #c3-sec-handle{ position:fixed; z-index:2147483646; display:none; align-items:center; gap:6px;
+        background:#1cc3af; color:#042e29; font:700 12px/1 -apple-system,system-ui,sans-serif;
+        padding:6px 11px; border-radius:999px; border:none; cursor:pointer; box-shadow:0 6px 18px rgba(0,0,0,.28); }
+      #c3-sec-handle:hover{ background:#15b3a0; }
       [data-cms-edit-badge]{ position:fixed; z-index:2147483646; background:#1cc3af; color:#042e29; font:700 11px/1 -apple-system,sans-serif;
         padding:4px 8px; border-radius:999px; pointer-events:none; transform:translateY(-50%); box-shadow:0 4px 12px rgba(0,0,0,.25); }
       #c3-toolbar{ position:fixed; z-index:2147483647; display:none; gap:2px; align-items:center;
@@ -138,6 +147,19 @@ export default function EditBridge() {
     bar.appendChild(mkBtn("✕", "Clear formatting", () => exec("removeFormat")));
     document.body.appendChild(bar);
 
+    // ── v3 R2: floating "select this section" handle ──
+    // Hovering a section shows a chip; clicking it selects the section so the
+    // editor can move / delete / recolor it — contextual, no sidebar.
+    const secChip = document.createElement("button");
+    secChip.id = "c3-sec-handle";
+    secChip.type = "button";
+    let secId = "";
+    secChip.addEventListener("mousedown", (e) => {
+      e.preventDefault(); e.stopPropagation();
+      if (secId) { post({ type: "cms:select", kind: "section", path: secId }); log("select-section", { path: secId }); }
+    });
+    document.body.appendChild(secChip);
+
     let activeEl: HTMLElement | null = null;
     const pathOf = (el: HTMLElement | null) => el?.getAttribute("data-cms") || "";
 
@@ -210,6 +232,15 @@ export default function EditBridge() {
         log("select-link", { path: link.getAttribute("data-cms-link") });
         return;
       }
+      // v3 R3: BACKGROUND selection — a tile's non-text area. Lowest priority, so
+      // clicking its text/image/button/icon still edits those directly.
+      const bg = tgt?.closest?.("[data-cms-bg]") as HTMLElement | null;
+      if (bg && !text && !img && !link && !icon) {
+        e.preventDefault(); e.stopPropagation(); clearSel(); bg.classList.add("cms-sel");
+        post({ type: "cms:select", kind: "bg", path: bg.getAttribute("data-cms-bg") });
+        log("select-bg", { path: bg.getAttribute("data-cms-bg") });
+        return;
+      }
       // plain links/buttons (untagged) — block navigation in edit mode
       const a = tgt?.closest?.("a,button");
       if (a && !text) { e.preventDefault(); e.stopPropagation(); log("blocked-nav", { to: (a as HTMLAnchorElement).getAttribute?.("href") || "" }); }
@@ -217,12 +248,30 @@ export default function EditBridge() {
     };
     const onDocClick = (e: MouseEvent) => { const t = e.target as HTMLElement; if (!t?.closest?.("[data-cms]") && !t?.closest?.("#c3-toolbar") && !t?.closest?.("#c3-fontmenu")) hideBar(); };
 
+    // v3 R2: show the section-select handle over whichever section is hovered.
+    const positionSecChip = (sec: HTMLElement) => {
+      const r = sec.getBoundingClientRect();
+      secChip.style.top = `${Math.max(6, r.top + 8)}px`;
+      secChip.style.left = `${Math.max(6, r.left + 8)}px`;
+      secChip.style.display = "inline-flex";
+    };
+    const onOver = (e: MouseEvent) => {
+      const t = e.target as HTMLElement;
+      if (t === secChip) return;
+      const sec = t?.closest?.("[data-section]") as HTMLElement | null;
+      if (!sec) { secChip.style.display = "none"; secId = ""; return; }
+      secId = sec.getAttribute("data-section") || "";
+      secChip.innerHTML = `<span aria-hidden="true">▚</span> Edit section`;
+      positionSecChip(sec);
+    };
+
     document.addEventListener("focusin", onFocusIn, true);
     document.addEventListener("input", onInput, true);
     document.addEventListener("selectionchange", onSelChange);
     document.addEventListener("click", onClick, true);
     document.addEventListener("mousedown", onDocClick, true);
-    window.addEventListener("scroll", () => { if (bar.style.display === "flex") positionBar(); }, true);
+    document.addEventListener("mouseover", onOver, true);
+    window.addEventListener("scroll", () => { if (bar.style.display === "flex") positionBar(); secChip.style.display = "none"; }, true);
 
     const onMsg = (e: MessageEvent) => {
       const d = e.data; if (!d || d.source !== "c3editor") return;
@@ -239,9 +288,10 @@ export default function EditBridge() {
       document.removeEventListener("selectionchange", onSelChange);
       document.removeEventListener("click", onClick, true);
       document.removeEventListener("mousedown", onDocClick, true);
+      document.removeEventListener("mouseover", onOver, true);
       window.removeEventListener("message", onMsg);
       els.forEach((el) => el.removeAttribute("contenteditable"));
-      bar.remove(); fontMenu.remove(); style.remove();
+      bar.remove(); fontMenu.remove(); style.remove(); secChip.remove();
       document.documentElement.removeAttribute("data-cms-edit");
     };
   }, []);

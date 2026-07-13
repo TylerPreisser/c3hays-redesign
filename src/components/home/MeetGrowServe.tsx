@@ -101,7 +101,7 @@ export default function MeetGrowServe({
           {/* 3-up tile grid */}
           <div className="pillar-grid grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-6 lg:gap-10">
             {pillars.map((pillar, pi) => (
-              <div key={pillar.word} className="pillar-tile group">
+              <div key={pillar.word} className="pillar-tile group" data-cms-bg={`tile:meetGrowServe.${pi}`}>
                 {/* Image */}
                 <div
                   className="pillar-img-wrap relative overflow-hidden mb-6"

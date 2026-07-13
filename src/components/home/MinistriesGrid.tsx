@@ -56,7 +56,7 @@ export default function MinistriesGrid({
           {Head}
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(300px,1fr))", gap: "0.9rem" }}>
             {tiles.map((t) => (
-              <div key={t.k} style={{ display: "flex", gap: "1rem", alignItems: "center", background: "#252727", borderRadius: "var(--radius,1rem)", padding: "1rem 1.25rem", border: "1px solid rgba(255,255,255,0.06)" }}>
+              <div key={t.k} data-cms-bg={`tile:ministries.${t.k}`} style={{ display: "flex", gap: "1rem", alignItems: "center", background: "#252727", borderRadius: "var(--radius,1rem)", padding: "1rem 1.25rem", border: "1px solid rgba(255,255,255,0.06)" }}>
                 <Glyph k={t.k} name={t.icon} />
                 <div style={{ minWidth: 0 }}>
                   <span data-cms={`t:ministries-${t.k}-title`} style={{ display: "block", color: "#fff", fontWeight: 700, fontSize: "1.1rem" }} dangerouslySetInnerHTML={{ __html: tx(text, `ministries-${t.k}-title`, t.title) }} />
@@ -76,7 +76,7 @@ export default function MinistriesGrid({
         {Head}
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(220px,1fr))", gap: "clamp(1rem,3vw,1.75rem)" }}>
           {tiles.map((t) => (
-            <div key={t.k} style={{ background: "#252727", borderRadius: "var(--radius-md,1.25rem)", padding: "clamp(1.5rem,3vw,2rem)", border: "1px solid rgba(255,255,255,0.06)" }}>
+            <div key={t.k} data-cms-bg={`tile:ministries.${t.k}`} style={{ background: "#252727", borderRadius: "var(--radius-md,1.25rem)", padding: "clamp(1.5rem,3vw,2rem)", border: "1px solid rgba(255,255,255,0.06)" }}>
               <div style={{ marginBottom: "1.1rem" }}><Glyph k={t.k} name={t.icon} /></div>
               <h3 data-cms={`t:ministries-${t.k}-title`} style={{ color: "#fff", fontWeight: 700, fontSize: "1.25rem", margin: "0 0 0.4rem" }} dangerouslySetInnerHTML={{ __html: tx(text, `ministries-${t.k}-title`, t.title) }} />
               <p data-cms={`t:ministries-${t.k}-blurb`} style={{ color: "rgba(255,255,255,0.7)", margin: 0 }} dangerouslySetInnerHTML={{ __html: tx(text, `ministries-${t.k}-blurb`, t.blurb) }} />

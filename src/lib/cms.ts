@@ -124,4 +124,6 @@ export interface StudioHome {
   icon?: Record<string, { color?: string; bg?: string; name?: string }>;
   sections?: Array<{ id?: string; visible?: boolean; bg?: string; variant?: string }>;
   img?: Record<string, { pos?: string; scale?: number }>;
+  /** v3 (R3): per-element background fills (data-cms-bg id → CSS background string). */
+  bgFill?: Record<string, string>;
 }

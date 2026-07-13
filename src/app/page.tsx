@@ -9,6 +9,7 @@ import GiveSection from "@/components/home/GiveSection";
 import PromoBanner from "@/components/home/PromoBanner";
 import { getHomeContent } from "@/lib/cms";
 import { fromStudioHome } from "@/lib/home-content";
+import { buildBgCss } from "@/lib/backgrounds";
 import { isExampleSection, renderExample, SECTION_EXAMPLE_IDS } from "@/lib/section-examples";
 
 export const metadata: Metadata = {
@@ -60,11 +61,11 @@ export default async function HomePage({
     ...SECTION_EXAMPLE_IDS,
   ]);
   const visible = c.sections.filter((s) => s.visible && known.has(s.id));
-  // Per-section background overrides → a single scoped stylesheet (no component edits).
-  const bgCss = c.sections
-    .filter((s) => s.visible && s.bg)
-    .map((s) => `[data-section="${s.id}"]>*{background-color:${s.bg} !important}`)
-    .join("");
+  // Per-section AND per-tile background overrides → ONE scoped stylesheet (no
+  // component edits). v3: `background` shorthand so a color, gradient, OR image
+  // all work, plus per-tile fills keyed by data-cms-bg (R3). buildBgCss is the
+  // shared primitive mirrored from c3-backend.
+  const bgCss = buildBgCss(c.sections, c.bgFill);
 
   return (
     <>
