@@ -41,6 +41,38 @@
   --radius:           1.5rem;     /* default cards ≈ 24px */
   --radius-md:        1.875rem;   /* large feature cards = 30px rounded tiles */
   --radius-pill:      999px;      /* buttons + selects = pills */
+
+  /* ── v6 R4 — the design-standard token vocabulary ─────────────────────────
+     Every v6 premium component consumes THESE (never ad-hoc px/hex), which is
+     what makes the set read as ONE system. Mirrored by name into the admin
+     backend @theme + C3_DESIGN_TOKENS.json (the platform source of truth). */
+
+  /* Spacing ladder — the only spacing values components should reach for */
+  --s-1:  4px;
+  --s-2:  8px;
+  --s-3:  12px;
+  --s-4:  16px;
+  --s-6:  24px;
+  --s-8:  32px;
+  --s-12: 48px;
+  --s-16: 64px;
+  --s-24: 96px;
+  --s-32: 128px;
+
+  /* Layout rhythm — generous, Apple-caliber vertical air + editorial measure */
+  --section-y:     clamp(96px, 10vw, 160px);
+  --measure:       720px;   /* readable/quote column cap */
+  --container-max: 1280px;
+
+  /* Motion — ONE easing, three durations. Reveals = slow; hovers = fast. */
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --dur-fast: 180ms;   /* hover */
+  --dur-base: 320ms;
+  --dur-slow: 520ms;   /* entrance reveal */
+
+  /* Elevation — flat at rest, soft bloom on hover */
+  --shadow-rest:  0 1px 2px rgba(27, 28, 28, 0.06);
+  --shadow-hover: 0 12px 40px rgba(27, 28, 28, 0.10);
 }
 
 /* ─────────────────────────────────────────────
@@ -90,22 +122,23 @@ img, video, svg {
    Typography Scale
    ───────────────────────────────────────────── */
 
-/* Hero H1 — proportionate, not overwhelming */
+/* Hero H1 — v6 R4: tighter tracking + line for a premium, condensed masthead.
+   Max ONE display-hero per page. */
 .display-hero {
   font-family: var(--font-display);
-  font-size: clamp(2.75rem, 6vw, 5rem);
+  font-size: clamp(2.75rem, 6vw, 4.75rem);
   font-weight: 600;
-  line-height: 1.05;
-  letter-spacing: -0.025em;
+  line-height: 1.03;
+  letter-spacing: -0.03em;
 }
 
-/* Section H2 — 40–60px */
+/* Section H2 — v6 R4 standard section title */
 .display-1 {
   font-family: var(--font-display);
-  font-size: clamp(2.5rem, 5vw, 3.75rem);
+  font-size: clamp(2.25rem, 5vw, 3.5rem);
   font-weight: 600;
-  line-height: 1.1;
-  letter-spacing: -0.02em;
+  line-height: 1.08;
+  letter-spacing: -0.025em;
 }
 
 /* Section H2 alt — slightly smaller */
@@ -117,9 +150,9 @@ img, video, svg {
   letter-spacing: -0.02em;
 }
 
-/* H3 — 24–32px */
+/* H3 — v6 R4: card / sub-section heading */
 .heading-1 {
-  font-size: clamp(1.75rem, 3vw, 2.5rem);
+  font-size: clamp(1.6rem, 3vw, 2.25rem);
   font-weight: 600;
   line-height: 1.15;
   letter-spacing: -0.02em;
@@ -155,12 +188,14 @@ img, video, svg {
   line-height: 1.55;
 }
 
-/* Overline — above section titles */
+/* Overline — v6 R4: the eyebrow above EVERY section title. This is the single
+   element that unifies the whole component set — teal-deep, 700, wide tracking. */
 .overline {
   font-size: 0.75rem;
-  font-weight: 600;
-  letter-spacing: 0.18em;
+  font-weight: 700;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
+  color: var(--color-teal-deep);
 }
 
 /* ─────────────────────────────────────────────
@@ -186,19 +221,12 @@ img, video, svg {
   .container-c3 { padding-inline: 3rem; }
 }
 
-/* Section vertical padding — fluid across the full range.
-   clamp() gives smooth scaling; the explicit breakpoints anchor the steps. */
+/* Section vertical rhythm — v6 R4: ONE token drives the generous, Apple-caliber
+   air on every section, so the whole page breathes consistently. Bigger than v5's
+   clamp(4rem,8vw,6rem). Per-section overrides are still possible but rarely needed. */
 .section {
-  padding-top: clamp(4rem, 8vw, 6rem);
-  padding-bottom: clamp(4rem, 8vw, 6rem);
-}
-
-@media (min-width: 768px) {
-  .section { padding-top: 8rem; padding-bottom: 8rem; }
-}
-
-@media (min-width: 1024px) {
-  .section { padding-top: 10rem; padding-bottom: 10rem; }
+  padding-top: var(--section-y);
+  padding-bottom: var(--section-y);
 }
 
 /* ─────────────────────────────────────────────
