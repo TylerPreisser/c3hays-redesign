@@ -107,11 +107,17 @@ export default function LocationsSection({ text = {}, btn = {} }: { text?: Recor
                 data-cms-img={`campus-${loc.id}-photo`}
                 className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.04]"
               />
+              {/* v8 iter-2 D1: decorative scrim is click-through so the photo above it is
+                  hit-testable → EditBridge shows "Change image" over the photo. */}
               <div
                 className="absolute inset-0"
-                style={{ background: "linear-gradient(to top, rgba(10,10,10,0.9) 0%, rgba(10,10,10,0.4) 55%, rgba(10,10,10,0.12) 100%)" }}
+                style={{ background: "linear-gradient(to top, rgba(10,10,10,0.9) 0%, rgba(10,10,10,0.4) 55%, rgba(10,10,10,0.12) 100%)", pointerEvents: "none" }}
               />
-              <div className="absolute inset-0 flex flex-col justify-end" style={{ padding: "2.5rem" }}>
+              {/* v8 iter-2 D1: content anchored to the BOTTOM only (was full-bleed inset-0,
+                  which blocked the whole photo). Now the photo zone above is free for the
+                  image (Change-image), while this block's empty area still yields the
+                  card-bg Recolor and its text/buttons stay interactive. Same visual. */}
+              <div className="absolute inset-x-0 bottom-0 flex flex-col justify-end" style={{ padding: "2.5rem" }}>
                 <h3 className="heading-1 text-white" data-cms={`t:campus-${loc.id}-name`} style={{ marginBottom: "0.4rem" }} dangerouslySetInnerHTML={{ __html: tx(text, `campus-${loc.id}-name`, loc.name) }} />
                 <p className="text-sm" data-cms={`t:campus-${loc.id}-info`} style={{ color: "rgba(255,255,255,0.7)", marginBottom: "1.75rem" }} dangerouslySetInnerHTML={{ __html: tx(text, `campus-${loc.id}-info`, `${loc.street}, ${loc.city}, ${loc.state} · ${loc.services[0]?.day} ${loc.services[0]?.times.join(", ")}`) }} />
                 <div className="flex flex-wrap gap-3">

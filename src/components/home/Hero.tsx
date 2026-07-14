@@ -75,11 +75,14 @@ export default function Hero({ content = HERO_DEFAULTS, btnStyle, text = {}, btn
           />
           {/* Scrim — guarantees the centered white headline reads at AA over any
               part of the photo (vertical gradient + a soft center vignette). */}
+          {/* v8 iter-2 D3: scrims are click-through so the hero photo underneath is
+              hit-testable and swappable (Change-image) in the editor. */}
           <div
             className="absolute inset-0"
             style={{
               background:
                 "linear-gradient(180deg, rgba(10,10,10,0.6) 0%, rgba(10,10,10,0.42) 45%, rgba(10,10,10,0.8) 100%)",
+              pointerEvents: "none",
             }}
           />
           <div
@@ -87,20 +90,24 @@ export default function Hero({ content = HERO_DEFAULTS, btnStyle, text = {}, btn
             style={{
               background:
                 "radial-gradient(ellipse 70% 55% at 50% 50%, rgba(10,10,10,0.45) 0%, transparent 70%)",
+              pointerEvents: "none",
             }}
           />
         </div>
 
         {/* ── Hero content — centered both axes ── */}
+        {/* v8 iter-2 D3: the content column is click-through (so empty hero areas fall
+            through to the photo for Change-image); its H1 + CTA row re-enable pointer
+            events so the headline stays editable and the buttons stay clickable. */}
         <div
           className="relative z-10 flex-1 flex flex-col items-center justify-center container-c3 text-center"
-          style={{ paddingTop: "6rem", paddingBottom: "6rem" }}
+          style={{ paddingTop: "6rem", paddingBottom: "6rem", pointerEvents: "none" }}
         >
           {/* H1 — CMS-editable rich text (formatting preserved as HTML) */}
           <motion.h1
             className="display-hero text-white"
             data-cms="hero.heading"
-            style={{ marginBottom: "clamp(2rem, 5vh, 4rem)" }}
+            style={{ marginBottom: "clamp(2rem, 5vh, 4rem)", pointerEvents: "auto" }}
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, ease: WORD_EASE, delay: 0.15 }}
@@ -110,6 +117,7 @@ export default function Hero({ content = HERO_DEFAULTS, btnStyle, text = {}, btn
           {/* CTAs — campus chooser leads (the COTM "Find a Church" move), then secondary links */}
           <motion.div
             className="flex flex-wrap items-center justify-center gap-4 md:gap-5"
+            style={{ pointerEvents: "auto" }}
             initial={{ opacity: 0, y: 14 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, ease: "easeOut", delay: 0.7 }}

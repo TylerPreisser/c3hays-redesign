@@ -43,7 +43,13 @@ export default function EditBridge() {
          prefers-reduced-motion falls back to a static dashed outline. The outline is
          a pointer-events:none ::after overlay, so it never covers the element's own
          background or blocks clicks. */
-      [data-cms], [data-cms-img], [data-cms-link], [data-cms-icon], [data-cms-bg]{ position:relative; border-radius:7px; }
+      /* v8 iter-2 D17: NO blanket position:relative here. That rule (injected AFTER
+         Tailwind, equal specificity → later wins) turned full-bleed hero wrappers
+         (<div class="absolute inset-0" data-cms-img="…">) into position:relative, so
+         inset-0 stopped stretching them → wrapper 0×0 → <Image fill> 0×0 → hero blank
+         in the editor. Anchoring is now done in JS, only for elements whose COMPUTED
+         position is static (see ensureAnchored). */
+      [data-cms], [data-cms-img], [data-cms-link], [data-cms-icon], [data-cms-bg]{ border-radius:7px; }
       [data-cms]{ cursor:text; transition:background-color .12s ease; }
       [data-cms]:hover{ background-color: rgba(28,195,175,.05); }
       [data-cms-img], [data-cms-link], [data-cms-icon], [data-cms-bg]{ cursor:pointer; }
@@ -173,7 +179,28 @@ export default function EditBridge() {
       cur.forEach((el) => el.classList.add("cms-sel"));
     };
 
-    const imgObserver = new MutationObserver(() => { if (Object.keys(shimImg).length) reapplyShimImgs(); reapplySel(); });
+    // v8 iter-2 D17: anchor the marching-ants ::after by making ONLY static elements
+    // position:relative. Elements already positioned (absolute/fixed/sticky/relative —
+    // e.g. a full-bleed `absolute inset-0` hero wrapper, or a next/image `fill`) KEEP
+    // their own position so `inset` still stretches them (no 0×0 collapse). Idempotent
+    // per node via a WeakSet, so getComputedStyle runs at most once per element and
+    // freshly-mounted nodes (client re-renders) get anchored on the next mutation.
+    const CMS_SELECTOR = "[data-cms],[data-cms-img],[data-cms-link],[data-cms-icon],[data-cms-bg]";
+    const anchored = new WeakSet<HTMLElement>();
+    const ensureAnchored = () => {
+      document.querySelectorAll<HTMLElement>(CMS_SELECTOR).forEach((el) => {
+        if (anchored.has(el)) return;
+        anchored.add(el);
+        // Anchor unless the element is ALREADY positioned. (Real browsers report
+        // "static" for unpositioned; jsdom reports "" — treat both as needing anchor.)
+        const pos = getComputedStyle(el).position;
+        if (pos !== "absolute" && pos !== "fixed" && pos !== "sticky" && pos !== "relative") {
+          el.style.position = "relative";
+        }
+      });
+    };
+
+    const imgObserver = new MutationObserver(() => { if (Object.keys(shimImg).length) reapplyShimImgs(); reapplySel(); ensureAnchored(); });
     imgObserver.observe(document.body, { childList: true, subtree: true });
 
     // ── build the floating toolbar ──
@@ -306,6 +333,7 @@ export default function EditBridge() {
     // make every tagged element editable
     const els = Array.from(document.querySelectorAll<HTMLElement>("[data-cms]"));
     els.forEach((el) => { el.setAttribute("contenteditable", "true"); el.spellcheck = false; });
+    ensureAnchored();
     log("ready", { regions: els.length });
 
     const onFocusIn = (e: FocusEvent) => {
