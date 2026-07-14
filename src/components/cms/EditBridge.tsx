@@ -91,6 +91,13 @@ export default function EditBridge() {
         background:#7c3aed; color:#fff; font:700 12px/1 -apple-system,system-ui,sans-serif;
         padding:6px 11px; border-radius:999px; border:none; cursor:pointer; box-shadow:0 6px 18px rgba(0,0,0,.28); }
       #c3-bg-handle:hover{ background:#6d28d9; }
+      /* v7 R12: the DISCOVERABLE per-image "Change image" chip (top-LEFT of the hovered
+         image — the old section oval that lived there is gone). Makes swapping a photo
+         obvious for Kale, instead of relying on knowing you can click the image. */
+      #c3-img-handle{ position:fixed; z-index:2147483646; display:none; align-items:center; gap:6px;
+        background:#1cc3af; color:#042e29; font:700 12px/1 -apple-system,system-ui,sans-serif;
+        padding:6px 11px; border-radius:999px; border:none; cursor:pointer; box-shadow:0 6px 18px rgba(0,0,0,.28); }
+      #c3-img-handle:hover{ background:#15b3a0; }
       [data-cms-edit-badge]{ position:fixed; z-index:2147483646; background:#1cc3af; color:#042e29; font:700 11px/1 -apple-system,sans-serif;
         padding:4px 8px; border-radius:999px; pointer-events:none; transform:translateY(-50%); box-shadow:0 4px 12px rgba(0,0,0,.25); }
       #c3-toolbar{ position:fixed; z-index:2147483647; display:none; gap:2px; align-items:center;
@@ -243,6 +250,22 @@ export default function EditBridge() {
     });
     document.body.appendChild(bgChip);
 
+    // ── v7 R12: discoverable "Change image" chip ──
+    // Hovering any image reveals this chip; clicking it opens the image Inspector
+    // (same cms:select{kind:"image"} the image-click posts), so swapping/uploading a
+    // photo is an obvious affordance — not a hidden click-the-image gesture.
+    const imgChip = document.createElement("button");
+    imgChip.id = "c3-img-handle";
+    imgChip.type = "button";
+    imgChip.setAttribute("data-cms-change-image", "");
+    imgChip.innerHTML = `<span aria-hidden="true">🖼</span> Change image`;
+    let imgPath = "";
+    imgChip.addEventListener("mousedown", (e) => {
+      e.preventDefault(); e.stopPropagation();
+      if (imgPath) { post({ type: "cms:select", kind: "image", path: imgPath }); log("select-image-chip", { path: imgPath }); }
+    });
+    document.body.appendChild(imgChip);
+
     let activeEl: HTMLElement | null = null;
     const pathOf = (el: HTMLElement | null) => el?.getAttribute("data-cms") || "";
 
@@ -346,15 +369,27 @@ export default function EditBridge() {
       bgChip.style.left = `${Math.max(6, Math.min(window.innerWidth - 108, r.right - 108))}px`;
       bgChip.style.display = "inline-flex";
     };
+    // v7 R12: the change-image chip sits top-LEFT of the image (the removed section oval's spot).
+    const positionImgChip = (el: HTMLElement) => {
+      const r = el.getBoundingClientRect();
+      imgChip.style.top = `${Math.max(6, r.top + 8)}px`;
+      imgChip.style.left = `${Math.max(6, r.left + 8)}px`;
+      imgChip.style.display = "inline-flex";
+    };
     const onOver = (e: MouseEvent) => {
       const t = e.target as HTMLElement;
-      // Keep the chip the pointer moved onto (so it can be clicked). (v7 R5: no section oval.)
-      if (t === bgChip) return;
-      // v7 R7: images are NOT recolorable. A [data-cms-img] often sits INSIDE a
-      // recolorable [data-cms-bg] wrapper (e.g. a pillar photo), so without this guard
-      // hovering the image would surface the 🎨 recolor chip. Suppress it over images —
-      // an image gets image controls only.
-      if (t?.closest?.("[data-cms-img]")) { bgChip.style.display = "none"; bgPath = ""; return; }
+      // Keep whichever chip the pointer moved onto (so it can be clicked).
+      if (t === bgChip || t === imgChip) return;
+      // v7 R7 + R12: images are NOT recolorable but ARE swappable. A [data-cms-img] often
+      // sits INSIDE a recolorable [data-cms-bg] wrapper (e.g. a pillar photo), so suppress
+      // the 🎨 recolor chip over images and instead show the discoverable 🖼 Change image chip.
+      const imgEl = t?.closest?.("[data-cms-img]") as HTMLElement | null;
+      if (imgEl) {
+        bgChip.style.display = "none"; bgPath = "";
+        imgPath = imgEl.getAttribute("data-cms-img") || ""; positionImgChip(imgEl);
+        return;
+      }
+      imgChip.style.display = "none"; imgPath = "";
       // v4 R2: a recolorable element (tile / card / footer) → show the recolor chip.
       const bgEl = t?.closest?.("[data-cms-bg]") as HTMLElement | null;
       if (bgEl) { bgPath = bgEl.getAttribute("data-cms-bg") || ""; positionBgChip(bgEl); }
@@ -367,7 +402,7 @@ export default function EditBridge() {
     document.addEventListener("click", onClick, true);
     document.addEventListener("mousedown", onDocClick, true);
     document.addEventListener("mouseover", onOver, true);
-    window.addEventListener("scroll", () => { if (bar.style.display === "flex") positionBar(); bgChip.style.display = "none"; }, true);
+    window.addEventListener("scroll", () => { if (bar.style.display === "flex") positionBar(); bgChip.style.display = "none"; imgChip.style.display = "none"; }, true);
 
     const onMsg = (e: MessageEvent) => {
       const d = e.data; if (!d || d.source !== "c3editor") return;
@@ -396,7 +431,7 @@ export default function EditBridge() {
       window.removeEventListener("message", onMsg);
       els.forEach((el) => el.removeAttribute("contenteditable"));
       imgObserver.disconnect();
-      bar.remove(); fontMenu.remove(); style.remove(); bgChip.remove(); shimStyle.remove();
+      bar.remove(); fontMenu.remove(); style.remove(); bgChip.remove(); imgChip.remove(); shimStyle.remove();
       document.documentElement.removeAttribute("data-cms-edit");
     };
   }, []);
