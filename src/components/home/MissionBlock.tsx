@@ -16,9 +16,12 @@ gsap.registerPlugin(ScrollTrigger);
 export default function MissionBlock({
   content = MISSION_DEFAULTS,
   variant,
+  bleed = false,
 }: {
   content?: MissionContent;
   variant?: string;
+  /** v7 R4 — opt-in gradient section-bleed (Tyler-advanced). Default OFF: clean edges. */
+  bleed?: boolean;
 }) {
   const sectionRef = useRef<HTMLElement>(null);
   const v = variant || "centered";
@@ -53,7 +56,7 @@ export default function MissionBlock({
         ref={sectionRef}
         className="flex items-center justify-center text-center"
         style={{
-          background: bleedBg("#1b1c1c"),
+          background: bleedBg("#1b1c1c", undefined, bleed),
           /* Fluid vertical padding: generous on desktop, proportionate on tablet/phone */
           paddingTop: "clamp(5rem, 10vw, 10rem)",
           paddingBottom: "clamp(5rem, 10vw, 10rem)",
@@ -86,7 +89,7 @@ export default function MissionBlock({
       <section
         ref={sectionRef}
         style={{
-          background: bleedBg("#1b1c1c"),
+          background: bleedBg("#1b1c1c", undefined, bleed),
           paddingTop: "clamp(5rem, 10vw, 10rem)",
           paddingBottom: "clamp(5rem, 10vw, 10rem)",
         }}
@@ -129,7 +132,7 @@ export default function MissionBlock({
     <section
       ref={sectionRef}
       style={{
-        background: bleedBg("#252727"),
+        background: bleedBg("#252727", undefined, bleed),
         paddingTop: "clamp(5rem, 10vw, 10rem)",
         paddingBottom: "clamp(5rem, 10vw, 10rem)",
       }}

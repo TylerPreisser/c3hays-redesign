@@ -26,7 +26,9 @@ export interface BtnStyle { bg: string; color: string; radius: number; variant: 
 export interface IconStyle { color: string; bg: string; name?: string }
 export interface SectionMeta { id: string; visible: boolean; bg?: string; variant?: string }
 export interface ImgStyle { pos?: string; scale?: number }
-export interface HomeContent { hero: HeroContent; mission: MissionContent; meetGrowServe: MeetGrowServeContent; nt26: NT26Content; give: GiveContent; stayConnected: StayConnectedContent; text: Record<string, string>; btn: Record<string, BtnStyle>; icon: Record<string, IconStyle>; sections: SectionMeta[]; img: Record<string, ImgStyle>; bgFill: Record<string, string>; anim: Record<string, string> }
+/** v7 (R4): site-wide visual-effect flags. Tyler-advanced; all OFF by default. */
+export interface FxFlags { sectionBleed?: boolean }
+export interface HomeContent { hero: HeroContent; mission: MissionContent; meetGrowServe: MeetGrowServeContent; nt26: NT26Content; give: GiveContent; stayConnected: StayConnectedContent; text: Record<string, string>; btn: Record<string, BtnStyle>; icon: Record<string, IconStyle>; sections: SectionMeta[]; img: Record<string, ImgStyle>; bgFill: Record<string, string>; anim: Record<string, string>; fx: FxFlags }
 
 /** v6 R6: entrance-animation preset for a tagged element (by its data-cms path), or
  *  undefined when none. Hand-mirrors the c3-backend accessor; the reveal player
@@ -87,7 +89,7 @@ export const GIVE_DEFAULTS: GiveContent = {
   heading: "Give.", body: "Partner with what God is doing through C3.", ctaLabel: "Give Now", ctaHref: "/give/", bgImage: "/images/building.webp",
 };
 export const HOME_DEFAULTS: HomeContent = {
-  hero: HERO_DEFAULTS, mission: MISSION_DEFAULTS, meetGrowServe: MEET_GROW_SERVE_DEFAULTS, nt26: NT26_DEFAULTS, give: GIVE_DEFAULTS, stayConnected: {}, text: {}, btn: {}, icon: {}, sections: SECTIONS_DEFAULT, img: {}, bgFill: {}, anim: {},
+  hero: HERO_DEFAULTS, mission: MISSION_DEFAULTS, meetGrowServe: MEET_GROW_SERVE_DEFAULTS, nt26: NT26_DEFAULTS, give: GIVE_DEFAULTS, stayConnected: {}, text: {}, btn: {}, icon: {}, sections: SECTIONS_DEFAULT, img: {}, bgFill: {}, anim: {}, fx: {},
 };
 
 const str = (v: unknown, fallback: string): string => (typeof v === "string" && v.trim() !== "" ? v : fallback);
@@ -147,5 +149,7 @@ export function fromStudioHome(raw: StudioHome | null | undefined): HomeContent 
     bgFill: (raw.bgFill && typeof raw.bgFill === "object" ? raw.bgFill : {}) as Record<string, string>,
     // v6 R6: per-element entrance animations (mirrors bgFill).
     anim: (raw.anim && typeof raw.anim === "object" ? raw.anim : {}) as Record<string, string>,
+    // v7 R4: site-wide fx flags. sectionBleed is OFF unless the studio explicitly sets true.
+    fx: { sectionBleed: raw.fx?.sectionBleed === true },
   };
 }

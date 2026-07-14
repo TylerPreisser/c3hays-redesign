@@ -98,9 +98,9 @@ export function renderExample(id: string, c: HomeContent, variant?: string): Rea
     // v5 R2 — CORE home sections, rendered EXACTLY as src/app/page.tsx renders them
     // (same typed fields + prop wiring) so the shoot thumbnail equals the live look.
     case "hero": return <Hero content={c.hero} btnStyle={c.btn["hero.cta"]} text={c.text} btn={c.btn} variant={variant} />;
-    case "mission": return <MissionBlock content={c.mission} variant={variant} />;
+    case "mission": return <MissionBlock content={c.mission} variant={variant} bleed={c.fx?.sectionBleed} />;
     case "meetGrowServe": return <MeetGrowServe content={c.meetGrowServe} img={c.img} variant={variant} />;
-    case "nt26": return <NT26Feature content={c.nt26} btnStyle={c.btn["nt26.cta"]} img={c.img} variant={variant} />;
+    case "nt26": return <NT26Feature content={c.nt26} btnStyle={c.btn["nt26.cta"]} img={c.img} variant={variant} bleed={c.fx?.sectionBleed} />;
     case "locations": return <LocationsSection text={c.text} btn={c.btn} />;
     case "stayConnected": return <StayConnected content={c.stayConnected} text={c.text} icon={c.icon} btn={c.btn} variant={variant} />;
     case "serviceTimes": return <ServiceTimes text={c.text} btnStyle={c.btn["svc.cta"]} variant={variant} />;
@@ -108,9 +108,9 @@ export function renderExample(id: string, c: HomeContent, variant?: string): Rea
     case "eventsStrip": return <EventsStrip text={c.text} btnStyle={c.btn["events.cta"]} variant={variant} />;
     case "ministriesGrid": return <MinistriesGrid text={c.text} icon={c.icon} variant={variant} />;
     case "staffGrid": return <StaffGrid text={c.text} img={c.img} variant={variant} />;
-    case "testimonial": return <Testimonial text={c.text} variant={variant} />;
+    case "testimonial": return <Testimonial text={c.text} variant={variant} bleed={c.fx?.sectionBleed} />;
     case "faq": return <FaqAccordion text={c.text} variant={variant} />;
-    case "statsBand": return <StatsBand text={c.text} variant={variant} />;
+    case "statsBand": return <StatsBand text={c.text} variant={variant} bleed={c.fx?.sectionBleed} />;
     case "nextSteps": return <NextSteps text={c.text} icon={c.icon} variant={variant} />;
     case "scriptureVerse": return <ScriptureVerse text={c.text} variant={variant} />;
     case "promo": return <PromoBanner text={c.text} btnStyle={c.btn["promo.cta"]} variant={variant} />;

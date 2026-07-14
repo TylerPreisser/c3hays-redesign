@@ -15,9 +15,12 @@ import { bleedBg } from "@/lib/section-bleed";
 export default function Testimonial({
   text,
   variant,
+  bleed = false,
 }: {
   text?: Record<string, string>;
   variant?: string;
+  /** v7 R4 — opt-in gradient section-bleed (Tyler-advanced). Default OFF: clean edges. */
+  bleed?: boolean;
 }) {
   const v = variant || "centered";
   const quote = "C3 is where our family found a home. We walked in as strangers and left knowing we belonged.";
@@ -26,7 +29,7 @@ export default function Testimonial({
 
   if (v === "panel") {
     return (
-      <section className="section" style={{ background: bleedBg("#252727") }}>
+      <section className="section" style={{ background: bleedBg("#252727", undefined, bleed) }}>
         <div className="container-c3" style={{ display: "flex", justifyContent: "center" }}>
           <div style={{ maxWidth: 720, width: "100%", background: "#1b1c1c", border: "2px solid #1cc3af", borderRadius: "var(--radius-md,1.25rem)", padding: "clamp(2.25rem,5vw,3.5rem)", textAlign: "center" }}>
             <span aria-hidden style={{ display: "block", color: "#1cc3af", fontSize: "3rem", lineHeight: 1, fontWeight: 800, marginBottom: "0.5rem" }}>&ldquo;</span>
@@ -41,7 +44,7 @@ export default function Testimonial({
   }
 
   return (
-    <section className="section" style={{ background: bleedBg("#1b1c1c"), textAlign: "center" }}>
+    <section className="section" style={{ background: bleedBg("#1b1c1c", undefined, bleed), textAlign: "center" }}>
       <div className="container-c3" style={{ maxWidth: 860 }}>
         <p className="overline" style={{ color: "#1cc3af", marginBottom: "var(--s-6, 24px)" }}>From our church family</p>
         <span aria-hidden style={{ display: "block", color: "#1cc3af", fontSize: "clamp(3rem,7vw,5rem)", lineHeight: 0.8, fontWeight: 800, marginBottom: "1rem" }}>&ldquo;</span>

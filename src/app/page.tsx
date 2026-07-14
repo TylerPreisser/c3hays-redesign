@@ -45,9 +45,9 @@ export default async function HomePage({
   const render = (id: string, variant?: string): React.ReactNode => {
     switch (id) {
       case "hero": return <Hero content={c.hero} btnStyle={c.btn["hero.cta"]} text={c.text} btn={c.btn} variant={variant} />;
-      case "mission": return <MissionBlock content={c.mission} variant={variant} />;
+      case "mission": return <MissionBlock content={c.mission} variant={variant} bleed={c.fx?.sectionBleed} />;
       case "meetGrowServe": return <MeetGrowServe content={c.meetGrowServe} img={c.img} variant={variant} />;
-      case "nt26": return <NT26Feature content={c.nt26} btnStyle={c.btn["nt26.cta"]} img={c.img} variant={variant} />;
+      case "nt26": return <NT26Feature content={c.nt26} btnStyle={c.btn["nt26.cta"]} img={c.img} variant={variant} bleed={c.fx?.sectionBleed} />;
       case "locations": return <LocationsSection text={c.text} btn={c.btn} />;
       case "stayConnected": return <StayConnected content={c.stayConnected} text={c.text} icon={c.icon} btn={c.btn} variant={variant} />;
       case "give": return <GiveSection />;

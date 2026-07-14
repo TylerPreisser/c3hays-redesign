@@ -15,9 +15,12 @@ import { bleedBg } from "@/lib/section-bleed";
 export default function StatsBand({
   text,
   variant,
+  bleed = false,
 }: {
   text?: Record<string, string>;
   variant?: string;
+  /** v7 R4 — opt-in gradient section-bleed (Tyler-advanced). Default OFF: clean edges. */
+  bleed?: boolean;
 }) {
   const v = variant || "band";
   const stats = [
@@ -29,7 +32,7 @@ export default function StatsBand({
 
   if (v === "cards") {
     return (
-      <section className="section" style={{ background: bleedBg("#1b1c1c") }}>
+      <section className="section" style={{ background: bleedBg("#1b1c1c", undefined, bleed) }}>
         <div className="container-c3">
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(180px,1fr))", gap: "clamp(1rem,3vw,1.75rem)" }}>
             {stats.map((s) => (

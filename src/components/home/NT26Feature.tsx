@@ -18,11 +18,14 @@ export default function NT26Feature({
   btnStyle,
   img = {},
   variant,
+  bleed = false,
 }: {
   content?: NT26Content;
   btnStyle?: BtnStyle;
   img?: Record<string, ImgStyle>;
   variant?: string;
+  /** v7 R4 — opt-in gradient section-bleed (Tyler-advanced). Default OFF: clean edges. */
+  bleed?: boolean;
 }) {
   const sectionRef = useRef<HTMLElement>(null);
   const v = variant || "imageRight";
@@ -76,7 +79,7 @@ export default function NT26Feature({
       <section
         ref={sectionRef}
         className="section overflow-hidden"
-        style={{ background: bleedBg("#1b1c1c") }}
+        style={{ background: bleedBg("#1b1c1c", undefined, bleed) }}
       >
         <div className="container-c3">
           {/* Side-by-side from md (768px); stacked single-col on phones */}
@@ -135,7 +138,7 @@ export default function NT26Feature({
       <section
         ref={sectionRef}
         className="section overflow-hidden"
-        style={{ background: bleedBg("#1b1c1c") }}
+        style={{ background: bleedBg("#1b1c1c", undefined, bleed) }}
       >
         <div className="container-c3">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-12 lg:gap-20 items-center">

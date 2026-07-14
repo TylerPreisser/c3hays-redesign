@@ -132,4 +132,6 @@ export interface StudioHome {
   bgFill?: Record<string, string>;
   /** v6 (R6): per-element entrance animations (data-cms path → ANIMATION_PRESETS key). */
   anim?: Record<string, string>;
+  /** v7 (R4): site-wide visual-effect flags. Tyler-advanced, OFF by default (Kale never toggles). */
+  fx?: { sectionBleed?: boolean };
 }
