@@ -6,7 +6,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { Mail, Phone, Smartphone, Video, Sparkles, type LucideIcon } from "lucide-react";
 import { site } from "@/data/site";
 import CmsIcon from "@/components/cms/CmsIcon";
-import { tx, type IconStyle, type StayConnectedContent } from "@/lib/home-content";
+import { tx, type IconStyle, type StayConnectedContent, type BtnStyle } from "@/lib/home-content";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -65,11 +65,14 @@ export default function StayConnected({
   content,
   text = {},
   icon = {},
+  btn = {},
   variant,
 }: {
   content?: StayConnectedContent;
   text?: Record<string, string>;
   icon?: Record<string, IconStyle>;
+  // R8: per-CTA color/font overrides, keyed by the link path (e.g. "connect-2.cta").
+  btn?: Record<string, BtnStyle>;
   variant?: string;
 }) {
   const v = variant || "cards";
@@ -234,8 +237,8 @@ export default function StayConnected({
                   {/* Body */}
                   <p className="text-sm" data-cms={rc.body.path} style={{ color: "rgba(27,28,28,0.62)", lineHeight: 1.65, flex: 1, marginBottom: "1.75rem" }} dangerouslySetInnerHTML={{ __html: rc.body.html }} />
 
-                  {/* CTA — R8: editable link (label + href persist) */}
-                  <span className="arrow-link" style={{ color: "#179c8c", fontWeight: 600 }}>
+                  {/* CTA — R8: editable link (label + href + color + font persist) */}
+                  <span className="arrow-link" style={{ color: btn[rc.linkPath]?.color || "#179c8c", fontFamily: btn[rc.linkPath]?.font || undefined, fontWeight: 600 }}>
                     <span data-cms-link-label>{rc.cta}</span> <span className="arrow">→</span>
                   </span>
                 </a>
@@ -342,8 +345,8 @@ export default function StayConnected({
                   dangerouslySetInnerHTML={{ __html: rc.body.html }}
                 />
 
-                {/* CTA — R8: editable link (label + href persist) */}
-                <span className="arrow-link" style={{ color: "#1cc3af", fontWeight: 600, fontSize: "0.875rem" }}>
+                {/* CTA — R8: editable link (label + href + color + font persist) */}
+                <span className="arrow-link" style={{ color: btn[rc.linkPath]?.color || "#1cc3af", fontFamily: btn[rc.linkPath]?.font || undefined, fontWeight: 600, fontSize: "0.875rem" }}>
                   <span data-cms-link-label>{rc.cta}</span> <span className="arrow">→</span>
                 </span>
               </a>
