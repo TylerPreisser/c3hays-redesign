@@ -1,6 +1,7 @@
 "use client";
 
 import { tx } from "@/lib/home-content";
+import { bleedBg } from "@/lib/section-bleed";
 
 /**
  * StatsBand — an addable "God is at work" impact-numbers band. Generic + editable:
@@ -28,7 +29,7 @@ export default function StatsBand({
 
   if (v === "cards") {
     return (
-      <section className="section" style={{ backgroundColor: "#1b1c1c" }}>
+      <section className="section" style={{ background: bleedBg("#1b1c1c") }}>
         <div className="container-c3">
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(180px,1fr))", gap: "clamp(1rem,3vw,1.75rem)" }}>
             {stats.map((s) => (

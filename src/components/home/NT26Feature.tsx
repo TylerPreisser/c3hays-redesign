@@ -9,6 +9,7 @@ import { assetPath } from "@/lib/asset-path";
 import { prefersReducedMotion } from "@/lib/reduced-motion";
 import { NT26_DEFAULTS, imgCss, type NT26Content, type BtnStyle, type ImgStyle } from "@/lib/home-content";
 import { btnCss } from "./Hero";
+import { bleedBg } from "@/lib/section-bleed";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -75,7 +76,7 @@ export default function NT26Feature({
       <section
         ref={sectionRef}
         className="section overflow-hidden"
-        style={{ backgroundColor: "#1b1c1c" }}
+        style={{ background: bleedBg("#1b1c1c") }}
       >
         <div className="container-c3">
           {/* Side-by-side from md (768px); stacked single-col on phones */}
@@ -134,7 +135,7 @@ export default function NT26Feature({
       <section
         ref={sectionRef}
         className="section overflow-hidden"
-        style={{ backgroundColor: "#1b1c1c" }}
+        style={{ background: bleedBg("#1b1c1c") }}
       >
         <div className="container-c3">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-12 lg:gap-20 items-center">
@@ -190,7 +191,7 @@ export default function NT26Feature({
     <section
       ref={sectionRef}
       className="section overflow-hidden"
-      style={{ backgroundColor: "#1b1c1c" }}
+      style={{ background: bleedBg("#1b1c1c") }}
     >
       <div className="container-c3">
 
