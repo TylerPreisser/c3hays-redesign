@@ -102,7 +102,7 @@ export function renderExample(id: string, c: HomeContent, variant?: string): Rea
     case "meetGrowServe": return <MeetGrowServe content={c.meetGrowServe} img={c.img} variant={variant} />;
     case "nt26": return <NT26Feature content={c.nt26} btnStyle={c.btn["nt26.cta"]} img={c.img} variant={variant} />;
     case "locations": return <LocationsSection text={c.text} btn={c.btn} />;
-    case "stayConnected": return <StayConnected content={c.stayConnected} text={c.text} icon={c.icon} variant={variant} />;
+    case "stayConnected": return <StayConnected content={c.stayConnected} text={c.text} icon={c.icon} btn={c.btn} variant={variant} />;
     case "serviceTimes": return <ServiceTimes text={c.text} btnStyle={c.btn["svc.cta"]} variant={variant} />;
     case "sermonFeature": return <SermonFeature text={c.text} img={c.img} btnStyle={c.btn["sermon.cta"]} variant={variant} />;
     case "eventsStrip": return <EventsStrip text={c.text} btnStyle={c.btn["events.cta"]} variant={variant} />;

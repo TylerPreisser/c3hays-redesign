@@ -49,7 +49,7 @@ export default async function HomePage({
       case "meetGrowServe": return <MeetGrowServe content={c.meetGrowServe} img={c.img} variant={variant} />;
       case "nt26": return <NT26Feature content={c.nt26} btnStyle={c.btn["nt26.cta"]} img={c.img} variant={variant} />;
       case "locations": return <LocationsSection text={c.text} btn={c.btn} />;
-      case "stayConnected": return <StayConnected content={c.stayConnected} text={c.text} icon={c.icon} variant={variant} />;
+      case "stayConnected": return <StayConnected content={c.stayConnected} text={c.text} icon={c.icon} btn={c.btn} variant={variant} />;
       case "give": return <GiveSection />;
       case "promo": return <PromoBanner text={c.text} btnStyle={c.btn["promo.cta"]} variant={variant} />;
       // New addable example sections (R3 library) render from the shared registry.
