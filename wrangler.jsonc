@@ -1,0 +1,27 @@
+{
+  // c3hays site — CMS_LIVE Cloudflare Worker (U6, Option b).
+  // Deployed via OpenNext: `npm run cf:build` (with CMS_LIVE=1 + NEXT_PUBLIC_CMS_URL
+  // set) then `npm run cf:deploy`. Phase 1 target = *.workers.dev (NOT the public
+  // church domain — the public cutover is a gated Phase 2 / Tyler decision, so a
+  // deploy from here can never break the live celebratejesus.org static site).
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "c3hays-live",
+  "main": ".open-next/worker.js",
+  "compatibility_date": "2025-03-25",
+  // node:crypto etc. — required by the OpenNext runtime shim.
+  "compatibility_flags": ["nodejs_compat"],
+  "assets": {
+    "directory": ".open-next/assets",
+    "binding": "ASSETS"
+  },
+  "vars": {
+    // Runtime env. NOTE: the LOAD-BEARING build vars — CMS_LIVE=1 and
+    // NEXT_PUBLIC_CMS_URL=<editor URL> — are NEXT_PUBLIC_* / build-time and are
+    // INLINED at `cf:build` (they are NOT read here at runtime). This site holds
+    // NO signing secret: it only forwards the opaque ?preview token to the editor,
+    // which owns + validates PREVIEW_TOKEN_SECRET.
+    "NODE_ENV": "production"
+  }
+  // Phase 2 (separate GO): add a `routes` custom_domain entry + DNS to point the
+  // public church domain here. Left out on purpose so Phase 1 stays *.workers.dev.
+}

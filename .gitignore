@@ -4,6 +4,10 @@ out/
 .DS_Store
 *.log
 .env*.local
+
+# OpenNext / Cloudflare Worker build output (U6)
+.open-next/
+.wrangler/
 _recon/
 _recon-favicon.png
 next-env.d.ts
