@@ -56,8 +56,9 @@ interface RenderCard {
   overline?: { path: string; html: string };
   title: { path: string; html: string };
   body: { path: string; html: string };
-  cta: string;
-  href: string;
+  cta: string;         // editable link LABEL (data-cms-link-label)
+  href: string;        // editable link HREF
+  linkPath: string;    // data-cms-link id (R8 — makes the CTA an editable link)
 }
 
 export default function StayConnected({
@@ -137,8 +138,11 @@ export default function StayConnected({
         overline: undefined,
         title: { path: `stayConnected.cards.${c.id}.title`, html: c.title },
         body: { path: `stayConnected.cards.${c.id}.body`, html: c.body },
-        cta: c.cta || "Learn more",
-        href: c.href,
+        // R8: CTA is an editable link — label + href persist in the text bag
+        // (mirrors EventsStrip's events.cta / -href / -label convention).
+        cta: text[`stayConnected.cards.${c.id}.cta-label`] || c.cta || "Learn more",
+        href: text[`stayConnected.cards.${c.id}.cta-href`] || c.href,
+        linkPath: `stayConnected.cards.${c.id}.cta`,
       }))
     : Array.from({ length: cardCount }, (_, i) => {
         const item = connectItems[i] || { icon: Sparkles, overline: "New", title: "New card", body: "Describe this card — click any text to edit it.", cta: "Learn more", href: "/connect/" };
@@ -150,8 +154,12 @@ export default function StayConnected({
           overline: { path: `t:connect-${i}-overline`, html: tx(text, `connect-${i}-overline`, item.overline) },
           title: { path: `t:connect-${i}-title`, html: tx(text, `connect-${i}-title`, item.title) },
           body: { path: `t:connect-${i}-body`, html: tx(text, `connect-${i}-body`, item.body) },
-          cta: item.cta,
-          href: item.href,
+          // R8: the contact CTA (Write to Us / Give Us a Call / Past Messages /
+          // C3 App) is now an editable link — label + href persist in the text bag
+          // (EventsStrip convention). This is Tyler's "links aren't editable" fix.
+          cta: text[`connect-${i}.cta-label`] || item.cta,
+          href: text[`connect-${i}.cta-href`] || item.href,
+          linkPath: `connect-${i}.cta`,
         };
       });
 
@@ -181,6 +189,7 @@ export default function StayConnected({
                   rel={external ? "noopener noreferrer" : undefined}
                   className="connect-item group block"
                   data-cms-bg={`tile:${rc.iconKey}`}
+                  data-cms-link={rc.linkPath}
                   style={{
                     position: "relative",
                     display: "flex",
@@ -225,9 +234,9 @@ export default function StayConnected({
                   {/* Body */}
                   <p className="text-sm" data-cms={rc.body.path} style={{ color: "rgba(27,28,28,0.62)", lineHeight: 1.65, flex: 1, marginBottom: "1.75rem" }} dangerouslySetInnerHTML={{ __html: rc.body.html }} />
 
-                  {/* CTA */}
+                  {/* CTA — R8: editable link (label + href persist) */}
                   <span className="arrow-link" style={{ color: "#179c8c", fontWeight: 600 }}>
-                    {rc.cta} <span className="arrow">→</span>
+                    <span data-cms-link-label>{rc.cta}</span> <span className="arrow">→</span>
                   </span>
                 </a>
               );
@@ -277,6 +286,7 @@ export default function StayConnected({
                 target={external ? "_blank" : undefined}
                 rel={external ? "noopener noreferrer" : undefined}
                 className="connect-item group block"
+                data-cms-link={rc.linkPath}
                 style={{
                   display: "flex",
                   flexDirection: "column",
@@ -332,9 +342,9 @@ export default function StayConnected({
                   dangerouslySetInnerHTML={{ __html: rc.body.html }}
                 />
 
-                {/* CTA */}
+                {/* CTA — R8: editable link (label + href persist) */}
                 <span className="arrow-link" style={{ color: "#1cc3af", fontWeight: 600, fontSize: "0.875rem" }}>
-                  {rc.cta} <span className="arrow">→</span>
+                  <span data-cms-link-label>{rc.cta}</span> <span className="arrow">→</span>
                 </span>
               </a>
             );
