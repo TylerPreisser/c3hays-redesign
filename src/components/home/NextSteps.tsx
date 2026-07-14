@@ -71,13 +71,18 @@ export default function NextSteps({
     <section className="section" style={{ backgroundColor: "#1b1c1c" }}>
       <div className="container-c3">
         {Head}
-        <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", gap: "clamp(1.5rem,4vw,2.5rem)" }}>
+        {/* v7 R3: a genuine NUMBERED path — a small step index badge on each icon
+            conveys the sequence cleanly; the old floating "→" (which poked out beside
+            each icon and read unfinished) is gone. */}
+        <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", gap: "clamp(1.75rem,4vw,3rem)" }}>
           {steps.map((s, i) => (
-            <div key={s.k} style={{ position: "relative", flex: "1 1 200px", maxWidth: 240, textAlign: "center" }}>
-              <div style={{ display: "flex", justifyContent: "center", marginBottom: "1rem" }}><Glyph k={s.k} name={s.icon} /></div>
-              <span aria-hidden style={{ position: "absolute", top: 0, right: "50%", transform: "translateX(160%)", color: "rgba(28,195,175,0.35)", fontWeight: 800, fontSize: "1.5rem" }}>{i < steps.length - 1 ? "→" : ""}</span>
-              <h3 data-cms={`t:nextSteps-${s.k}-title`} style={{ color: "#fff", fontWeight: 700, fontSize: "1.25rem", margin: "0 0 0.4rem" }} dangerouslySetInnerHTML={{ __html: tx(text, `nextSteps-${s.k}-title`, s.title) }} />
-              <p data-cms={`t:nextSteps-${s.k}-blurb`} style={{ color: "rgba(255,255,255,0.7)", margin: 0 }} dangerouslySetInnerHTML={{ __html: tx(text, `nextSteps-${s.k}-blurb`, s.blurb) }} />
+            <div key={s.k} style={{ position: "relative", flex: "1 1 190px", maxWidth: 236, textAlign: "center" }}>
+              <div style={{ position: "relative", display: "inline-flex", justifyContent: "center", marginBottom: "1.2rem" }}>
+                <Glyph k={s.k} name={s.icon} />
+                <span aria-hidden style={{ position: "absolute", top: -6, right: -6, minWidth: 22, height: 22, padding: "0 5px", borderRadius: 999, background: "#1b1c1c", border: "1.5px solid #1cc3af", color: "#1cc3af", fontSize: "0.72rem", fontWeight: 800, display: "grid", placeItems: "center", lineHeight: 1 }}>{i + 1}</span>
+              </div>
+              <h3 data-cms={`t:nextSteps-${s.k}-title`} style={{ color: "#fff", fontWeight: 700, fontSize: "1.25rem", letterSpacing: "-0.01em", margin: "0 0 0.45rem" }} dangerouslySetInnerHTML={{ __html: tx(text, `nextSteps-${s.k}-title`, s.title) }} />
+              <p data-cms={`t:nextSteps-${s.k}-blurb`} style={{ color: "rgba(255,255,255,0.7)", margin: 0, lineHeight: 1.6, maxWidth: 210, marginInline: "auto" }} dangerouslySetInnerHTML={{ __html: tx(text, `nextSteps-${s.k}-blurb`, s.blurb) }} />
             </div>
           ))}
         </div>

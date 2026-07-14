@@ -24,25 +24,37 @@ export default function ServiceTimes({
 }) {
   const v = variant || "cards";
 
+  // v7 R3: a world-class campus card — restrained color (teal as a top accent + a soft
+  // icon badge, not a loud all-teal heading), a crisp white campus name, a hairline rule,
+  // and generously-set times. The single editable regions (city / times) are unchanged.
   const Campus = ({ k, city, days }: { k: string; city: string; days: string }) => (
     <div
       style={{
         flex: "1 1 320px",
-        background: "#1b1c1c",
+        position: "relative",
+        overflow: "hidden",
+        background: "linear-gradient(180deg,#1f2121,#191a1a)",
         borderRadius: "var(--radius-md, 1.25rem)",
-        padding: "clamp(1.75rem,4vw,2.75rem)",
-        border: "1px solid rgba(255,255,255,0.08)",
+        padding: "clamp(1.9rem,4vw,2.75rem)",
+        border: "1px solid rgba(255,255,255,0.09)",
+        boxShadow: "0 1px 0 rgba(255,255,255,0.04) inset",
       }}
     >
-      <span
-        data-cms={`t:svc-${k}-city`}
-        style={{ display: "block", color: "#1cc3af", fontWeight: 700, letterSpacing: "0.02em", fontSize: "clamp(1.3rem,3vw,1.9rem)", marginBottom: "0.6rem" }}
-        dangerouslySetInnerHTML={{ __html: tx(text, `svc-${k}-city`, city) }}
-      />
+      <span aria-hidden style={{ position: "absolute", top: 0, left: 0, right: 0, height: 3, background: "linear-gradient(90deg,#1cc3af,rgba(28,195,175,0))" }} />
+      <div style={{ display: "flex", alignItems: "center", gap: "0.8rem", marginBottom: "1.15rem" }}>
+        <span aria-hidden style={{ width: 40, height: 40, borderRadius: 12, flexShrink: 0, display: "grid", placeItems: "center", background: "rgba(28,195,175,0.13)", border: "1px solid rgba(28,195,175,0.22)" }}>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1cc3af" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" /><circle cx="12" cy="10" r="3" /></svg>
+        </span>
+        <span
+          data-cms={`t:svc-${k}-city`}
+          style={{ display: "block", color: "#fff", fontWeight: 700, letterSpacing: "-0.01em", fontSize: "clamp(1.25rem,3vw,1.7rem)", lineHeight: 1.1 }}
+          dangerouslySetInnerHTML={{ __html: tx(text, `svc-${k}-city`, city) }}
+        />
+      </div>
+      <div aria-hidden style={{ height: 1, background: "rgba(255,255,255,0.08)", marginBottom: "1.1rem" }} />
       <p
         data-cms={`t:svc-${k}-times`}
-        className="body-lg"
-        style={{ color: "rgba(255,255,255,0.78)", margin: 0, lineHeight: 1.6 }}
+        style={{ color: "rgba(255,255,255,0.82)", margin: 0, fontSize: "1.075rem", lineHeight: 2, letterSpacing: "0.005em" }}
         dangerouslySetInnerHTML={{ __html: tx(text, `svc-${k}-times`, days) }}
       />
     </div>
