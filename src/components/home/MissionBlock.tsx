@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { MISSION_DEFAULTS, type MissionContent } from "@/lib/home-content";
+import { bleedBg } from "@/lib/section-bleed";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -52,7 +53,7 @@ export default function MissionBlock({
         ref={sectionRef}
         className="flex items-center justify-center text-center"
         style={{
-          backgroundColor: "#1b1c1c",
+          background: bleedBg("#1b1c1c"),
           /* Fluid vertical padding: generous on desktop, proportionate on tablet/phone */
           paddingTop: "clamp(5rem, 10vw, 10rem)",
           paddingBottom: "clamp(5rem, 10vw, 10rem)",
@@ -85,7 +86,7 @@ export default function MissionBlock({
       <section
         ref={sectionRef}
         style={{
-          backgroundColor: "#1b1c1c",
+          background: bleedBg("#1b1c1c"),
           paddingTop: "clamp(5rem, 10vw, 10rem)",
           paddingBottom: "clamp(5rem, 10vw, 10rem)",
         }}
@@ -128,7 +129,7 @@ export default function MissionBlock({
     <section
       ref={sectionRef}
       style={{
-        backgroundColor: "#252727",
+        background: bleedBg("#252727"),
         paddingTop: "clamp(5rem, 10vw, 10rem)",
         paddingBottom: "clamp(5rem, 10vw, 10rem)",
       }}

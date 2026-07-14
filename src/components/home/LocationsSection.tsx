@@ -34,7 +34,7 @@ export default function LocationsSection({ text = {}, btn = {} }: { text?: Recor
   }, []);
 
   return (
-    <section ref={sectionRef} className="section" style={{ backgroundColor: "#f6f6f6" }}>
+    <section ref={sectionRef} className="section" style={{ backgroundColor: "transparent" }}>
       <div className="container-c3">
         {/* Header */}
         <div className="locations-heading" style={{ marginBottom: "clamp(2rem, 4vw, 3.5rem)", maxWidth: 640 }}>

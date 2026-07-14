@@ -103,6 +103,37 @@ body {
   -webkit-tap-highlight-color: transparent;
 }
 
+/* ─────────────────────────────────────────────
+   v6 R5 — SEAMLESS UNIFIED CANVAS (the default vibe)
+   ONE page-level canvas behind everything: a very low-contrast bone→haze→bone
+   vertical drift + a single ultra-soft teal glow anchored top-center (Stripe's
+   ribbon idea dialed to a whisper). Sections default to `background: transparent`
+   so this shows through; a section only paints its own bg when it opts out
+   (a dark "moment", or a per-section bgFill override via buildBgCss !important).
+   Fixed + overscanned so it drifts slowly as you scroll — never busy.
+   Honors prefers-reduced-motion: the drift stops, the gradient stays (static).
+   ───────────────────────────────────────────── */
+body::before {
+  content: "";
+  position: fixed;
+  inset: -25% 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(55% 38% at 50% 0%, rgba(28, 195, 175, 0.055), transparent 72%),
+    linear-gradient(180deg, #ffffff 0%, #f8f8f8 34%, #ffffff 64%, #f6f6f6 100%);
+  background-size: 100% 200%, 100% 200%;
+  background-position: 0 0%, 0 0%;
+  animation: canvas-drift 34s var(--ease-out) infinite alternate;
+}
+@keyframes canvas-drift {
+  from { background-position: 0 0%, 0 8%; }
+  to   { background-position: 0 60%, 0 40%; }
+}
+@media (prefers-reduced-motion: reduce) {
+  body::before { animation: none; }
+}
+
 h1, h2, h3, h4, h5, h6,
 p, ul, ol, figure, blockquote {
   margin: 0;
@@ -455,6 +486,28 @@ img, video, svg {
   clip-path: inset(0 0 100% 0);
 }
 
+/* v6 R6/§1.5 — reduced-motion guard, BUILT FRESH (repo had none). When the OS
+   asks for reduced motion, entrance reveals resolve to their FINAL resting state
+   with no transform/opacity animation. The GSAP sections additionally bail in JS
+   (prefersReducedMotion) so they never set the opacity:0 "from" state. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+  .reveal {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+  .img-reveal {
+    clip-path: none !important;
+  }
+}
+
 /* ─────────────────────────────────────────────
    Lenis
    ───────────────────────────────────────────── */
@@ -513,6 +566,20 @@ html.lenis body {
   background-color: var(--color-teal);
   color: var(--color-ink);
   border-color: var(--color-teal);
+}
+
+/* v6 R3: footer link hover — quiet lift to full white on the ink canvas */
+.footer-link:hover {
+  color: #fff !important;
+}
+
+/* v6 R1: bento tile — flat at rest, soft lift + shadow bloom on hover (§1.5). */
+.bento-tile {
+  transition: transform var(--dur-base) var(--ease-out), box-shadow var(--dur-base) var(--ease-out);
+}
+.bento-tile:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-hover) !important;
 }
 
 /* ─────────────────────────────────────────────

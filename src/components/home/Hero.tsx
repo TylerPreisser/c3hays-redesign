@@ -146,6 +146,7 @@ export default function Hero({ content = HERO_DEFAULTS, btnStyle, text = {}, btn
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.8, ease: WORD_EASE, delay: 0.1 }}
             >
+              <p className="overline" style={{ color: "#1cc3af" }}>Welcome home</p>
               <h1
                 className="display-hero text-white"
                 data-cms="hero.heading"
@@ -208,7 +209,7 @@ export default function Hero({ content = HERO_DEFAULTS, btnStyle, text = {}, btn
   return (
     <section
       className="relative flex flex-col overflow-hidden"
-      style={{ minHeight: "100dvh", backgroundColor: "#fff" }}
+      style={{ minHeight: "100dvh", backgroundColor: "transparent" }}
     >
       {liveStrip}
 
@@ -216,19 +217,16 @@ export default function Hero({ content = HERO_DEFAULTS, btnStyle, text = {}, btn
         className="flex-1 flex flex-col items-center justify-center container-c3 text-center"
         style={{ paddingTop: "8rem", paddingBottom: "8rem" }}
       >
-        {/* Subtle teal accent bar above the headline */}
-        <motion.div
-          className="rounded-full"
-          style={{
-            width: "3rem",
-            height: "4px",
-            backgroundColor: "#1cc3af",
-            marginBottom: "2rem",
-          }}
-          initial={{ opacity: 0, scaleX: 0 }}
-          animate={{ opacity: 1, scaleX: 1 }}
+        {/* Overline eyebrow — the unifying element across every v6 section */}
+        <motion.p
+          className="overline"
+          style={{ marginBottom: "var(--s-6, 24px)" }}
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, ease: "easeOut", delay: 0.1 }}
-        />
+        >
+          Welcome home
+        </motion.p>
 
         <motion.h1
           className="display-hero"
