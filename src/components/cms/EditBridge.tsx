@@ -71,11 +71,18 @@ export default function EditBridge() {
         [data-cms]:hover::after, [data-cms-img]:hover::after, [data-cms-link]:hover::after, [data-cms-icon]:hover::after, [data-cms-bg]:hover::after,
         [data-cms].cms-sel::after, [data-cms-img].cms-sel::after, [data-cms-link].cms-sel::after, [data-cms-icon].cms-sel::after, [data-cms-bg].cms-sel::after{ animation:none; }
       }
-      /* v3 R2: the floating "select this section" handle (move/delete/background). */
-      #c3-sec-handle{ position:fixed; z-index:2147483646; display:none; align-items:center; gap:6px;
-        background:#1cc3af; color:#042e29; font:700 12px/1 -apple-system,system-ui,sans-serif;
-        padding:6px 11px; border-radius:999px; border:none; cursor:pointer; box-shadow:0 6px 18px rgba(0,0,0,.28); }
-      #c3-sec-handle:hover{ background:#15b3a0; }
+      /* v7 R6: selection = the marching-ants ONLY. Kill the solid green box — the
+         c3hays brand :focus-visible ring (globals.css: outline 2px solid teal) that
+         paints a filled rounded box while a contenteditable/link is focused. Scoped
+         to edit mode (this whole sheet is injected only when cmsEdit=1), so the
+         public-site focus ring stays intact for accessibility. */
+      [data-cms]:focus, [data-cms]:focus-visible,
+      [data-cms].cms-sel, [data-cms-img].cms-sel, [data-cms-link].cms-sel, [data-cms-icon].cms-sel, [data-cms-bg].cms-sel,
+      [data-cms].cms-sel:focus-visible, [data-cms-link].cms-sel:focus-visible, [data-cms-img].cms-sel:focus-visible, [data-cms-icon].cms-sel:focus-visible, [data-cms-bg].cms-sel:focus-visible{
+        outline: none !important;
+      }
+      /* v7 R5: the on-canvas "Edit section" oval (#c3-sec-handle) is REMOVED — section
+         editing is triggered from the right-rail SectionDock card, not a floating pill. */
       /* v4 R2: the floating "recolor this tile" handle. A packed tile has almost no
          bare background to click, so the v3 click-empty-pixels path was undiscoverable
          (a click landed a text caret). This EXPLICIT chip appears on hover over any
@@ -133,7 +140,23 @@ export default function EditBridge() {
         document.querySelectorAll<HTMLElement>(`[data-cms-img="${path}"]`).forEach((el) => applyImgTo(el, src));
       }
     };
-    const imgObserver = new MutationObserver(() => { if (Object.keys(shimImg).length) reapplyShimImgs(); });
+
+    // v7 R6: PERSIST the selection by PATH, not by node. The sticky header (and any
+    // client re-render) mounts FRESH nodes that lack the `.cms-sel` class, so the
+    // marching-ants vanish mid-edit — esp. in the nav bar. We remember the selected
+    // element as a stable attribute-selector and re-stamp `.cms-sel` onto whatever
+    // node currently matches it, on every DOM mutation (same remount hook the image
+    // shim already uses). Empty ⇒ nothing selected. Preview-only; no persistence.
+    let selPath = "";
+    const reapplySel = () => {
+      if (!selPath) return;
+      const cur = document.querySelectorAll<HTMLElement>(selPath);
+      if (!cur.length) return; // element not (re)mounted yet — leave prior state
+      document.querySelectorAll(".cms-sel").forEach((n) => { if (!(n as HTMLElement).matches(selPath)) n.classList.remove("cms-sel"); });
+      cur.forEach((el) => el.classList.add("cms-sel"));
+    };
+
+    const imgObserver = new MutationObserver(() => { if (Object.keys(shimImg).length) reapplyShimImgs(); reapplySel(); });
     imgObserver.observe(document.body, { childList: true, subtree: true });
 
     // ── build the floating toolbar ──
@@ -198,18 +221,9 @@ export default function EditBridge() {
     bar.appendChild(mkBtn("✕", "Clear formatting", () => exec("removeFormat")));
     document.body.appendChild(bar);
 
-    // ── v3 R2: floating "select this section" handle ──
-    // Hovering a section shows a chip; clicking it selects the section so the
-    // editor can move / delete / recolor it — contextual, no sidebar.
-    const secChip = document.createElement("button");
-    secChip.id = "c3-sec-handle";
-    secChip.type = "button";
-    let secId = "";
-    secChip.addEventListener("mousedown", (e) => {
-      e.preventDefault(); e.stopPropagation();
-      if (secId) { post({ type: "cms:select", kind: "section", path: secId }); log("select-section", { path: secId }); }
-    });
-    document.body.appendChild(secChip);
+    // ── v7 R5: the on-canvas "Edit section" oval is GONE ──
+    // Section editing is triggered from the right-rail SectionDock card (which already
+    // sets secSel in HomeEditor). No floating canvas pill — one predictable affordance.
 
     // ── v4 R2: floating "recolor this tile" chip ──
     // The discoverable recolor affordance. Hovering ANY recolorable element
@@ -265,8 +279,12 @@ export default function EditBridge() {
       const el = (e.target as HTMLElement)?.closest?.("[data-cms]") as HTMLElement | null;
       if (!el) { return; }
       activeEl = el; positionBar();
-      post({ type: "cms:focus", path: pathOf(el) });
-      log("focus", { path: pathOf(el) });
+      // v7 R6: focusing a text region SELECTS it — persistent marching-ants, not a
+      // hover-only outline that vanishes when the mouse moves away.
+      const p = pathOf(el);
+      clearSel(); el.classList.add("cms-sel"); selPath = p ? `[data-cms="${p}"]` : "";
+      post({ type: "cms:focus", path: p });
+      log("focus", { path: p });
     };
     const onInput = (e: Event) => {
       const el = (e.target as HTMLElement)?.closest?.("[data-cms]") as HTMLElement | null;
@@ -283,6 +301,7 @@ export default function EditBridge() {
       const text = tgt?.closest?.("[data-cms]") as HTMLElement | null;
       if (icon && !text) {
         e.preventDefault(); e.stopPropagation(); clearSel(); icon.classList.add("cms-sel");
+        selPath = `[data-cms-icon="${icon.getAttribute("data-cms-icon")}"]`;
         post({ type: "cms:select", kind: "icon", path: icon.getAttribute("data-cms-icon") });
         log("select-icon", { path: icon.getAttribute("data-cms-icon") });
         return;
@@ -290,12 +309,14 @@ export default function EditBridge() {
       // OBJECT selection: image → open picker; link → edit label/href
       if (img && !text) {
         e.preventDefault(); e.stopPropagation(); clearSel(); img.classList.add("cms-sel");
+        selPath = `[data-cms-img="${img.getAttribute("data-cms-img")}"]`;
         post({ type: "cms:select", kind: "image", path: img.getAttribute("data-cms-img") });
         log("select-image", { path: img.getAttribute("data-cms-img") });
         return;
       }
       if (link && !text) {
         e.preventDefault(); e.stopPropagation(); clearSel(); link.classList.add("cms-sel");
+        selPath = `[data-cms-link="${link.getAttribute("data-cms-link")}"]`;
         const lab = (link.querySelector("[data-cms-link-label]") as HTMLElement)?.innerText ?? link.innerText;
         post({ type: "cms:select", kind: "link", path: link.getAttribute("data-cms-link"), label: lab, href: (link as HTMLAnchorElement).getAttribute?.("href") || "" });
         log("select-link", { path: link.getAttribute("data-cms-link") });
@@ -306,6 +327,7 @@ export default function EditBridge() {
       const bg = tgt?.closest?.("[data-cms-bg]") as HTMLElement | null;
       if (bg && !text && !img && !link && !icon) {
         e.preventDefault(); e.stopPropagation(); clearSel(); bg.classList.add("cms-sel");
+        selPath = `[data-cms-bg="${bg.getAttribute("data-cms-bg")}"]`;
         post({ type: "cms:select", kind: "bg", path: bg.getAttribute("data-cms-bg") });
         log("select-bg", { path: bg.getAttribute("data-cms-bg") });
         return;
@@ -317,15 +339,7 @@ export default function EditBridge() {
     };
     const onDocClick = (e: MouseEvent) => { const t = e.target as HTMLElement; if (!t?.closest?.("[data-cms]") && !t?.closest?.("#c3-toolbar") && !t?.closest?.("#c3-fontmenu")) hideBar(); };
 
-    // v3 R2: show the section-select handle over whichever section is hovered.
-    const positionSecChip = (sec: HTMLElement) => {
-      const r = sec.getBoundingClientRect();
-      secChip.style.top = `${Math.max(6, r.top + 8)}px`;
-      secChip.style.left = `${Math.max(6, r.left + 8)}px`;
-      secChip.style.display = "inline-flex";
-    };
-    // v4 R2: position the recolor chip at the top-RIGHT of the hovered tile (the
-    // section chip owns the top-left), so both are reachable without overlap.
+    // v4 R2: position the recolor chip at the top-RIGHT of the hovered tile.
     const positionBgChip = (el: HTMLElement) => {
       const r = el.getBoundingClientRect();
       bgChip.style.top = `${Math.max(6, r.top + 8)}px`;
@@ -334,14 +348,13 @@ export default function EditBridge() {
     };
     const onOver = (e: MouseEvent) => {
       const t = e.target as HTMLElement;
-      // Keep whichever chip the pointer moved onto (so it can be clicked).
-      if (t === secChip || t === bgChip) return;
-      const sec = t?.closest?.("[data-section]") as HTMLElement | null;
-      if (sec) {
-        secId = sec.getAttribute("data-section") || "";
-        secChip.innerHTML = `<span aria-hidden="true">▚</span> Edit section`;
-        positionSecChip(sec);
-      } else { secChip.style.display = "none"; secId = ""; }
+      // Keep the chip the pointer moved onto (so it can be clicked). (v7 R5: no section oval.)
+      if (t === bgChip) return;
+      // v7 R7: images are NOT recolorable. A [data-cms-img] often sits INSIDE a
+      // recolorable [data-cms-bg] wrapper (e.g. a pillar photo), so without this guard
+      // hovering the image would surface the 🎨 recolor chip. Suppress it over images —
+      // an image gets image controls only.
+      if (t?.closest?.("[data-cms-img]")) { bgChip.style.display = "none"; bgPath = ""; return; }
       // v4 R2: a recolorable element (tile / card / footer) → show the recolor chip.
       const bgEl = t?.closest?.("[data-cms-bg]") as HTMLElement | null;
       if (bgEl) { bgPath = bgEl.getAttribute("data-cms-bg") || ""; positionBgChip(bgEl); }
@@ -354,7 +367,7 @@ export default function EditBridge() {
     document.addEventListener("click", onClick, true);
     document.addEventListener("mousedown", onDocClick, true);
     document.addEventListener("mouseover", onOver, true);
-    window.addEventListener("scroll", () => { if (bar.style.display === "flex") positionBar(); secChip.style.display = "none"; bgChip.style.display = "none"; }, true);
+    window.addEventListener("scroll", () => { if (bar.style.display === "flex") positionBar(); bgChip.style.display = "none"; }, true);
 
     const onMsg = (e: MessageEvent) => {
       const d = e.data; if (!d || d.source !== "c3editor") return;
@@ -383,7 +396,7 @@ export default function EditBridge() {
       window.removeEventListener("message", onMsg);
       els.forEach((el) => el.removeAttribute("contenteditable"));
       imgObserver.disconnect();
-      bar.remove(); fontMenu.remove(); style.remove(); secChip.remove(); bgChip.remove(); shimStyle.remove();
+      bar.remove(); fontMenu.remove(); style.remove(); bgChip.remove(); shimStyle.remove();
       document.documentElement.removeAttribute("data-cms-edit");
     };
   }, []);
