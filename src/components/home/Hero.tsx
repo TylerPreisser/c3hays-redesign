@@ -209,7 +209,7 @@ export default function Hero({ content = HERO_DEFAULTS, btnStyle, text = {}, btn
   return (
     <section
       className="relative flex flex-col overflow-hidden"
-      style={{ minHeight: "100dvh", backgroundColor: "#fff" }}
+      style={{ minHeight: "100dvh", backgroundColor: "transparent" }}
     >
       {liveStrip}
 

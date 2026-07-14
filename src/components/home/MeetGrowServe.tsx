@@ -90,7 +90,7 @@ export default function MeetGrowServe({
   /* ─── VARIANT: cards (default — current look) ─────────────────────── */
   if (v === "cards") {
     return (
-      <section ref={sectionRef} className="section" style={{ backgroundColor: "#ffffff" }}>
+      <section ref={sectionRef} className="section" style={{ backgroundColor: "transparent" }}>
         <div className="container-c3">
           {/* Header */}
           <div className="mgs-heading mb-10 md:mb-14 lg:mb-20">
@@ -154,7 +154,7 @@ export default function MeetGrowServe({
   /* Horizontal rows: image left (fixed 40% width), text right, stacked vertically. */
   if (v === "list") {
     return (
-      <section ref={sectionRef} className="section" style={{ backgroundColor: "#ffffff" }}>
+      <section ref={sectionRef} className="section" style={{ backgroundColor: "transparent" }}>
         <div className="container-c3">
           {/* Header */}
           <div className="mgs-heading mb-10 md:mb-14 lg:mb-16">
@@ -227,7 +227,7 @@ export default function MeetGrowServe({
      lift). Reads from the same `pillars` content — no shape change. */
   if (v === "bento") {
     return (
-      <section ref={sectionRef} className="section" style={{ backgroundColor: "#ffffff" }}>
+      <section ref={sectionRef} className="section" style={{ backgroundColor: "transparent" }}>
         <div className="container-c3">
           <div className="mgs-heading mb-10 md:mb-14 lg:mb-16" style={{ maxWidth: "40ch" }}>
             <p className="overline" style={{ marginBottom: "var(--s-4, 16px)" }}>Take a next step</p>
@@ -299,7 +299,7 @@ export default function MeetGrowServe({
   /* ─── VARIANT: minimal ────────────────────────────────────────────── */
   /* No images — big text links with teal accent number, generous spacing. */
   return (
-    <section ref={sectionRef} className="section" style={{ backgroundColor: "#ffffff" }}>
+    <section ref={sectionRef} className="section" style={{ backgroundColor: "transparent" }}>
       <div className="container-c3">
         {/* Header */}
         <div

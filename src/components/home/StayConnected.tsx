@@ -159,7 +159,7 @@ export default function StayConnected({
   if (v === "cards") {
     return (
       /* Soft mist section — premium rounded cards */
-      <section ref={sectionRef} className="section" style={{ backgroundColor: "#f6f6f6" }}>
+      <section ref={sectionRef} className="section" style={{ backgroundColor: "transparent" }}>
         <div className="container-c3">
           {/* Header — heading + supporting line, centered */}
           <div className="connect-heading" style={{ marginBottom: "clamp(2rem, 4vw, 3.5rem)", maxWidth: 640 }}>
