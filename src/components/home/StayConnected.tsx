@@ -1,14 +1,21 @@
 "use client";
 
-import { useEffect, useRef } from "react";
-import { gsap } from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { Mail, Phone, Smartphone, Video, Sparkles, type LucideIcon } from "lucide-react";
 import { site } from "@/data/site";
 import CmsIcon from "@/components/cms/CmsIcon";
+import { STAGGER_STEP_MS } from "@/lib/reveal";
 import { tx, type IconStyle, type StayConnectedContent, type BtnStyle } from "@/lib/home-content";
 
-gsap.registerPlugin(ScrollTrigger);
+/**
+ * v7 R10: the Get-in-Touch entrance was a bespoke GSAP ScrollTrigger with a failsafe
+ * timeout — janky and off the shared system. It now rides the SAME preset reveal
+ * system as the rest of the site (data-anim → animations.css, revealed on viewport
+ * enter by RevealPlayer): the heading rises-and-fades, then the cards RISE in a clean
+ * left-to-right SEQUENCE (staggered animation-delay). Progressive-enhancement +
+ * prefers-reduced-motion safe are inherited from animations.css (content is only ever
+ * hidden once the player confirms it's running). Tyler can still override per-element
+ * entrances in the advanced drawer.
+ */
 
 const connectItems = [
   {
@@ -76,55 +83,8 @@ export default function StayConnected({
   variant?: string;
 }) {
   const v = variant || "cards";
-  const sectionRef = useRef<HTMLElement>(null);
-
-  useEffect(() => {
-    const ctx = gsap.context(() => {
-      gsap.fromTo(
-        ".connect-heading",
-        { opacity: 0, y: 28 },
-        {
-          opacity: 1,
-          y: 0,
-          duration: 0.9,
-          ease: "power3.out",
-          scrollTrigger: {
-            trigger: sectionRef.current,
-            start: "top 75%",
-            once: true,
-          },
-        }
-      );
-
-      gsap.fromTo(
-        ".connect-item",
-        { opacity: 0, y: 32 },
-        {
-          opacity: 1,
-          y: 0,
-          stagger: 0.1,
-          duration: 0.85,
-          ease: "power3.out",
-          scrollTrigger: {
-            trigger: ".connect-grid",
-            start: "top 75%",
-            once: true,
-          },
-        }
-      );
-    }, sectionRef);
-
-    // Fail-safe: if ScrollTrigger never fires (fast scroll, smooth-scroll quirks,
-    // headless capture), force the cards visible so this section is NEVER empty.
-    const failsafe = setTimeout(() => {
-      gsap.set([".connect-heading", ".connect-item"], { opacity: 1, y: 0 });
-    }, 1600);
-
-    return () => {
-      clearTimeout(failsafe);
-      ctx.revert();
-    };
-  }, []);
+  // v7 R10: the card entrance sequences left-to-right — order 1..N after the heading.
+  const cardDelay = (i: number): string => `${(i + 1) * STAGGER_STEP_MS}ms`;
 
   /* ─── card model: content-driven cards (R2) OR legacy connect-count ──────
      ADDITIVE FENCE: when `content.cards` is absent/empty, this reduces to the
@@ -170,10 +130,10 @@ export default function StayConnected({
   if (v === "cards") {
     return (
       /* Soft mist section — premium rounded cards */
-      <section ref={sectionRef} className="section" style={{ backgroundColor: "transparent" }}>
+      <section className="section" style={{ backgroundColor: "transparent" }}>
         <div className="container-c3">
           {/* Header — heading + supporting line, centered */}
-          <div className="connect-heading" style={{ marginBottom: "clamp(2rem, 4vw, 3.5rem)", maxWidth: 640 }}>
+          <div className="connect-heading" data-anim="fadeInUp" style={{ marginBottom: "clamp(2rem, 4vw, 3.5rem)", maxWidth: 640 }}>
             <span data-cms="t:getintouch-eyebrow" style={{ display: "inline-block", textTransform: "uppercase", letterSpacing: "0.16em", fontSize: "0.75rem", fontWeight: 700, color: "#1cc3af", marginBottom: "1rem" }} dangerouslySetInnerHTML={{ __html: tx(text, "getintouch-eyebrow", "Connect with us") }} />
             <h2 className="display-2" data-cms="t:getintouch-heading" style={{ color: "#1b1c1c", marginBottom: "1rem" }} dangerouslySetInnerHTML={{ __html: tx(text, "getintouch-heading", "Get in Touch") }} />
             <p data-cms="t:getintouch-intro" style={{ fontSize: "1.125rem", color: "rgba(27,28,28,0.62)", lineHeight: 1.6 }} dangerouslySetInnerHTML={{ __html: tx(text, "getintouch-intro", "However you want to connect, there's a way in. Reach out, catch a message, or take C3 with you.") }} />
@@ -182,7 +142,7 @@ export default function StayConnected({
           {/* Rounded card grid — legacy count is editable (1–6); a published
               stayConnected.cards collection drives it when present. */}
           <div className="connect-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-            {renderCards.map((rc) => {
+            {renderCards.map((rc, i) => {
               const external = rc.href.startsWith("http");
               return (
                 <a
@@ -191,9 +151,11 @@ export default function StayConnected({
                   target={external ? "_blank" : undefined}
                   rel={external ? "noopener noreferrer" : undefined}
                   className="connect-item group block"
+                  data-anim="riseUp"
                   data-cms-bg={`tile:${rc.iconKey}`}
                   data-cms-link={rc.linkPath}
                   style={{
+                    animationDelay: cardDelay(i),
                     position: "relative",
                     display: "flex",
                     flexDirection: "column",
@@ -254,10 +216,10 @@ export default function StayConnected({
   /* Charcoal bg, denser multi-column grid, icon inline with title,
      tighter padding — a genuinely different layout feel.             */
   return (
-    <section ref={sectionRef} className="section" style={{ backgroundColor: "#1b1c1c" }}>
+    <section className="section" style={{ backgroundColor: "#1b1c1c" }}>
       <div className="container-c3">
         {/* Header — eyebrow + heading left-aligned on dark bg */}
-        <div className="connect-heading" style={{ marginBottom: "clamp(1.5rem, 3vw, 2.5rem)" }}>
+        <div className="connect-heading" data-anim="fadeInUp" style={{ marginBottom: "clamp(1.5rem, 3vw, 2.5rem)" }}>
           <span
             data-cms="t:getintouch-eyebrow"
             style={{ display: "inline-block", textTransform: "uppercase", letterSpacing: "0.16em", fontSize: "0.7rem", fontWeight: 700, color: "#1cc3af", marginBottom: "0.6rem" }}
@@ -280,7 +242,7 @@ export default function StayConnected({
 
         {/* Dense grid — up to 3 cols on lg, 2 on sm; tighter padding */}
         <div className="connect-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-          {renderCards.map((rc) => {
+          {renderCards.map((rc, i) => {
             const external = rc.href.startsWith("http");
             return (
               <a
@@ -289,8 +251,10 @@ export default function StayConnected({
                 target={external ? "_blank" : undefined}
                 rel={external ? "noopener noreferrer" : undefined}
                 className="connect-item group block"
+                data-anim="riseUp"
                 data-cms-link={rc.linkPath}
                 style={{
+                  animationDelay: cardDelay(i),
                   display: "flex",
                   flexDirection: "column",
                   padding: "1.25rem 1.25rem",

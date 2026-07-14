@@ -19,12 +19,16 @@ html.c3-anim-ready [data-anim]:not(.c3-revealed) {
 [data-anim="popIn"].c3-revealed      { animation-name: c3-popIn; }
 [data-anim="slideDown"].c3-revealed  { animation-name: c3-slideDown; }
 [data-anim="slideUp"].c3-revealed    { animation-name: c3-slideUp; }
+/* v7 R10: "Rise up" — a stronger, more premium upward rise (bigger travel + a whisper
+   of scale) than the small slide/fade. "Rise & fade" stays fadeInUp. */
+[data-anim="riseUp"].c3-revealed     { animation-name: c3-riseUp; }
 
 @keyframes c3-fadeIn    { from { opacity: 0; }                                to { opacity: 1; } }
 @keyframes c3-fadeInUp  { from { opacity: 0; transform: translateY(16px); }  to { opacity: 1; transform: none; } }
 @keyframes c3-popIn     { from { opacity: 0; transform: scale(0.96); }       to { opacity: 1; transform: none; } }
 @keyframes c3-slideDown { from { opacity: 0; transform: translateY(-18px); } to { opacity: 1; transform: none; } }
 @keyframes c3-slideUp   { from { opacity: 0; transform: translateY(18px); }  to { opacity: 1; transform: none; } }
+@keyframes c3-riseUp    { from { opacity: 0; transform: translateY(48px) scale(0.985); } to { opacity: 1; transform: none; } }
 
 /* Accessibility: never hide content behind an animation for reduced-motion users. */
 @media (prefers-reduced-motion: reduce) {

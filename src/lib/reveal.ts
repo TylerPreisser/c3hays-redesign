@@ -18,6 +18,11 @@
  *  their data-cms-* attribute. */
 export const REVEAL_ATTRS = ["data-cms-bg", "data-cms-img", "data-cms-link", "data-cms-icon", "data-cms", "data-section"] as const;
 
+/** v7 R10: per-step delay for a staggered SEQUENCE. An anim value may carry an optional
+ *  ":<order>" suffix ("riseUp:2"); the order N becomes an animation-delay of N*step so
+ *  tagged elements enter one after another ("this goes, then this"). */
+export const STAGGER_STEP_MS = 90;
+
 /** CSS.escape fallback for attribute-value selectors (jsdom/older engines). */
 function esc(v: string): string {
   const g = globalThis as unknown as { CSS?: { escape?: (s: string) => string } };
@@ -34,12 +39,22 @@ function esc(v: string): string {
 export function stampReveals(root: ParentNode, animMap: Record<string, string> | undefined | null): Element[] {
   if (!animMap) return [];
   const stamped: Element[] = [];
-  for (const [path, preset] of Object.entries(animMap)) {
-    if (!preset || typeof preset !== "string") continue;
+  for (const [path, raw] of Object.entries(animMap)) {
+    if (!raw || typeof raw !== "string") continue;
+    // v7 R10: an optional ":<order>" suffix sequences the element. Stamp the CLEAN preset
+    // name (so animations.css matches) and, when ordered, an animation-delay = order*step.
+    const ci = raw.indexOf(":");
+    const preset = ci >= 0 ? raw.slice(0, ci) : raw;
+    const order = ci >= 0 ? Number(raw.slice(ci + 1)) : NaN;
+    if (!preset) continue;
     const selector = REVEAL_ATTRS.map((a) => `[${a}="${esc(path)}"]`).join(",");
     const el = root.querySelector(selector);
     if (el && !el.hasAttribute("data-anim")) {
       el.setAttribute("data-anim", preset);
+      if (Number.isFinite(order) && order > 0) {
+        (el as HTMLElement).style.animationDelay = `${order * STAGGER_STEP_MS}ms`;
+        el.setAttribute("data-anim-order", String(order));
+      }
       stamped.push(el);
     }
   }
