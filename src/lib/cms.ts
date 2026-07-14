@@ -106,6 +106,8 @@ export interface CMSOverrides {
   media?: Record<string, string>;
   /** v3 (R4): per-element background fills keyed by data-cms-bg id (e.g. "g:footer"). */
   bgFill?: Record<string, string>;
+  /** v6 (R6): per-element entrance animations keyed by data-cms path → preset. */
+  anim?: Record<string, string>;
   nav?: { items?: { label: string; href: string }[]; bg?: string; color?: string; font?: string; effect?: "auto" | "solid" | "transparent" };
 }
 /** Per-page overrides (text/buttons/images) by slug, e.g. "/about/". */
@@ -128,4 +130,6 @@ export interface StudioHome {
   img?: Record<string, { pos?: string; scale?: number }>;
   /** v3 (R3): per-element background fills (data-cms-bg id → CSS background string). */
   bgFill?: Record<string, string>;
+  /** v6 (R6): per-element entrance animations (data-cms path → ANIMATION_PRESETS key). */
+  anim?: Record<string, string>;
 }
