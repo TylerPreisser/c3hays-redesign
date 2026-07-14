@@ -37,22 +37,40 @@ export default function EditBridge() {
 
     const style = document.createElement("style");
     style.textContent = `
-      /* Clean, professional edit affordance: soft rounded highlight + thin ring — NO dashed lines. */
-      [data-cms]{ outline:none; border-radius:6px; transition:background-color .12s ease, box-shadow .12s ease; cursor:text; }
-      [data-cms]:hover{ background-color: rgba(28,195,175,.06); box-shadow:0 0 0 2px rgba(28,195,175,.16); }
-      [data-cms]:focus{ outline:none; background-color: rgba(28,195,175,.07); box-shadow:0 0 0 2px rgba(28,195,175,.5); }
-      [data-cms-img], [data-cms-link], [data-cms-icon]{ cursor:pointer; }
-      [data-cms-icon]{ border-radius:8px; transition:box-shadow .12s ease; }
-      [data-cms-icon]:hover{ box-shadow:0 0 0 3px rgba(28,195,175,.55); }
-      [data-cms-img]{ position:relative; border-radius:6px; transition:box-shadow .12s ease; }
-      [data-cms-img]:hover{ box-shadow:0 0 0 3px rgba(28,195,175,.6); }
-      [data-cms-img].cms-sel, [data-cms-link].cms-sel, [data-cms-icon].cms-sel{ box-shadow:0 0 0 3px #1cc3af; }
-      [data-cms-link]{ border-radius:8px; transition:box-shadow .12s ease; }
-      [data-cms-link]:hover{ box-shadow:0 0 0 3px rgba(28,195,175,.55); }
-      /* v3 R3: a tile whose BACKGROUND is editable — click its non-text area to recolor. */
-      [data-cms-bg]{ cursor:pointer; transition:box-shadow .12s ease; }
-      [data-cms-bg]:hover{ box-shadow:0 0 0 3px rgba(28,195,175,.4); }
-      [data-cms-bg].cms-sel{ box-shadow:0 0 0 3px #1cc3af; }
+      /* v6 R9: an obviously-EDITOR affordance — an animated dashed "marching-ants"
+         outline that circles the hovered/selected element (never a plain website
+         hover). cmsEdit-only (this whole stylesheet is injected only in edit mode);
+         prefers-reduced-motion falls back to a static dashed outline. The outline is
+         a pointer-events:none ::after overlay, so it never covers the element's own
+         background or blocks clicks. */
+      [data-cms], [data-cms-img], [data-cms-link], [data-cms-icon], [data-cms-bg]{ position:relative; border-radius:7px; }
+      [data-cms]{ cursor:text; transition:background-color .12s ease; }
+      [data-cms]:hover{ background-color: rgba(28,195,175,.05); }
+      [data-cms-img], [data-cms-link], [data-cms-icon], [data-cms-bg]{ cursor:pointer; }
+      /* the marching border — shown on hover, and persistently on the selected element */
+      [data-cms]:hover::after, [data-cms-img]:hover::after, [data-cms-link]:hover::after, [data-cms-icon]:hover::after, [data-cms-bg]:hover::after,
+      [data-cms].cms-sel::after, [data-cms-img].cms-sel::after, [data-cms-link].cms-sel::after, [data-cms-icon].cms-sel::after, [data-cms-bg].cms-sel::after{
+        content:""; position:absolute; inset:-3px; border-radius:9px; pointer-events:none; z-index:2147482000;
+        --ant: rgba(28,195,175,.85);
+        background-image:
+          repeating-linear-gradient(90deg, var(--ant) 0 7px, transparent 7px 14px),
+          repeating-linear-gradient(90deg, var(--ant) 0 7px, transparent 7px 14px),
+          repeating-linear-gradient(0deg,  var(--ant) 0 7px, transparent 7px 14px),
+          repeating-linear-gradient(0deg,  var(--ant) 0 7px, transparent 7px 14px);
+        background-size: 100% 2px, 100% 2px, 2px 100%, 2px 100%;
+        background-position: 0 0, 0 100%, 0 0, 100% 0;
+        background-repeat: no-repeat;
+        animation: c3ants .5s linear infinite;
+      }
+      /* SELECTED = distinct: deeper teal, thicker ants, a touch faster. */
+      [data-cms].cms-sel::after, [data-cms-img].cms-sel::after, [data-cms-link].cms-sel::after, [data-cms-icon].cms-sel::after, [data-cms-bg].cms-sel::after{
+        --ant: #179c8c; background-size: 100% 3px, 100% 3px, 3px 100%, 3px 100%; animation-duration:.38s;
+      }
+      @keyframes c3ants{ to{ background-position: 14px 0, -14px 100%, 0 -14px, 100% 14px; } }
+      @media (prefers-reduced-motion: reduce){
+        [data-cms]:hover::after, [data-cms-img]:hover::after, [data-cms-link]:hover::after, [data-cms-icon]:hover::after, [data-cms-bg]:hover::after,
+        [data-cms].cms-sel::after, [data-cms-img].cms-sel::after, [data-cms-link].cms-sel::after, [data-cms-icon].cms-sel::after, [data-cms-bg].cms-sel::after{ animation:none; }
+      }
       /* v3 R2: the floating "select this section" handle (move/delete/background). */
       #c3-sec-handle{ position:fixed; z-index:2147483646; display:none; align-items:center; gap:6px;
         background:#1cc3af; color:#042e29; font:700 12px/1 -apple-system,system-ui,sans-serif;
