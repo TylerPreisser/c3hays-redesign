@@ -25,7 +25,20 @@ export default function CampusChooser({
   btn?: Record<string, BtnStyle>;
 }) {
   const [open, setOpen] = useState(false);
+  const [editMode, setEditMode] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
+
+  // v8 D2: in the C3 Studio editor (?cmsEdit=1 inside the iframe) the disclosure
+  // toggle competes with EditBridge's click-to-SELECT — clicking "Find your campus"
+  // opened the dropdown instead of selecting the button, so the button looked
+  // uneditable. Detect edit mode and suppress the toggle so the click falls through
+  // to EditBridge, which selects this [data-cms-link] like any other button.
+  useEffect(() => {
+    try {
+      const q = new URLSearchParams(window.location.search);
+      setEditMode(q.get("cmsEdit") === "1" && window.parent !== window);
+    } catch { /* SSR / sandboxed — stay live */ }
+  }, []);
 
   useEffect(() => {
     if (!open) return;
@@ -50,7 +63,7 @@ export default function CampusChooser({
     <div ref={ref} className="relative inline-block text-left">
       <button
         type="button"
-        onClick={() => setOpen((o) => !o)}
+        onClick={() => { if (editMode) return; setOpen((o) => !o); }}
         aria-haspopup="true"
         aria-expanded={open}
         data-cms-link={id}
@@ -84,7 +97,8 @@ export default function CampusChooser({
           {locations.map((loc, i) => (
             <Link
               key={loc.id}
-              href={`/locations/${loc.slug}/`}
+              href={text[`${id}-item-${loc.id}-href`] || `/locations/${loc.slug}/`}
+              data-cms-link={`${id}-item-${loc.id}`}
               className="flex items-center gap-3 px-5 py-4 transition-colors duration-150 hover:bg-[#f6f6f6]"
               style={{
                 borderTop: i === 0 ? "none" : "1px solid rgba(27,28,28,0.08)",
@@ -101,7 +115,7 @@ export default function CampusChooser({
                 <MapPin size={17} />
               </span>
               <span className="min-w-0">
-                <span className="block font-bold leading-tight" style={{ color: "var(--color-ink)" }}>
+                <span className="block font-bold leading-tight" data-cms-link-label style={{ color: "var(--color-ink)" }}>
                   {loc.name}
                 </span>
                 <span className="block text-sm truncate" style={{ color: "rgba(27,28,28,0.55)" }}>

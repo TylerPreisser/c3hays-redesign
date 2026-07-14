@@ -47,6 +47,7 @@ export default function LocationsSection({ text = {}, btn = {} }: { text?: Recor
           {/* Stylized NW-Kansas map */}
           <div
             className="lg:col-span-3 relative overflow-hidden"
+            data-cms-bg="t:findcampus-map"
             style={{ background: "#fff", borderRadius: "var(--radius-md)", minHeight: 300 }}
           >
             <svg viewBox="0 0 500 320" className="w-full h-full" role="img" aria-label="Map of C3 campuses across northwest Kansas">
@@ -81,6 +82,7 @@ export default function LocationsSection({ text = {}, btn = {} }: { text?: Recor
           {/* Teal chooser card */}
           <div
             className="lg:col-span-2 flex flex-col justify-center"
+            data-cms-bg="t:findcampus-card"
             style={{ background: "var(--color-ink)", borderRadius: "var(--radius-md)", padding: "2.5rem 2.25rem" }}
           >
             <h3 className="heading-2 text-white" data-cms="t:findcampus-heading" style={{ marginBottom: "0.875rem" }} dangerouslySetInnerHTML={{ __html: tx(text, "findcampus-heading", "Find your campus") }} />
@@ -95,12 +97,14 @@ export default function LocationsSection({ text = {}, btn = {} }: { text?: Recor
             <div
               key={loc.id}
               className="campus-card group relative overflow-hidden"
+              data-cms-bg={`t:campus-${loc.id}`}
               style={{ aspectRatio: "4/3", minHeight: 260, width: "100%", borderRadius: "var(--radius-md)" }}
             >
               <Image
                 src={assetPath(loc.image)}
                 alt={`C3 ${loc.name} campus`}
                 fill
+                data-cms-img={`campus-${loc.id}-photo`}
                 className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.04]"
               />
               <div

@@ -141,9 +141,9 @@ function FooterEditorial({ t, m, preCta = false }: { t: TextBag; m: MediaBag; pr
         </div>
       )}
 
-      {/* Slim teal hairline accent (thinner than the prior 3px rule) — only when
-          there's no CTA band above (the band already provides the teal moment). */}
-      {!preCta && <div aria-hidden style={{ height: 2, background: "linear-gradient(90deg, transparent, #1cc3af 30%, #1cc3af 70%, transparent)", opacity: 0.85 }} />}
+      {/* v8 D4: the 2px teal hairline that used to sit mid-footer is REMOVED (Tyler
+          confirmed with the user). The GradientBleed above already carries the page →
+          ink transition, so the footer reads clean with no stray teal line. */}
 
       <div className="container-c3" style={{ paddingTop: "var(--s-24, 96px)", paddingBottom: "var(--s-16, 64px)" }}>
         <div className="flex flex-col items-center text-center gap-12 md:grid md:grid-cols-2 md:items-start md:text-left md:gap-x-10 md:gap-y-12 lg:grid-cols-12 lg:gap-y-0">
@@ -209,7 +209,7 @@ function FooterMinimal({ t, m }: { t: TextBag; m: MediaBag }) {
   return (
     <footer data-cms-bg="g:footer" style={{ backgroundColor: "#1b1c1c", color: "rgba(255,255,255,0.75)" }}>
       <GradientBleed />
-      <div aria-hidden style={{ height: 2, background: "linear-gradient(90deg, transparent, #1cc3af 30%, #1cc3af 70%, transparent)", opacity: 0.85 }} />
+      {/* v8 D4: teal hairline removed here too (see FooterEditorial) — clean footer. */}
 
       <div className="container-c3" style={{ paddingTop: "var(--s-24, 96px)", paddingBottom: "var(--s-12, 48px)", textAlign: "center", display: "flex", flexDirection: "column", alignItems: "center", gap: "var(--s-8, 32px)" }}>
         <Link href="/" aria-label="C3 Home"><Logo size={56} variant="light" cmsKey="g:logo-light" srcOverride={m["logo-light"]} /></Link>

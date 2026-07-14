@@ -50,7 +50,17 @@ export default function EditBridge() {
       /* the marching border — shown on hover, and persistently on the selected element */
       [data-cms]:hover::after, [data-cms-img]:hover::after, [data-cms-link]:hover::after, [data-cms-icon]:hover::after, [data-cms-bg]:hover::after,
       [data-cms].cms-sel::after, [data-cms-img].cms-sel::after, [data-cms-link].cms-sel::after, [data-cms-icon].cms-sel::after, [data-cms-bg].cms-sel::after{
-        content:""; position:absolute; inset:-3px; border-radius:9px; pointer-events:none; z-index:2147482000;
+        content:""; position:absolute;
+        /* v8 D3: PIN the geometry with !important. Some tagged elements own their own
+           author ::after (e.g. globals.css .nav-link-underline::after sets width:0;
+           height:2px;bottom:-2px). That author rule leaks its width/height/inset into
+           this overlay and collapses the marching-ants ring to a 0x2px sliver — the
+           "navbar ring still wrong" bug. Forcing all four insets AND width/height with
+           !important beats any co-resident author ::after regardless of specificity or
+           order, so the ring always renders as a full rectangle around EVERY data-cms.  */
+        top:-3px!important; right:-3px!important; bottom:-3px!important; left:-3px!important;
+        width:auto!important; height:auto!important;
+        border-radius:9px; pointer-events:none; z-index:2147482000;
         --ant: rgba(28,195,175,.85);
         background-image:
           repeating-linear-gradient(90deg, var(--ant) 0 7px, transparent 7px 14px),

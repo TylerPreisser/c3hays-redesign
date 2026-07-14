@@ -36,15 +36,16 @@ export default function Hero({ content = HERO_DEFAULTS, btnStyle, text = {}, btn
         className="animate-pulse-dot w-2 h-2 rounded-full shrink-0"
         style={{ backgroundColor: "#fff" }}
       />
-      <span className="text-xs font-bold uppercase tracking-[0.18em] text-white">
+      <span className="text-xs font-bold uppercase tracking-[0.18em] text-white" data-cms="hero.live-label">
         We&apos;re live now
       </span>
       <span className="text-white/50 text-xs">·</span>
       <Link
         href="/watch/"
+        data-cms-link="hero.live-cta"
         className="text-xs font-bold uppercase tracking-[0.18em] text-white underline underline-offset-2 hover:no-underline transition-all"
       >
-        Watch Live →
+        <span data-cms-link-label>Watch Live →</span>
       </Link>
     </div>
   ) : null;
@@ -68,6 +69,7 @@ export default function Hero({ content = HERO_DEFAULTS, btnStyle, text = {}, btn
             fill
             priority
             sizes="100vw"
+            data-cms-img="hero.bg"
             className="object-cover animate-ken-burns"
             style={{ objectPosition: "center 35%" }}
           />
@@ -183,6 +185,7 @@ export default function Hero({ content = HERO_DEFAULTS, btnStyle, text = {}, btn
                 fill
                 priority
                 sizes="(max-width: 1024px) 100vw, 50vw"
+                data-cms-img="hero.bg"
                 className="object-cover"
                 style={{ objectPosition: "center 35%" }}
               />
