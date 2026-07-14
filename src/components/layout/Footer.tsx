@@ -126,22 +126,24 @@ function FooterEditorial({ t, m, preCta = false }: { t: TextBag; m: MediaBag; pr
       {/* Seamless entry from the page canvas */}
       <GradientBleed />
 
-      {/* Big-CTA pre-band — teal "Plan your visit" moment that flows into the links */}
+      {/* Big-CTA pre-band — full-bleed teal "Plan your visit" moment that flows
+          STRAIGHT into the dark link footer as ONE unit: flush bottom (no gap,
+          bottom corners squared) sits directly on the footer, and the hairline is
+          dropped in this mode since the teal→ink meeting IS the transition. */}
       {preCta && (
-        <div className="container-c3" style={{ paddingBottom: "var(--s-16, 64px)" }}>
-          <div style={{ position: "relative", overflow: "hidden", borderRadius: "var(--radius-md, 1.875rem)", background: "linear-gradient(135deg, #179c8c 0%, #1cc3af 100%)", padding: "clamp(2.5rem, 6vw, 4.5rem)", textAlign: "center" }}>
-            <div aria-hidden style={{ position: "absolute", inset: 0, background: "radial-gradient(80% 90% at 50% 0%, rgba(255,255,255,0.20), transparent 65%)", pointerEvents: "none" }} />
-            <p className="overline" data-cms="g:footer-cta-eyebrow" style={{ color: "#042e29", position: "relative" }} dangerouslySetInnerHTML={{ __html: tx(t, "footer-cta-eyebrow", "New here?") }} />
-            <h2 className="display-1" data-cms="g:footer-cta-heading" style={{ color: "#fff", margin: "var(--s-3, 12px) 0 var(--s-6, 24px)", position: "relative" }} dangerouslySetInnerHTML={{ __html: tx(t, "footer-cta-heading", "Plan your first visit") }} />
-            <Link href={t["footer-cta-href"] || "/visit/"} data-cms-link="g:footer-cta" className="btn" style={{ position: "relative", background: "#042e29", color: "#fff", borderRadius: "var(--radius-pill, 999px)", fontWeight: 700, padding: "0.95rem 2.2rem" }}>
-              <span data-cms-link-label>{tx(t, "footer-cta-label", "What to expect")}</span>
-            </Link>
-          </div>
+        <div style={{ position: "relative", overflow: "hidden", background: "linear-gradient(135deg, #179c8c 0%, #1cc3af 100%)", padding: "clamp(3rem, 7vw, 5rem) clamp(1.5rem, 5vw, 3rem)", textAlign: "center" }}>
+          <div aria-hidden style={{ position: "absolute", inset: 0, background: "radial-gradient(80% 90% at 50% 0%, rgba(255,255,255,0.20), transparent 65%)", pointerEvents: "none" }} />
+          <p className="overline" data-cms="g:footer-cta-eyebrow" style={{ color: "#042e29", position: "relative" }} dangerouslySetInnerHTML={{ __html: tx(t, "footer-cta-eyebrow", "New here?") }} />
+          <h2 className="display-1" data-cms="g:footer-cta-heading" style={{ color: "#fff", margin: "var(--s-3, 12px) 0 var(--s-6, 24px)", position: "relative" }} dangerouslySetInnerHTML={{ __html: tx(t, "footer-cta-heading", "Plan your first visit") }} />
+          <Link href={t["footer-cta-href"] || "/visit/"} data-cms-link="g:footer-cta" className="btn" style={{ position: "relative", background: "#042e29", color: "#fff", borderRadius: "var(--radius-pill, 999px)", fontWeight: 700, padding: "0.95rem 2.2rem" }}>
+            <span data-cms-link-label>{tx(t, "footer-cta-label", "What to expect")}</span>
+          </Link>
         </div>
       )}
 
-      {/* Slim teal hairline accent (thinner than the prior 3px rule) */}
-      <div aria-hidden style={{ height: 2, background: "linear-gradient(90deg, transparent, #1cc3af 30%, #1cc3af 70%, transparent)", opacity: 0.85 }} />
+      {/* Slim teal hairline accent (thinner than the prior 3px rule) — only when
+          there's no CTA band above (the band already provides the teal moment). */}
+      {!preCta && <div aria-hidden style={{ height: 2, background: "linear-gradient(90deg, transparent, #1cc3af 30%, #1cc3af 70%, transparent)", opacity: 0.85 }} />}
 
       <div className="container-c3" style={{ paddingTop: "var(--s-24, 96px)", paddingBottom: "var(--s-16, 64px)" }}>
         <div className="flex flex-col items-center text-center gap-12 md:grid md:grid-cols-2 md:items-start md:text-left md:gap-x-10 md:gap-y-12 lg:grid-cols-12 lg:gap-y-0">
