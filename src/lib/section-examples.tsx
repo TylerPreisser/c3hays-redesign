@@ -60,10 +60,10 @@ export const SECTION_EXAMPLES: SectionExampleDef[] = [
   // v5 R2 — the six CORE home sections. `variants: []` → the shoot harness renders
   // ONE real preview per id (their editor default look); renderExample feeds them
   // exactly the props src/app/page.tsx uses, so the thumbnail matches the live page.
-  { id: "hero", label: "Hero", icon: "PanelTop", group: "Core", description: "Full-bleed welcome with headline and call to action.", variants: [] },
+  { id: "hero", label: "Hero", icon: "PanelTop", group: "Core", description: "Full-bleed welcome with headline and call to action.", variants: [{ key: "classic", label: "Full-bleed Cinematic" }, { key: "split", label: "Editorial Split" }, { key: "minimal", label: "Centered Statement" }] },
   { id: "mission", label: "Mission statement", icon: "Quote", group: "Core", description: "One emphasized sentence — your why.", variants: [] },
-  { id: "meetGrowServe", label: "Find your place", icon: "LayoutGrid", group: "Core", description: "A grid of tiles linking people to next steps.", variants: [] },
-  { id: "nt26", label: "Bible reading feature", icon: "BookOpen", group: "Core", description: "Split feature with image, heading and CTA.", variants: [] },
+  { id: "meetGrowServe", label: "Find your place", icon: "LayoutGrid", group: "Core", description: "A grid of tiles linking people to next steps.", variants: [{ key: "cards", label: "3-up Feature Cards" }, { key: "bento", label: "Bento Grid" }, { key: "list", label: "Editorial List" }] },
+  { id: "nt26", label: "Bible reading feature", icon: "BookOpen", group: "Core", description: "Split feature with image, heading and CTA.", variants: [{ key: "imageRight", label: "Media Right" }, { key: "imageLeft", label: "Media Left" }, { key: "stacked", label: "Centered Stack" }] },
   { id: "locations", label: "Our churches", icon: "MapPin", group: "Core", description: "Campus cards with service times and directions.", variants: [] },
   { id: "stayConnected", label: "Get in Touch", icon: "Mail", group: "Core", description: "Contact cards with recolorable icons.", variants: [] },
   { id: "serviceTimes", label: "Service Times", icon: "Clock", group: "Visit", description: "When & where you gather — campuses and weekend times.", variants: [{ key: "cards", label: "Campus cards" }, { key: "band", label: "Centered band" }] },
