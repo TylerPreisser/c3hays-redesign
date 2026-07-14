@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import { buildBgCss } from "@/lib/backgrounds";
+import { FONT_PICKER } from "@/lib/fonts";
 
 /**
  * EditBridge — turns the live site into an ON-PAGE editor when embedded in C3
@@ -141,27 +142,10 @@ export default function EditBridge() {
     const size = document.createElement("select"); size.title = "Text size";
     [["2", "S"], ["3", "M"], ["5", "L"], ["7", "XL"]].forEach(([v, l]) => { const o = document.createElement("option"); o.value = v; o.textContent = l; size.appendChild(o); });
     size.value = "3"; size.addEventListener("mousedown", (e) => e.stopPropagation()); size.addEventListener("change", () => exec("fontSize", size.value)); bar.appendChild(size);
-    // font — a VISIBLE picker: each name is rendered in its own font
-    const FONTS: [string, string][] = [
-      ["'Hanken Grotesk', sans-serif", "Hanken Grotesk"],
-      ["Inter, sans-serif", "Inter"],
-      ["Montserrat, sans-serif", "Montserrat"],
-      ["Poppins, sans-serif", "Poppins"],
-      ["'Work Sans', sans-serif", "Work Sans"],
-      ["Raleway, sans-serif", "Raleway"],
-      ["Oswald, sans-serif", "Oswald"],
-      ["'Bebas Neue', sans-serif", "Bebas Neue"],
-      ["'Archivo Black', sans-serif", "Archivo Black"],
-      ["Lora, serif", "Lora"],
-      ["'Playfair Display', serif", "Playfair Display"],
-      ["'DM Serif Display', serif", "DM Serif Display"],
-      ["Merriweather, serif", "Merriweather"],
-      ["'Roboto Slab', serif", "Roboto Slab"],
-      ["Georgia, serif", "Georgia"],
-      ["'Courier New', monospace", "Courier"],
-      ["'Caveat', cursive", "Caveat"],
-      ["'Pacifico', cursive", "Pacifico"],
-    ];
+    // font — a VISIBLE picker: each name is rendered in its own font.
+    // v6 R7: DERIVED from the shared FONT_CATALOG (via FONT_PICKER), the same catalog
+    // that generates the layout <link>, so nothing offered here is ever unloaded.
+    const FONTS: [string, string][] = FONT_PICKER;
     const fontBtn = document.createElement("button");
     fontBtn.innerHTML = "Font ▾"; fontBtn.title = "Font"; fontBtn.style.minWidth = "60px";
     const fontMenu = document.createElement("div");

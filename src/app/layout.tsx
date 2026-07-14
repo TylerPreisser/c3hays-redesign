@@ -9,6 +9,7 @@ import { site } from "@/data/site";
 import { assetPath } from "@/lib/asset-path";
 import { getCMSGlobals } from "@/lib/cms";
 import { buildBgCss } from "@/lib/backgrounds";
+import { buildGoogleFontsHref } from "@/lib/fonts";
 
 const hankenGrotesk = Hanken_Grotesk({
   subsets: ["latin"],
@@ -95,10 +96,9 @@ export default async function RootLayout({
             site renders whatever font staff choose. */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Bebas+Neue&family=Caveat:wght@400;700&family=DM+Serif+Display&family=Inter:wght@400;600;700&family=Lora:ital,wght@0,400;0,700;1,400&family=Merriweather:wght@400;700&family=Montserrat:wght@400;600;700&family=Oswald:wght@400;600&family=Pacifico&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Poppins:wght@400;600;700&family=Raleway:wght@400;600;700&family=Roboto+Slab:wght@400;700&family=Work+Sans:wght@400;600;700&display=swap"
-          rel="stylesheet"
-        />
+        {/* v6 R7: the href is GENERATED from the shared FONT_CATALOG, so the fonts
+            the editor offers and the fonts the site loads can never drift apart. */}
+        <link href={buildGoogleFontsHref()} rel="stylesheet" />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
