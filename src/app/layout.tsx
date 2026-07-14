@@ -1,9 +1,11 @@
 import type { Metadata, Viewport } from "next";
 import { Hanken_Grotesk } from "next/font/google";
 import "./globals.css";
+import "./animations.css";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import EditBridge from "@/components/cms/EditBridge";
+import RevealPlayer from "@/components/cms/RevealPlayer";
 import SmoothScrollProvider from "@/providers/SmoothScrollProvider";
 import { site } from "@/data/site";
 import { assetPath } from "@/lib/asset-path";
@@ -113,6 +115,9 @@ export default async function RootLayout({
         {/* On-page editor bridge — mounted globally so EVERY page (not just Home)
             is click-to-edit when loaded in C3 Studio with ?cmsEdit=1. */}
         <EditBridge />
+        {/* v6 R6 (6b): entrance-reveal player for global elements (footer/header).
+            Home-page element reveals feed content.anim into a RevealPlayer in page.tsx. */}
+        <RevealPlayer anim={globals.anim} />
         <SmoothScrollProvider>
           <Header globals={globals} />
           <main>{children}</main>

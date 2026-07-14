@@ -1,0 +1,37 @@
+/* ─────────────────────────────────────────────
+   Website Editor v6 — R6 (6b): entrance reveal presets
+   Token-driven (durations/eases from globals.css @theme). Progressive-enhancement:
+   elements are only HIDDEN once the player marks <html> ready, so with JS off (or
+   before hydration) all content stays visible — a reveal must never hide content.
+   Honors prefers-reduced-motion. Kept in its own file (globals.css is large).
+   ───────────────────────────────────────────── */
+
+/* Pre-reveal state — applied ONLY after the RevealPlayer confirms it's running. */
+html.c3-anim-ready [data-anim]:not(.c3-revealed) {
+  opacity: 0;
+  will-change: opacity, transform;
+}
+
+/* On viewport-enter the player adds .c3-revealed → play the chosen preset. */
+[data-anim].c3-revealed { animation-duration: var(--dur-slow, 520ms); animation-timing-function: var(--ease-out, cubic-bezier(0.22, 1, 0.36, 1)); animation-fill-mode: both; }
+[data-anim="fadeIn"].c3-revealed     { animation-name: c3-fadeIn; }
+[data-anim="fadeInUp"].c3-revealed   { animation-name: c3-fadeInUp; }
+[data-anim="popIn"].c3-revealed      { animation-name: c3-popIn; }
+[data-anim="slideDown"].c3-revealed  { animation-name: c3-slideDown; }
+[data-anim="slideUp"].c3-revealed    { animation-name: c3-slideUp; }
+
+@keyframes c3-fadeIn    { from { opacity: 0; }                                to { opacity: 1; } }
+@keyframes c3-fadeInUp  { from { opacity: 0; transform: translateY(16px); }  to { opacity: 1; transform: none; } }
+@keyframes c3-popIn     { from { opacity: 0; transform: scale(0.96); }       to { opacity: 1; transform: none; } }
+@keyframes c3-slideDown { from { opacity: 0; transform: translateY(-18px); } to { opacity: 1; transform: none; } }
+@keyframes c3-slideUp   { from { opacity: 0; transform: translateY(18px); }  to { opacity: 1; transform: none; } }
+
+/* Accessibility: never hide content behind an animation for reduced-motion users. */
+@media (prefers-reduced-motion: reduce) {
+  html.c3-anim-ready [data-anim],
+  [data-anim].c3-revealed {
+    opacity: 1 !important;
+    transform: none !important;
+    animation: none !important;
+  }
+}

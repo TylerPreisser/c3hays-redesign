@@ -10,6 +10,7 @@ import PromoBanner from "@/components/home/PromoBanner";
 import { getHomeContent } from "@/lib/cms";
 import { fromStudioHome } from "@/lib/home-content";
 import { buildBgCss } from "@/lib/backgrounds";
+import RevealPlayer from "@/components/cms/RevealPlayer";
 import { isExampleSection, renderExample, SECTION_EXAMPLE_IDS } from "@/lib/section-examples";
 
 export const metadata: Metadata = {
@@ -71,6 +72,8 @@ export default async function HomePage({
     <>
       {/* EditBridge is mounted globally in layout.tsx now. */}
       {bgCss && <style dangerouslySetInnerHTML={{ __html: bgCss }} />}
+      {/* v6 R6 (6b): play per-element entrance animations for this page's content. */}
+      <RevealPlayer anim={c.anim} />
       {visible.map((s) => (
         <div key={s.id} data-section={s.id}>
           {render(s.id, s.variant)}
