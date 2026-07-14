@@ -42,6 +42,7 @@ export default function Testimonial({
   return (
     <section className="section" style={{ backgroundColor: "#1b1c1c", textAlign: "center" }}>
       <div className="container-c3" style={{ maxWidth: 860 }}>
+        <p className="overline" style={{ color: "#1cc3af", marginBottom: "var(--s-6, 24px)" }}>From our church family</p>
         <span aria-hidden style={{ display: "block", color: "#1cc3af", fontSize: "clamp(3rem,7vw,5rem)", lineHeight: 0.8, fontWeight: 800, marginBottom: "1rem" }}>&ldquo;</span>
         <p data-cms="t:testimonial-quote" className="text-balance" style={{ color: "#fff", fontSize: "clamp(1.6rem,4vw,2.6rem)", fontWeight: 600, lineHeight: 1.3, margin: "0 0 1.75rem", letterSpacing: "-0.01em" }}
           dangerouslySetInnerHTML={{ __html: tx(text, "testimonial-quote", quote) }} />

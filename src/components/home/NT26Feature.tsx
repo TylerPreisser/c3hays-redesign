@@ -6,6 +6,7 @@ import { useEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { assetPath } from "@/lib/asset-path";
+import { prefersReducedMotion } from "@/lib/reduced-motion";
 import { NT26_DEFAULTS, imgCss, type NT26Content, type BtnStyle, type ImgStyle } from "@/lib/home-content";
 import { btnCss } from "./Hero";
 
@@ -26,6 +27,8 @@ export default function NT26Feature({
   const v = variant || "imageRight";
 
   useEffect(() => {
+    // v6 §1.5 — honor reduced motion: render final resting state, no reveal.
+    if (prefersReducedMotion()) return;
     const ctx = gsap.context(() => {
       /* Text content stagger */
       gsap.fromTo(
@@ -80,6 +83,7 @@ export default function NT26Feature({
 
             {/* Text left */}
             <div className="nt26-content">
+              <p className="overline" style={{ color: "#1cc3af", marginBottom: "var(--s-4, 16px)" }}>Grow deeper</p>
               <h2
                 className="display-2 text-white text-balance"
                 data-cms="nt26.heading"
@@ -152,16 +156,7 @@ export default function NT26Feature({
 
             {/* Text right */}
             <div className="nt26-content order-first md:order-last">
-              {/* Teal accent bar */}
-              <div
-                style={{
-                  width: "3rem",
-                  height: "4px",
-                  borderRadius: "2px",
-                  backgroundColor: "#1cc3af",
-                  marginBottom: "clamp(1rem, 2.5vw, 1.75rem)",
-                }}
-              />
+              <p className="overline" style={{ color: "#1cc3af", marginBottom: "var(--s-4, 16px)" }}>Grow deeper</p>
               <h2
                 className="display-2 text-white text-balance"
                 data-cms="nt26.heading"

@@ -6,6 +6,7 @@ import { useEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { assetPath } from "@/lib/asset-path";
+import { prefersReducedMotion } from "@/lib/reduced-motion";
 import { MEET_GROW_SERVE_DEFAULTS, imgCss, type MeetGrowServeContent, type ImgStyle } from "@/lib/home-content";
 
 gsap.registerPlugin(ScrollTrigger);
@@ -24,6 +25,9 @@ export default function MeetGrowServe({
   const sectionRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
+    // v6 §1.5 — honor reduced motion: skip all entrance animation so content
+    // renders in its final resting state (GSAP never applies the opacity:0 from).
+    if (prefersReducedMotion()) return;
     const ctx = gsap.context(() => {
       /* Section heading */
       gsap.fromTo(
@@ -90,6 +94,7 @@ export default function MeetGrowServe({
         <div className="container-c3">
           {/* Header */}
           <div className="mgs-heading mb-10 md:mb-14 lg:mb-20">
+            <p className="overline" style={{ marginBottom: "var(--s-4, 16px)" }}>Take a next step</p>
             <h2
               className="display-2"
               data-cms="meetGrowServe.heading"
@@ -209,6 +214,82 @@ export default function MeetGrowServe({
                 </div>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  /* ─── VARIANT: bento (v6 R1) ──────────────────────────────────────── */
+  /* Asymmetric bento — first pillar is a large 2-col hero tile with an image
+     backdrop + overlaid label; the rest are smaller supporting tiles. Apple's
+     bento trend, on the design-standard tokens (--radius-md, soft shadow, hover
+     lift). Reads from the same `pillars` content — no shape change. */
+  if (v === "bento") {
+    return (
+      <section ref={sectionRef} className="section" style={{ backgroundColor: "#ffffff" }}>
+        <div className="container-c3">
+          <div className="mgs-heading mb-10 md:mb-14 lg:mb-16" style={{ maxWidth: "40ch" }}>
+            <p className="overline" style={{ marginBottom: "var(--s-4, 16px)" }}>Take a next step</p>
+            <h2 className="display-2" data-cms="meetGrowServe.heading" style={{ color: "#1b1c1c" }} dangerouslySetInnerHTML={{ __html: content.heading }} />
+          </div>
+
+          <div
+            className="pillar-grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 lg:gap-6"
+            style={{ gridAutoRows: "1fr" }}
+          >
+            {pillars.map((pillar, pi) => {
+              const isHero = pi === 0;
+              return (
+                <Link
+                  key={pillar.word}
+                  href={pillar.href}
+                  className={`pillar-tile bento-tile group relative overflow-hidden flex flex-col justify-end ${isHero ? "md:col-span-2 lg:col-span-2 md:row-span-2" : ""}`}
+                  data-cms-bg={`tile:meetGrowServe.${pi}`}
+                  style={{
+                    borderRadius: "var(--radius-md)",
+                    minHeight: isHero ? "clamp(320px, 42vw, 460px)" : "clamp(220px, 26vw, 300px)",
+                    boxShadow: "var(--shadow-rest)",
+                    textDecoration: "none",
+                    color: "#fff",
+                  }}
+                >
+                  {/* Image backdrop */}
+                  <div className="pillar-img-wrap absolute inset-0" data-cms-img={`meetGrowServe.pillars.${pi}.image`} aria-hidden>
+                    <Image
+                      src={assetPath(pillar.image)}
+                      alt=""
+                      fill
+                      className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.05]"
+                      style={imgCss(img[`meetGrowServe.pillars.${pi}.image`])}
+                    />
+                  </div>
+                  {/* Scrim for AA-legible overlaid label */}
+                  <div className="absolute inset-0" aria-hidden style={{ background: "linear-gradient(180deg, rgba(10,10,10,0) 30%, rgba(10,10,10,0.72) 100%)" }} />
+
+                  {/* Overlaid label */}
+                  <div className="relative p-6 lg:p-8">
+                    <h3
+                      className={isHero ? "heading-1" : "heading-3"}
+                      data-cms={`meetGrowServe.pillars.${pi}.headline`}
+                      style={{ color: "#fff", marginBottom: isHero ? "var(--s-3, 12px)" : "var(--s-2, 8px)" }}
+                      dangerouslySetInnerHTML={{ __html: pillar.headline }}
+                    />
+                    {isHero && (
+                      <p
+                        className="body-base"
+                        data-cms={`meetGrowServe.pillars.${pi}.body`}
+                        style={{ color: "rgba(255,255,255,0.82)", maxWidth: "46ch", margin: 0 }}
+                        dangerouslySetInnerHTML={{ __html: pillar.body }}
+                      />
+                    )}
+                    <span className="arrow-link" style={{ color: "#fff", marginTop: "var(--s-4, 16px)", display: "inline-flex" }}>
+                      Learn More <span className="arrow">→</span>
+                    </span>
+                  </div>
+                </Link>
+              );
+            })}
           </div>
         </div>
       </section>

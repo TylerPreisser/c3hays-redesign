@@ -455,6 +455,28 @@ img, video, svg {
   clip-path: inset(0 0 100% 0);
 }
 
+/* v6 R6/§1.5 — reduced-motion guard, BUILT FRESH (repo had none). When the OS
+   asks for reduced motion, entrance reveals resolve to their FINAL resting state
+   with no transform/opacity animation. The GSAP sections additionally bail in JS
+   (prefersReducedMotion) so they never set the opacity:0 "from" state. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+  .reveal {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+  .img-reveal {
+    clip-path: none !important;
+  }
+}
+
 /* ─────────────────────────────────────────────
    Lenis
    ───────────────────────────────────────────── */
@@ -513,6 +535,20 @@ html.lenis body {
   background-color: var(--color-teal);
   color: var(--color-ink);
   border-color: var(--color-teal);
+}
+
+/* v6 R3: footer link hover — quiet lift to full white on the ink canvas */
+.footer-link:hover {
+  color: #fff !important;
+}
+
+/* v6 R1: bento tile — flat at rest, soft lift + shadow bloom on hover (§1.5). */
+.bento-tile {
+  transition: transform var(--dur-base) var(--ease-out), box-shadow var(--dur-base) var(--ease-out);
+}
+.bento-tile:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-hover) !important;
 }
 
 /* ─────────────────────────────────────────────
