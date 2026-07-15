@@ -1,3 +1,4 @@
+import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { getHomeContent } from "@/lib/cms";
 import { fromStudioHome } from "@/lib/home-content";
 import { buildBgCss } from "@/lib/backgrounds";
@@ -27,6 +28,23 @@ import { renderExample } from "@/lib/section-examples";
  * StylePicker can preview a variant the user hasn't committed yet.
  */
 
+// CMS_LIVE resolution — RUNTIME source of truth is the CLOUDFLARE env, NOT process.env.
+// On the Worker, wrangler `vars` land on getCloudflareContext().env; process.env.CMS_LIVE
+// is EMPTY at runtime (the same gotcha that bit DEMO_MODE). getCloudflareContext() throws
+// outside a request/opennext context (static-export `next build`, vitest) → wrap + fall
+// back to process.env (unset in export) so the route stays export-safe: no Cloudflare
+// context ⇒ cmsLive=false ⇒ searchParams untouched ⇒ no forced-dynamic. Mirrors
+// c3-backend's isDemoMode().
+function isCmsLive(): boolean {
+  try {
+    const env = getCloudflareContext().env as { CMS_LIVE?: string } | undefined;
+    if (env && "CMS_LIVE" in env && env.CMS_LIVE === "1") return true;
+  } catch {
+    // no Cloudflare context (export build / vitest / plain node) → fall through
+  }
+  return process.env.CMS_LIVE === "1";
+}
+
 // Match the homepage's export-safety contract: searchParams are read ONLY under the
 // CMS_LIVE server runtime. In the static-export build CMS_LIVE is unset, so we never
 // touch searchParams (that would force dynamic rendering and break `output: export`).
@@ -45,7 +63,7 @@ export default async function LiveSectionPreview({
 }: {
   searchParams?: Promise<Record<string, string | string[] | undefined>>;
 }) {
-  const cmsLive = process.env.CMS_LIVE === "1";
+  const cmsLive = isCmsLive();
   const sp = cmsLive && searchParams ? await searchParams : {};
   const id = typeof sp.section === "string" ? sp.section : undefined;
   const preview = typeof sp.preview === "string" ? sp.preview : undefined;
