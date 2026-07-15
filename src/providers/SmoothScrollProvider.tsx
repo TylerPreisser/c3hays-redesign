@@ -1,9 +1,11 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { usePathname } from "next/navigation";
 import Lenis from "lenis";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { isSectionPreviewPath } from "@/lib/preview-route";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -18,8 +20,14 @@ export default function SmoothScrollProvider({
   children: React.ReactNode;
 }) {
   const lenisRef = useRef<Lenis | null>(null);
+  // PERF: the inert /section-preview thumbnail doesn't scroll, so it never needs Lenis or
+  // the gsap ScrollTrigger RAF loop. Skipping them keeps each rail thumbnail from booting
+  // the smooth-scroll runtime (a chief cost of N thumbnails on /editor open). Children
+  // still render, so the previewed section is unchanged. Live pages never match.
+  const bare = isSectionPreviewPath(usePathname());
 
   useEffect(() => {
+    if (bare) return;
     // Detect touch/mobile devices. On iOS Safari, Lenis smooth scroll
     // fights the native rubber-band overscroll bounce and causes jank.
     // Disabling Lenis on touch devices preserves native momentum scrolling
@@ -71,7 +79,7 @@ export default function SmoothScrollProvider({
       lenis.destroy();
       lenisRef.current = null;
     };
-  }, []);
+  }, [bare]);
 
   return <>{children}</>;
 }

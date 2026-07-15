@@ -1,7 +1,9 @@
 "use client";
 
 import { useEffect } from "react";
+import { usePathname } from "next/navigation";
 import { stampReveals } from "@/lib/reveal";
+import { isSectionPreviewPath } from "@/lib/preview-route";
 
 /**
  * Website Editor v6 — R6 (6b): the entrance-reveal player.
@@ -14,8 +16,13 @@ import { stampReveals } from "@/lib/reveal";
  * editor's benefit but skips hiding/observing, and the CSS guard forces visible).
  */
 export default function RevealPlayer({ anim }: { anim?: Record<string, string> }) {
+  // PERF: skip the reveal runtime on the inert /section-preview thumbnail route (its
+  // content is already forced-visible by CHROMELESS_CSS's `[data-anim]{opacity:1}`), so a
+  // rail thumbnail doesn't pay for stampReveals + an IntersectionObserver. Live pages
+  // never match, so their reveals are unchanged.
+  const bare = isSectionPreviewPath(usePathname());
   useEffect(() => {
-    if (typeof window === "undefined") return;
+    if (typeof window === "undefined" || bare) return;
     // Stamp data-anim so the editor's chosen presets are visible in the DOM either way.
     stampReveals(document, anim);
 
@@ -41,7 +48,7 @@ export default function RevealPlayer({ anim }: { anim?: Record<string, string> }
       io.disconnect();
       root.classList.remove("c3-anim-ready");
     };
-  }, [anim]);
+  }, [anim, bare]);
 
   return null;
 }

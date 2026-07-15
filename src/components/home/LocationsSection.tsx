@@ -13,6 +13,13 @@ import CampusChooser from "./CampusChooser";
 
 gsap.registerPlugin(ScrollTrigger);
 
+// A 1×1 transparent PNG — the DEFAULT src of the map's swappable photo layer, so the
+// stylized SVG map shows through until someone actually picks a photo (EditBridge swaps
+// this <img>'s src, exactly as it does for the campus-card photos). `unoptimized` images
+// in next.config allow a data-URI src.
+const BLANK_PX =
+  "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==";
+
 /* "Our Churches" — Church-on-the-Move's campus-chooser pattern, reskinned to C3:
    a stylized northwest-Kansas map with Hays + Colby markers beside a teal
    "find your campus" card, then two rounded campus cards. */
@@ -50,7 +57,19 @@ export default function LocationsSection({ text = {}, btn = {} }: { text?: Recor
             data-cms-bg="t:findcampus-map"
             style={{ background: "#fff", borderRadius: "var(--radius-md)", minHeight: 300 }}
           >
-            <svg viewBox="0 0 500 320" className="w-full h-full" role="img" aria-label="Map of C3 campuses across northwest Kansas">
+            {/* B1: a SWAPPABLE image region for the map tile — mirrors the campus-card
+                <Image data-cms-img> so EditBridge offers "Change image" here (not only
+                Recolor). Transparent by default so the stylized SVG map below is the
+                fallback; picking a photo swaps this <img>'s src to cover the map. The
+                outer data-cms-bg keeps Recolor available. */}
+            <Image
+              src={BLANK_PX}
+              alt="C3 campuses across northwest Kansas"
+              fill
+              data-cms-img="findcampus-map-photo"
+              className="object-cover"
+            />
+            <svg viewBox="0 0 500 320" className="absolute inset-0 w-full h-full" style={{ pointerEvents: "none" }} role="img" aria-label="Map of C3 campuses across northwest Kansas">
               <rect width="500" height="320" fill="#fff" />
               {/* faint county/road grid */}
               <g stroke="rgba(27,28,28,0.10)" strokeWidth="2" fill="none">
@@ -77,6 +96,11 @@ export default function LocationsSection({ text = {}, btn = {} }: { text?: Recor
               </g>
               <text x="245" y="205" textAnchor="middle" fill="rgba(27,28,28,0.30)" fontSize="11" fontWeight="600" letterSpacing="2">I-70 · ~100 MILES</text>
             </svg>
+            {/* B1: a bottom hit-zone that is a data-cms-bg descendant but NOT the image, so
+                — exactly like the campus card's bottom content zone — hovering here yields
+                the tile Recolor while the map body above yields Change-image. Keeps BOTH
+                affordances reachable. Transparent + no layout effect. */}
+            <div className="absolute inset-x-0 bottom-0 h-12" aria-hidden />
           </div>
 
           {/* Teal chooser card */}

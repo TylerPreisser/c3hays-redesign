@@ -2,24 +2,38 @@
 
 import Link from "next/link";
 import { useState, useEffect } from "react";
+import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X } from "lucide-react";
-import { navItems } from "@/data/navigation";
+import { Menu, X, ChevronDown } from "lucide-react";
+import { navItems, ctaItem } from "@/data/navigation";
 import Logo from "@/components/brand/Logo";
 import type { CMSOverrides } from "@/lib/cms";
 import { tx } from "@/lib/home-content";
 import { btnCss } from "@/components/home/Hero";
+import { isSectionPreviewPath } from "@/lib/preview-route";
 
 const navKey = (href: string) => href.replace(/\//g, "") || "home";
+
+/** A nav entry as rendered in the bar — the editor's flat config OR the code default
+ *  (which carries `children` for the About/Locations dropdowns). */
+type NavEntry = { label: string; href: string; children?: { label: string; href: string }[] };
 
 export default function Header({ globals = {} }: { globals?: CMSOverrides }) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [openMenu, setOpenMenu] = useState<string | null>(null); // desktop dropdown open state
+  const pathname = usePathname();
   const t = globals.text || {};
   const nav = globals.nav || {};
   const m = globals.media || {}; // v3 (R4): editable logo sources by globals key
-  // Nav items come from the editor's nav config when set, else the code defaults.
-  const navList = nav.items && nav.items.length ? nav.items : navItems.map((n) => ({ label: n.label, href: n.href }));
+  // Nav items come from the editor's nav config when set, else the code defaults. The
+  // code default carries `children` (About → Our Story / What We Believe, Locations →
+  // Hays / Colby) so those pages are reachable via dropdowns — never orphaned (G3).
+  const navList: NavEntry[] = nav.items && nav.items.length ? nav.items : navItems;
+  // /give was orphaned: Header exported ctaItem (Give) but never rendered it. Surface it
+  // as a secondary CTA so it's reachable from the bar (G3).
+  const giveHref = t["nav-give-href"] || ctaItem.href;
+  const giveLabel = tx(t, "nav-give-label", ctaItem.label);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 60);
@@ -63,6 +77,11 @@ export default function Header({ globals = {} }: { globals?: CMSOverrides }) {
   const isScrolled = nav.effect === "solid" ? true : nav.effect === "transparent" ? false : scrolled;
   const navColor = nav.color;
 
+  // PERF: the inert /section-preview thumbnail is chromeless — render NO header at all so
+  // a rail thumbnail never boots framer-motion (the mobile drawer) or the scroll listener.
+  // Live pages never match, so the real header is unchanged.
+  if (isSectionPreviewPath(pathname)) return null;
+
   return (
     <>
       <header
@@ -86,30 +105,78 @@ export default function Header({ globals = {} }: { globals?: CMSOverrides }) {
             <Logo size={38} variant={isScrolled ? "dark" : "light"} cmsKey={`g:logo-${isScrolled ? "dark" : "light"}`} srcOverride={m[isScrolled ? "logo-dark" : "logo-light"]} />
           </Link>
 
-          {/* Desktop Nav — visible from md (768px) up; tighter spacing at md, full at lg */}
+          {/* Desktop Nav — visible from md (768px) up; tighter spacing at md, full at lg.
+              Items with children render a DROPDOWN (hover + keyboard focus-within) so the
+              child pages (Our Story / What We Believe, Hays / Colby) are reachable — G3. */}
           <ul className="hidden md:flex items-center gap-0 lg:gap-1" role="list">
             {navList.map((item) => {
               const k = navKey(item.href);
               const base = navColor || (isScrolled ? "rgba(27,28,28,0.7)" : "rgba(255,255,255,0.82)");
               const hover = navColor || (isScrolled ? "#1b1c1c" : "#ffffff");
+              const kids = item.children || [];
+              const hasKids = kids.length > 0;
+              const isOpen = openMenu === item.href;
               return (
-              <li key={item.href}>
+              <li
+                key={item.href}
+                className="relative"
+                onMouseEnter={hasKids ? () => setOpenMenu(item.href) : undefined}
+                onMouseLeave={hasKids ? () => setOpenMenu((cur) => (cur === item.href ? null : cur)) : undefined}
+              >
                 <Link
                   href={t[`nav-${k}-href`] || item.href}
                   data-cms-link={`g:nav-${k}`}
-                  className="nav-link-underline block px-2 py-2 lg:px-4 text-[0.65rem] lg:text-xs font-semibold uppercase tracking-[0.1em] lg:tracking-[0.12em] transition-colors duration-200"
+                  aria-haspopup={hasKids || undefined}
+                  aria-expanded={hasKids ? isOpen : undefined}
+                  onFocus={hasKids ? () => setOpenMenu(item.href) : undefined}
+                  className="nav-link-underline flex items-center gap-1 px-2 py-2 lg:px-4 text-[0.65rem] lg:text-xs font-semibold uppercase tracking-[0.1em] lg:tracking-[0.12em] transition-colors duration-200"
                   style={{ color: base }}
                   onMouseEnter={(e) => { e.currentTarget.style.color = hover; }}
                   onMouseLeave={(e) => { e.currentTarget.style.color = base; }}
                 >
                   <span data-cms-link-label>{tx(t, `nav-${k}-label`, item.label)}</span>
+                  {hasKids && <ChevronDown size={12} aria-hidden className={`transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`} />}
                 </Link>
+                {hasKids && (
+                  <ul
+                    role="menu"
+                    className={`absolute left-0 top-full min-w-[12rem] rounded-xl border border-black/5 bg-white shadow-[0_18px_40px_rgba(0,0,0,0.14)] py-2 transition-all duration-150 ${isOpen ? "opacity-100 visible translate-y-0" : "opacity-0 invisible -translate-y-1 pointer-events-none"}`}
+                  >
+                    {kids.map((child) => {
+                      const ck = navKey(child.href);
+                      return (
+                        <li key={child.href} role="none">
+                          <Link
+                            role="menuitem"
+                            href={t[`nav-${ck}-href`] || child.href}
+                            data-cms-link={`g:nav-${ck}`}
+                            onClick={() => setOpenMenu(null)}
+                            className="block px-4 py-2 text-xs font-semibold uppercase tracking-[0.08em] text-[rgba(27,28,28,0.72)] hover:text-[#1b1c1c] hover:bg-black/[0.04] transition-colors"
+                          >
+                            <span data-cms-link-label>{tx(t, `nav-${ck}-label`, child.label)}</span>
+                          </Link>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                )}
               </li>
             );})}
           </ul>
 
-          {/* Desktop right: single primary CTA — Plan a Visit */}
-          <div className="hidden md:flex items-center">
+          {/* Desktop right: secondary Give link + primary Plan-a-Visit CTA. Give was
+              orphaned (never rendered) — it's now reachable in the bar (G3). */}
+          <div className="hidden md:flex items-center gap-2 lg:gap-3">
+            <Link
+              href={giveHref}
+              data-cms-link="g:nav-give"
+              className="nav-link-underline text-[0.65rem] lg:text-xs font-semibold uppercase tracking-[0.1em] lg:tracking-[0.12em] transition-colors duration-200"
+              style={{ color: navColor || (isScrolled ? "rgba(27,28,28,0.7)" : "rgba(255,255,255,0.82)") }}
+              onMouseEnter={(e) => { e.currentTarget.style.color = navColor || (isScrolled ? "#1b1c1c" : "#ffffff"); }}
+              onMouseLeave={(e) => { e.currentTarget.style.color = navColor || (isScrolled ? "rgba(27,28,28,0.7)" : "rgba(255,255,255,0.82)"); }}
+            >
+              <span data-cms-link-label>{giveLabel}</span>
+            </Link>
             <Link href={t["nav-cta-href"] || "/visit/"} data-cms-link="g:nav-cta" className="btn btn-primary btn-sm text-[0.75rem] lg:text-[0.8125rem] px-4 lg:px-[1.85rem]" style={btnCss(globals.btn?.["nav-cta"] as never)}>
               <span data-cms-link-label>{tx(t, "nav-cta-label", "Plan a Visit")}</span>
             </Link>
@@ -172,6 +239,7 @@ export default function Header({ globals = {} }: { globals?: CMSOverrides }) {
               <ul className="flex flex-col" role="list">
                 {navList.map((item, i) => {
                   const k = navKey(item.href);
+                  const kids = item.children || [];
                   return (
                   <motion.li
                     key={item.href}
@@ -187,12 +255,32 @@ export default function Header({ globals = {} }: { globals?: CMSOverrides }) {
                     >
                       <span data-cms-link-label>{tx(t, `nav-${k}-label`, item.label)}</span>
                     </Link>
+                    {/* Child pages are reachable on mobile too — indented under the parent (G3). */}
+                    {kids.length > 0 && (
+                      <ul className="pl-4 border-b border-white/8">
+                        {kids.map((child) => {
+                          const ck = navKey(child.href);
+                          return (
+                            <li key={child.href}>
+                              <Link
+                                href={t[`nav-${ck}-href`] || child.href}
+                                data-cms-link={`g:nav-${ck}`}
+                                className="block py-3 text-base font-semibold text-white/60 hover:text-white transition-colors"
+                                onClick={() => setMobileOpen(false)}
+                              >
+                                <span data-cms-link-label>{tx(t, `nav-${ck}-label`, child.label)}</span>
+                              </Link>
+                            </li>
+                          );
+                        })}
+                      </ul>
+                    )}
                   </motion.li>
                 );})}
               </ul>
 
               <motion.div
-                className="mt-10"
+                className="mt-10 flex flex-col gap-3"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.45, duration: 0.3 }}
@@ -204,6 +292,15 @@ export default function Header({ globals = {} }: { globals?: CMSOverrides }) {
                   onClick={() => setMobileOpen(false)}
                 >
                   <span data-cms-link-label>{tx(t, "nav-cta-label", "Plan a Visit")}</span>
+                </Link>
+                {/* Give — reachable secondary action on mobile too (G3). */}
+                <Link
+                  href={giveHref}
+                  data-cms-link="g:nav-give"
+                  className="btn btn-outline btn-lg w-full text-center"
+                  onClick={() => setMobileOpen(false)}
+                >
+                  <span data-cms-link-label>{giveLabel}</span>
                 </Link>
               </motion.div>
             </nav>
