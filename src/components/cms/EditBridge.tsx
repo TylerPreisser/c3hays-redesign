@@ -19,7 +19,8 @@ import { FONT_PICKER } from "@/lib/fonts";
  * From parent (source:"c3editor"):
  *   {type:"cms:setHtml", path, html}     // set a region's content (external update)
  *   {type:"cms:setImg", path, src}       // U10: live-swap a tagged image (preview only)
- *   {type:"cms:setStyle", path, background} // U10: live-paint a tagged element bg (preview only)
+ *   {type:"cms:setStyle", path, background}            // U10: live-paint a tagged tile bg (preview only)
+ *   {type:"cms:setStyle", path, background, scope:"section"} // v8 P6: live-paint a SECTION bg
  */
 export default function EditBridge() {
   useEffect(() => {
@@ -142,12 +143,24 @@ export default function EditBridge() {
     // the preview survives a client re-render (e.g. a client component re-rendering
     // and re-applying its own inline background). Preview-only; no persistence.
     const shimBg: Record<string, string> = {};
+    // v8 polish P6: a SECTION bg edit (scope:"section") paints a `[data-section=id]>*`
+    // rule — routed through buildBgCss's SECTIONS arg, exactly like the published path
+    // (page.tsx buildBgCss(c.sections,…)). Keyed separately from the data-cms-bg tiles.
+    const shimSections: Record<string, string> = {};
     const shimStyle = document.createElement("style");
     shimStyle.id = "c3-shim-bg";
     document.head.appendChild(shimStyle);
+    const rebuildShim = () => {
+      const secs = Object.entries(shimSections).map(([id, bg]) => ({ id, visible: true, bg }));
+      shimStyle.textContent = buildBgCss(secs, shimBg);
+    };
     const applyShimBg = (path: string, background: string) => {
       if (background) shimBg[path] = background; else delete shimBg[path];
-      shimStyle.textContent = buildBgCss([], shimBg);
+      rebuildShim();
+    };
+    const applyShimSection = (id: string, background: string) => {
+      if (background) shimSections[id] = background; else delete shimSections[id];
+      rebuildShim();
     };
 
     // Unit L: preview IMAGE swaps (esp. the per-variant logos g:logo-light/dark).
@@ -461,7 +474,9 @@ export default function EditBridge() {
         applyShimImg(d.path, typeof d.src === "string" ? d.src : "");
       } else if (d.type === "cms:setStyle" && typeof d.path === "string") {
         // Update the shim stylesheet (survives re-render); "" clears the rule → default.
-        applyShimBg(d.path, typeof d.background === "string" ? d.background : "");
+        // v8 polish P6: scope:"section" paints a `[data-section=id]>*` rule; else a tile.
+        const bg = typeof d.background === "string" ? d.background : "";
+        if (d.scope === "section") applyShimSection(d.path, bg); else applyShimBg(d.path, bg);
       }
     };
     window.addEventListener("message", onMsg);
