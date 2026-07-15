@@ -4,46 +4,14 @@ import Link from "next/link";
 import { getCMSPage } from "@/lib/cms";
 import { tx, imgCss } from "@/lib/home-content";
 import { assetPath } from "@/lib/asset-path";
+import OurValues from "@/components/about/OurValues";
+import StaffGrid from "@/components/about/StaffGrid";
 
 export const metadata: Metadata = {
   title: "About",
   description:
-    "Learn about the story, values, and people of Celebration Community Church — a church family in western Kansas.",
+    "Learn about who we are and meet the leadership of Celebration Community Church — a church family in western Kansas.",
 };
-
-/* ── Fallback value data — defaults until CMS overrides exist ──────────── */
-const VALUE_DEFAULTS = [
-  {
-    id: "scripture-first",
-    title: "Scripture First",
-    body: "Everything we do is anchored in the Bible — God's Word is our authority for faith, practice, and community life.",
-  },
-  {
-    id: "jesus-centered",
-    title: "Jesus-Centered Worship",
-    body: "We believe worship is more than music. It's a way of life that puts Jesus at the center of everything.",
-  },
-  {
-    id: "authentic-community",
-    title: "Authentic Community",
-    body: "We weren't meant to do life alone. Small groups, friendships, and belonging are part of the C3 DNA.",
-  },
-  {
-    id: "generosity",
-    title: "Generosity",
-    body: "God is generous — and His people are too. We steward our time, talent, and treasure for His kingdom.",
-  },
-  {
-    id: "serving-others",
-    title: "Serving Others",
-    body: "We take the love of Christ outside our walls — into Hays, Colby, and to the ends of the earth.",
-  },
-  {
-    id: "every-generation",
-    title: "Every Generation",
-    body: "From kids to seniors, we believe every age has a role to play in building the church Jesus is building.",
-  },
-];
 
 export default async function AboutPage() {
   const ov = (await getCMSPage("/about")) || {};
@@ -57,7 +25,6 @@ export default async function AboutPage() {
         className="relative flex items-end overflow-hidden"
         style={{ minHeight: "clamp(480px, 62vh, 740px)" }}
       >
-        {/* Background image */}
         <div
           className="absolute inset-0"
           data-cms-img="about-hero-bg"
@@ -72,12 +39,10 @@ export default async function AboutPage() {
             className="object-cover"
             style={imgCss(ov.img?.["about-hero-bg"])}
           />
-          {/* Dark overlay */}
           <div
             className="absolute inset-0"
             style={{ background: "rgba(10,10,10,0.52)" }}
           />
-          {/* Bottom-to-top gradient for text legibility */}
           <div
             className="absolute inset-0"
             style={{
@@ -87,108 +52,92 @@ export default async function AboutPage() {
           />
         </div>
 
-        {/* Hero text */}
         <div className="relative z-10 container-c3 pb-16 pt-40">
-          {/* Eyebrow */}
           <p
             className="overline mb-4"
             style={{ color: "#1cc3af" }}
             data-cms="t:about-hero-eyebrow"
             dangerouslySetInnerHTML={{
-              __html: tx(t, "about-hero-eyebrow", "Who We Are"),
+              __html: tx(t, "about-hero-eyebrow", "About Us"),
             }}
           />
           <h1
             className="display-1 text-white text-balance"
             data-cms="t:about-hero-heading"
             dangerouslySetInnerHTML={{
-              __html: tx(t, "about-hero-heading", "A people on a mission."),
+              __html: tx(t, "about-hero-heading", "Who we are."),
             }}
           />
           <p
-            className="body-lg mt-5 max-w-lg"
+            className="body-lg mt-5 max-w-xl"
             style={{ color: "rgba(255,255,255,0.68)" }}
             data-cms="t:about-hero-subhead"
             dangerouslySetInnerHTML={{
               __html: tx(
                 t,
                 "about-hero-subhead",
-                "To meet Jesus, grow with Him, and serve our community."
+                "Jesus is central to everything we do at C3. We exist to meet with Him, grow in Him, and serve through Him."
               ),
             }}
           />
         </div>
       </section>
 
-      {/* ── Mission ───────────────────────────────────────────────────────── */}
+      {/* ── Who We Are ────────────────────────────────────────────────────── */}
       <section className="section" style={{ backgroundColor: "#ffffff" }}>
         <div className="container-c3">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-stretch">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-14 lg:gap-24 items-center">
             {/* Text column */}
             <div className="flex flex-col justify-center">
-              {/* Eyebrow */}
               <p
-                className="overline mb-5"
+                className="overline mb-6"
                 style={{ color: "#1cc3af" }}
-                data-cms="t:about-mission-eyebrow"
+                data-cms="t:about-who-eyebrow"
                 dangerouslySetInnerHTML={{
-                  __html: tx(t, "about-mission-eyebrow", "Our Mission"),
+                  __html: tx(t, "about-who-eyebrow", "Who We Are"),
                 }}
               />
 
               <h2
                 className="display-2 mb-8 text-balance"
                 style={{ color: "#1b1c1c" }}
-                data-cms="t:about-mission-title"
+                data-cms="t:about-who-title"
                 dangerouslySetInnerHTML={{
                   __html: tx(
                     t,
-                    "about-mission-title",
-                    `We exist to <em class="not-italic" style="color:#1cc3af">Meet.</em> <em class="not-italic" style="color:#1cc3af">Grow.</em> <em class="not-italic" style="color:#1cc3af">Serve.</em>`
+                    "about-who-title",
+                    "A relationship, not religion."
                   ),
                 }}
               />
 
               <p
-                className="body-lg mb-6"
-                style={{ color: "rgba(27,28,28,0.80)", fontWeight: 500 }}
-                data-cms="t:about-mission-lead"
+                className="body-lg mb-7"
+                style={{ color: "rgba(27,28,28,0.80)", fontWeight: 500, lineHeight: 1.7 }}
+                data-cms="t:about-who-lead"
                 dangerouslySetInnerHTML={{
                   __html: tx(
                     t,
-                    "about-mission-lead",
-                    "Jesus is central to everything we do at C3. We exist to meet with Him, grow in Him, and serve through Him."
+                    "about-who-lead",
+                    "We believe that being a part of the local church is not about religion, but a relationship with Jesus."
                   ),
                 }}
               />
 
               <p
-                className="body-base mb-5"
-                style={{ color: "rgba(27,28,28,0.65)", lineHeight: 1.75 }}
-                data-cms="t:about-mission-body-1"
+                className="body-base"
+                style={{ color: "rgba(27,28,28,0.65)", lineHeight: 1.8 }}
+                data-cms="t:about-who-body"
                 dangerouslySetInnerHTML={{
                   __html: tx(
                     t,
-                    "about-mission-body-1",
-                    "Celebration Community Church began with a simple conviction: that the local church matters. When people gather in the name of Jesus, lives change. Families are restored. Communities are transformed."
+                    "about-who-body",
+                    "We want you to join us as you are; there isn&apos;t a mold you have to fit before you walk through our doors."
                   ),
                 }}
               />
 
-              <p
-                className="body-base mb-10"
-                style={{ color: "rgba(27,28,28,0.65)", lineHeight: 1.75 }}
-                data-cms="t:about-mission-body-2"
-                dangerouslySetInnerHTML={{
-                  __html: tx(
-                    t,
-                    "about-mission-body-2",
-                    "From our roots in Hays, Kansas, we&apos;ve grown into a multi-campus church family that spans northwest Kansas — with one vision, one mission, and one King."
-                  ),
-                }}
-              />
-
-              <div>
+              <div className="mt-12">
                 <Link
                   href={t["about-beliefs-btn-href"] || "/beliefs/"}
                   data-cms-link="about-beliefs-btn"
@@ -203,92 +152,40 @@ export default async function AboutPage() {
 
             {/* Image column */}
             <div
-              className="relative overflow-hidden lg:min-h-[480px]"
-              data-cms-img="about-mission-img"
+              className="relative overflow-hidden lg:min-h-[520px] min-h-[340px]"
+              data-cms-img="about-who-img"
               style={{ borderRadius: "var(--radius-md)" }}
             >
               <Image
-                src={assetPath(media["about-mission-img"] || "/images/gather.webp")}
-                alt="Church gathering"
+                src={assetPath(media["about-who-img"] || media["about-mission-img"] || "/images/gather.webp")}
+                alt="Church family gathered together"
                 fill
                 className="object-cover"
-                style={imgCss(ov.img?.["about-mission-img"])}
+                style={imgCss(ov.img?.["about-who-img"])}
               />
             </div>
           </div>
         </div>
       </section>
 
-      {/* ── Values ────────────────────────────────────────────────────────── */}
-      <section className="section" style={{ backgroundColor: "#1b1c1c" }}>
-        <div className="container-c3">
-          {/* Section header */}
-          <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-6 mb-14">
-            <div>
-              <p
-                className="overline mb-4"
-                style={{ color: "#1cc3af" }}
-                data-cms="t:about-values-eyebrow"
-                dangerouslySetInnerHTML={{
-                  __html: tx(t, "about-values-eyebrow", "What We Live By"),
-                }}
-              />
-              <h2
-                className="display-2 text-white"
-                data-cms="t:about-values-title"
-                dangerouslySetInnerHTML={{
-                  __html: tx(t, "about-values-title", "Our Values"),
-                }}
-              />
-            </div>
-          </div>
+      {/* ── Our Values — redesigned (Meet / Grow / Serve) ─────────────────── */}
+      <OurValues text={t} />
 
-          {/* Values grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {VALUE_DEFAULTS.map((v, i) => (
-              <div
-                key={v.id}
-                className="p-8 flex flex-col"
-                style={{
-                  background: "rgba(255,255,255,0.04)",
-                  border: "1px solid rgba(255,255,255,0.10)",
-                  borderRadius: "var(--radius-md)",
-                }}
-              >
-                <span
-                  className="block overline mb-5"
-                  style={{ color: "#1cc3af" }}
-                >
-                  {String(i + 1).padStart(2, "0")}
-                </span>
-                <h3
-                  className="heading-3 text-white mb-3"
-                  data-cms={`t:about-value-${i}-title`}
-                  dangerouslySetInnerHTML={{
-                    __html: tx(t, `about-value-${i}-title`, v.title),
-                  }}
-                />
-                <p
-                  className="body-sm"
-                  style={{ color: "rgba(255,255,255,0.55)" }}
-                  data-cms={`t:about-value-${i}-body`}
-                  dangerouslySetInnerHTML={{
-                    __html: tx(t, `about-value-${i}-body`, v.body),
-                  }}
-                />
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+      {/* ── Meet Our Staff — real 14-person roster ────────────────────────── */}
+      <StaffGrid text={t} img={ov.img} />
 
-      {/* ── CTA ───────────────────────────────────────────────────────────── */}
-      <section className="section" style={{ backgroundColor: "#ffffff" }}>
-        <div className="container-c3 text-center" style={{ maxWidth: "42rem", marginInline: "auto" }}>
-          {/* Eyebrow */}
+      {/* ── Ready to Visit — opened-up vertical rhythm ────────────────────── */}
+      <section
+        className="section"
+        style={{ backgroundColor: "#f7f8f8" }}
+      >
+        <div
+          className="container-c3 text-center"
+          style={{ maxWidth: "44rem", marginInline: "auto" }}
+        >
           <p
-            className="overline mb-5"
-            style={{ color: "#1cc3af" }}
+            className="overline"
+            style={{ color: "#1cc3af", marginBottom: "clamp(1.25rem, 2.5vw, 1.75rem)" }}
             data-cms="t:about-cta-eyebrow"
             dangerouslySetInnerHTML={{
               __html: tx(t, "about-cta-eyebrow", "First Time Here?"),
@@ -296,8 +193,8 @@ export default async function AboutPage() {
           />
 
           <h2
-            className="display-2 mb-5"
-            style={{ color: "#1b1c1c" }}
+            className="display-2"
+            style={{ color: "#1b1c1c", marginBottom: "clamp(1.5rem, 3vw, 2.25rem)" }}
             data-cms="t:about-cta-title"
             dangerouslySetInnerHTML={{
               __html: tx(t, "about-cta-title", "Ready to visit?"),
@@ -305,19 +202,25 @@ export default async function AboutPage() {
           />
 
           <p
-            className="body-lg mb-10"
-            style={{ color: "rgba(27,28,28,0.65)" }}
+            className="body-lg"
+            style={{
+              color: "rgba(27,28,28,0.65)",
+              lineHeight: 1.75,
+              marginBottom: "clamp(2.5rem, 5vw, 3.5rem)",
+              marginInline: "auto",
+              maxWidth: "36rem",
+            }}
             data-cms="t:about-cta-body"
             dangerouslySetInnerHTML={{
               __html: tx(
                 t,
                 "about-cta-body",
-                "We&apos;d love to meet you. No pressure, no dress code — just come."
+                "No matter what stage, age, or season you find yourself in, Celebration Community Church is for you. Come just as you are — there&apos;s no dress code, no pressure, and a seat saved for you."
               ),
             }}
           />
 
-          <div className="flex flex-wrap gap-4 justify-center">
+          <div className="flex flex-wrap gap-5 justify-center">
             <Link
               href={t["about-visit-btn-href"] || "/visit/"}
               data-cms-link="about-visit-btn"
@@ -333,7 +236,7 @@ export default async function AboutPage() {
               className="btn btn-outline-navy btn-lg"
             >
               <span data-cms-link-label>
-                {tx(t, "about-connect-btn-label", "Fill Out a Connect Card")}
+                {tx(t, "about-connect-btn-label", "Let Us Know You're Coming")}
               </span>
             </Link>
           </div>
