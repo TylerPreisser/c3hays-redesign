@@ -190,8 +190,13 @@ function FooterEditorial({ t, m, preCta = false }: { t: TextBag; m: MediaBag; pr
           {/* Newsletter + social */}
           <div className="lg:col-span-3 w-full max-w-sm md:max-w-none">
             <FooterHeading id="footer-news-head" t={t}>Stay in the loop</FooterHeading>
-            <p className="body-sm mb-5" data-cms="g:footer-news-blurb" style={{ color: "rgba(255,255,255,0.65)", lineHeight: 1.65 }} dangerouslySetInnerHTML={{ __html: tx(t, "footer-news-blurb", "Sermon notes and what's happening at C3 — in your inbox.") }} />
-            <NewsletterForm />
+            <p className="body-sm" data-cms="g:footer-news-blurb" style={{ color: "rgba(255,255,255,0.65)", lineHeight: 1.65 }} dangerouslySetInnerHTML={{ __html: tx(t, "footer-news-blurb", "Sermon notes and what's happening at C3 — in your inbox.") }} />
+            {/* v8 P3: widen the cramped blurb→form gap. The blurb is a <p>, and globals.css
+               has an UNLAYERED `p{margin:0}` reset that beats Tailwind's layered `mb-*`
+               utility, so `mb-5`/`mb-8` on the blurb compute to 0 (verified live). The
+               effective, codebase-idiomatic fix is a spacing wrapper on the NEXT element —
+               matching the sibling `<div className="mt-7"><SocialRow/></div>` below. */}
+            <div className="mt-7"><NewsletterForm /></div>
             <div className="mt-7"><SocialRow t={t} /></div>
           </div>
         </div>

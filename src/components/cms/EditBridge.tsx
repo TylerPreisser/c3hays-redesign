@@ -66,6 +66,14 @@ export default function EditBridge() {
            order, so the ring always renders as a full rectangle around EVERY data-cms.  */
         top:-3px!important; right:-3px!important; bottom:-3px!important; left:-3px!important;
         width:auto!important; height:auto!important;
+        /* v8 P4: RESET the background-color. The nav links carry
+           .nav-link-underline whose ::after sets background-color:var(--color-teal)
+           (globals.css). Because D3 above pins this overlay to full size
+           (inset:-3px + width/height:auto !important), that leaked solid teal fills
+           the whole box and paints an unreadable SOLID GREEN BOX over the label. The
+           ants are drawn via background-IMAGE, so forcing background-COLOR transparent
+           keeps the marching-ants ring while letting the text ("ABOUT" etc.) show. */
+        background-color: transparent !important;
         border-radius:9px; pointer-events:none; z-index:2147482000;
         --ant: rgba(28,195,175,.85);
         background-image:
