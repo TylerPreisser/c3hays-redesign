@@ -846,3 +846,24 @@ html.lenis body {
 .nav-link-underline:hover::after {
   width: 100%;
 }
+
+/* ─────────────────────────────────────────────
+   Swappable content / tile images — FILL, never letterbox (Phase 3)
+   ─────────────────────────────────────────────
+   Every image a user can swap in the editor (campus photos, hero backdrops,
+   the "Our churches" map tile, mission/pillar/NT26/staff images, page heroes)
+   is tagged `data-cms-img`. Force such images to COVER their tile — crop to
+   fill, no black side/letterbox bars — for BOTH authoring patterns:
+     (a) the attribute sits on the <img> itself (hero.bg, campus + map photos);
+     (b) the attribute sits on a wrapper whose child is a Next <Image fill>
+         (meetGrowServe pillars, nt26.image, staff portraits, page hero bgs).
+   EXCLUSIONS: logos (data-cms-img="g:logo-*") keep their natural aspect ratio
+   so wordmarks are never squashed; icons are inline <svg>, so they're untouched.
+   Focal-point overrides (inline object-position) are preserved — this rule sets
+   object-fit + box size only, never object-position. */
+img[data-cms-img]:not([data-cms-img^="g:logo"]),
+[data-cms-img]:not([data-cms-img^="g:logo"]) img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}

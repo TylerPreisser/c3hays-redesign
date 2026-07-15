@@ -22,7 +22,11 @@ export const navItems: NavItem[] = [
     ],
   },
   { label: "Messages", href: "/messages/" },
-  { label: "News", href: "/news/" },
+  // News → Newsletter (Phase 3): the weekly newsletter now lives at /newsletter/.
+  // The legacy /news route is kept as a redirect → /newsletter by the page coder.
+  { label: "Newsletter", href: "/newsletter/" },
+  // Events is a real top-level page (built by the events coder at /events/).
+  { label: "Events", href: "/events/" },
   { label: "Watch", href: "/watch/" },
   { label: "Counseling", href: "/counseling/" },
   { label: "Connect", href: "/connect/" },

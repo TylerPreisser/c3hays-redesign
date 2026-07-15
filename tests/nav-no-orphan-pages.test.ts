@@ -51,8 +51,13 @@ function navHrefs(): Set<string> {
 // Reachable WITHOUT a nav-bar link: Home (the logo) + the header CTAs (Plan a Visit, Give).
 const INTENTIONAL_CTA = new Set(["/", "/visit", norm(ctaItem.href)]);
 
+// Phase 3: /news was renamed to Newsletter (/newsletter/). The old /news route is
+// retained ONLY as a redirect → /newsletter (SEO/back-compat), so it is intentionally
+// not a nav destination — the "Newsletter" nav item points at the live /newsletter page.
+const LEGACY_REDIRECTS = new Set(["/news"]);
+
 describe("G3 — no public page is orphaned from the nav", () => {
-  const reachable = new Set<string>([...navHrefs(), ...INTENTIONAL_CTA]);
+  const reachable = new Set<string>([...navHrefs(), ...INTENTIONAL_CTA, ...LEGACY_REDIRECTS]);
   const routes = diskRoutes().map(norm);
 
   it.each(routes)("route %s is reachable from the nav (or an intentional CTA)", (route) => {

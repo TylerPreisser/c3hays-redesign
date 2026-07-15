@@ -61,17 +61,20 @@ export function tx(text: Record<string, string> | undefined, key: string, fallba
 
 /* ── DEFAULTS = the canonical site content ──── */
 export const HERO_DEFAULTS: HeroContent = {
-  heading: "Welcome home.",
+  // Verbatim from celebratejesus.org home H1.
+  heading: "Welcome Home.",
   bgImage: "/images/building.webp",
   ctaLabel: "Plan Your Visit",
   ctaHref: "/visit/",
   isLive: false,
 };
 export const MISSION_DEFAULTS: MissionContent = {
-  html: `We exist to <em style="color:${TEAL};font-style:italic">meet</em> Him, <em style="color:${TEAL};font-style:italic">grow</em> in Him, and <em style="color:${TEAL};font-style:italic">serve</em> through Him.`,
+  // Verbatim mission line from celebratejesus.org (no comma before "and").
+  html: `We exist to <em style="color:${TEAL};font-style:italic">meet</em> Him, <em style="color:${TEAL};font-style:italic">grow</em> in Him and <em style="color:${TEAL};font-style:italic">serve</em> through Him.`,
 };
 export const MEET_GROW_SERVE_DEFAULTS: MeetGrowServeContent = {
-  heading: "Find your place at C3.",
+  // Real celebratejesus.org home section header.
+  heading: "Meet. Grow. Serve.",
   pillars: [
     { word: "About", headline: "Who We Are", body: "A church family in Hays and Colby, Kansas — where everyone is welcome, just as you are.", image: "/images/congregation.webp", href: "/about/" },
     { word: "Messages", headline: "Watch &amp; Listen", body: "Catch up on any message, any series — anytime, anywhere. New sermons every week.", image: "/images/gather.webp", href: "/messages/" },

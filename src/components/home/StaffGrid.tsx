@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { tx, imgCss, type ImgStyle } from "@/lib/home-content";
 import { assetPath } from "@/lib/asset-path";
+import { leadershipStaff } from "@/data/staff";
 
 /**
  * StaffGrid — an addable "meet the team" grid of leader cards. Generic + editable:
@@ -23,12 +24,14 @@ export default function StaffGrid({
   variant?: string;
 }) {
   const v = variant || "grid";
-  const people = [
-    { k: "a", name: "Lead Pastor", role: "Teaching &amp; Vision", image: "/images/congregation.webp" },
-    { k: "b", name: "Worship Pastor", role: "Worship &amp; Arts", image: "/images/worship.webp" },
-    { k: "c", name: "Family Pastor", role: "Kids &amp; Students", image: "/images/gather.webp" },
-    { k: "d", name: "Connections", role: "Groups &amp; Care", image: "/images/exterior.webp" },
-  ];
+  // REAL C3 leadership (celebratejesus.org /our-staff-2), sourced from the shared roster —
+  // never placeholder names. Stable CMS keys (staff.a…d) are preserved for editability.
+  const people = leadershipStaff.map((m, i) => ({
+    k: ["a", "b", "c", "d"][i] ?? String(i),
+    name: m.name,
+    role: m.role,
+    image: m.image ?? "/images/congregation.webp",
+  }));
 
   const Head = (
     <div style={{ textAlign: "center", marginBottom: "clamp(2rem,5vw,3.25rem)" }}>

@@ -69,7 +69,10 @@ export default function LocationsSection({ text = {}, btn = {} }: { text?: Recor
               data-cms-img="findcampus-map-photo"
               className="object-cover"
             />
-            <svg viewBox="0 0 500 320" className="absolute inset-0 w-full h-full" style={{ pointerEvents: "none" }} role="img" aria-label="Map of C3 campuses across northwest Kansas">
+            {/* preserveAspectRatio="slice" → the map COVERS the tile (fills width AND
+                height, cropping overflow) so the default/empty state never shows black
+                letterbox bars, matching the swapped-photo cover behavior. */}
+            <svg viewBox="0 0 500 320" preserveAspectRatio="xMidYMid slice" className="absolute inset-0 w-full h-full" style={{ pointerEvents: "none" }} role="img" aria-label="Map of C3 campuses across northwest Kansas">
               <rect width="500" height="320" fill="#fff" />
               {/* faint county/road grid */}
               <g stroke="rgba(27,28,28,0.10)" strokeWidth="2" fill="none">
