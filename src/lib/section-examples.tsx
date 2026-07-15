@@ -38,6 +38,7 @@ import MeetGrowServe from "@/components/home/MeetGrowServe";
 import NT26Feature from "@/components/home/NT26Feature";
 import LocationsSection from "@/components/home/LocationsSection";
 import StayConnected from "@/components/home/StayConnected";
+import GiveSection from "@/components/home/GiveSection";
 
 export interface VariantDef { key: string; label: string }
 export interface SectionExampleDef {
@@ -103,6 +104,10 @@ export function renderExample(id: string, c: HomeContent, variant?: string): Rea
     case "nt26": return <NT26Feature content={c.nt26} btnStyle={c.btn["nt26.cta"]} img={c.img} variant={variant} bleed={c.fx?.sectionBleed} />;
     case "locations": return <LocationsSection text={c.text} btn={c.btn} />;
     case "stayConnected": return <StayConnected content={c.stayConnected} text={c.text} icon={c.icon} btn={c.btn} variant={variant} />;
+    // `give` is a CORE homepage section (rendered directly in page.tsx, never via the
+    // isExampleSection default branch). It's registered here ONLY so the LIVE
+    // /section-preview route can render a true thumbnail for it like every other card.
+    case "give": return <GiveSection />;
     case "serviceTimes": return <ServiceTimes text={c.text} btnStyle={c.btn["svc.cta"]} variant={variant} />;
     case "sermonFeature": return <SermonFeature text={c.text} img={c.img} btnStyle={c.btn["sermon.cta"]} variant={variant} />;
     case "eventsStrip": return <EventsStrip text={c.text} btnStyle={c.btn["events.cta"]} variant={variant} />;
