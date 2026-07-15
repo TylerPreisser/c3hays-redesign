@@ -1,17 +1,16 @@
 /**
  * REAL staff roster — shared source of truth (Phase 3).
  *
- * Verbatim name + title from celebratejesus.org `/our-staff-2` ("Meet Our Leadership":
- * Elder Staff · Hays Campus Staff · Colby Campus Staff). NO bios exist on the real site —
- * only the role line — so none are invented here. Reuse this on the Home StaffGrid, the
- * About page staff section, and anywhere else leadership is surfaced. Do NOT hardcode
- * placeholder names ("Lead Pastor", "Pastor Lance Carter", etc.) — import from here.
+ * Verbatim name + title from celebratejesus.org `/our-staff-2` (Elder Staff · Hays
+ * Campus Staff · Colby Campus Staff). NO bios exist on the real site — only the role
+ * line — so none are invented. Used by the Home StaffGrid (`leadershipStaff`) and the
+ * About staff section (`staffGroups`). Never hardcode placeholder names
+ * ("Lead Pastor", "Pastor Lance Carter", etc.) — import from here.
  *
- * Headshots: the real site has 14 portrait images (media.thechurchcoassets.com/accounts/
- * 6004/…, empty alts, mapped by card order). Until those assets are pulled in, `image`
- * falls back to existing site imagery so a card is never broken.
+ * Headshots: the real site has 14 portraits; until those assets are pulled in, `image`
+ * falls back to existing site imagery so a card is never broken (and is CMS-swappable).
  */
-export type StaffGroup = "elder" | "hays" | "colby";
+export type StaffGroupKey = "elder" | "hays" | "colby";
 
 export interface StaffMember {
   /** Stable slug id (kebab-case of the name). */
@@ -19,12 +18,12 @@ export interface StaffMember {
   name: string;
   /** Role / title line, exactly as on celebratejesus.org. */
   role: string;
-  group: StaffGroup;
+  group: StaffGroupKey;
   /** Optional real headshot; falls back to site imagery when absent. */
   image?: string;
 }
 
-export const STAFF_GROUP_LABELS: Record<StaffGroup, string> = {
+export const STAFF_GROUP_LABELS: Record<StaffGroupKey, string> = {
   elder: "Elder Staff",
   hays: "Hays Campus Staff",
   colby: "Colby Campus Staff",
@@ -51,11 +50,19 @@ export const staff: StaffMember[] = [
   { id: "brooks-wachs", name: "Brooks Wachs", role: "Youth Pastor", group: "colby", image: "/images/gather.webp" },
 ];
 
-/** Leadership subset — the two Elder-Staff pastors + Hays worship/connections leads.
- *  Used by the Home StaffGrid so an added "meet the team" block shows REAL leaders. */
-export const leadershipStaff: StaffMember[] = [
-  staff[0], // Brant Rice — Senior Pastor
-  staff[1], // Derek Mayfield — Executive Pastor
-  staff[2], // Isabella Blansett — Worship Director
-  staff[3], // Kael Bloom — Connections Pastor
-];
+/** Grouped roster (Elder → Hays → Colby) for the About staff section. */
+export interface StaffGroup {
+  id: StaffGroupKey;
+  label: string;
+  members: StaffMember[];
+}
+
+export const staffGroups: StaffGroup[] = (["elder", "hays", "colby"] as StaffGroupKey[]).map((g) => ({
+  id: g,
+  label: STAFF_GROUP_LABELS[g],
+  members: staff.filter((m) => m.group === g),
+}));
+
+/** Leadership subset — Elder pastors + Hays worship/connections leads.
+ *  Used by the Home StaffGrid so a "meet the team" block shows REAL leaders. */
+export const leadershipStaff: StaffMember[] = [staff[0], staff[1], staff[2], staff[3]];

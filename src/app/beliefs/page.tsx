@@ -156,21 +156,26 @@ export default async function BeliefsPage() {
                       {/* Content */}
                       <div className="flex-1 min-w-0">
                         <h3
-                          className="heading-2 mb-3"
+                          className="heading-2 mb-4"
                           data-cms={`t:beliefs-item-${belief.id}-title`}
                           style={{ color: "#1b1c1c" }}
                           dangerouslySetInnerHTML={{
                             __html: tx(t, `beliefs-item-${belief.id}-title`, belief.title),
                           }}
                         />
-                        <p
-                          className="body-lg"
-                          data-cms={`t:beliefs-item-${belief.id}-body`}
-                          style={{ color: "rgba(27,28,28,0.65)" }}
-                          dangerouslySetInnerHTML={{
-                            __html: tx(t, `beliefs-item-${belief.id}-body`, belief.body),
-                          }}
-                        />
+                        <div className="flex flex-col gap-4">
+                          {belief.paragraphs.map((para, pi) => (
+                            <p
+                              key={pi}
+                              className="body-lg"
+                              data-cms={`t:beliefs-item-${belief.id}-p${pi}`}
+                              style={{ color: "rgba(27,28,28,0.68)", lineHeight: 1.75 }}
+                              dangerouslySetInnerHTML={{
+                                __html: tx(t, `beliefs-item-${belief.id}-p${pi}`, para),
+                              }}
+                            />
+                          ))}
+                        </div>
                       </div>
 
                     </div>
@@ -200,7 +205,7 @@ export default async function BeliefsPage() {
           <h2
             className="display-2 text-white mb-5"
             data-cms="t:beliefs-cta-heading"
-            dangerouslySetInnerHTML={{ __html: tx(t, "beliefs-cta-heading", "We&apos;d love to talk.") }}
+            dangerouslySetInnerHTML={{ __html: tx(t, "beliefs-cta-heading", "Have questions?") }}
           />
           <p
             className="body-lg mb-10"
@@ -210,21 +215,21 @@ export default async function BeliefsPage() {
               __html: tx(
                 t,
                 "beliefs-cta-body",
-                "Theology matters — and so do your questions. Reach out, or come visit us on a Sunday."
+                "For any questions regarding our statement of beliefs, please email office@celebratejesus.org."
               ),
             }}
           />
 
           <div className="flex flex-wrap gap-4 justify-center">
-            <Link
-              href={t["beliefs-cta-primary-href"] || "/connect/"}
+            <a
+              href={t["beliefs-cta-primary-href"] || "mailto:office@celebratejesus.org"}
               data-cms-link="beliefs-cta-primary"
               className="btn btn-primary btn-lg"
             >
               <span data-cms-link-label>
-                {tx(t, "beliefs-cta-primary-label", "Connect With Us")}
+                {tx(t, "beliefs-cta-primary-label", "Email Our Office")}
               </span>
-            </Link>
+            </a>
             <Link
               href={t["beliefs-cta-secondary-href"] || "/visit/"}
               data-cms-link="beliefs-cta-secondary"

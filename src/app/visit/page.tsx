@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import { Clock, MapPin, Smile, Users, Baby, Shirt } from "lucide-react";
+import { Clock, MapPin, HeartHandshake, Shirt, Baby } from "lucide-react";
 import { locations } from "@/data/locations";
 import { assetPath } from "@/lib/asset-path";
 import { getCMSPage } from "@/lib/cms";
@@ -13,42 +13,27 @@ export const metadata: Metadata = {
     "Everything you need to know before your first visit to Celebration Community Church in Hays or Colby, Kansas.",
 };
 
-const whatToExpect = [
+const CCB_FORM = "https://celebration.ccbchurch.com/goto/forms/47/responses/new";
+
+/* Verbatim from celebratejesus.org /plan-your-visit (captured 2026-07-15). */
+const expectBlocks = [
   {
-    id: "clock",
-    icon: Clock,
-    title: "How long is a service?",
-    body: "Services are typically 60–70 minutes — worship, a practical message from Scripture, and communion on the first Sunday of the month.",
+    id: "expect",
+    icon: HeartHandshake,
+    title: "What To Expect",
+    body: "We know that showing up to a new place for the first time can be intimidating, but at C3 it&apos;s our desire that you feel right at home from the moment you pull into the parking lot. As a first-time guest, you are VIP to us so we&apos;ll be there with you every step of the way! We even have a gift for you - just to say &lsquo;thank you&rsquo; for checking out our church. Fill out the form at the bottom of this page and we&apos;ll have a member of our greeting team ready to meet you at the door, show you around, help you check in your kids and find a seat.",
   },
   {
-    id: "shirt",
+    id: "dress",
     icon: Shirt,
-    title: "What should I wear?",
-    body: "Come as you are — seriously. You'll see jeans, boots, and dress clothes all in the same row. There is no dress code at C3.",
+    title: "Come As You Are",
+    body: "At C3, there is no dress code. Some people show up in suits, and others wear jeans and t-shirts. We want you to wear whatever makes you feel comfortable.",
   },
   {
-    id: "baby",
+    id: "kids",
     icon: Baby,
-    title: "What about my kids?",
-    body: "We have programming for every age, birth through 5th grade, during all services. Student ministry meets on Friday evenings.",
-  },
-  {
-    id: "smile",
-    icon: Smile,
-    title: "What if I'm not a Christian?",
-    body: "Perfect — come anyway. We're a church full of imperfect people on a journey. You won't be called out, embarrassed, or pressured.",
-  },
-  {
-    id: "users",
-    icon: Users,
-    title: "Can I bring a friend?",
-    body: "Please do. There's always room for one more. C3 is at its best when it's full of people experiencing Jesus for the first time.",
-  },
-  {
-    id: "mappin",
-    icon: MapPin,
-    title: "Where do I park?",
-    body: "Ample free parking at both campuses. Look for first-time guest parking spots near the main entrance — they're saved for you.",
+    title: "Bring The Kids",
+    body: "C3Kids is available for children ages 3 through the 5th grade. The care and growth of every child is our highest priority and our passion is to create exciting, Bible-driven, interactive environments especially designed for your kids! C3Kids is available during our 9:30am service on Sunday so you can enjoy a great service knowing your child is being loved and nurtured.",
   },
 ];
 
@@ -64,10 +49,7 @@ export default async function VisitPage() {
         className="relative flex items-end overflow-hidden"
         style={{ minHeight: "70vh" }}
       >
-        <div
-          className="absolute inset-0"
-          data-cms-img="visit-hero-bg"
-        >
+        <div className="absolute inset-0" data-cms-img="visit-hero-bg">
           <Image
             src={assetPath(media["visit-hero-bg"] || "/images/hero-2.webp")}
             alt="Family arriving at C3"
@@ -77,12 +59,10 @@ export default async function VisitPage() {
             className="object-cover"
             style={imgCss(ov.img?.["visit-hero-bg"])}
           />
-          {/* Base dark scrim */}
           <div
             className="absolute inset-0"
             style={{ background: "rgba(10,10,10,0.45)" }}
           />
-          {/* Bottom-up gradient to ground the headline */}
           <div
             className="absolute inset-0"
             style={{
@@ -105,7 +85,7 @@ export default async function VisitPage() {
             className="display-1 text-white text-balance"
             data-cms="t:visit-hero-heading"
             dangerouslySetInnerHTML={{
-              __html: tx(t, "visit-hero-heading", "Plan your first visit."),
+              __html: tx(t, "visit-hero-heading", "Plan your visit."),
             }}
           />
           <p
@@ -123,73 +103,80 @@ export default async function VisitPage() {
         </div>
       </section>
 
-      {/* ── What to Expect ──────────────────────────────────────── */}
+      {/* ── Welcome! — verbatim intro, generous rhythm ──────────── */}
       <section className="section" style={{ backgroundColor: "#ffffff" }}>
-        <div className="container-c3">
-          {/* Section header */}
-          <div className="max-w-xl mb-16">
-            <p
-              className="overline mb-4"
-              style={{ color: "#1cc3af" }}
-              data-cms="t:visit-expect-eyebrow"
-              dangerouslySetInnerHTML={{
-                __html: tx(t, "visit-expect-eyebrow", "What to expect"),
-              }}
-            />
-            <h2
-              className="display-2 text-balance"
-              style={{ color: "#1b1c1c" }}
-              data-cms="t:visit-expect-heading"
-              dangerouslySetInnerHTML={{
-                __html: tx(
-                  t,
-                  "visit-expect-heading",
-                  "No surprises. Just welcome."
-                ),
-              }}
-            />
-          </div>
+        <div
+          className="container-c3 text-center"
+          style={{ maxWidth: "48rem", marginInline: "auto" }}
+        >
+          <p
+            className="overline"
+            style={{ color: "#1cc3af", marginBottom: "clamp(1.25rem, 2.5vw, 1.75rem)" }}
+            data-cms="t:visit-welcome-eyebrow"
+            dangerouslySetInnerHTML={{
+              __html: tx(t, "visit-welcome-eyebrow", "Welcome!"),
+            }}
+          />
+          <h2
+            className="display-2 text-balance"
+            style={{ color: "#1b1c1c", marginBottom: "clamp(1.75rem, 3.5vw, 2.5rem)" }}
+            data-cms="t:visit-welcome-heading"
+            dangerouslySetInnerHTML={{
+              __html: tx(t, "visit-welcome-heading", "You&apos;re invited — just as you are."),
+            }}
+          />
+          <p
+            className="body-lg"
+            style={{ color: "rgba(27,28,28,0.70)", lineHeight: 1.8, marginInline: "auto", maxWidth: "42rem" }}
+            data-cms="t:visit-welcome-body"
+            dangerouslySetInnerHTML={{
+              __html: tx(
+                t,
+                "visit-welcome-body",
+                "No matter what stage, age, or season you find yourself in, Celebration Community Church is for you! We invite you to come just as you are and be part of this community of people who are striving together to discover God&apos;s purpose and plan for their lives!"
+              ),
+            }}
+          />
+        </div>
+      </section>
 
-          {/* FAQ grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10 md:gap-8">
-            {whatToExpect.map((item) => {
-              const Icon = item.icon;
-              const titleId = `visit-faq-${item.id}-title` as const;
-              const bodyId = `visit-faq-${item.id}-body` as const;
+      {/* ── What To Expect / Come As You Are / Bring The Kids ───── */}
+      <section className="section" style={{ backgroundColor: "#f7f8f8", paddingTop: 0 }}>
+        <div className="container-c3">
+          <div
+            className="grid grid-cols-1 lg:grid-cols-3"
+            style={{ gap: "clamp(2.5rem, 5vw, 4rem)" }}
+          >
+            {expectBlocks.map((block) => {
+              const Icon = block.icon;
               return (
-                <div key={item.id}>
-                  {/* Icon tile */}
+                <div key={block.id} className="flex flex-col">
                   <div
-                    className="grid place-items-center mb-6"
-                    data-cms-icon={`visit-faq-${item.id}-icon`}
+                    className="grid place-items-center mb-7"
+                    data-cms-icon={`visit-block-${block.id}-icon`}
                     style={{
-                      width: 52,
-                      height: 52,
-                      borderRadius: 14,
+                      width: 56,
+                      height: 56,
+                      borderRadius: 16,
                       background: "rgba(28,195,175,0.12)",
                     }}
                   >
-                    <Icon
-                      size={24}
-                      style={{ color: "#179c8c" }}
-                      strokeWidth={1.75}
-                    />
+                    <Icon size={26} style={{ color: "#179c8c" }} strokeWidth={1.75} />
                   </div>
-
                   <h3
-                    className="heading-3 mb-3"
+                    className="heading-2 mb-4"
                     style={{ color: "#1b1c1c" }}
-                    data-cms={`t:${titleId}`}
+                    data-cms={`t:visit-block-${block.id}-title`}
                     dangerouslySetInnerHTML={{
-                      __html: tx(t, titleId, item.title),
+                      __html: tx(t, `visit-block-${block.id}-title`, block.title),
                     }}
                   />
                   <p
-                    className="body-sm leading-relaxed"
-                    style={{ color: "rgba(27,28,28,0.65)" }}
-                    data-cms={`t:${bodyId}`}
+                    className="body-base"
+                    style={{ color: "rgba(27,28,28,0.65)", lineHeight: 1.8 }}
+                    data-cms={`t:visit-block-${block.id}-body`}
                     dangerouslySetInnerHTML={{
-                      __html: tx(t, bodyId, item.body),
+                      __html: tx(t, `visit-block-${block.id}-body`, block.body),
                     }}
                   />
                 </div>
@@ -199,17 +186,15 @@ export default async function VisitPage() {
         </div>
       </section>
 
-      {/* ── Service Times — dark split ───────────────────────────── */}
+      {/* ── When & Where — dark split ───────────────────────────── */}
       <section
         className="relative overflow-hidden"
         style={{ backgroundColor: "#1b1c1c" }}
       >
         <div className="flex flex-col lg:flex-row lg:min-h-[640px]">
-
-          {/* Left: heading + campus cards */}
-          <div className="flex-1 min-w-0 section lg:py-20 xl:py-24">
+          <div className="flex-1 min-w-0 section lg:py-24 xl:py-28">
             <div className="container-c3 lg:pr-0 xl:pr-0">
-              <div className="mb-12">
+              <div style={{ marginBottom: "clamp(2.5rem, 5vw, 3.5rem)" }}>
                 <p
                   className="overline mb-4"
                   style={{ color: "#1cc3af" }}
@@ -222,16 +207,11 @@ export default async function VisitPage() {
                   className="heading-1 text-white"
                   data-cms="t:visit-times-heading"
                   dangerouslySetInnerHTML={{
-                    __html: tx(
-                      t,
-                      "visit-times-heading",
-                      "When do services meet?"
-                    ),
+                    __html: tx(t, "visit-times-heading", "When & where we meet"),
                   }}
                 />
               </div>
 
-              {/* Campus cards */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 {locations.map((loc) => (
                   <div
@@ -308,7 +288,6 @@ export default async function VisitPage() {
             </div>
           </div>
 
-          {/* Right: worship photo — desktop only */}
           <div
             className="hidden lg:block lg:w-2/5 xl:w-1/2 relative shrink-0"
             aria-hidden="true"
@@ -321,7 +300,6 @@ export default async function VisitPage() {
               className="object-cover object-center"
               style={imgCss(ov.img?.["visit-times-photo"])}
             />
-            {/* Left-edge fade into dark section */}
             <div
               className="absolute inset-0"
               style={{
@@ -330,57 +308,54 @@ export default async function VisitPage() {
               }}
             />
           </div>
-
         </div>
       </section>
 
-      {/* ── Connect CTA ─────────────────────────────────────────── */}
+      {/* ── Let Us Know You're Coming — CCB form CTA ────────────── */}
       <section className="section" style={{ backgroundColor: "#ffffff" }}>
         <div className="container-c3">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-14 lg:gap-20 items-center">
             <div>
               <p
-                className="overline mb-5"
+                className="overline mb-6"
                 style={{ color: "#1cc3af" }}
                 data-cms="t:visit-cta-eyebrow"
                 dangerouslySetInnerHTML={{
-                  __html: tx(t, "visit-cta-eyebrow", "Ready to visit?"),
+                  __html: tx(t, "visit-cta-eyebrow", "Coming this weekend?"),
                 }}
               />
               <h2
-                className="display-2 mb-5 text-balance"
+                className="display-2 mb-6 text-balance"
                 style={{ color: "#1b1c1c" }}
                 data-cms="t:visit-cta-heading"
                 dangerouslySetInnerHTML={{
-                  __html: tx(
-                    t,
-                    "visit-cta-heading",
-                    "We&apos;re saving you a seat."
-                  ),
+                  __html: tx(t, "visit-cta-heading", "Let us know you&apos;re coming."),
                 }}
               />
               <p
-                className="body-lg mb-10"
-                style={{ color: "rgba(27,28,28,0.65)" }}
+                className="body-lg"
+                style={{ color: "rgba(27,28,28,0.65)", lineHeight: 1.8, marginBottom: "clamp(2.5rem, 5vw, 3.25rem)" }}
                 data-cms="t:visit-cta-body"
                 dangerouslySetInnerHTML={{
                   __html: tx(
                     t,
                     "visit-cta-body",
-                    "Fill out a quick connect card and we&apos;ll send you everything you need to know before Sunday. No spam, ever."
+                    "Fill out the form and a member of our greeting team will be ready to meet you at the door, show you around, help you check in your kids, and find you a seat. We even have a gift for you — just to say thank you for checking out our church."
                   ),
                 }}
               />
-              <div className="flex flex-wrap gap-4">
-                <Link
-                  href={t["visit-cta-primary-href"] || "/connect/"}
+              <div className="flex flex-wrap gap-5">
+                <a
+                  href={t["visit-cta-primary-href"] || CCB_FORM}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   data-cms-link="visit-cta-primary"
                   className="btn btn-primary btn-lg"
                 >
                   <span data-cms-link-label>
-                    {tx(t, "visit-cta-primary-label", "Fill Out a Connect Card")}
+                    {tx(t, "visit-cta-primary-label", "Let Us Know You're Coming")}
                   </span>
-                </Link>
+                </a>
                 <Link
                   href={t["visit-cta-secondary-href"] || "/messages/"}
                   data-cms-link="visit-cta-secondary"
@@ -395,7 +370,7 @@ export default async function VisitPage() {
 
             <div
               className="relative overflow-hidden"
-              style={{ height: 400, borderRadius: "var(--radius-md)" }}
+              style={{ height: 440, borderRadius: "var(--radius-md)" }}
               data-cms-img="visit-cta-photo"
             >
               <Image
