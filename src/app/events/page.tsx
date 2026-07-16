@@ -6,52 +6,15 @@ import { getCMSPage } from "@/lib/cms";
 import { tx, imgCss } from "@/lib/home-content";
 import Section from "@/components/ui/Section";
 import SectionHeader from "@/components/ui/SectionHeader";
-import EventCard from "@/components/events/EventCard";
+import LiveCalendar from "@/components/events/LiveCalendar";
+import UpcomingEventsLive from "@/components/events/UpcomingEventsLive";
+import { ESPACE_FULL_CALENDAR_URL } from "@/lib/espace";
 
 export const metadata: Metadata = {
   title: "Events",
   description:
     "What's on at Celebration Community Church — upcoming events, gatherings, and the full C3 calendar across both campuses.",
 };
-
-/* Real full-calendar surface from the content inventory: the church's live eSpace
-   calendar widget (the /calendar page embeds exactly this). EV2 (Wave 3) will
-   convert this feed into a prettier on-theme calendar; the iframe stays for now. */
-const ESPACE_CALENDAR =
-  "https://app.espace.cool/clientApi/FullMonth/16599?calendarId=1774&categories=54054,50192,50191,50194,50193,50200,50195,50198,50196,50197,50199,54053&locationId=126482";
-
-/* Upcoming events — editable in place via `events-<k>-*` CMS text hooks (same
-   convention as the shared EventsStrip) plus a real image per event (EV1). The
-   image falls back to a tasteful gradient inside EventCard, never a grey box. */
-const UPCOMING = [
-  {
-    k: "a",
-    month: "JUL",
-    day: "20",
-    title: "Baptism Sunday",
-    detail: "Both services &bull; Take your next step",
-    campus: "Both campuses",
-    image: "/images/worship.webp",
-  },
-  {
-    k: "b",
-    month: "JUL",
-    day: "26",
-    title: "Youth Summer Night",
-    detail: "Fri 7:00pm &bull; Grades 6&ndash;12",
-    campus: "Hays campus",
-    image: "/images/gather.webp",
-  },
-  {
-    k: "c",
-    month: "AUG",
-    day: "03",
-    title: "Newcomers Lunch",
-    detail: "After 11:00am &bull; Meet the team",
-    campus: "Both campuses",
-    image: "/images/community.webp",
-  },
-];
 
 export default async function EventsPage() {
   const ov = (await getCMSPage("/events")) || {};
@@ -129,54 +92,7 @@ export default async function EventsPage() {
             />
           }
         />
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
-            gap: "clamp(1.25rem, 3vw, 2rem)",
-            alignItems: "stretch",
-          }}
-        >
-          {UPCOMING.map((e) => (
-            <EventCard
-              key={e.k}
-              image={media[`events-${e.k}-img`] || e.image}
-              imgCmsKey={`events-${e.k}-img`}
-              href={t[`events-${e.k}-href`] || t["events.cta-href"] || "/connect/"}
-              imageAlt={e.title}
-              month={
-                <span
-                  data-cms={`t:events-${e.k}-month`}
-                  dangerouslySetInnerHTML={{ __html: tx(t, `events-${e.k}-month`, e.month) }}
-                />
-              }
-              day={
-                <span
-                  data-cms={`t:events-${e.k}-day`}
-                  dangerouslySetInnerHTML={{ __html: tx(t, `events-${e.k}-day`, e.day) }}
-                />
-              }
-              title={
-                <span
-                  data-cms={`t:events-${e.k}-title`}
-                  dangerouslySetInnerHTML={{ __html: tx(t, `events-${e.k}-title`, e.title) }}
-                />
-              }
-              detail={
-                <span
-                  data-cms={`t:events-${e.k}-detail`}
-                  dangerouslySetInnerHTML={{ __html: tx(t, `events-${e.k}-detail`, e.detail) }}
-                />
-              }
-              campus={
-                <span
-                  data-cms={`t:events-${e.k}-campus`}
-                  dangerouslySetInnerHTML={{ __html: tx(t, `events-${e.k}-campus`, e.campus) }}
-                />
-              }
-            />
-          ))}
-        </div>
+        <UpcomingEventsLive />
       </Section>
 
       {/* ── Full calendar (real eSpace widget — EV2/Wave 3 prettifies) ── */}
@@ -210,10 +126,10 @@ export default async function EventsPage() {
             }
           />
           <a
-            href={t["events-cal-href"] || ESPACE_CALENDAR}
+            href={t["events-cal-href"] || ESPACE_FULL_CALENDAR_URL}
             target="_blank"
             rel="noopener noreferrer"
-            className="btn btn-outline"
+            className="btn btn-outline-ink"
             data-cms-link="events-cal-cta"
           >
             <span data-cms-link-label>{tx(t, "events-cal-cta-label", "Open full calendar")}</span>
@@ -221,20 +137,7 @@ export default async function EventsPage() {
           </a>
         </div>
 
-        <div
-          className="relative overflow-hidden"
-          style={{
-            borderRadius: "var(--radius-md)",
-            border: "1px solid rgba(27,28,28,0.10)",
-            background: "#f6f6f6",
-          }}
-        >
-          <iframe
-            src={t["events-cal-embed"] || ESPACE_CALENDAR}
-            title="C3 Hays church calendar"
-            style={{ width: "100%", height: 720, border: 0, display: "block" }}
-          />
-        </div>
+        <LiveCalendar />
       </Section>
       {/* EV3 / G2: terminal newcomers CTA removed — the Footer is the site-wide CTA. */}
     </>
