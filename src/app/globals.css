@@ -64,6 +64,17 @@
   --measure:       720px;   /* readable/quote column cap */
   --container-max: 1280px;
 
+  /* Named vertical-rhythm tokens — Phase 4, Wave 0 (§2.2). Components consume
+     THESE (via <Stack gap> / <Section size>) instead of hand-picking raw clamps,
+     so every eyebrow→heading→body→cta group breathes identically sitewide.
+     Built on the --s-* ladder + --section-y; generous, premium. */
+  --space-eyebrow: var(--s-4);                /* overline → heading (16px) */
+  --space-heading: clamp(20px, 3vw, 32px);    /* heading → body */
+  --space-body:    var(--s-6);                /* paragraph → paragraph (24px) */
+  --space-cta:     clamp(32px, 5vw, 56px);    /* body → button row */
+  --space-block:   clamp(48px, 6vw, 80px);    /* sub-block → sub-block within a section */
+  --section-y-sm:  clamp(64px, 7vw, 104px);   /* tighter section (rarely) */
+
   /* Motion — ONE easing, three durations. Reveals = slow; hovers = fast. */
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
   --dur-fast: 180ms;   /* hover */
@@ -134,14 +145,26 @@ body::before {
   body::before { animation: none; }
 }
 
-h1, h2, h3, h4, h5, h6,
-p, ul, ol, figure, blockquote {
-  margin: 0;
-}
+/* ─────────────────────────────────────────────
+   Element reset — MUST be layered (Phase 4, Wave 0, S1).
+   Tailwind v4 puts `mb-*`/`mt-*`/`space-y-*` in `@layer utilities`. An UNLAYERED
+   `h1..h6,p,ul,ol,figure,blockquote { margin: 0 }` reset always beats a LAYERED
+   utility, so every heading/paragraph margin silently computed to 0 sitewide —
+   the single load-bearing cause of the "everything is vertically cramped"
+   complaints. Wrapping the reset in `@layer base` restores the cascade order so
+   utility margins win again. Do NOT hoist this out of the layer.
+   (box-sizing + :focus-visible stay unlayered — they don't fight utilities.)
+   ───────────────────────────────────────────── */
+@layer base {
+  h1, h2, h3, h4, h5, h6,
+  p, ul, ol, figure, blockquote {
+    margin: 0;
+  }
 
-img, video, svg {
-  display: block;
-  max-width: 100%;
+  img, video, svg {
+    display: block;
+    max-width: 100%;
+  }
 }
 
 :focus-visible {
@@ -269,9 +292,12 @@ img, video, svg {
   justify-content: center;
   gap: 0.5rem;
   font-family: var(--font-sans);
-  font-size: 0.8125rem;
+  /* Phase 4 / G3: line-height 1 → 1.15 (kills the vertically-squeezed pill text)
+     + base font 0.8125rem → 0.875rem. Horizontal padding stays generous. The nav
+     "Plan a Visit" CTA and every other `.btn` inherit this de-cramped baseline. */
+  font-size: 0.875rem;
   font-weight: 700;
-  line-height: 1;
+  line-height: 1.15;
   text-decoration: none;
   border: 2px solid transparent;
   cursor: pointer;
@@ -281,8 +307,8 @@ img, video, svg {
               transform 220ms cubic-bezier(0.33, 0, 0.19, 1);
   border-radius: var(--radius-pill);
   white-space: nowrap;
-  padding: 1rem 1.85rem;
-  letter-spacing: 0.04em;
+  padding: 0.9rem 1.75rem;
+  letter-spacing: 0.02em;
   text-transform: none;
 }
 
@@ -362,13 +388,15 @@ img, video, svg {
 }
 
 .btn-lg {
-  padding: 1.125rem 2rem;
-  font-size: 0.875rem;
+  padding: 1.05rem 2.1rem;
+  font-size: 0.95rem;
+  line-height: 1.15;
 }
 
 .btn-sm {
   padding: 0.7rem 1.35rem;
   font-size: 0.8125rem;
+  line-height: 1.15;
 }
 
 /* Gentle pill lift on hover (COTM friendliness) */
