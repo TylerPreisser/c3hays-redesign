@@ -1,10 +1,16 @@
 import type { Metadata } from "next";
 import Image from "next/image";
-import { Mail, Calendar, BookOpen, Users, Smartphone } from "lucide-react";
+import { Calendar, BookOpen, Users, Smartphone } from "lucide-react";
 import { assetPath } from "@/lib/asset-path";
 import { getCMSPage } from "@/lib/cms";
 import { tx, imgCss } from "@/lib/home-content";
-import NewsletterForm from "@/components/layout/NewsletterForm";
+import Section from "@/components/ui/Section";
+import SectionHeader from "@/components/ui/SectionHeader";
+import Stack from "@/components/ui/Stack";
+import FeatureCard from "@/components/ui/FeatureCard";
+import InboxTile from "@/components/newsletter/InboxTile";
+import IssueBrowser from "@/components/newsletter/IssueBrowser";
+import { newsletterIssues } from "@/data/news";
 
 /* Brand marks as inline SVGs (this lucide build ships no brand icons — matches the
    Footer's inline-SVG convention). currentColor drives the fill. */
@@ -39,26 +45,12 @@ export const metadata: Metadata = {
     "The C3 Weekly — a short note each week with what's coming up, new messages, and ways to connect at Celebration Community Church.",
 };
 
-/** Weekly newsletter issues. Empty until the first issue ships — this page is the
- *  ready-to-fill shell (the future Beehiiv-style module drops issues in here). We do
- *  NOT fabricate an archive; when there are no issues yet, we show a subscribe-forward
- *  "on its way" state (never a bare empty string). */
-interface Issue {
-  id: string;
-  title: string;
-  date: string; // ISO
-  excerpt: string;
-  href: string;
-  image?: string;
-}
-const issues: Issue[] = [];
-
 /* Real "stay connected" channels (from the content inventory). */
 const CHANNELS = [
-  { id: "app", Icon: Smartphone, label: "C3 App", href: "https://apps.apple.com/us/app/c3-hays/id1028509278" },
-  { id: "youtube", Icon: YoutubeIcon, label: "YouTube", href: "https://www.youtube.com/@c3hays" },
-  { id: "facebook", Icon: FacebookIcon, label: "Facebook", href: "https://facebook.com/c3hays" },
-  { id: "instagram", Icon: InstagramIcon, label: "Instagram", href: "https://instagram.com/c3hays" },
+  { id: "app", Icon: Smartphone, label: "C3 App", meta: "iPhone & Android", href: "https://apps.apple.com/us/app/c3-hays/id1028509278" },
+  { id: "youtube", Icon: YoutubeIcon, label: "YouTube", meta: "@c3hays", href: "https://www.youtube.com/@c3hays" },
+  { id: "facebook", Icon: FacebookIcon, label: "Facebook", meta: "/c3hays", href: "https://facebook.com/c3hays" },
+  { id: "instagram", Icon: InstagramIcon, label: "Instagram", meta: "@c3hays", href: "https://instagram.com/c3hays" },
 ];
 
 const INSIDE = [
@@ -74,11 +66,8 @@ export default async function NewsletterPage() {
 
   return (
     <>
-      {/* ── Hero ─────────────────────────────────────────────────── */}
-      <section
-        className="relative flex items-end overflow-hidden"
-        style={{ minHeight: "52vh" }}
-      >
+      {/* ── Hero (NL1) ───────────────────────────────────────────── */}
+      <section className="relative flex items-end overflow-hidden" style={{ minHeight: "54vh" }}>
         <div className="absolute inset-0" data-cms-img="newsletter-hero-img">
           <Image
             src={assetPath(media["newsletter-hero-img"] || "/images/community.webp")}
@@ -98,230 +87,186 @@ export default async function NewsletterPage() {
           />
         </div>
         <div className="relative z-10 container-c3 pb-16 pt-44">
-          <p
-            className="overline mb-5"
-            style={{ color: "#1cc3af" }}
-            data-cms="t:newsletter-hero-eyebrow"
-            dangerouslySetInnerHTML={{ __html: tx(t, "newsletter-hero-eyebrow", "Newsletter") }}
-          />
-          <h1
-            className="display-1 text-white text-balance"
-            data-cms="t:newsletter-hero-heading"
-            dangerouslySetInnerHTML={{ __html: tx(t, "newsletter-hero-heading", "The C3 Weekly") }}
-          />
-          <p
-            className="body-lg mt-5 max-w-xl"
-            style={{ color: "rgba(255,255,255,0.68)" }}
-            data-cms="t:newsletter-hero-body"
-            dangerouslySetInnerHTML={{
-              __html: tx(
-                t,
-                "newsletter-hero-body",
-                "A short note each week &mdash; what&rsquo;s coming up, this week&rsquo;s message, and simple ways to take your next step."
-              ),
-            }}
-          />
-        </div>
-      </section>
-
-      {/* ── Subscribe ────────────────────────────────────────────── */}
-      <section className="section" style={{ backgroundColor: "#f6f6f6" }}>
-        <div className="container-c3">
-          <div
-            className="mx-auto text-center"
-            style={{
-              maxWidth: 620,
-              background: "#fff",
-              borderRadius: "var(--radius-lg, 1.5rem)",
-              padding: "clamp(2rem, 5vw, 3.5rem)",
-              boxShadow: "0 30px 70px rgba(10,10,10,0.07)",
-              border: "1px solid rgba(27,28,28,0.06)",
-            }}
-          >
-            <span
-              className="inline-flex items-center justify-center mx-auto"
-              style={{ width: 60, height: 60, borderRadius: 16, marginBottom: "1.5rem", background: "rgba(28,195,175,0.12)", color: "var(--color-teal)" }}
-            >
-              <Mail size={28} />
-            </span>
-            <h2
-              className="display-2 mb-3"
-              style={{ color: "#1b1c1c" }}
-              data-cms="t:newsletter-sub-heading"
-              dangerouslySetInnerHTML={{ __html: tx(t, "newsletter-sub-heading", "Get it in your inbox") }}
-            />
+          <Stack gap="heading" style={{ maxWidth: 640 }}>
+            <Stack gap="eyebrow">
+              <p
+                className="overline"
+                style={{ color: "#1cc3af" }}
+                data-cms="t:newsletter-hero-eyebrow"
+                dangerouslySetInnerHTML={{ __html: tx(t, "newsletter-hero-eyebrow", "Newsletter") }}
+              />
+              <h1
+                className="display-1 text-white text-balance"
+                data-cms="t:newsletter-hero-heading"
+                dangerouslySetInnerHTML={{ __html: tx(t, "newsletter-hero-heading", "The C3 Weekly") }}
+              />
+            </Stack>
             <p
-              className="body-lg mb-8"
-              style={{ color: "rgba(27,28,28,0.6)" }}
-              data-cms="t:newsletter-sub-body"
+              className="body-lg max-w-xl"
+              style={{ color: "rgba(255,255,255,0.68)" }}
+              data-cms="t:newsletter-hero-body"
               dangerouslySetInnerHTML={{
-                __html: tx(t, "newsletter-sub-body", "One email a week. No spam, unsubscribe anytime."),
+                __html: tx(
+                  t,
+                  "newsletter-hero-body",
+                  "A short note each week &mdash; what&rsquo;s coming up, this week&rsquo;s message, and simple ways to take your next step."
+                ),
               }}
             />
-            <div style={{ maxWidth: 420, margin: "0 auto" }}>
-              <NewsletterForm />
-            </div>
-          </div>
+          </Stack>
         </div>
       </section>
 
-      {/* ── What's inside ────────────────────────────────────────── */}
-      <section className="section" style={{ backgroundColor: "#ffffff", paddingTop: "clamp(2rem,4vw,3rem)" }}>
-        <div className="container-c3">
-          <div className="mb-12 max-w-2xl">
-            <p
-              className="overline mb-4"
-              style={{ color: "#1cc3af" }}
+      {/* ── More ways to keep up (NL4 — moved to TOP) ────────────── */}
+      <Section tone="mist" size="sm" container>
+        <SectionHeader
+          eyebrow={
+            <span
+              data-cms="t:newsletter-stay-eyebrow"
+              dangerouslySetInnerHTML={{ __html: tx(t, "newsletter-stay-eyebrow", "Stay connected") }}
+            />
+          }
+          title={
+            <span
+              data-cms="t:newsletter-stay-heading"
+              dangerouslySetInnerHTML={{ __html: tx(t, "newsletter-stay-heading", "More ways to keep up with C3") }}
+            />
+          }
+          lead={
+            <span
+              data-cms="t:newsletter-stay-lead"
+              dangerouslySetInnerHTML={{
+                __html: tx(t, "newsletter-stay-lead", "Follow along wherever you already are &mdash; the app, video, and social.")
+              }}
+            />
+          }
+          style={{ marginBottom: "var(--space-block)" }}
+        />
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          {CHANNELS.map((c) => {
+            const Icon = c.Icon;
+            return (
+              <a
+                key={c.id}
+                href={t[`newsletter-channel-${c.id}-href`] || c.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="bento-tile group flex items-center gap-3.5"
+                style={{
+                  padding: "1.15rem 1.35rem",
+                  borderRadius: "var(--radius-md)",
+                  background: "#fff",
+                  border: "1px solid rgba(27,28,28,0.07)",
+                  boxShadow: "var(--shadow-rest)",
+                  color: "var(--color-ink)",
+                }}
+              >
+                <span
+                  className="inline-flex items-center justify-center shrink-0"
+                  style={{ width: "2.75rem", height: "2.75rem", borderRadius: "var(--radius-sm)", background: "rgba(28,195,175,0.1)", color: "var(--color-teal)" }}
+                  aria-hidden="true"
+                >
+                  <Icon size={22} />
+                </span>
+                <span className="flex flex-col" style={{ minWidth: 0 }}>
+                  <span style={{ fontWeight: 700, fontSize: "0.95rem", lineHeight: 1.2 }}>
+                    {tx(t, `newsletter-channel-${c.id}-label`, c.label)}
+                  </span>
+                  <span style={{ fontSize: "0.78rem", color: "var(--color-mute)" }}>{c.meta}</span>
+                </span>
+              </a>
+            );
+          })}
+        </div>
+      </Section>
+
+      {/* ── What's inside (FeatureCard trio) ─────────────────────── */}
+      <Section tone="white" container>
+        <SectionHeader
+          eyebrow={
+            <span
               data-cms="t:newsletter-inside-eyebrow"
               dangerouslySetInnerHTML={{ __html: tx(t, "newsletter-inside-eyebrow", "Every week") }}
             />
-            <h2
-              className="display-2"
-              style={{ color: "#1b1c1c" }}
+          }
+          title={
+            <span
               data-cms="t:newsletter-inside-heading"
               dangerouslySetInnerHTML={{ __html: tx(t, "newsletter-inside-heading", "What&rsquo;s inside") }}
             />
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-            {INSIDE.map((item, i) => {
-              const Icon = item.Icon;
-              return (
-                <div
-                  key={i}
-                  style={{ borderRadius: "var(--radius-md)", padding: "2rem", background: "#f6f6f6", border: "1px solid rgba(27,28,28,0.06)" }}
-                >
+          }
+          style={{ marginBottom: "var(--space-block)" }}
+        />
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+          {INSIDE.map((item, i) => {
+            const Icon = item.Icon;
+            return (
+              <FeatureCard
+                key={i}
+                icon={<Icon size={22} />}
+                title={
                   <span
-                    className="inline-flex items-center justify-center mb-5"
-                    style={{ width: 48, height: 48, borderRadius: 12, background: "rgba(28,195,175,0.12)", color: "var(--color-teal)" }}
-                  >
-                    <Icon size={22} />
-                  </span>
-                  <h3
-                    className="heading-2 mb-2"
-                    style={{ color: "#1b1c1c", fontSize: "1.2rem" }}
                     data-cms={`t:newsletter-inside-${i}-title`}
                     dangerouslySetInnerHTML={{ __html: tx(t, `newsletter-inside-${i}-title`, item.defaultTitle) }}
                   />
-                  <p
-                    className="body-base"
-                    style={{ color: "rgba(27,28,28,0.6)" }}
+                }
+                body={
+                  <span
                     data-cms={`t:newsletter-inside-${i}-body`}
                     dangerouslySetInnerHTML={{ __html: tx(t, `newsletter-inside-${i}-body`, item.defaultBody) }}
                   />
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      </section>
-
-      {/* ── Recent issues (ready-to-fill archive) ────────────────── */}
-      <section className="section" style={{ backgroundColor: "#f6f6f6" }}>
-        <div className="container-c3">
-          <div className="mb-10 max-w-2xl">
-            <p
-              className="overline mb-4"
-              style={{ color: "#1cc3af" }}
-              data-cms="t:newsletter-archive-eyebrow"
-              dangerouslySetInnerHTML={{ __html: tx(t, "newsletter-archive-eyebrow", "The archive") }}
-            />
-            <h2
-              className="display-2"
-              style={{ color: "#1b1c1c" }}
-              data-cms="t:newsletter-archive-heading"
-              dangerouslySetInnerHTML={{ __html: tx(t, "newsletter-archive-heading", "Recent issues") }}
-            />
-          </div>
-
-          {issues.length === 0 ? (
-            <div
-              className="text-center"
-              style={{ background: "#fff", borderRadius: "var(--radius-md)", padding: "clamp(2.5rem,6vw,4rem)", border: "1px dashed rgba(27,28,28,0.14)" }}
-            >
-              <h3
-                className="heading-1 mb-3"
-                style={{ color: "#1b1c1c" }}
-                data-cms="t:newsletter-empty-heading"
-                dangerouslySetInnerHTML={{ __html: tx(t, "newsletter-empty-heading", "The first issue is on its way.") }}
+                }
               />
-              <p
-                className="body-lg mx-auto"
-                style={{ color: "rgba(27,28,28,0.6)", maxWidth: 460 }}
-                data-cms="t:newsletter-empty-body"
-                dangerouslySetInnerHTML={{
-                  __html: tx(t, "newsletter-empty-body", "Subscribe above and you&rsquo;ll be the first to get The C3 Weekly when it lands."),
-                }}
-              />
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {issues.map((n) => (
-                <a
-                  key={n.id}
-                  href={n.href}
-                  className="group block"
-                  style={{ background: "#fff", borderRadius: "var(--radius-md)", overflow: "hidden", border: "1px solid rgba(27,28,28,0.08)" }}
-                >
-                  {n.image && (
-                    <div className="relative overflow-hidden" style={{ aspectRatio: "16/10" }}>
-                      <Image src={assetPath(n.image)} alt={n.title} fill className="object-cover transition-transform duration-500 group-hover:scale-105" />
-                    </div>
-                  )}
-                  <div style={{ padding: "1.5rem" }}>
-                    <p style={{ fontSize: ".72rem", color: "rgba(27,28,28,0.45)", fontWeight: 600, marginBottom: 8 }}>
-                      {new Date(n.date + "T00:00:00").toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}
-                    </p>
-                    <h3 className="heading-2" style={{ fontSize: "1.2rem", marginBottom: 8, color: "#1b1c1c" }}>{n.title}</h3>
-                    <p style={{ fontSize: ".9rem", color: "rgba(27,28,28,0.62)", lineHeight: 1.6 }}>{n.excerpt}</p>
-                  </div>
-                </a>
-              ))}
-            </div>
-          )}
+            );
+          })}
         </div>
-      </section>
+      </Section>
 
-      {/* ── Stay connected (real channels) ───────────────────────── */}
-      <section className="section" style={{ backgroundColor: "#1b1c1c" }}>
-        <div className="container-c3 text-center" style={{ maxWidth: 700 }}>
-          <p
-            className="overline mb-4"
-            style={{ color: "#1cc3af" }}
-            data-cms="t:newsletter-stay-eyebrow"
-            dangerouslySetInnerHTML={{ __html: tx(t, "newsletter-stay-eyebrow", "Stay connected") }}
-          />
-          <h2
-            className="display-2 text-white mb-8"
-            data-cms="t:newsletter-stay-heading"
-            dangerouslySetInnerHTML={{ __html: tx(t, "newsletter-stay-heading", "More ways to keep up with C3") }}
-          />
-          <div className="flex flex-wrap items-center justify-center gap-4">
-            {CHANNELS.map((c) => {
-              const Icon = c.Icon;
-              return (
-                <a
-                  key={c.id}
-                  href={t[`newsletter-channel-${c.id}-href`] || c.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2.5 transition-colors"
-                  style={{
-                    color: "#fff",
-                    padding: "0.85rem 1.4rem",
-                    borderRadius: 999,
-                    border: "1px solid rgba(255,255,255,0.16)",
-                    background: "rgba(255,255,255,0.04)",
-                    fontWeight: 600,
+      {/* ── Browse the issues (NL5/NL6) + InboxTile aside (NL2) ──── */}
+      <Section tone="mist" container>
+        <SectionHeader
+          eyebrow={
+            <span
+              data-cms="t:newsletter-issues-eyebrow"
+              dangerouslySetInnerHTML={{ __html: tx(t, "newsletter-issues-eyebrow", "The archive") }}
+            />
+          }
+          title={
+            <span
+              data-cms="t:newsletter-issues-heading"
+              dangerouslySetInnerHTML={{ __html: tx(t, "newsletter-issues-heading", "Browse The C3 Weekly") }}
+            />
+          }
+          lead={
+            <span
+              data-cms="t:newsletter-issues-lead"
+              dangerouslySetInnerHTML={{
+                __html: tx(t, "newsletter-issues-lead", "Filter by week or search a topic &mdash; then open any issue to read it in full.")
+              }}
+            />
+          }
+          style={{ marginBottom: "var(--space-block)" }}
+        />
+        <div className="flex flex-col gap-10 lg:grid lg:gap-10 lg:items-start lg:[grid-template-columns:minmax(0,1fr)_320px]">
+          <IssueBrowser issues={newsletterIssues} />
+          <InboxTile
+            title={
+                <span
+                  data-cms="t:newsletter-sub-heading"
+                  dangerouslySetInnerHTML={{ __html: tx(t, "newsletter-sub-heading", "Get it in your inbox") }}
+                />
+              }
+              body={
+                <span
+                  data-cms="t:newsletter-sub-body"
+                  dangerouslySetInnerHTML={{
+                    __html: tx(t, "newsletter-sub-body", "One short email each week &mdash; what&rsquo;s coming up, this week&rsquo;s message, and simple next steps.")
                   }}
-                >
-                  <Icon size={20} style={{ color: "#1cc3af" }} />
-                  {tx(t, `newsletter-channel-${c.id}-label`, c.label)}
-                </a>
-              );
-            })}
-          </div>
+                />
+              }
+            />
         </div>
-      </section>
+      </Section>
     </>
   );
 }
