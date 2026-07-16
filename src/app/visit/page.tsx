@@ -146,7 +146,7 @@ export default async function VisitPage() {
       {/* V2: premium, equal-height FeatureCard trio (Wave-0 primitive) —
           contained tiles, icon chips, balanced type. Verbatim content preserved
           via data-cms spans + dangerouslySetInnerHTML. */}
-      <Section tone="mist" size="default">
+      <Section tone="white" size="default">
         <div className="container-c3">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8 items-stretch">
             {expectBlocks.map((block) => {
