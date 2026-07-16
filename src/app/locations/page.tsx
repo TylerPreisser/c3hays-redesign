@@ -217,51 +217,6 @@ export default async function LocationsPage() {
         </div>
       </Section>
 
-      {/* ── Join Us strip (dark ink) ── */}
-      <Section tone="dark" container centered>
-        <Stack gap="cta" align="center">
-          <Stack gap="heading" align="center">
-            <Stack gap="eyebrow" align="center">
-              <p
-                className="overline"
-                data-cms="t:locations-join-eyebrow"
-                style={{ color: "var(--color-teal)" }}
-                dangerouslySetInnerHTML={{
-                  __html: tx(t, "locations-join-eyebrow", "This Weekend"),
-                }}
-              />
-              <h2
-                className="display-2 text-white"
-                data-cms="t:locations-join-heading"
-                dangerouslySetInnerHTML={{
-                  __html: tx(t, "locations-join-heading", "We&rsquo;d love to see you."),
-                }}
-              />
-            </Stack>
-            <p
-              className="body-lg"
-              data-cms="t:locations-join-body"
-              style={{ color: "rgba(255,255,255,0.72)" }}
-              dangerouslySetInnerHTML={{
-                __html: tx(
-                  t,
-                  "locations-join-body",
-                  "No matter where you are in life, you&rsquo;re welcome here. Pick a campus, show up, and let us take care of the rest."
-                ),
-              }}
-            />
-          </Stack>
-          <Link
-            href={t["locations-join-cta-href"] || "/visit/"}
-            data-cms-link="locations-join-cta"
-            className="btn btn-primary"
-          >
-            <span data-cms-link-label>
-              {tx(t, "locations-join-cta-label", "Plan Your Visit")}
-            </span>
-          </Link>
-        </Stack>
-      </Section>
     </>
   );
 }
