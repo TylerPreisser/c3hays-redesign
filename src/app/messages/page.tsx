@@ -1,10 +1,21 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import { Play, ExternalLink, Mic } from "lucide-react";
+import { Play, ExternalLink } from "lucide-react";
 import { assetPath } from "@/lib/asset-path";
 import { getCMSPage } from "@/lib/cms";
 import { tx, imgCss } from "@/lib/home-content";
+
+/* Brand mark as an inline SVG (this lucide build ships no brand icons — matches the
+   Footer + Watch page's inline-SVG convention). currentColor drives the fill. */
+function YoutubeIcon({ size = 15, style }: { size?: number; style?: React.CSSProperties }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" style={style}>
+      <path d="M22.54 6.42a2.78 2.78 0 0 0-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46a2.78 2.78 0 0 0-1.95 1.96A29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58A2.78 2.78 0 0 0 3.41 19.6C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 0 0 1.95-1.95A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z" />
+      <polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02" fill="#fff" />
+    </svg>
+  );
+}
 
 export const metadata: Metadata = {
   title: "Messages",
@@ -136,7 +147,7 @@ export default async function MessagesPage() {
               __html: tx(
                 t,
                 "messages-hero-body",
-                "Miss a Sunday? Browse our full sermon archive on Vimeo, or tune in live this weekend."
+                "Miss a Sunday? Browse our full sermon archive on YouTube, or tune in live this weekend."
               ),
             }}
           />
@@ -218,33 +229,19 @@ export default async function MessagesPage() {
               />
             </div>
 
-            {/* External platform links */}
+            {/* External platform link — the full sermon archive lives on YouTube */}
             <div className="flex gap-3">
               <a
-                href={t["messages-vimeo-href"] || "https://vimeo.com/c3hays"}
+                href={t["messages-youtube-href"] || "https://www.youtube.com/@c3hays"}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="btn btn-outline-navy btn-sm inline-flex items-center gap-2"
               >
-                <ExternalLink size={14} aria-hidden="true" />
+                <YoutubeIcon size={15} />
                 <span
-                  data-cms="t:messages-vimeo-label"
+                  data-cms="t:messages-youtube-label"
                   dangerouslySetInnerHTML={{
-                    __html: tx(t, "messages-vimeo-label", "All on Vimeo"),
-                  }}
-                />
-              </a>
-              <a
-                href={t["messages-podcast-href"] || "https://anchor.fm/c3pod"}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="btn btn-outline-navy btn-sm inline-flex items-center gap-2"
-              >
-                <Mic size={14} aria-hidden="true" />
-                <span
-                  data-cms="t:messages-podcast-label"
-                  dangerouslySetInnerHTML={{
-                    __html: tx(t, "messages-podcast-label", "Podcast"),
+                    __html: tx(t, "messages-youtube-label", "Watch on YouTube"),
                   }}
                 />
               </a>
@@ -337,7 +334,7 @@ export default async function MessagesPage() {
           {/* Full archive CTA */}
           <div className="mt-14 text-center">
             <a
-              href={t["messages-archive-href"] || "https://vimeo.com/c3hays"}
+              href={t["messages-archive-href"] || "https://www.youtube.com/@c3hays"}
               target="_blank"
               rel="noopener noreferrer"
               className="btn btn-primary btn-lg inline-flex items-center gap-2"
@@ -349,7 +346,7 @@ export default async function MessagesPage() {
                   __html: tx(
                     t,
                     "messages-archive-label",
-                    "View Full Archive on Vimeo"
+                    "Full Archive on YouTube"
                   ),
                 }}
               />
@@ -358,7 +355,7 @@ export default async function MessagesPage() {
         </div>
       </section>
 
-      {/* ── Podcast / App callout — dark section ── */}
+      {/* ── Watch-anytime callout — dark section (full archive on YouTube) ── */}
       <section className="section" style={{ backgroundColor: "#1b1c1c" }}>
         <div className="container-c3">
           <div
@@ -367,7 +364,7 @@ export default async function MessagesPage() {
             {/* Text */}
             <div>
               <span
-                data-cms="t:messages-podcast-eyebrow"
+                data-cms="t:messages-youtube-eyebrow"
                 style={{
                   display: "inline-block",
                   textTransform: "uppercase",
@@ -378,23 +375,23 @@ export default async function MessagesPage() {
                   marginBottom: "1rem",
                 }}
                 dangerouslySetInnerHTML={{
-                  __html: tx(t, "messages-podcast-eyebrow", "Take It With You"),
+                  __html: tx(t, "messages-youtube-eyebrow", "Watch Anytime"),
                 }}
               />
               <h2
                 className="display-2 text-white text-balance"
-                data-cms="t:messages-podcast-heading"
+                data-cms="t:messages-youtube-heading"
                 style={{ marginBottom: "clamp(1rem, 3vw, 1.75rem)" }}
                 dangerouslySetInnerHTML={{
                   __html: tx(
                     t,
-                    "messages-podcast-heading",
-                    "Listen on the Podcast"
+                    "messages-youtube-heading",
+                    "Every Message on YouTube"
                   ),
                 }}
               />
               <p
-                data-cms="t:messages-podcast-body"
+                data-cms="t:messages-youtube-body"
                 style={{
                   fontSize: "1.125rem",
                   color: "rgba(255,255,255,0.75)",
@@ -404,26 +401,26 @@ export default async function MessagesPage() {
                 dangerouslySetInnerHTML={{
                   __html: tx(
                     t,
-                    "messages-podcast-body",
-                    "Every message from C3 is available as a podcast — subscribe once and never miss a week. Available on Spotify, Apple Podcasts, and anywhere you listen."
+                    "messages-youtube-body",
+                    "Missed a weekend? Every C3 message is on our YouTube channel — catch the latest series, revisit an old favorite, and subscribe so you never miss a Sunday."
                   ),
                 }}
               />
               <div className="flex flex-wrap gap-3">
                 <a
-                  href={t["messages-podcast-cta-href"] || "https://anchor.fm/c3pod"}
+                  href={t["messages-youtube-cta-href"] || "https://www.youtube.com/@c3hays"}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="btn btn-primary btn-sm inline-flex items-center gap-2"
                 >
-                  <Mic size={15} aria-hidden="true" />
+                  <YoutubeIcon size={15} />
                   <span
-                    data-cms="t:messages-podcast-cta-label"
+                    data-cms="t:messages-youtube-cta-label"
                     dangerouslySetInnerHTML={{
                       __html: tx(
                         t,
-                        "messages-podcast-cta-label",
-                        "Subscribe to Podcast"
+                        "messages-youtube-cta-label",
+                        "Watch on YouTube"
                       ),
                     }}
                   />
@@ -443,7 +440,7 @@ export default async function MessagesPage() {
             {/* Image */}
             <div
               className="relative overflow-hidden"
-              data-cms-img="messages-podcast-img"
+              data-cms-img="messages-youtube-img"
               style={{
                 aspectRatio: "4/3",
                 borderRadius: "var(--radius-md)",
@@ -451,11 +448,11 @@ export default async function MessagesPage() {
               }}
             >
               <Image
-                src={assetPath(media["messages-podcast-img"] || "/images/gather.webp")}
-                alt="C3 podcast and messages"
+                src={assetPath(media["messages-youtube-img"] || "/images/gather.webp")}
+                alt="Watch C3 messages on YouTube"
                 fill
                 className="object-cover"
-                style={imgCss(ov.img?.["messages-podcast-img"])}
+                style={imgCss(ov.img?.["messages-youtube-img"])}
               />
             </div>
           </div>

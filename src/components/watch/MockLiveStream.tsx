@@ -4,7 +4,7 @@
    MOCK LIVE-STREAM ADAPTER  (labeled mock — local/internal build)
 
    Production replaces this single component with the real embed
-   (Vimeo Live / YouTube / Mux). It deliberately makes ZERO external
+   (YouTube / Facebook Live). It deliberately makes ZERO external
    network calls so the local build is self-contained and never hits a
    third-party service. The "MOCK STREAM" chip keeps that explicit.
 

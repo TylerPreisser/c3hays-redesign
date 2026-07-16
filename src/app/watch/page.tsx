@@ -270,7 +270,7 @@ export default async function WatchPage() {
                 href={t["watch-youtube-btn-href"] || YOUTUBE}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="btn btn-outline btn-lg"
+                className="btn btn-outline-ink btn-lg"
                 data-cms-link="watch-youtube-btn"
               >
                 <span data-cms-link-label>
