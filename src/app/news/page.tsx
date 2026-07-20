@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import { assetPath } from "@/lib/asset-path";
-import { getCMSPage } from "@/lib/cms";
+import { getPageContent } from "@/lib/cms";
+import { isCmsLive } from "@/lib/cms-live";
 import { parseSections, imgCss, type SectionMeta } from "@/lib/home-content";
 import { Tx } from "@/components/cms/Editable";
 import PageComposer from "@/components/cms/PageComposer";
@@ -42,8 +43,17 @@ const PAGE_DEFAULT_SECTIONS: SectionMeta[] = [
 /* Responsive gutter for the wide Browse container (mirrors .container-c3 padding). */
 const GUTTER = "clamp(1.25rem, 5vw, 3rem)";
 
-export default async function NewsPage() {
-  const ov = (await getCMSPage("/news")) || {};
+export default async function NewsPage({
+  searchParams,
+}: {
+  searchParams?: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  // Finding 2: forward the editor's ?preview token under CMS_LIVE so the editor
+  // preview reflects DRAFT (published in export / public).
+  const cmsLive = isCmsLive();
+  const sp = cmsLive && searchParams ? await searchParams : {};
+  const preview = typeof sp.preview === "string" ? sp.preview : undefined;
+  const ov = (await getPageContent("/news", preview)) || {};
   const t = ov.text || {};
   const media = ov.media || {};
   const sections = parseSections(ov.sections, PAGE_DEFAULT_SECTIONS);

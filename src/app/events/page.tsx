@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import { assetPath } from "@/lib/asset-path";
-import { getCMSPage } from "@/lib/cms";
+import { getPageContent } from "@/lib/cms";
+import { isCmsLive } from "@/lib/cms-live";
 import { imgCss, parseSections, type SectionMeta } from "@/lib/home-content";
 import { Tx } from "@/components/cms/Editable";
 import Section from "@/components/ui/Section";
@@ -39,8 +40,17 @@ const PAGE_DEFAULT_SECTIONS: SectionMeta[] = [
  * (EventCard rendered without a `cmsKey`), are now fully editable via
  * <UpcomingEventsLive> → <UpcomingEventsGrid>.
  */
-export default async function EventsPage() {
-  const ov = (await getCMSPage("/events")) || {};
+export default async function EventsPage({
+  searchParams,
+}: {
+  searchParams?: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  // Finding 2: forward the editor's ?preview token under CMS_LIVE so the editor
+  // preview reflects DRAFT (published in export / public).
+  const cmsLive = isCmsLive();
+  const sp = cmsLive && searchParams ? await searchParams : {};
+  const preview = typeof sp.preview === "string" ? sp.preview : undefined;
+  const ov = (await getPageContent("/events", preview)) || {};
   const t = ov.text || {};
   const media = ov.media || {};
   const sections = parseSections(ov.sections, PAGE_DEFAULT_SECTIONS);

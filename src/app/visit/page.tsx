@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import { getCMSPage } from "@/lib/cms";
+import { getPageContent } from "@/lib/cms";
+import { isCmsLive } from "@/lib/cms-live";
 import { parseSections, type SectionMeta } from "@/lib/home-content";
 import PageComposer from "@/components/cms/PageComposer";
 import JoinPanel from "@/components/visit/JoinPanel";
@@ -38,8 +39,17 @@ const PAGE_DEFAULT_SECTIONS: SectionMeta[] = [
   { id: "visit-plan", visible: true },
 ];
 
-export default async function VisitPage() {
-  const ov = (await getCMSPage("/visit")) || {};
+export default async function VisitPage({
+  searchParams,
+}: {
+  searchParams?: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  // Finding 2: forward the editor's ?preview token under CMS_LIVE so the editor
+  // preview reflects DRAFT (published in export / public).
+  const cmsLive = isCmsLive();
+  const sp = cmsLive && searchParams ? await searchParams : {};
+  const preview = typeof sp.preview === "string" ? sp.preview : undefined;
+  const ov = (await getPageContent("/visit", preview)) || {};
   const t = ov.text || {};
   const sections = parseSections(ov.sections, PAGE_DEFAULT_SECTIONS);
 
