@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import Image from "next/image";
-import { ArrowUpRight } from "lucide-react";
 import { assetPath } from "@/lib/asset-path";
 import { getCMSPage } from "@/lib/cms";
 import { tx, imgCss } from "@/lib/home-content";
@@ -8,7 +7,6 @@ import Section from "@/components/ui/Section";
 import SectionHeader from "@/components/ui/SectionHeader";
 import LiveCalendar from "@/components/events/LiveCalendar";
 import UpcomingEventsLive from "@/components/events/UpcomingEventsLive";
-import { ESPACE_FULL_CALENDAR_URL } from "@/lib/espace";
 
 export const metadata: Metadata = {
   title: "Events",
@@ -95,47 +93,36 @@ export default async function EventsPage() {
         <UpcomingEventsLive />
       </Section>
 
-      {/* ── Full calendar (real eSpace widget — EV2/Wave 3 prettifies) ── */}
+      {/* ── Full calendar (real eSpace widget — EV2/Wave 3 prettifies) ──
+          EV/redesign: the "Open full calendar" CTA (a link out to the eSpace
+          FullMonth widget) is intentionally DROPPED — its role is replaced by the
+          per-event "Add to calendar" control on the upcoming-events cards above.
+          The live calendar feed itself stays. */}
       <Section tone="white" container>
-        <div
-          className="flex flex-wrap items-end justify-between gap-6"
-          style={{ marginBottom: "var(--space-block)" }}
-        >
-          <SectionHeader
-            style={{ maxWidth: "40rem" }}
-            eyebrow={
-              <span
-                style={{ color: "var(--color-teal-deep)" }}
-                data-cms="t:events-cal-eyebrow"
-                dangerouslySetInnerHTML={{ __html: tx(t, "events-cal-eyebrow", "The full picture") }}
-              />
-            }
-            title={
-              <span
-                data-cms="t:events-cal-heading"
-                dangerouslySetInnerHTML={{ __html: tx(t, "events-cal-heading", "The C3 calendar") }}
-              />
-            }
-            lead={
-              <span
-                data-cms="t:events-cal-body"
-                dangerouslySetInnerHTML={{
-                  __html: tx(t, "events-cal-body", "Every service, class, and gathering &mdash; browse the live church calendar below."),
-                }}
-              />
-            }
-          />
-          <a
-            href={t["events-cal-href"] || ESPACE_FULL_CALENDAR_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="btn btn-outline-ink"
-            data-cms-link="events-cal-cta"
-          >
-            <span data-cms-link-label>{tx(t, "events-cal-cta-label", "Open full calendar")}</span>
-            <ArrowUpRight size={18} className="ml-1.5" />
-          </a>
-        </div>
+        <SectionHeader
+          style={{ maxWidth: "40rem", marginBottom: "var(--space-block)" }}
+          eyebrow={
+            <span
+              style={{ color: "var(--color-teal-deep)" }}
+              data-cms="t:events-cal-eyebrow"
+              dangerouslySetInnerHTML={{ __html: tx(t, "events-cal-eyebrow", "The full picture") }}
+            />
+          }
+          title={
+            <span
+              data-cms="t:events-cal-heading"
+              dangerouslySetInnerHTML={{ __html: tx(t, "events-cal-heading", "The C3 calendar") }}
+            />
+          }
+          lead={
+            <span
+              data-cms="t:events-cal-body"
+              dangerouslySetInnerHTML={{
+                __html: tx(t, "events-cal-body", "Every service, class, and gathering &mdash; browse the live church calendar below."),
+              }}
+            />
+          }
+        />
 
         <LiveCalendar />
       </Section>

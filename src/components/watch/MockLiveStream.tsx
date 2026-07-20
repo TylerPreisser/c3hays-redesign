@@ -16,15 +16,19 @@ import Image from "next/image";
 import { useState } from "react";
 import { Play, Radio } from "lucide-react";
 import { assetPath } from "@/lib/asset-path";
+import { Tx } from "@/components/cms/Editable";
 
 export default function MockLiveStream({
   poster,
   isLive = false,
   nextService = "Saturday · 5:00 PM",
+  text,
 }: {
   poster: string;
   isLive?: boolean;
   nextService?: string;
+  /** CMS text override bag — authored labels/copy render editable via <Tx>. */
+  text?: Record<string, string>;
 }) {
   const [playing, setPlaying] = useState(false);
 
@@ -60,12 +64,14 @@ export default function MockLiveStream({
           WebkitBackdropFilter: "blur(6px)",
         }}
       >
-        <span
+        <Tx
+          as="span"
+          text={text}
+          k="watch-stream-mock-label"
+          fallback="Mock stream &middot; local build"
           className="text-[0.6875rem] font-bold uppercase tracking-[0.16em]"
           style={{ color: "rgba(255,255,255,0.7)" }}
-        >
-          Mock stream · local build
-        </span>
+        />
       </div>
 
       {/* Live / offline badge — top-right */}
@@ -77,12 +83,12 @@ export default function MockLiveStream({
         {isLive ? (
           <>
             <span className="animate-pulse-dot w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: "#1cc3af" }} />
-            <span className="text-[0.6875rem] font-bold uppercase tracking-[0.16em] text-white">Live now</span>
+            <Tx as="span" text={text} k="watch-stream-live-label" fallback="Live now" className="text-[0.6875rem] font-bold uppercase tracking-[0.16em] text-white" />
           </>
         ) : (
           <>
             <Radio size={13} style={{ color: "rgba(255,255,255,0.55)" }} />
-            <span className="text-[0.6875rem] font-bold uppercase tracking-[0.16em]" style={{ color: "rgba(255,255,255,0.55)" }}>Offline</span>
+            <Tx as="span" text={text} k="watch-stream-offline-label" fallback="Offline" className="text-[0.6875rem] font-bold uppercase tracking-[0.16em]" style={{ color: "rgba(255,255,255,0.55)" }} />
           </>
         )}
       </div>
@@ -113,11 +119,31 @@ export default function MockLiveStream({
           className="mt-6 text-sm max-w-md"
           style={{ color: "rgba(255,255,255,0.62)" }}
         >
-          {playing
-            ? "Preview playing — the production build streams the live service here."
-            : isLive
-              ? "We're live. Press play to join the service."
-              : `We're not streaming right now. Next service: ${nextService}.`}
+          {playing ? (
+            <Tx
+              as="span"
+              text={text}
+              k="watch-stream-msg-playing"
+              fallback="Preview playing &mdash; the production build streams the live service here."
+            />
+          ) : isLive ? (
+            <Tx
+              as="span"
+              text={text}
+              k="watch-stream-msg-live"
+              fallback="We&rsquo;re live. Press play to join the service."
+            />
+          ) : (
+            <>
+              <Tx
+                as="span"
+                text={text}
+                k="watch-stream-msg-offline"
+                fallback="We&rsquo;re not streaming right now. Next service:"
+              />{" "}
+              {nextService}.
+            </>
+          )}
         </p>
       </div>
     </div>

@@ -2,12 +2,14 @@
 
 import { useEffect, useMemo, useState } from "react";
 import EventCard from "@/components/events/EventCard";
+import AddToCalendar from "@/components/events/AddToCalendar";
 import {
   fetchEspaceEvents,
   upcomingEvents,
   ESPACE_FULL_CALENDAR_URL,
   type CalEvent,
 } from "@/lib/espace";
+import type { CalendarEvent } from "@/lib/calendar";
 
 /**
  * <UpcomingEventsLive> — Phase 4, EV2/Wave 3. Replaces the hardcoded fake UPCOMING
@@ -35,6 +37,17 @@ function detailLine(ev: CalEvent): string {
 function campusLabel(ev: CalEvent): string {
   if (ev.campus) return `${ev.campus} campus`;
   return ev.isHoliday ? "Holiday" : "Both campuses";
+}
+
+/** Map a live eSpace event → the plain shape the calendar helpers consume. */
+function toCalendarEvent(ev: CalEvent): CalendarEvent {
+  return {
+    title: ev.title,
+    start: ev.start,
+    end: ev.end,
+    location: ev.location || undefined,
+    description: ev.description || undefined,
+  };
 }
 
 /** Dark-surface skeleton matching EventCard's contained-tile silhouette. */
@@ -120,16 +133,30 @@ export default function UpcomingEventsLive() {
   return (
     <div style={GRID}>
       {top.map((ev) => (
-        <EventCard
+        // Card + per-event add-to-calendar stacked in one grid cell. NOTE: no
+        // `cmsKey` — these rows are LIVE eSpace data (positional, refetched each
+        // request), so they stay non-editable by design; only the section heading
+        // (in the page) is CMS-editable. The card link and the interactive
+        // AddToCalendar menu are SIBLINGS (never nested — <button> inside <a> is
+        // invalid HTML).
+        <div
           key={ev.id}
-          href={ev.registerUrl || ESPACE_FULL_CALENDAR_URL}
-          imageAlt={ev.title}
-          month={ev.start.toLocaleDateString("en-US", { month: "short" }).toUpperCase()}
-          day={String(ev.start.getDate()).padStart(2, "0")}
-          title={ev.title}
-          detail={detailLine(ev)}
-          campus={campusLabel(ev)}
-        />
+          style={{ display: "flex", flexDirection: "column", height: "100%" }}
+        >
+          <EventCard
+            href={ev.registerUrl || ESPACE_FULL_CALENDAR_URL}
+            imageAlt={ev.title}
+            month={ev.start.toLocaleDateString("en-US", { month: "short" }).toUpperCase()}
+            day={String(ev.start.getDate()).padStart(2, "0")}
+            title={ev.title}
+            detail={detailLine(ev)}
+            campus={campusLabel(ev)}
+            style={{ height: "auto", flex: "1 1 auto" }}
+          />
+          <div style={{ marginTop: "0.75rem" }}>
+            <AddToCalendar event={toCalendarEvent(ev)} />
+          </div>
+        </div>
       ))}
     </div>
   );
