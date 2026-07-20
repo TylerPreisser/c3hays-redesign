@@ -14,9 +14,39 @@
 // renders its hand-built pages — keeping `output: "export"` statically
 // buildable. Set NEXT_PUBLIC_CMS_URL (and run a server runtime) to let C3 Studio
 // drive the site once the admin backend is live.
+import { getCloudflareContext } from "@opennextjs/cloudflare";
 import type { SectionMeta } from "@/lib/home-content";
 
 const CMS_BASE = process.env.NEXT_PUBLIC_CMS_URL || "";
+
+/**
+ * Finding 2 — the fetcher used for EVERY c3-studio content read (published + draft).
+ *
+ * On the Worker, a same-account Worker→Worker subrequest to c3-studio's PUBLIC
+ * workers.dev URL does not deliver the response body to the render — so BOTH published
+ * (cmsFetch) and draft (draftFetch) silently fell back to the components' hard-coded
+ * fallbacks (draft edits "disappeared" on reload; Publish appeared to not change the
+ * live site). The fix is the loopback-safe SERVICE BINDING declared in wrangler.jsonc
+ * (`services: [{ binding: "CMS", service: "c3-studio" }]`): when it's present we route
+ * the subrequest through `env.CMS.fetch()`, which reaches c3-studio directly.
+ *
+ * getCloudflareContext() THROWS off the Worker (local `next dev`, vitest, static
+ * export) → we fall back to the public-URL global fetch, so nothing changes there. The
+ * URL is always built from CMS_BASE; only the FETCHER differs.
+ */
+type FetchLike = (input: string, init?: RequestInit) => Promise<Response>;
+function cmsFetcher(): FetchLike {
+  try {
+    const env = getCloudflareContext().env as
+      | { CMS?: { fetch: (input: RequestInfo | URL, init?: RequestInit) => Promise<Response> } }
+      | undefined;
+    const cms = env?.CMS;
+    if (cms) return (input, init) => cms.fetch(input, init);
+  } catch {
+    // no Cloudflare context (dev / vitest / export) → public-URL fetch
+  }
+  return (input, init) => fetch(input, init);
+}
 
 export interface CMSBlock {
   id: string;
@@ -40,7 +70,7 @@ export interface NavItem { id: string; label: string; href: string; children?: N
 async function cmsFetch<T>(path: string): Promise<T | null> {
   if (!CMS_BASE) return null; // CMS not configured → static fallback (no fetch, export-safe)
   try {
-    const res = await fetch(`${CMS_BASE}${path}`, { cache: "no-store", signal: AbortSignal.timeout(2500) });
+    const res = await cmsFetcher()(`${CMS_BASE}${path}`, { cache: "no-store", signal: AbortSignal.timeout(2500) });
     if (!res.ok) return null;
     return (await res.json()) as T;
   } catch {
@@ -82,7 +112,7 @@ async function draftFetch<T>(path: string, preview?: string): Promise<T | null> 
     // Worker-to-Worker subrequest → the old 2500ms AbortSignal tripped and draftFetch
     // returned null, so the editor preview silently fell back to PUBLISHED (edits
     // "disappeared" on reload). 8s gives the cold draft route room.
-    const res = await fetch(url, { cache: "no-store", signal: AbortSignal.timeout(8000) });
+    const res = await cmsFetcher()(url, { cache: "no-store", signal: AbortSignal.timeout(8000) });
     if (!res.ok) return null; // 401/expired/invalid/anything ⇒ caller falls back to published
     return (await res.json()) as T;
   } catch {

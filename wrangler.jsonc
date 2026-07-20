@@ -26,7 +26,17 @@
     // its whole render off a false flag and renders blank. (Same gotcha as DEMO_MODE.)
     "CMS_LIVE": "1",
     "NODE_ENV": "production"
-  }
+  },
+  // Finding 2: SERVICE BINDING to the c3-studio editor Worker (same account). The SSR
+  // fetches c3-studio's content/draft API per request; a Worker→Worker subrequest to
+  // c3-studio's PUBLIC workers.dev URL does not deliver the body to the render (draft
+  // AND published silently fell back to component fallbacks). This loopback-safe
+  // binding routes those subrequests straight to c3-studio. cms.ts prefers env.CMS
+  // when present and falls back to the public-URL fetch for local/dev/export.
+  // NOTE: `service` MUST match c3-studio's wrangler `name`; the target must be deployed.
+  "services": [
+    { "binding": "CMS", "service": "c3-studio" }
+  ]
   // Phase 2 (separate GO): add a `routes` custom_domain entry + DNS to point the
   // public church domain here. Left out on purpose so Phase 1 stays *.workers.dev.
 }
