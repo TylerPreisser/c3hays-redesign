@@ -64,6 +64,14 @@ export interface EventCardProps {
   /** CMS text override bag (paired with `cmsKey`) — persisted edits render from here. */
   cmsText?: Record<string, string>;
   /**
+   * STRUCTURED / authored-card mode: the card's data-cms path prefix, e.g.
+   * `events.cards.<id>`. When set, month/day/title/detail/campus emit
+   * `data-cms="<cardPath>.<field>"` (no scope prefix) carrying the value verbatim,
+   * so the editor's card-path router persists edits into the structured page
+   * collection (mirrors home/StayConnected). Mutually exclusive with `cmsKey`.
+   */
+  cardPath?: string;
+  /**
    * `data-cms-bg` hook on the card CONTAINER, so the editor can recolor THIS card's
    * background independently (buildBgCss paints `bgFill[bgCmsKey]` with !important).
    * Optional → omitting it leaves the card bg untagged (backward compatible).
@@ -84,11 +92,17 @@ export interface EventCardProps {
 }
 
 /**
- * Render one field. With a `cmsKey` and a string/number value → an editable <Tx>
- * (emits data-cms so C3 Studio can edit it); otherwise the raw ReactNode inside the
- * given element — byte-for-byte the pre-cmsKey behavior.
+ * Render one field. Three modes, in precedence order:
+ *   1. `cmsPath` (STRUCTURED / authored cards) — emits a raw element carrying the
+ *      exact `data-cms="<cmsPath>"` (e.g. "events.cards.<id>.title") with the value
+ *      as innerHTML, mirroring home/StayConnected. The editor's card-path router
+ *      persists edits into the structured page collection. No scope prefix.
+ *   2. `cmsKey` (FLAT / positional-live cards) — an editable <Tx> emitting
+ *      `data-cms="t:<cmsKey>-<suffix>"`, persisted in the page text bag.
+ *   3. neither — the raw ReactNode (byte-for-byte the pre-CMS behavior).
  */
 function Field({
+  cmsPath,
   cmsKey,
   cmsText,
   suffix,
@@ -97,6 +111,7 @@ function Field({
   className,
   style,
 }: {
+  cmsPath?: string;
   cmsKey?: string;
   cmsText?: Record<string, string>;
   suffix: string;
@@ -105,6 +120,17 @@ function Field({
   className?: string;
   style?: CSSProperties;
 }) {
+  if (cmsPath != null && (typeof value === "string" || typeof value === "number")) {
+    const Tag = as;
+    return (
+      <Tag
+        data-cms={cmsPath}
+        className={className}
+        style={style}
+        dangerouslySetInnerHTML={{ __html: String(value) }}
+      />
+    );
+  }
   if (cmsKey != null && (typeof value === "string" || typeof value === "number")) {
     return (
       <Tx
@@ -183,6 +209,7 @@ export default function EventCard({
   imgCmsKey,
   cmsKey,
   cmsText,
+  cardPath,
   bgCmsKey,
   ctaCmsKey,
   ctaHref,
@@ -191,6 +218,9 @@ export default function EventCard({
   className,
   style,
 }: EventCardProps) {
+  // Structured (authored) card → per-field data-cms path; else undefined (flat/live).
+  const fieldPath = (field: string): string | undefined =>
+    cardPath != null ? `${cardPath}.${field}` : undefined;
   const surface: CSSProperties = {
     display: "flex",
     flexDirection: "column",
@@ -223,6 +253,7 @@ export default function EventCard({
       }}
     >
       <Field
+        cmsPath={fieldPath("month")}
         cmsKey={cmsKey}
         cmsText={cmsText}
         suffix="month"
@@ -231,6 +262,7 @@ export default function EventCard({
         style={{ fontSize: "0.7rem", fontWeight: 800, letterSpacing: "0.08em" }}
       />
       <Field
+        cmsPath={fieldPath("day")}
         cmsKey={cmsKey}
         cmsText={cmsText}
         suffix="day"
@@ -252,6 +284,7 @@ export default function EventCard({
       }}
     >
       <Field
+        cmsPath={fieldPath("title")}
         cmsKey={cmsKey}
         cmsText={cmsText}
         suffix="title"
@@ -262,6 +295,7 @@ export default function EventCard({
       />
       {detail != null && (
         <Field
+          cmsPath={fieldPath("detail")}
           cmsKey={cmsKey}
           cmsText={cmsText}
           suffix="detail"
@@ -275,6 +309,7 @@ export default function EventCard({
       <div style={{ flex: 1 }} />
       {campus != null && (
         <Field
+          cmsPath={fieldPath("campus")}
           cmsKey={cmsKey}
           cmsText={cmsText}
           suffix="campus"
