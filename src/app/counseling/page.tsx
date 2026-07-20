@@ -73,6 +73,8 @@ function CardLabel({ children }: { children: React.ReactNode }) {
   );
 }
 
+export const dynamic = "force-dynamic";
+
 export default async function CounselingPage({
   searchParams,
 }: {

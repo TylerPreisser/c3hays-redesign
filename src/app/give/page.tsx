@@ -32,6 +32,8 @@ const PAGE_DEFAULT_SECTIONS: SectionMeta[] = [
  * the real Pushpay giving destinations (nothing invented; the old $-motif tiles
  * are gone). Composed through the shared PageComposer, same as home.
  */
+export const dynamic = "force-dynamic";
+
 export default async function GivePage({
   searchParams,
 }: {

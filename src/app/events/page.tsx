@@ -40,6 +40,8 @@ const PAGE_DEFAULT_SECTIONS: SectionMeta[] = [
  * (EventCard rendered without a `cmsKey`), are now fully editable via
  * <UpcomingEventsLive> → <UpcomingEventsGrid>.
  */
+export const dynamic = "force-dynamic";
+
 export default async function EventsPage({
   searchParams,
 }: {

@@ -14,6 +14,12 @@ import PageComposer from "@/components/cms/PageComposer";
 import { assetPath } from "@/lib/asset-path";
 import { isExampleSection, renderExample, SECTION_EXAMPLE_IDS } from "@/lib/section-examples";
 
+// Finding 2: force per-request render so the editor's ?preview token is always read
+// and the (binding-fetched) DRAFT reflects. Without this the SSR response was served
+// cached → edits "disappeared" on reload even though getHomeContent(preview) returns
+// the draft. Public traffic still fetches PUBLISHED per request (CMS drives the site).
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "Celebration Community Church | Welcome Home.",
   description:

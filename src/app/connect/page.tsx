@@ -21,6 +21,8 @@ const PAGE_DEFAULT_SECTIONS: SectionMeta[] = [
   { id: "connect-steps", visible: true },
 ];
 
+export const dynamic = "force-dynamic";
+
 export default async function ConnectPage({
   searchParams,
 }: {

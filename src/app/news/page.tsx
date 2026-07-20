@@ -43,6 +43,8 @@ const PAGE_DEFAULT_SECTIONS: SectionMeta[] = [
 /* Responsive gutter for the wide Browse container (mirrors .container-c3 padding). */
 const GUTTER = "clamp(1.25rem, 5vw, 3rem)";
 
+export const dynamic = "force-dynamic";
+
 export default async function NewsPage({
   searchParams,
 }: {
