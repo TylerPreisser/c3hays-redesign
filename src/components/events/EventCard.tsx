@@ -1,6 +1,7 @@
-import type { CSSProperties, ReactNode } from "react";
+import type { CSSProperties, ElementType, ReactNode } from "react";
 import Image from "next/image";
 import { assetPath } from "@/lib/asset-path";
+import { Tx } from "@/components/cms/Editable";
 
 /**
  * <EventCard> — Phase 4, Wave 2F primitive (§3.5, EV1).
@@ -26,6 +27,16 @@ import { assetPath } from "@/lib/asset-path";
  * `title` / `detail` / `campus` accept ReactNode so a page can pass a node
  * carrying its own `data-cms` editor hook + `dangerouslySetInnerHTML`.
  *
+ * EDITABLE-BY-CONSTRUCTION: pass a stable `cmsKey` and the card renders month / day
+ * / title / detail / campus through <Tx> (data-cms="t:<cmsKey>-<field>"), so an
+ * AUTHORED/static consumer gets in-place C3 Studio editing for free — modeled on
+ * home/EventsStrip.tsx. LIVE consumers (e.g. <UpcomingEventsLive>, whose rows are
+ * positional and refetched each request) MUST NOT pass `cmsKey`: doing so would let
+ * a saved edit on row N bleed onto whatever event lands in slot N next time. With no
+ * `cmsKey` the card renders its props verbatim, exactly as before (non-editable by
+ * design). String/number field values become the editable fallback; non-string
+ * ReactNode fields are rendered verbatim even when `cmsKey` is set.
+ *
  * Server component (CSS-only hover). The whole card is a link when `href` is set.
  */
 export interface EventCardProps {
@@ -45,8 +56,57 @@ export interface EventCardProps {
   href?: string;
   /** `data-cms-img` hook for the image region (editor recolor/replace). */
   imgCmsKey?: string;
+  /**
+   * Stable CMS key. When set, month/day/title/detail/campus become editable via
+   * <Tx> (keys `${cmsKey}-month` etc). Omit for LIVE/positional data (see note).
+   */
+  cmsKey?: string;
+  /** CMS text override bag (paired with `cmsKey`) — persisted edits render from here. */
+  cmsText?: Record<string, string>;
   className?: string;
   style?: CSSProperties;
+}
+
+/**
+ * Render one field. With a `cmsKey` and a string/number value → an editable <Tx>
+ * (emits data-cms so C3 Studio can edit it); otherwise the raw ReactNode inside the
+ * given element — byte-for-byte the pre-cmsKey behavior.
+ */
+function Field({
+  cmsKey,
+  cmsText,
+  suffix,
+  value,
+  as,
+  className,
+  style,
+}: {
+  cmsKey?: string;
+  cmsText?: Record<string, string>;
+  suffix: string;
+  value: ReactNode;
+  as: ElementType;
+  className?: string;
+  style?: CSSProperties;
+}) {
+  if (cmsKey != null && (typeof value === "string" || typeof value === "number")) {
+    return (
+      <Tx
+        as={as}
+        text={cmsText}
+        k={`${cmsKey}-${suffix}`}
+        fallback={String(value)}
+        className={className}
+        style={style}
+      />
+    );
+  }
+  const Tag = as;
+  return (
+    <Tag className={className} style={style}>
+      {value}
+    </Tag>
+  );
 }
 
 /** 4:5 media area — image with cover fit, or a teal→ink gradient fallback. */
@@ -105,6 +165,8 @@ export default function EventCard({
   imageAlt,
   href,
   imgCmsKey,
+  cmsKey,
+  cmsText,
   className,
   style,
 }: EventCardProps) {
@@ -139,12 +201,22 @@ export default function EventCard({
         boxShadow: "0 6px 18px rgba(4,46,41,0.28)",
       }}
     >
-      <span style={{ fontSize: "0.7rem", fontWeight: 800, letterSpacing: "0.08em" }}>
-        {month}
-      </span>
-      <span style={{ fontSize: "1.6rem", fontWeight: 800, marginTop: "0.15rem" }}>
-        {day}
-      </span>
+      <Field
+        cmsKey={cmsKey}
+        cmsText={cmsText}
+        suffix="month"
+        value={month}
+        as="span"
+        style={{ fontSize: "0.7rem", fontWeight: 800, letterSpacing: "0.08em" }}
+      />
+      <Field
+        cmsKey={cmsKey}
+        cmsText={cmsText}
+        suffix="day"
+        value={day}
+        as="span"
+        style={{ fontSize: "1.6rem", fontWeight: 800, marginTop: "0.15rem" }}
+      />
     </div>
   );
 
@@ -158,21 +230,35 @@ export default function EventCard({
         gap: "0.4rem",
       }}
     >
-      <h3
+      <Field
+        cmsKey={cmsKey}
+        cmsText={cmsText}
+        suffix="title"
+        value={title}
+        as="h3"
         className="heading-3"
         style={{ color: "#fff", fontSize: "1.3rem", margin: 0 }}
-      >
-        {title}
-      </h3>
+      />
       {detail != null && (
-        <p className="body-base" style={{ color: "rgba(255,255,255,0.7)", margin: 0 }}>
-          {detail}
-        </p>
+        <Field
+          cmsKey={cmsKey}
+          cmsText={cmsText}
+          suffix="detail"
+          value={detail}
+          as="p"
+          className="body-base"
+          style={{ color: "rgba(255,255,255,0.7)", margin: 0 }}
+        />
       )}
       {/* Flex spacer pushes the campus pill to the bottom → equal-height rows align. */}
       <div style={{ flex: 1 }} />
       {campus != null && (
-        <span
+        <Field
+          cmsKey={cmsKey}
+          cmsText={cmsText}
+          suffix="campus"
+          value={campus}
+          as="span"
           style={{
             alignSelf: "flex-start",
             marginTop: "0.85rem",
@@ -189,9 +275,7 @@ export default function EventCard({
             borderRadius: "999px",
             padding: "0.3rem 0.7rem",
           }}
-        >
-          {campus}
-        </span>
+        />
       )}
     </div>
   );
