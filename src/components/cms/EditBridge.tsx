@@ -264,7 +264,19 @@ export default function EditBridge() {
       });
     };
 
-    const imgObserver = new MutationObserver(() => { if (Object.keys(shimImg).length) reapplyShimImgs(); reapplySel(); reapplySecSel(); ensureAnchored(); });
+    // #2 fix (general): make EVERY [data-cms] editable, including nodes a CLIENT island
+    // mounts AFTER this effect's one-time scan (e.g. /events upcoming cards fetched async,
+    // /news live lists). Before this, the doc-level focusin/click still selected+outlined
+    // them (they "highlighted") but they never got contenteditable, so you couldn't type —
+    // exactly the "clicking highlights but won't let me edit" bug. Idempotent; re-run on
+    // every DOM mutation via the observer below.
+    const ensureEditable = () => {
+      document.querySelectorAll<HTMLElement>("[data-cms]").forEach((el) => {
+        if (el.getAttribute("contenteditable") !== "true") { el.setAttribute("contenteditable", "true"); el.spellcheck = false; }
+      });
+    };
+
+    const imgObserver = new MutationObserver(() => { if (Object.keys(shimImg).length) reapplyShimImgs(); reapplySel(); reapplySecSel(); ensureAnchored(); ensureEditable(); });
     imgObserver.observe(document.body, { childList: true, subtree: true });
 
     // ── build the floating toolbar ──
