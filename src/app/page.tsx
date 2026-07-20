@@ -8,6 +8,7 @@ import StayConnected from "@/components/home/StayConnected";
 import GiveSection from "@/components/home/GiveSection";
 import PromoBanner from "@/components/home/PromoBanner";
 import { getHomeContent } from "@/lib/cms";
+import { isCmsLive } from "@/lib/cms-live";
 import { fromStudioHome } from "@/lib/home-content";
 import PageComposer from "@/components/cms/PageComposer";
 import { isExampleSection, renderExample, SECTION_EXAMPLE_IDS } from "@/lib/section-examples";
@@ -34,7 +35,7 @@ export default async function HomePage({
   // Preview only exists in the CMS_LIVE server runtime. In the static-export build
   // CMS_LIVE is unset, so we must NOT read searchParams (that forces dynamic
   // rendering and breaks `output: export`). Export ⇒ published, byte-identical.
-  const cmsLive = process.env.CMS_LIVE === "1";
+  const cmsLive = isCmsLive();
   const sp = cmsLive && searchParams ? await searchParams : {};
   const preview = typeof sp.preview === "string" ? sp.preview : undefined;
   const c = fromStudioHome(await getHomeContent(preview));

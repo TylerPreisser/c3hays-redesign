@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { getPageContent } from "@/lib/cms";
+import { isCmsLive } from "@/lib/cms-live";
 import { parseSections, type SectionMeta } from "@/lib/home-content";
 import PageComposer from "@/components/cms/PageComposer";
 import { ConnectHero, ConnectSteps } from "./ConnectClient";
@@ -30,7 +31,7 @@ export default async function ConnectPage({
   // Preview only exists in the CMS_LIVE server runtime. In the static-export build
   // CMS_LIVE is unset, so we must NOT read searchParams (that forces dynamic
   // rendering and breaks `output: export`). Export ⇒ published, byte-identical.
-  const cmsLive = process.env.CMS_LIVE === "1";
+  const cmsLive = isCmsLive();
   const sp = cmsLive && searchParams ? await searchParams : {};
   const preview = typeof sp.preview === "string" ? sp.preview : undefined;
 

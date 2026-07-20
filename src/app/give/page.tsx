@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { getPageContent } from "@/lib/cms";
+import { isCmsLive } from "@/lib/cms-live";
 import { parseSections, type SectionMeta } from "@/lib/home-content";
 import PageComposer from "@/components/cms/PageComposer";
 import GiveHero from "./GiveHero";
@@ -39,7 +40,7 @@ export default async function GivePage({
 }) {
   // Only read searchParams in the CMS_LIVE server runtime — in the static-export
   // build reading them forces dynamic rendering and breaks `output: export`.
-  const cmsLive = process.env.CMS_LIVE === "1";
+  const cmsLive = isCmsLive();
   const sp = cmsLive && searchParams ? await searchParams : {};
   const preview = typeof sp.preview === "string" ? sp.preview : undefined;
 

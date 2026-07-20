@@ -4,6 +4,7 @@ import { Phone, DollarSign, CheckCircle, GraduationCap } from "lucide-react";
 import { counselors } from "@/data/counselors";
 import { assetPath } from "@/lib/asset-path";
 import { getPageContent } from "@/lib/cms";
+import { isCmsLive } from "@/lib/cms-live";
 import { imgCss, parseSections, type SectionMeta } from "@/lib/home-content";
 import Section from "@/components/ui/Section";
 import SectionHeader from "@/components/ui/SectionHeader";
@@ -82,7 +83,7 @@ export default async function CounselingPage({
   // Preview only exists in the CMS_LIVE server runtime. In the static-export build
   // CMS_LIVE is unset, so we must NOT read searchParams (that forces dynamic
   // rendering and breaks `output: export`).
-  const cmsLive = process.env.CMS_LIVE === "1";
+  const cmsLive = isCmsLive();
   const sp = cmsLive && searchParams ? await searchParams : {};
   const preview = typeof sp.preview === "string" ? sp.preview : undefined;
 

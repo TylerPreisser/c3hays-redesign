@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { getPageContent, getCMSScreen, getCMSBundle } from "@/lib/cms";
+import { isCmsLive } from "@/lib/cms-live";
 
 /**
  * Website Editor v4 — R5: generic renderer for CMS-authored pages (a Screen).
@@ -47,7 +48,7 @@ export default async function GenericPage({
   params: Promise<{ slug: string }>;
   searchParams?: Promise<Record<string, string | string[] | undefined>>;
 }) {
-  const cmsLive = process.env.CMS_LIVE === "1";
+  const cmsLive = isCmsLive();
   const { slug } = await params;
   const sp = cmsLive && searchParams ? await searchParams : {};
   const preview = typeof sp.preview === "string" ? sp.preview : undefined;
