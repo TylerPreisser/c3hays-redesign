@@ -45,7 +45,7 @@ const EXPLORE_LINKS = [
   { id: "footer-explore-0", label: "About", href: "/about/" },
   { id: "footer-explore-1", label: "Locations", href: "/locations/" },
   { id: "footer-explore-2", label: "Messages", href: "/messages/" },
-  { id: "footer-explore-3", label: "Newsletter", href: "/newsletter/" },
+  { id: "footer-explore-3", label: "C3 Weekly", href: "/news/" },
   { id: "footer-explore-4", label: "Events", href: "/events/" },
   { id: "footer-explore-5", label: "Watch Live", href: "/watch/" },
   { id: "footer-explore-6", label: "Counseling", href: "/counseling/" },

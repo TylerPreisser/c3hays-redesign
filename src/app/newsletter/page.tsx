@@ -2,20 +2,22 @@
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 /**
- * /newsletter → /visit/ redirect.
+ * /newsletter → /news/ redirect.
  *
- * "Plan Your Visit" and "The C3 Weekly" were merged into ONE consolidated page at
- * /visit (redesign/visit). This route now redirects there.
+ * "The C3 Weekly" now lives at its OWN page, /news. This legacy route forwards there
+ * (SEO / back-compat) so the old /newsletter link and the editor's "News" resolve to
+ * the real C3 Weekly content — NOT the old Visit page (reversing the redirect-orphan
+ * chain news → newsletter → the-visit-page that made the editor's "News" show Visit).
  *
- * Robust for BOTH build modes (next.config redirects are ignored by output:export,
- * so we can't rely on them):
- *   1. client-side router.replace("/visit/") in useEffect (SPA nav, no history entry),
+ * Robust for BOTH build modes (next.config redirects are ignored by output:export):
+ *   1. client-side router.replace("/news/") in useEffect (SPA nav, no history entry),
  *   2. a <meta httpEquiv="refresh"> so a static export / no-JS load still forwards,
  *   3. a visible fallback link if neither fires.
  */
-const TARGET = "/visit/";
+const TARGET = "/news/";
 
 export default function NewsletterRedirect() {
   const router = useRouter();
@@ -42,16 +44,16 @@ export default function NewsletterRedirect() {
       >
         <div className="container-c3">
           <p className="overline" style={{ color: "var(--color-teal-deep)", marginBottom: "var(--space-eyebrow)" }}>
-            The C3 Weekly has moved
+            The C3 Weekly
           </p>
           <h1 className="display-2 text-balance" style={{ marginBottom: "var(--space-heading)" }}>
-            Taking you to Plan Your Visit&hellip;
+            Taking you to The C3 Weekly&hellip;
           </h1>
           <p className="body-lg" style={{ color: "var(--color-stone)" }}>
             If you aren&rsquo;t redirected automatically,{" "}
-            <a href={TARGET} style={{ color: "var(--color-teal-deep)", fontWeight: 600, textDecoration: "underline" }}>
-              continue to /visit
-            </a>
+            <Link href={TARGET} style={{ color: "var(--color-teal-deep)", fontWeight: 600, textDecoration: "underline" }}>
+              continue to The C3 Weekly
+            </Link>
             .
           </p>
         </div>

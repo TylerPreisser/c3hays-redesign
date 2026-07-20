@@ -58,14 +58,19 @@ describe("Connect — form first, no captcha copy, real CCB form", () => {
   });
 });
 
-describe("Newsletter — new /newsletter page; old /news redirects", () => {
-  it("/newsletter page exists", () => {
-    expect(existsSync(app("newsletter/page.tsx"))).toBe(true);
-  });
-  it("/news redirects to /newsletter", () => {
+describe("The C3 Weekly — real /news page; old /newsletter redirects", () => {
+  // EE-visitweekly: /news is now the REAL "C3 Weekly" page (was a redirect stub); the
+  // legacy /newsletter route redirects to /news (reversing the old news→newsletter→visit
+  // orphan chain that made the editor's "News" show Visit content).
+  it("/news is a real content page (not a redirect stub)", () => {
     const news = read("news/page.tsx");
-    expect(news).toContain("redirect");
-    expect(news).toContain("/newsletter");
+    expect(news).not.toContain("router.replace");
+    expect(news).toContain("PageComposer");
+  });
+  it("/newsletter redirects to /news (not /visit)", () => {
+    const nl = read("newsletter/page.tsx");
+    expect(nl).toContain("/news");
+    expect(nl).not.toContain("/visit");
   });
 });
 
