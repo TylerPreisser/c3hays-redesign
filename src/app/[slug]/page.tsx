@@ -29,6 +29,7 @@ import { getPageContent, getCMSScreen, getCMSBundle } from "@/lib/cms";
 // without updating this list.
 export const STATIC_ROUTES = new Set([
   "about", "beliefs", "visit", "locations", "messages", "news", "watch", "counseling", "connect", "give",
+  "events", "newsletter", "section-preview",
 ]);
 
 export async function generateStaticParams(): Promise<{ slug: string }[]> {
