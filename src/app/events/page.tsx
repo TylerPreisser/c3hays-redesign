@@ -9,6 +9,8 @@ import SectionHeader from "@/components/ui/SectionHeader";
 import PageComposer from "@/components/cms/PageComposer";
 import LiveCalendar from "@/components/events/LiveCalendar";
 import UpcomingEventsLive from "@/components/events/UpcomingEventsLive";
+import UpcomingEventsAuthored from "@/components/events/UpcomingEventsAuthored";
+import { parseEventCards } from "@/components/events/events-content";
 
 export const metadata: Metadata = {
   title: "Events",
@@ -42,6 +44,9 @@ export default async function EventsPage() {
   const t = ov.text || {};
   const media = ov.media || {};
   const sections = parseSections(ov.sections, PAGE_DEFAULT_SECTIONS);
+  // Authored cards (round-2) OVERRIDE the live eSpace feed when present; absent ⇒ the
+  // live island keeps auto-populating (live-by-default). See events-content.ts.
+  const authoredCards = parseEventCards(ov);
 
   const render = (id: string): React.ReactNode => {
     switch (id) {
@@ -110,7 +115,11 @@ export default async function EventsPage() {
               }
               title={<Tx text={t} k="events-heading" fallback="Upcoming Events" />}
             />
-            <UpcomingEventsLive text={t} media={media} />
+            {authoredCards.length > 0 ? (
+              <UpcomingEventsAuthored cards={authoredCards} text={t} media={media} />
+            ) : (
+              <UpcomingEventsLive text={t} media={media} />
+            )}
           </Section>
         );
 

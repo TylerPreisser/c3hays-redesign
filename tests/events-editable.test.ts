@@ -63,6 +63,7 @@ function sampleEvent(i: number, title: string): CalEvent {
 
 let pageHtml = "";
 let gridHtml = "";
+let authoredHtml = "";
 
 beforeAll(async () => {
   // LiveCalendar/UpcomingEventsLive pull gsap-adjacent modules that read matchMedia
@@ -82,6 +83,18 @@ beforeAll(async () => {
   const events = [sampleEvent(0, "Baptism Sunday"), sampleEvent(1, "Student Night")];
   gridHtml = renderToStaticMarkup(
     createElement(UpcomingEventsGrid, { events, text: {}, media: {} }),
+  );
+
+  // Round-2 authored path: server-rendered, add/removable, structured data-cms paths.
+  const { default: UpcomingEventsAuthored } = await import(
+    "@/components/events/UpcomingEventsAuthored"
+  );
+  const cards = [
+    { id: "aa", title: "Baptism Sunday", month: "JUL", day: "20", detail: "Both services", campus: "Both campuses" },
+    { id: "bb", title: "Student Night", month: "AUG", day: "01", detail: "Grades 6-12", campus: "Hays campus" },
+  ];
+  authoredHtml = renderToStaticMarkup(
+    createElement(UpcomingEventsAuthored, { cards, text: {}, media: {} }),
   );
 });
 
@@ -118,5 +131,52 @@ describe("upcoming cards are editor-native (contract §1 a–e)", () => {
     expect(linkKeys).toContain("events-upcoming-1-cta");
     // Editable-by-construction invariant: NO collapsed (label-less) links.
     expect(collapsedLinkKeys(gridHtml)).toEqual([]);
+  });
+});
+
+describe("authored events cards support true-edit + add/remove (round-2)", () => {
+  it("wraps the list in the add/remove anchor data-cms-list=events.cards", () => {
+    expect(attrValues(authoredHtml, "data-cms-list")).toContain("events.cards");
+  });
+
+  it("renders each field as a STRUCTURED data-cms path (router target), not a t: key", () => {
+    // These are what the editor's events.cards.<id>.<field> router persists.
+    expect(authoredHtml).toContain('data-cms="events.cards.aa.title"');
+    expect(authoredHtml).toContain('data-cms="events.cards.aa.month"');
+    expect(authoredHtml).toContain('data-cms="events.cards.aa.day"');
+    expect(authoredHtml).toContain('data-cms="events.cards.aa.detail"');
+    expect(authoredHtml).toContain('data-cms="events.cards.aa.campus"');
+    expect(authoredHtml).toContain('data-cms="events.cards.bb.title"');
+    // The authored field value renders verbatim (persisted content), no t: scope leak.
+    expect(authoredHtml).not.toContain('data-cms="t:events-card');
+  });
+
+  it("gives each card its own bg handle and swappable image", () => {
+    const bg = attrValues(authoredHtml, "data-cms-bg");
+    expect(bg).toContain("events-card-aa-bg");
+    expect(bg).toContain("events-card-bb-bg");
+    const img = attrValues(authoredHtml, "data-cms-img");
+    expect(img).toContain("events-card-aa-img");
+    expect(img).toContain("events-card-bb-img");
+  });
+
+  it("gives each card an editable CTA link with a label span (no collapse)", () => {
+    const links = attrValues(authoredHtml, "data-cms-link");
+    expect(links).toContain("events.cards.aa.cta");
+    expect(links).toContain("events.cards.bb.cta");
+    expect(collapsedLinkKeys(authoredHtml)).toEqual([]);
+  });
+});
+
+describe("parseEventCards defensive boundary", () => {
+  it("returns [] with no authored cards (⇒ live fallback) and skips garbage", async () => {
+    const { parseEventCards } = await import("@/components/events/events-content");
+    expect(parseEventCards(undefined)).toEqual([]);
+    expect(parseEventCards({})).toEqual([]);
+    expect(parseEventCards({ cards: "nope" })).toEqual([]);
+    // Missing/blank id or non-object entries are skipped; valid ones survive.
+    const parsed = parseEventCards({ cards: [null, { title: "no id" }, { id: "ok", title: "Kept" }] });
+    expect(parsed.map((c) => c.id)).toEqual(["ok"]);
+    expect(parsed[0].title).toBe("Kept");
   });
 });
