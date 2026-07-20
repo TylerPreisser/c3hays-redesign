@@ -34,7 +34,7 @@ beforeAll(async () => {
     window.matchMedia = () => ({ matches: false, media: "", onchange: null, addListener() {}, removeListener() {}, addEventListener() {}, removeEventListener() {}, dispatchEvent() { return false; } });
   }
   const { default: NewsPage } = await import("@/app/news/page");
-  newsHtml = renderToStaticMarkup(await NewsPage());
+  newsHtml = renderToStaticMarkup(await NewsPage({ searchParams: Promise.resolve({}) }));
 });
 
 describe("#8 — weekly-hero keeps an editable top image + left header", () => {

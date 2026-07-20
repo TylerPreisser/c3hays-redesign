@@ -59,11 +59,12 @@ beforeAll(async () => {
     window.matchMedia = () => ({ matches: false, media: "", onchange: null, addListener() {}, removeListener() {}, addEventListener() {}, removeEventListener() {}, dispatchEvent() { return false; } });
   }
 
+  const noProps = { searchParams: Promise.resolve({}) };
   const { default: VisitPage } = await import("@/app/visit/page");
-  visitHtml = renderToStaticMarkup(await VisitPage());
+  visitHtml = renderToStaticMarkup(await VisitPage(noProps));
 
   const { default: NewsPage } = await import("@/app/news/page");
-  newsHtml = renderToStaticMarkup(await NewsPage());
+  newsHtml = renderToStaticMarkup(await NewsPage(noProps));
 
   // Shared nav is layout-level (one <Header> for every page). Render it twice to
   // prove it is pathname-independent → identical nav on /visit and any other page.
