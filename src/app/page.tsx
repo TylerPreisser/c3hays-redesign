@@ -9,8 +9,7 @@ import GiveSection from "@/components/home/GiveSection";
 import PromoBanner from "@/components/home/PromoBanner";
 import { getHomeContent } from "@/lib/cms";
 import { fromStudioHome } from "@/lib/home-content";
-import { buildBgCss } from "@/lib/backgrounds";
-import RevealPlayer from "@/components/cms/RevealPlayer";
+import PageComposer from "@/components/cms/PageComposer";
 import { isExampleSection, renderExample, SECTION_EXAMPLE_IDS } from "@/lib/section-examples";
 
 export const metadata: Metadata = {
@@ -57,28 +56,15 @@ export default async function HomePage({
     }
   };
 
+  // Home is now the REFERENCE implementation of the generic PageComposer. It keeps
+  // its own `known` allow-list (home renders only these ids) BEFORE handing the
+  // list to the composer — the composer applies the visible-filter + buildBgCss.
+  // EditBridge is mounted globally in layout.tsx.
   const known = new Set([
     "hero", "mission", "meetGrowServe", "nt26", "locations", "stayConnected", "give", "promo",
     ...SECTION_EXAMPLE_IDS,
   ]);
-  const visible = c.sections.filter((s) => s.visible && known.has(s.id));
-  // Per-section AND per-tile background overrides → ONE scoped stylesheet (no
-  // component edits). v3: `background` shorthand so a color, gradient, OR image
-  // all work, plus per-tile fills keyed by data-cms-bg (R3). buildBgCss is the
-  // shared primitive mirrored from c3-backend.
-  const bgCss = buildBgCss(c.sections, c.bgFill);
+  const sections = c.sections.filter((s) => known.has(s.id));
 
-  return (
-    <>
-      {/* EditBridge is mounted globally in layout.tsx now. */}
-      {bgCss && <style dangerouslySetInnerHTML={{ __html: bgCss }} />}
-      {/* v6 R6 (6b): play per-element entrance animations for this page's content. */}
-      <RevealPlayer anim={c.anim} />
-      {visible.map((s) => (
-        <div key={s.id} data-section={s.id}>
-          {render(s.id, s.variant)}
-        </div>
-      ))}
-    </>
-  );
+  return <PageComposer sections={sections} bgFill={c.bgFill} anim={c.anim} render={render} />;
 }

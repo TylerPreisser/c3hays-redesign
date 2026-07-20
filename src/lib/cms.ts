@@ -14,6 +14,8 @@
 // renders its hand-built pages — keeping `output: "export"` statically
 // buildable. Set NEXT_PUBLIC_CMS_URL (and run a server runtime) to let C3 Studio
 // drive the site once the admin backend is live.
+import type { SectionMeta } from "@/lib/home-content";
+
 const CMS_BASE = process.env.NEXT_PUBLIC_CMS_URL || "";
 
 export interface CMSBlock {
@@ -108,6 +110,14 @@ export interface CMSOverrides {
   bgFill?: Record<string, string>;
   /** v6 (R6): per-element entrance animations keyed by data-cms path → preset. */
   anim?: Record<string, string>;
+  /**
+   * Layer-2 (any-page): the page's OWN ordered/recolorable section list — mirrors
+   * StudioHome.sections (home-only today). A non-home page persists its section
+   * order + per-section bg here so the editor rail can add/reorder/hide/recolor it,
+   * and PageComposer emits the `<div data-section>` wrappers + scoped bg stylesheet.
+   * Parse defensively at the boundary with `parseSections` (home-content.ts).
+   */
+  sections?: SectionMeta[];
   nav?: { items?: { label: string; href: string }[]; bg?: string; color?: string; font?: string; effect?: "auto" | "solid" | "transparent" };
 }
 /** Per-page overrides (text/buttons/images) by slug, e.g. "/about/". */

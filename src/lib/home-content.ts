@@ -59,6 +59,26 @@ export function tx(text: Record<string, string> | undefined, key: string, fallba
   return text && typeof text[key] === "string" && text[key].trim() !== "" ? text[key] : fallback;
 }
 
+/**
+ * Defensive parse of a persisted section list (CMS overrides / StudioHome) into
+ * `SectionMeta[]`. Any-page equivalent of the inline home parse (used by
+ * `fromStudioHome`): keeps only entries with a string `id`, defaults `visible` to
+ * true (only an explicit `false` hides), and string-guards `bg`/`variant`. Returns
+ * `fallback` when `raw` is not a non-empty array (missing/garbage ⇒ page defaults).
+ * Page files call `parseSections(overrides?.sections, PAGE_DEFAULT_SECTIONS)`.
+ */
+export function parseSections(raw: unknown, fallback: SectionMeta[]): SectionMeta[] {
+  if (!Array.isArray(raw) || raw.length === 0) return fallback;
+  return (raw as Array<{ id?: unknown; visible?: unknown; bg?: unknown; variant?: unknown }>)
+    .filter((s) => !!s && typeof s.id === "string")
+    .map((s) => ({
+      id: s.id as string,
+      visible: s.visible !== false,
+      bg: typeof s.bg === "string" ? s.bg : undefined,
+      variant: typeof s.variant === "string" ? s.variant : undefined,
+    }));
+}
+
 /* ── DEFAULTS = the canonical site content ──── */
 export const HERO_DEFAULTS: HeroContent = {
   // Verbatim from celebratejesus.org home H1.
@@ -142,11 +162,8 @@ export function fromStudioHome(raw: StudioHome | null | undefined): HomeContent 
     text: (raw.text && typeof raw.text === "object" ? raw.text : {}) as Record<string, string>,
     btn: (raw.btn && typeof raw.btn === "object" ? raw.btn : {}) as Record<string, BtnStyle>,
     icon: (raw.icon && typeof raw.icon === "object" ? raw.icon : {}) as Record<string, IconStyle>,
-    sections: Array.isArray(raw.sections) && raw.sections.length
-      ? raw.sections
-          .filter((s) => s && typeof s.id === "string")
-          .map((s) => ({ id: s.id as string, visible: s.visible !== false, bg: typeof s.bg === "string" ? s.bg : undefined, variant: typeof s.variant === "string" ? s.variant : undefined }))
-      : SECTIONS_DEFAULT,
+    // Byte-identical to the previous inline parse, now shared with any page.
+    sections: parseSections(raw.sections, SECTIONS_DEFAULT),
     img: (raw.img && typeof raw.img === "object" ? raw.img : {}) as Record<string, ImgStyle>,
     // v3 (R3): per-element background fills (data-cms-bg id → CSS background string).
     bgFill: (raw.bgFill && typeof raw.bgFill === "object" ? raw.bgFill : {}) as Record<string, string>,
