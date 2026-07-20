@@ -1,22 +1,39 @@
 import type { Metadata } from "next";
 import Image from "next/image";
-import Link from "next/link";
 import { Phone, DollarSign, CheckCircle } from "lucide-react";
 import { counselors } from "@/data/counselors";
 import { assetPath } from "@/lib/asset-path";
-import { getCMSPage } from "@/lib/cms";
-import { tx, imgCss } from "@/lib/home-content";
+import { getPageContent } from "@/lib/cms";
+import { imgCss, parseSections, type SectionMeta } from "@/lib/home-content";
 import Section from "@/components/ui/Section";
 import SectionHeader from "@/components/ui/SectionHeader";
 import Stack from "@/components/ui/Stack";
 import FeatureCard from "@/components/ui/FeatureCard";
-import { Tx } from "@/components/cms/Editable";
+import PageComposer from "@/components/cms/PageComposer";
+import { Tx, EditableLink } from "@/components/cms/Editable";
 
 export const metadata: Metadata = {
   title: "Counseling",
   description:
     "Bible-based counseling at C3 — trained counselors helping you develop spiritually healthy relationships with God and others.",
 };
+
+/**
+ * /counseling is now editor-native (contract §1–§3): it composes into the SAME
+ * three ordered sections c3-backend's `defaultSectionsForSlug("/counseling")`
+ * declares — so the editor rail can add/reorder/hide/recolor each — and every
+ * tile inside carries its own Layer-1 handles (`data-cms` text, `data-cms-bg`
+ * card bg, `data-cms-img` hero photo, `data-cms-link`+label button). The
+ * counselor cards, previously bespoke JSX bolted onto `@/data/counselors`, keep
+ * that data as fallbacks but route name/role/bio through <Tx>. Server component.
+ */
+
+/** MUST match c3-backend `page-sections.ts` `/counseling` verbatim (shared key-space). */
+const PAGE_DEFAULT_SECTIONS: SectionMeta[] = [
+  { id: "counseling-hero", visible: true },
+  { id: "counseling-team", visible: true },
+  { id: "counseling-fees", visible: true },
+];
 
 /** One line in a policy card — teal check + CMS-wired (editable) text. */
 function PolicyLine({
@@ -52,206 +69,238 @@ function CardLabel({ children }: { children: React.ReactNode }) {
   );
 }
 
-export default async function CounselingPage() {
-  const ov = (await getCMSPage("/counseling")) || {};
+export default async function CounselingPage({
+  searchParams,
+}: {
+  // Preview mode (U6): the editor iframe carries `?cmsEdit=1&preview=<token>`.
+  // A tokenless/public request never receives a token, so it never gets draft.
+  searchParams?: Promise<Record<string, string | string[] | undefined>>;
+} = {}) {
+  // Preview only exists in the CMS_LIVE server runtime. In the static-export build
+  // CMS_LIVE is unset, so we must NOT read searchParams (that forces dynamic
+  // rendering and breaks `output: export`).
+  const cmsLive = process.env.CMS_LIVE === "1";
+  const sp = cmsLive && searchParams ? await searchParams : {};
+  const preview = typeof sp.preview === "string" ? sp.preview : undefined;
+
+  const ov = (await getPageContent("/counseling", preview)) || {};
   const t = ov.text || {};
   const media = ov.media || {};
+  const sections = parseSections(ov.sections, PAGE_DEFAULT_SECTIONS);
 
-  return (
-    <>
-      {/* ── Hero photo band — warm ink scrim, display headline via SectionHeader ── */}
-      <section
-        className="relative flex items-end overflow-hidden"
-        style={{ minHeight: "60vh" }}
-      >
-        <div className="absolute inset-0" data-cms-img="counseling-hero-bg">
-          <Image
-            src={assetPath(media["counseling-hero-bg"] || "/images/congregation.webp")}
-            alt="C3 congregation worshipping together"
-            fill
-            className="object-cover"
-            priority
-            style={imgCss(ov.img?.["counseling-hero-bg"])}
-          />
-          {/* Warm base scrim (ink-warm) */}
-          <div className="absolute inset-0" style={{ background: "rgba(26,24,21,0.56)" }} />
-          {/* Bottom-to-top warm gradient for headline readability */}
-          <div
-            className="absolute inset-0"
-            style={{
-              background:
-                "linear-gradient(to top, rgba(26,24,21,0.92) 0%, rgba(26,24,21,0.30) 55%, rgba(26,24,21,0.04) 100%)",
-            }}
-          />
-        </div>
+  /* ── counseling-hero — top photo band (editable image + editable headline) ── */
+  const heroSection = (
+    <section
+      className="relative flex items-end overflow-hidden"
+      style={{ minHeight: "60vh" }}
+    >
+      {/* Top PHOTO — swappable in the editor via data-cms-img. */}
+      <div className="absolute inset-0" data-cms-img="counseling-hero-bg">
+        <Image
+          src={assetPath(media["counseling-hero-bg"] || "/images/congregation.webp")}
+          alt="C3 congregation worshipping together"
+          fill
+          className="object-cover"
+          priority
+          style={imgCss(ov.img?.["counseling-hero-bg"])}
+        />
+        {/* Warm base scrim (ink-warm) */}
+        <div className="absolute inset-0" style={{ background: "rgba(26,24,21,0.56)" }} />
+        {/* Bottom-to-top warm gradient for headline readability */}
+        <div
+          className="absolute inset-0"
+          style={{
+            background:
+              "linear-gradient(to top, rgba(26,24,21,0.92) 0%, rgba(26,24,21,0.30) 55%, rgba(26,24,21,0.04) 100%)",
+          }}
+        />
+      </div>
 
-        <div className="relative z-10 container-c3 pb-16 pt-44" data-anim="fadeInUp">
-          <SectionHeader
-            titleAs="h1"
-            titleClassName="display-1"
-            leadMaxWidth="34rem"
-            style={{ maxWidth: "40rem" }}
-            eyebrow={
-              <Tx
-                text={t}
-                k="counseling-hero-eyebrow"
-                fallback="C3 Counseling"
-                style={{ color: "var(--color-teal)" }}
-              />
-            }
-            title={
-              <Tx
-                as="span"
-                text={t}
-                k="counseling-hero-heading"
-                fallback="Counseling"
-                className="text-balance"
-                style={{ color: "#fff" }}
-              />
-            }
-            lead={
-              <Tx
-                as="span"
-                text={t}
-                k="counseling-hero-sub"
-                fallback="Professional, Bible-based counseling — for people who want to grow in wholeness."
-                className="text-balance"
-                style={{ color: "rgba(255,255,255,0.78)" }}
-              />
-            }
-          />
-        </div>
-      </section>
-
-      {/* ── Mission intro on warm paper ── */}
-      <Section
-        container
-        style={{ background: "var(--color-paper)", color: "var(--color-ink-warm)" }}
-      >
+      <div className="relative z-10 container-c3 pb-16 pt-44" data-anim="fadeInUp">
         <SectionHeader
-          leadMaxWidth="48rem"
-          style={{ marginBottom: "var(--space-block)" }}
+          titleAs="h1"
+          titleClassName="display-1"
+          leadMaxWidth="34rem"
+          style={{ maxWidth: "40rem" }}
           eyebrow={
-            <Tx text={t} k="counseling-vision-eyebrow" fallback="Our Mission" />
+            <Tx
+              text={t}
+              k="counseling-hero-eyebrow"
+              fallback="C3 Counseling"
+              style={{ color: "var(--color-teal)" }}
+            />
           }
           title={
             <Tx
               as="span"
               text={t}
-              k="counseling-vision-heading"
-              fallback="Whole people, through Christ."
+              k="counseling-hero-heading"
+              fallback="Counseling"
+              className="text-balance"
+              style={{ color: "#fff" }}
             />
           }
           lead={
             <Tx
               as="span"
               text={t}
-              k="counseling-vision-body"
-              fallback="Helping people develop spiritually healthy relationships with God through Jesus Christ — and supporting emotional and relational wellness with a team of trained, Bible-based counselors."
-              style={{ color: "var(--color-stone)" }}
+              k="counseling-hero-sub"
+              fallback="Professional, Bible-based counseling — for people who want to grow in wholeness."
+              className="text-balance"
+              style={{ color: "rgba(255,255,255,0.78)" }}
             />
           }
         />
+      </div>
+    </section>
+  );
 
-        {/* Counselor cards — signature premium card language (no initials avatars). */}
-        <div
-          className="grid grid-cols-1 md:grid-cols-3 items-stretch"
-          style={{ gap: "var(--space-body)" }}
-        >
-          {counselors.map((c) => (
-            <article
-              key={c.id}
-              data-anim="fadeInUp"
-              className="bento-tile flex flex-col h-full"
-              style={{
-                padding: "clamp(1.75rem, 3vw, 2.5rem)",
-                background: "var(--color-paper-soft)",
-                border: "1px solid var(--color-clay-line)",
-                borderRadius: "var(--radius-md)",
-                boxShadow: "var(--shadow-rest)",
-              }}
-            >
-              {/* Thin teal accent mark */}
-              <span
-                aria-hidden="true"
-                style={{
-                  display: "block",
-                  width: "2.5rem",
-                  height: "3px",
-                  borderRadius: "var(--radius-pill)",
-                  background: "var(--color-teal)",
-                  marginBottom: "var(--space-heading)",
-                }}
-              />
+  /* ── counseling-team — mission intro + editable counselor cards ── */
+  const teamSection = (
+    <Section
+      container
+      style={{ background: "var(--color-paper)", color: "var(--color-ink-warm)" }}
+    >
+      <SectionHeader
+        leadMaxWidth="48rem"
+        style={{ marginBottom: "var(--space-block)" }}
+        eyebrow={<Tx text={t} k="counseling-vision-eyebrow" fallback="Our Mission" />}
+        title={
+          <Tx
+            as="span"
+            text={t}
+            k="counseling-vision-heading"
+            fallback="Whole people, through Christ."
+          />
+        }
+        lead={
+          <Tx
+            as="span"
+            text={t}
+            k="counseling-vision-body"
+            fallback="Helping people develop spiritually healthy relationships with God through Jesus Christ — and supporting emotional and relational wellness with a team of trained, Bible-based counselors."
+            style={{ color: "var(--color-stone)" }}
+          />
+        }
+      />
 
-              {/* Title as teal eyebrow */}
-              <p className="overline">{c.title}</p>
-
-              {/* Name + credentials */}
-              <h3
-                className="heading-3"
-                style={{ color: "var(--color-ink-warm)", marginTop: "var(--space-eyebrow)" }}
-              >
-                {c.name}
-                {c.credentials && (
-                  <span
-                    className="font-normal ml-1.5"
-                    style={{ color: "var(--color-stone)", fontSize: "0.9rem" }}
-                  >
-                    {c.credentials}
-                  </span>
-                )}
-              </h3>
-
-              <p
-                className="body-sm flex-1"
-                style={{ color: "var(--color-stone)", marginTop: "var(--space-body)" }}
-              >
-                {c.bio}
-              </p>
-
-              {/* Specialties */}
-              <div style={{ marginTop: "var(--space-body)" }}>
-                <CardLabel>Specialties</CardLabel>
-                <ul className="flex flex-col gap-2" style={{ marginTop: "0.75rem" }}>
-                  {c.specialties.map((s) => (
-                    <li
-                      key={s}
-                      className="flex items-center gap-2 body-sm"
-                      style={{ color: "var(--color-mute)" }}
-                    >
-                      <CheckCircle
-                        size={13}
-                        style={{ color: "var(--color-teal)" }}
-                        className="shrink-0"
-                      />
-                      {s}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-
-              {/* Education */}
-              <div style={{ marginTop: "var(--space-body)" }}>
-                <CardLabel>Education</CardLabel>
-                <ul className="flex flex-col gap-1.5" style={{ marginTop: "0.6rem" }}>
-                  {c.education.map((e) => (
-                    <li key={e} className="text-xs" style={{ color: "var(--color-stone)" }}>
-                      {e}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </article>
-          ))}
-        </div>
-      </Section>
-
-      {/* ── Fees & Policies — warm ink section, equal-height FeatureCards ── */}
-      <Section
-        container
-        style={{ background: "var(--color-ink-warm)", color: "#fff" }}
+      {/* Counselor cards — each is its OWN editable tile: data-cms-bg on the
+          container, and role/name/bio routed through <Tx> (keys derived from the
+          counselor id, @/data/counselors values as fallbacks). */}
+      <div
+        className="grid grid-cols-1 md:grid-cols-3 items-stretch"
+        style={{ gap: "var(--space-body)" }}
       >
+        {counselors.map((c) => (
+          <article
+            key={c.id}
+            data-anim="fadeInUp"
+            data-cms-bg={`counseling-${c.id}-bg`}
+            className="bento-tile flex flex-col h-full"
+            style={{
+              padding: "clamp(1.75rem, 3vw, 2.5rem)",
+              background: "var(--color-paper-soft)",
+              border: "1px solid var(--color-clay-line)",
+              borderRadius: "var(--radius-md)",
+              boxShadow: "var(--shadow-rest)",
+            }}
+          >
+            {/* Thin teal accent mark */}
+            <span
+              aria-hidden="true"
+              style={{
+                display: "block",
+                width: "2.5rem",
+                height: "3px",
+                borderRadius: "var(--radius-pill)",
+                background: "var(--color-teal)",
+                marginBottom: "var(--space-heading)",
+              }}
+            />
+
+            {/* Role as teal eyebrow — editable */}
+            <Tx
+              as="p"
+              className="overline"
+              text={t}
+              k={`counseling-${c.id}-role`}
+              fallback={c.title}
+            />
+
+            {/* Name + credentials — name editable */}
+            <h3
+              className="heading-3"
+              style={{ color: "var(--color-ink-warm)", marginTop: "var(--space-eyebrow)" }}
+            >
+              <Tx
+                as="span"
+                text={t}
+                k={`counseling-${c.id}-name`}
+                fallback={c.name}
+              />
+              {c.credentials && (
+                <span
+                  className="font-normal ml-1.5"
+                  style={{ color: "var(--color-stone)", fontSize: "0.9rem" }}
+                >
+                  {c.credentials}
+                </span>
+              )}
+            </h3>
+
+            {/* Bio — editable */}
+            <Tx
+              as="p"
+              className="body-sm flex-1"
+              text={t}
+              k={`counseling-${c.id}-bio`}
+              fallback={c.bio}
+              style={{ color: "var(--color-stone)", marginTop: "var(--space-body)" }}
+            />
+
+            {/* Specialties */}
+            <div style={{ marginTop: "var(--space-body)" }}>
+              <CardLabel>Specialties</CardLabel>
+              <ul className="flex flex-col gap-2" style={{ marginTop: "0.75rem" }}>
+                {c.specialties.map((s) => (
+                  <li
+                    key={s}
+                    className="flex items-center gap-2 body-sm"
+                    style={{ color: "var(--color-mute)" }}
+                  >
+                    <CheckCircle
+                      size={13}
+                      style={{ color: "var(--color-teal)" }}
+                      className="shrink-0"
+                    />
+                    {s}
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Education */}
+            <div style={{ marginTop: "var(--space-body)" }}>
+              <CardLabel>Education</CardLabel>
+              <ul className="flex flex-col gap-1.5" style={{ marginTop: "0.6rem" }}>
+                {c.education.map((e) => (
+                  <li key={e} className="text-xs" style={{ color: "var(--color-stone)" }}>
+                    {e}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </article>
+        ))}
+      </div>
+    </Section>
+  );
+
+  /* ── counseling-fees — fees/policies cards + closing Connect CTA ── */
+  const feesSection = (
+    <>
+      {/* Fees & Policies — warm ink section, editable FeatureCards. */}
+      <Section container style={{ background: "var(--color-ink-warm)", color: "#fff" }}>
         <SectionHeader
           style={{ marginBottom: "var(--space-block)" }}
           eyebrow={
@@ -281,6 +330,7 @@ export default async function CounselingPage() {
           <div className="h-full" data-anim="fadeInUp">
             <FeatureCard
               tone="dark"
+              bgKey="counseling-fees-card-bg"
               icon={<DollarSign size={24} />}
               title={<Tx text={t} k="counseling-fees-heading" fallback="Fees" />}
             >
@@ -308,6 +358,7 @@ export default async function CounselingPage() {
           <div className="h-full" data-anim="fadeInUp">
             <FeatureCard
               tone="dark"
+              bgKey="counseling-cancel-card-bg"
               icon={<Phone size={24} />}
               title={<Tx text={t} k="counseling-cancel-heading" fallback="Cancellation Policy" />}
             >
@@ -333,6 +384,7 @@ export default async function CounselingPage() {
           <div className="h-full" data-anim="fadeInUp">
             <FeatureCard
               tone="dark"
+              bgKey="counseling-start-card-bg"
               icon={<CheckCircle size={24} />}
               title={<Tx text={t} k="counseling-start-heading" fallback="Getting Started" />}
             >
@@ -361,27 +413,26 @@ export default async function CounselingPage() {
         </div>
       </Section>
 
-      {/* ── Connect CTA — calm warm closing panel ── */}
+      {/* Connect CTA — calm warm closing panel (editable card bg + button). */}
       <Section container style={{ background: "var(--color-paper)" }}>
         <div
           className="mx-auto"
           data-anim="fadeInUp"
+          data-cms-bg="counseling-cta-panel-bg"
           style={{
             maxWidth: "52rem",
             background: "var(--color-paper-soft)",
             border: "1px solid var(--color-clay-line)",
             borderRadius: "var(--radius-md)",
             boxShadow: "var(--shadow-rest)",
-            padding: "clamp(2.5rem, 5vw, 4rem)",
+            padding: "clamp(2.75rem, 5vw, 4.25rem)",
           }}
         >
           <Stack gap="cta" align="center">
             <SectionHeader
               align="center"
               leadMaxWidth="34rem"
-              eyebrow={
-                <Tx text={t} k="counseling-cta-eyebrow" fallback="Take the first step" />
-              }
+              eyebrow={<Tx text={t} k="counseling-cta-eyebrow" fallback="Take the first step" />}
               title={
                 <Tx
                   as="span"
@@ -401,18 +452,33 @@ export default async function CounselingPage() {
                 />
               }
             />
-            <Link
-              href={t["counseling-cta-btn-href"] || "/connect/"}
-              data-cms-link="counseling-cta-btn"
+            <EditableLink
+              text={t}
+              k="counseling-cta-btn"
+              href="/connect/"
+              label="Get Connected"
               className="btn btn-primary btn-lg"
-            >
-              <span data-cms-link-label>
-                {tx(t, "counseling-cta-btn-label", "Get Connected")}
-              </span>
-            </Link>
+            />
           </Stack>
         </div>
       </Section>
     </>
+  );
+
+  const render = (id: string): React.ReactNode => {
+    switch (id) {
+      case "counseling-hero":
+        return heroSection;
+      case "counseling-team":
+        return teamSection;
+      case "counseling-fees":
+        return feesSection;
+      default:
+        return null;
+    }
+  };
+
+  return (
+    <PageComposer sections={sections} bgFill={ov.bgFill} anim={ov.anim} render={render} />
   );
 }
