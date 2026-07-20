@@ -129,6 +129,12 @@ export default function Header({ globals = {} }: { globals?: CMSOverrides }) {
         {entry.href ? (
           <Link
             href={entry.href}
+            // prefetch={false}: the global nav has ~11 links, all in-viewport at once. Next's
+            // default eager viewport prefetch fires ~11 concurrent RSC requests; in the CMS_LIVE
+            // SSR deploy (c3hays-live) that burst — compounded by the editor's section-preview
+            // iframes — drove the Worker to 503, whose XFO:SAMEORIGIN error page blanked the
+            // editor preview iframe ("refused to connect"). Click/hover nav stays fast.
+            prefetch={false}
             data-cms-link={entry.cmsLink}
             aria-haspopup={hasKids || undefined}
             aria-expanded={hasKids ? isOpen : undefined}
@@ -167,6 +173,7 @@ export default function Header({ globals = {} }: { globals?: CMSOverrides }) {
                 <Link
                   role="menuitem"
                   href={child.href}
+                  prefetch={false}
                   data-cms-link={child.cmsLink}
                   onClick={() => setOpenMenu(null)}
                   className="block px-4 py-2 text-xs font-semibold uppercase tracking-[0.08em] text-[rgba(27,28,28,0.72)] hover:text-[#1b1c1c] hover:bg-black/[0.04] transition-colors"
@@ -200,6 +207,7 @@ export default function Header({ globals = {} }: { globals?: CMSOverrides }) {
           {/* Logo — light on transparent dark hero, dark on scrolled white header */}
           <Link
             href="/"
+            prefetch={false}
             aria-label="C3 — Celebration Community Church — Home"
             className="shrink-0 flex items-center"
           >
@@ -222,6 +230,7 @@ export default function Header({ globals = {} }: { globals?: CMSOverrides }) {
           <div className="hidden md:flex items-center gap-3 lg:gap-4">
             <Link
               href={giveHref}
+              prefetch={false}
               data-cms-link="g:nav-give"
               className="nav-link-underline text-xs font-semibold uppercase tracking-[0.12em] transition-colors duration-200"
               style={{ color: base }}
@@ -230,7 +239,7 @@ export default function Header({ globals = {} }: { globals?: CMSOverrides }) {
             >
               <span data-cms-link-label>{giveLabel}</span>
             </Link>
-            <Link href={t["nav-cta-href"] || "/visit/"} data-cms-link="g:nav-cta" className="btn btn-primary btn-sm text-[0.8125rem] px-4 lg:px-[1.85rem]" style={btnCss(globals.btn?.["nav-cta"] as never)}>
+            <Link href={t["nav-cta-href"] || "/visit/"} prefetch={false} data-cms-link="g:nav-cta" className="btn btn-primary btn-sm text-[0.8125rem] px-4 lg:px-[1.85rem]" style={btnCss(globals.btn?.["nav-cta"] as never)}>
               <span data-cms-link-label>{tx(t, "nav-cta-label", "Plan a Visit")}</span>
             </Link>
           </div>
@@ -273,6 +282,7 @@ export default function Header({ globals = {} }: { globals?: CMSOverrides }) {
             <div className="flex items-center justify-between h-16 container-c3 border-b border-white/10">
               <Link
                 href="/"
+                prefetch={false}
                 className="flex items-center"
                 onClick={() => setMobileOpen(false)}
                 aria-label="C3 Home"
@@ -322,6 +332,7 @@ export default function Header({ globals = {} }: { globals?: CMSOverrides }) {
                               <li key={child.key}>
                                 <Link
                                   href={child.href}
+                                  prefetch={false}
                                   data-cms-link={child.cmsLink}
                                   className="block py-3 pl-4 text-lg font-semibold text-white/60 hover:text-white transition-colors border-b border-white/[0.06]"
                                   onClick={() => setMobileOpen(false)}
@@ -346,6 +357,7 @@ export default function Header({ globals = {} }: { globals?: CMSOverrides }) {
               >
                 <Link
                   href={t["nav-cta-href"] || "/visit/"}
+                  prefetch={false}
                   data-cms-link="g:nav-cta"
                   className="btn btn-primary btn-lg w-full text-center"
                   onClick={() => setMobileOpen(false)}
@@ -355,6 +367,7 @@ export default function Header({ globals = {} }: { globals?: CMSOverrides }) {
                 {/* Give — reachable secondary action on mobile too (G5). */}
                 <Link
                   href={giveHref}
+                  prefetch={false}
                   data-cms-link="g:nav-give"
                   className="btn btn-outline btn-lg w-full text-center"
                   onClick={() => setMobileOpen(false)}

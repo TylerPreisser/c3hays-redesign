@@ -70,7 +70,7 @@ type MediaBag = Record<string, string>;
 function FLink({ t, id, label, href, tone = "muted" }: { t: TextBag; id: string; label: string; href: string; tone?: "muted" | "bright" }) {
   const color = tone === "bright" ? "rgba(255,255,255,0.80)" : "rgba(255,255,255,0.60)";
   return (
-    <Link href={t[`${id}-href`] || href} data-cms-link={`g:${id}`} className="footer-link" style={{ color, transition: "color var(--dur-fast) var(--ease-out)" }}>
+    <Link href={t[`${id}-href`] || href} prefetch={false} data-cms-link={`g:${id}`} className="footer-link" style={{ color, transition: "color var(--dur-fast) var(--ease-out)" }}>
       <span data-cms-link-label>{tx(t, `${id}-label`, label)}</span>
     </Link>
   );
@@ -137,7 +137,7 @@ function FooterEditorial({ t, m, preCta = false }: { t: TextBag; m: MediaBag; pr
           <div aria-hidden style={{ position: "absolute", inset: 0, background: "radial-gradient(80% 90% at 50% 0%, rgba(255,255,255,0.20), transparent 65%)", pointerEvents: "none" }} />
           <p className="overline" data-cms="g:footer-cta-eyebrow" style={{ color: "#042e29", position: "relative" }} dangerouslySetInnerHTML={{ __html: tx(t, "footer-cta-eyebrow", "New here?") }} />
           <h2 className="display-1" data-cms="g:footer-cta-heading" style={{ color: "#fff", margin: "var(--s-3, 12px) 0 var(--s-6, 24px)", position: "relative" }} dangerouslySetInnerHTML={{ __html: tx(t, "footer-cta-heading", "Plan your first visit") }} />
-          <Link href={t["footer-cta-href"] || "/visit/"} data-cms-link="g:footer-cta" className="btn" style={{ position: "relative", background: "#042e29", color: "#fff", borderRadius: "var(--radius-pill, 999px)", fontWeight: 700, padding: "0.95rem 2.2rem" }}>
+          <Link href={t["footer-cta-href"] || "/visit/"} prefetch={false} data-cms-link="g:footer-cta" className="btn" style={{ position: "relative", background: "#042e29", color: "#fff", borderRadius: "var(--radius-pill, 999px)", fontWeight: 700, padding: "0.95rem 2.2rem" }}>
             <span data-cms-link-label>{tx(t, "footer-cta-label", "What to expect")}</span>
           </Link>
         </div>
@@ -151,7 +151,7 @@ function FooterEditorial({ t, m, preCta = false }: { t: TextBag; m: MediaBag; pr
         <div className="flex flex-col items-center text-center gap-12 md:grid md:grid-cols-2 md:items-start md:text-left md:gap-x-10 md:gap-y-12 lg:grid-cols-12 lg:gap-y-0">
           {/* Brand — oversized wordmark + contact */}
           <div className="lg:col-span-4 max-w-xs md:max-w-none">
-            <Link href="/" className="inline-block mb-6" aria-label="C3 Home"><Logo size={56} variant="light" cmsKey="g:logo-light" srcOverride={m["logo-light"]} /></Link>
+            <Link href="/" prefetch={false} className="inline-block mb-6" aria-label="C3 Home"><Logo size={56} variant="light" cmsKey="g:logo-light" srcOverride={m["logo-light"]} /></Link>
             <p className="heading-3 mb-4" data-cms="g:footer-brand" style={{ color: "rgba(255,255,255,0.95)" }} dangerouslySetInnerHTML={{ __html: tx(t, "footer-brand", "Celebration Community Church") }} />
             <p className="body-sm leading-relaxed mb-6 mx-auto md:mx-0" data-cms="g:footer-tagline" style={{ color: "rgba(255,255,255,0.52)", maxWidth: "22rem" }} dangerouslySetInnerHTML={{ __html: tx(t, "footer-tagline", "One church family in two places across northwest Kansas — for everyone, just as you are.") }} />
             <div className="flex flex-col gap-2 items-center md:items-start">
@@ -219,7 +219,7 @@ function FooterMinimal({ t, m }: { t: TextBag; m: MediaBag }) {
       {/* v8 D4: teal hairline removed here too (see FooterEditorial) — clean footer. */}
 
       <div className="container-c3" style={{ paddingTop: "var(--s-24, 96px)", paddingBottom: "var(--s-12, 48px)", textAlign: "center", display: "flex", flexDirection: "column", alignItems: "center", gap: "var(--s-8, 32px)" }}>
-        <Link href="/" aria-label="C3 Home"><Logo size={56} variant="light" cmsKey="g:logo-light" srcOverride={m["logo-light"]} /></Link>
+        <Link href="/" prefetch={false} aria-label="C3 Home"><Logo size={56} variant="light" cmsKey="g:logo-light" srcOverride={m["logo-light"]} /></Link>
 
         <p className="body-lg" data-cms="g:footer-tagline" style={{ color: "rgba(255,255,255,0.60)", maxWidth: "42ch", margin: 0 }} dangerouslySetInnerHTML={{ __html: tx(t, "footer-tagline", "One church family in two places across northwest Kansas — for everyone, just as you are.") }} />
 
