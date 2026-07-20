@@ -11,6 +11,7 @@ import { getHomeContent } from "@/lib/cms";
 import { isCmsLive } from "@/lib/cms-live";
 import { fromStudioHome } from "@/lib/home-content";
 import PageComposer from "@/components/cms/PageComposer";
+import { assetPath } from "@/lib/asset-path";
 import { isExampleSection, renderExample, SECTION_EXAMPLE_IDS } from "@/lib/section-examples";
 
 export const metadata: Metadata = {
@@ -45,7 +46,10 @@ export default async function HomePage({
   const render = (id: string, variant?: string): React.ReactNode => {
     switch (id) {
       case "hero": return <Hero content={c.hero} btnStyle={c.btn["hero.cta"]} text={c.text} btn={c.btn} variant={variant} />;
-      case "mission": return <MissionBlock content={c.mission} variant={variant} bleed={c.fx?.sectionBleed} />;
+      // #3: pass the hero image so the top photo CONTINUES down through the mission
+      // (one editable image, shared "hero.bg" key). Only the default (centered) variant
+      // paints it; a chosen variant keeps its own look.
+      case "mission": return <MissionBlock content={c.mission} variant={variant} bleed={c.fx?.sectionBleed} bgImage={c.hero?.bgImage ? assetPath(c.hero.bgImage) : undefined} />;
       case "meetGrowServe": return <MeetGrowServe content={c.meetGrowServe} img={c.img} variant={variant} />;
       case "nt26": return <NT26Feature content={c.nt26} btnStyle={c.btn["nt26.cta"]} img={c.img} variant={variant} bleed={c.fx?.sectionBleed} />;
       case "locations": return <LocationsSection text={c.text} btn={c.btn} />;

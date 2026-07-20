@@ -17,11 +17,17 @@ export default function MissionBlock({
   content = MISSION_DEFAULTS,
   variant,
   bleed = false,
+  bgImage,
 }: {
   content?: MissionContent;
   variant?: string;
   /** v7 R4 — opt-in gradient section-bleed (Tyler-advanced). Default OFF: clean edges. */
   bleed?: boolean;
+  /** #3: when set (home), the hero's top image CONTINUES down through the mission —
+   *  one editable image spanning both. Rendered as a scrimmed cover behind the
+   *  statement, tagged with the SAME data-cms-img key ("hero.bg") as the hero so a
+   *  single edit swaps both and they stay one continuous photo. Omit → solid dark. */
+  bgImage?: string;
 }) {
   const sectionRef = useRef<HTMLElement>(null);
   const v = variant || "centered";
@@ -51,18 +57,31 @@ export default function MissionBlock({
   /* ── centered (default) ─────────────────────────────────────────────── */
   if (v === "centered") {
     return (
-      /* Full-width ink-dark — centered massive headline */
+      /* Full-width ink-dark — centered massive headline. #3: when `bgImage` is set
+         (home), the hero photo CONTINUES here behind a scrim (one editable image). */
       <section
         ref={sectionRef}
-        className="flex items-center justify-center text-center"
+        className="relative overflow-hidden flex items-center justify-center text-center"
         style={{
-          background: bleedBg("#1b1c1c", undefined, bleed),
+          background: bgImage ? "#0f1111" : bleedBg("#1b1c1c", undefined, bleed),
           /* Fluid vertical padding: generous on desktop, proportionate on tablet/phone */
           paddingTop: "clamp(5rem, 10vw, 10rem)",
           paddingBottom: "clamp(5rem, 10vw, 10rem)",
         }}
       >
-        <div className="container-c3">
+        {bgImage && (
+          <>
+            {/* #3: the continuous hero image — SAME editable key as the hero
+                (data-cms-img="hero.bg"), so one click edits both. */}
+            <div data-cms-img="hero.bg" aria-hidden="true" className="absolute inset-0 z-0">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={bgImage} alt="" className="w-full h-full" style={{ objectFit: "cover", objectPosition: "center" }} />
+            </div>
+            {/* scrim keeps the white statement legible over the photo */}
+            <div aria-hidden="true" className="absolute inset-0 z-0" style={{ background: "linear-gradient(180deg, rgba(15,17,17,.74) 0%, rgba(15,17,17,.82) 100%)" }} />
+          </>
+        )}
+        <div className="container-c3 relative z-10">
           <div className="mission-text max-w-4xl mx-auto">
             <h2
               className="text-white text-balance"
