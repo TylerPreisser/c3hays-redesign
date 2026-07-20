@@ -1,24 +1,23 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import EventCard from "@/components/events/EventCard";
-import AddToCalendar from "@/components/events/AddToCalendar";
-import {
-  fetchEspaceEvents,
-  upcomingEvents,
-  ESPACE_FULL_CALENDAR_URL,
-  type CalEvent,
-} from "@/lib/espace";
-import type { CalendarEvent } from "@/lib/calendar";
+import UpcomingEventsGrid from "@/components/events/UpcomingEventsGrid";
+import { fetchEspaceEvents, upcomingEvents, type CalEvent } from "@/lib/espace";
 
 /**
- * <UpcomingEventsLive> — Phase 4, EV2/Wave 3. Replaces the hardcoded fake UPCOMING
- * array on /events with the live eSpace feed. A client island that shares the SAME
- * cached network request as <LiveCalendar> (fetchEspaceEvents dedupes by URL), takes
- * the next 3 real-first events, and renders the existing premium <EventCard> grid.
+ * <UpcomingEventsLive> — Phase 4, EV2/Wave 3 (editor-native rebuild). Replaces the
+ * hardcoded fake UPCOMING array on /events with the live eSpace feed. A client island
+ * that shares the SAME cached network request as <LiveCalendar> (fetchEspaceEvents
+ * dedupes by URL), takes the next 3 real-first events, and renders the premium
+ * <UpcomingEventsGrid>.
  *
  * Never shows fake events: while loading it paints 3 skeleton cards; on error or an
  * empty feed it hides the grid and leaves a quiet pointer to the full calendar below.
+ *
+ * EDITABILITY: the island itself only fetches + tracks state; the editor-native card
+ * markup (data-cms / data-cms-bg / data-cms-img / data-cms-link) lives in
+ * <UpcomingEventsGrid>. The page passes its CMS `text`/`media` override bags through
+ * so persisted card edits render (positional, index-keyed — see the grid's note).
  */
 
 const GRID: React.CSSProperties = {
@@ -27,28 +26,6 @@ const GRID: React.CSSProperties = {
   gap: "clamp(1.25rem, 3vw, 2rem)",
   alignItems: "stretch",
 };
-
-function detailLine(ev: CalEvent): string {
-  const desc = ev.description ? ev.description.trim() : "";
-  const clipped = desc.length > 60 ? `${desc.slice(0, 60).trimEnd()}…` : desc;
-  return clipped ? `${ev.timeLabel} · ${clipped}` : ev.timeLabel;
-}
-
-function campusLabel(ev: CalEvent): string {
-  if (ev.campus) return `${ev.campus} campus`;
-  return ev.isHoliday ? "Holiday" : "Both campuses";
-}
-
-/** Map a live eSpace event → the plain shape the calendar helpers consume. */
-function toCalendarEvent(ev: CalEvent): CalendarEvent {
-  return {
-    title: ev.title,
-    start: ev.start,
-    end: ev.end,
-    location: ev.location || undefined,
-    description: ev.description || undefined,
-  };
-}
 
 /** Dark-surface skeleton matching EventCard's contained-tile silhouette. */
 function SkeletonCard() {
@@ -83,7 +60,14 @@ function Note() {
   );
 }
 
-export default function UpcomingEventsLive() {
+export interface UpcomingEventsLiveProps {
+  /** Page text overrides — persisted card edits (title/date/detail/campus/CTA). */
+  text?: Record<string, string>;
+  /** Page media overrides — a swapped image src per `events-upcoming-${i}-img` key. */
+  media?: Record<string, string>;
+}
+
+export default function UpcomingEventsLive({ text, media }: UpcomingEventsLiveProps) {
   const [events, setEvents] = useState<CalEvent[] | null>(null);
   const [status, setStatus] = useState<"loading" | "ready" | "error">("loading");
 
@@ -130,34 +114,5 @@ export default function UpcomingEventsLive() {
     return <Note />;
   }
 
-  return (
-    <div style={GRID}>
-      {top.map((ev) => (
-        // Card + per-event add-to-calendar stacked in one grid cell. NOTE: no
-        // `cmsKey` — these rows are LIVE eSpace data (positional, refetched each
-        // request), so they stay non-editable by design; only the section heading
-        // (in the page) is CMS-editable. The card link and the interactive
-        // AddToCalendar menu are SIBLINGS (never nested — <button> inside <a> is
-        // invalid HTML).
-        <div
-          key={ev.id}
-          style={{ display: "flex", flexDirection: "column", height: "100%" }}
-        >
-          <EventCard
-            href={ev.registerUrl || ESPACE_FULL_CALENDAR_URL}
-            imageAlt={ev.title}
-            month={ev.start.toLocaleDateString("en-US", { month: "short" }).toUpperCase()}
-            day={String(ev.start.getDate()).padStart(2, "0")}
-            title={ev.title}
-            detail={detailLine(ev)}
-            campus={campusLabel(ev)}
-            style={{ height: "auto", flex: "1 1 auto" }}
-          />
-          <div style={{ marginTop: "0.75rem" }}>
-            <AddToCalendar event={toCalendarEvent(ev)} />
-          </div>
-        </div>
-      ))}
-    </div>
-  );
+  return <UpcomingEventsGrid events={top} text={text} media={media} />;
 }
