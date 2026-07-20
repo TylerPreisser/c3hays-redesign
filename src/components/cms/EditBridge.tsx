@@ -92,6 +92,28 @@ export default function EditBridge() {
         --ant: #179c8c; background-size: 100% 3px, 100% 3px, 3px 100%, 3px 100%; animation-duration:.38s;
       }
       @keyframes c3ants{ to{ background-position: 14px 0, -14px 100%, 0 -14px, 100% 14px; } }
+      /* keystone A/C: SECTION selection outline. Every page composed by PageComposer
+         wraps each section in <div data-section=id>. Clicking a section's own chrome
+         (canvas, symptom A) OR its rail card (symptom C) stamps .cms-sel-sec on that
+         wrapper → the SAME marching-ants, sized for a full section. Positioned only
+         when selected so the plain wrapper never changes layout in normal flow. */
+      [data-section].cms-sel-sec{ position: relative; }
+      [data-section].cms-sel-sec::after{
+        content:""; position:absolute; top:2px!important; right:2px!important; bottom:2px!important; left:2px!important;
+        width:auto!important; height:auto!important; background-color:transparent!important;
+        border-radius:12px; pointer-events:none; z-index:2147481000;
+        --ant:#0ea5a0;
+        background-image:
+          repeating-linear-gradient(90deg, var(--ant) 0 9px, transparent 9px 18px),
+          repeating-linear-gradient(90deg, var(--ant) 0 9px, transparent 9px 18px),
+          repeating-linear-gradient(0deg,  var(--ant) 0 9px, transparent 9px 18px),
+          repeating-linear-gradient(0deg,  var(--ant) 0 9px, transparent 9px 18px);
+        background-size: 100% 3px, 100% 3px, 3px 100%, 3px 100%;
+        background-position: 0 0, 0 100%, 0 0, 100% 0;
+        background-repeat: no-repeat;
+        animation: c3ants .5s linear infinite;
+      }
+      @media (prefers-reduced-motion: reduce){ [data-section].cms-sel-sec::after{ animation:none; } }
       @media (prefers-reduced-motion: reduce){
         [data-cms]:hover::after, [data-cms-img]:hover::after, [data-cms-link]:hover::after, [data-cms-icon]:hover::after, [data-cms-bg]:hover::after,
         [data-cms].cms-sel::after, [data-cms-img].cms-sel::after, [data-cms-link].cms-sel::after, [data-cms-icon].cms-sel::after, [data-cms-bg].cms-sel::after{ animation:none; }
@@ -200,6 +222,27 @@ export default function EditBridge() {
       cur.forEach((el) => el.classList.add("cms-sel"));
     };
 
+    // keystone A/C: SECTION selection, persisted by data-section id (survives re-render,
+    // same pattern as selPath). selectSection("") clears. Set from a canvas section-click
+    // (A) and from an inbound cms:selectSection posted when a rail card is clicked (C).
+    const cssEsc = (s: string) => (typeof CSS !== "undefined" && CSS.escape ? CSS.escape(s) : s.replace(/["\\]/g, "\\$&"));
+    let secSelId = "";
+    const clearSecSel = () => document.querySelectorAll(".cms-sel-sec").forEach((n) => n.classList.remove("cms-sel-sec"));
+    const selectSection = (id: string) => {
+      secSelId = id || "";
+      clearSecSel();
+      if (!secSelId) return;
+      document.querySelectorAll<HTMLElement>(`[data-section="${cssEsc(secSelId)}"]`).forEach((el) => el.classList.add("cms-sel-sec"));
+    };
+    const reapplySecSel = () => {
+      if (!secSelId) return;
+      const sel = `[data-section="${cssEsc(secSelId)}"]`;
+      const cur = document.querySelectorAll<HTMLElement>(sel);
+      if (!cur.length) return; // section not (re)mounted yet
+      document.querySelectorAll(".cms-sel-sec").forEach((n) => { if (!(n as HTMLElement).matches(sel)) n.classList.remove("cms-sel-sec"); });
+      cur.forEach((el) => el.classList.add("cms-sel-sec"));
+    };
+
     // v8 iter-2 D17: anchor the marching-ants ::after by making ONLY static elements
     // position:relative. Elements already positioned (absolute/fixed/sticky/relative —
     // e.g. a full-bleed `absolute inset-0` hero wrapper, or a next/image `fill`) KEEP
@@ -221,7 +264,7 @@ export default function EditBridge() {
       });
     };
 
-    const imgObserver = new MutationObserver(() => { if (Object.keys(shimImg).length) reapplyShimImgs(); reapplySel(); ensureAnchored(); });
+    const imgObserver = new MutationObserver(() => { if (Object.keys(shimImg).length) reapplyShimImgs(); reapplySel(); reapplySecSel(); ensureAnchored(); });
     imgObserver.observe(document.body, { childList: true, subtree: true });
 
     // ── build the floating toolbar ──
@@ -414,6 +457,20 @@ export default function EditBridge() {
         log("select-bg", { path: bg.getAttribute("data-cms-bg") });
         return;
       }
+      // keystone A: SECTION selection — a click on a section's own chrome that isn't a
+      // tagged text/image/link/icon/bg target selects the WHOLE section, so its rail
+      // controls (move / bg / style / delete) open and the marching-ants ring the
+      // section. Lowest priority, so editing any tile's content still wins. The rail
+      // card (symptom C) is the always-available path; this makes the canvas work too.
+      const sec = tgt?.closest?.("[data-section]") as HTMLElement | null;
+      if (sec && !text && !img && !link && !icon && !bg) {
+        e.preventDefault(); e.stopPropagation();
+        const id = sec.getAttribute("data-section") || "";
+        selectSection(id);
+        post({ type: "cms:select", kind: "section", path: id });
+        log("select-section", { path: id });
+        return;
+      }
       // plain links/buttons (untagged) — block navigation in edit mode
       const a = tgt?.closest?.("a,button");
       if (a && !text) { e.preventDefault(); e.stopPropagation(); log("blocked-nav", { to: (a as HTMLAnchorElement).getAttribute?.("href") || "" }); }
@@ -477,6 +534,17 @@ export default function EditBridge() {
         // v8 polish P6: scope:"section" paints a `[data-section=id]>*` rule; else a tile.
         const bg = typeof d.background === "string" ? d.background : "";
         if (d.scope === "section") applyShimSection(d.path, bg); else applyShimBg(d.path, bg);
+      } else if (d.type === "cms:selectSection" && typeof d.id === "string") {
+        // keystone C: the editor selected a section (rail card OR echoing a canvas
+        // click) → ring that [data-section] and bring it into view so the user sees
+        // exactly what they're editing.
+        selectSection(d.id);
+        if (d.id) {
+          const el = document.querySelector<HTMLElement>(`[data-section="${cssEsc(d.id)}"]`);
+          if (el && d.scroll !== false) el.scrollIntoView({ behavior: "smooth", block: "center" });
+        }
+      } else if (d.type === "cms:deselectSection") {
+        selectSection("");
       }
     };
     window.addEventListener("message", onMsg);
