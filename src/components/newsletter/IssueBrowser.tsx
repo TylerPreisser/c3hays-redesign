@@ -166,7 +166,14 @@ export default function IssueBrowser({ issues }: IssueBrowserProps) {
           </p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+        <div
+          style={{
+            display: "grid",
+            gap: "clamp(16px, 2vw, 28px)",
+            gridTemplateColumns:
+              "repeat(auto-fit, minmax(clamp(260px, 22vw, 340px), 1fr))",
+          }}
+        >
           {filtered.map((issue) => (
             <button
               key={issue.id}
@@ -186,13 +193,14 @@ export default function IssueBrowser({ issues }: IssueBrowserProps) {
               aria-label={`Read Issue No. ${issue.number}: ${issue.title}`}
             >
               {issue.image && (
-                <div className="relative overflow-hidden" style={{ aspectRatio: "16 / 10" }}>
+                <div className="relative overflow-hidden" style={{ aspectRatio: "16 / 9" }}>
                   <Image
                     src={assetPath(issue.image)}
                     alt=""
                     fill
                     sizes="(max-width: 640px) 100vw, 400px"
                     className="object-cover transition-transform duration-500 group-hover:scale-105"
+                    style={{ objectFit: "cover" }}
                   />
                   <span
                     style={{
