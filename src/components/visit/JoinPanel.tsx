@@ -1,5 +1,5 @@
 import type { CSSProperties } from "react";
-import { Clock, MapPin, HeartHandshake, Shirt, Baby, Smartphone } from "lucide-react";
+import { Clock, MapPin, Smartphone } from "lucide-react";
 import { locations } from "@/data/locations";
 import { site } from "@/data/site";
 import { Tx } from "@/components/cms/Editable";
@@ -8,21 +8,19 @@ import Section from "@/components/ui/Section";
 import Stack from "@/components/ui/Stack";
 
 /**
- * <JoinPanel> — consolidated /visit top panel (redesign/visit).
+ * <JoinPanel> — the /visit HERO section (data-section="visit-hero").
  *
- * ONE unified, warm, premium panel that folds together everything a first-time
- * guest needs above the fold:
+ * The warm, premium top panel a first-time guest lands on:
  *   • the true C3 Logo + social icon buttons (C3 App / YouTube / Facebook / Instagram)
- *   • the "Join Us" heading
- *   • the two service-time cards (Hays + Colby)
- *   • the "What to Expect" content (What To Expect / Come As You Are / Bring The Kids),
- *     FOLDED IN as integrated feature rows — NOT separate standalone cards.
+ *   • the "Join Us / When & where we meet" heading
+ *   • the two service-time cards (Hays + Colby) — TIMES + address + a single
+ *     editable "Directions" link (no campus-details filler, per Phase-4).
  *
- * Editability: every authored string routes through <Tx> and PRESERVES the visit
- * page's existing data-cms keys (visit-times-eyebrow/heading, visit-campus-*-name/
- * -address, visit-block-*-title/-body). Service times come from `locations` data.
+ * The "What to Expect" expectations moved OUT to <VisitPlan> (visit-plan) so each is
+ * its own editor-native, independently-recolorable section. Every authored string
+ * routes through <Tx> (PRESERVING the existing data-cms keys) and every service card
+ * carries its OWN data-cms-bg + an editable Directions link (data-cms-link + label).
  *
- * Warm-first: warm neutral tokens carry the surface; teal is a restrained accent.
  * Server component (no client state).
  */
 
@@ -61,42 +59,7 @@ const SOCIALS = [
   { id: "instagram", label: "Follow on Instagram", href: site.social.instagram, Icon: InstagramIcon },
 ] as const;
 
-/* Verbatim from celebratejesus.org /plan-your-visit (captured 2026-07-15).
-   FOLDED into this panel as integrated feature rows (not standalone cards). */
-const expectBlocks = [
-  {
-    id: "expect",
-    Icon: HeartHandshake,
-    title: "What To Expect",
-    body: "We know that showing up to a new place for the first time can be intimidating, but at C3 it&apos;s our desire that you feel right at home from the moment you pull into the parking lot. As a first-time guest, you are VIP to us so we&apos;ll be there with you every step of the way! We even have a gift for you - just to say &lsquo;thank you&rsquo; for checking out our church.",
-  },
-  {
-    id: "dress",
-    Icon: Shirt,
-    title: "Come As You Are",
-    body: "At C3, there is no dress code. Some people show up in suits, and others wear jeans and t-shirts. We want you to wear whatever makes you feel comfortable.",
-  },
-  {
-    id: "kids",
-    Icon: Baby,
-    title: "Bring The Kids",
-    body: "C3Kids is available for children ages 3 through the 5th grade. The care and growth of every child is our highest priority and our passion is to create exciting, Bible-driven, interactive environments especially designed for your kids! C3Kids is available during our 9:30am service on Sunday so you can enjoy a great service knowing your child is being loved and nurtured.",
-  },
-];
-
 export default function JoinPanel({ t }: { t: Record<string, string> }) {
-  const iconChip: CSSProperties = {
-    display: "inline-flex",
-    alignItems: "center",
-    justifyContent: "center",
-    width: "3rem",
-    height: "3rem",
-    borderRadius: "var(--radius-sm)",
-    background: "rgba(28,195,175,0.12)",
-    color: "var(--color-teal)",
-    flexShrink: 0,
-  };
-
   return (
     <Section
       container
@@ -155,12 +118,13 @@ export default function JoinPanel({ t }: { t: Record<string, string> }) {
         />
       </Stack>
 
-      {/* ── Two service-time cards (Hays + Colby) ──────────────── */}
+      {/* ── Two service-time cards (Hays + Colby) — each its own data-cms-bg ── */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 lg:gap-8 items-stretch">
         {locations.map((loc) => (
           <div
             key={loc.id}
             className="flex flex-col h-full"
+            data-cms-bg={`visit-service-${loc.id}`}
             style={{
               background: "var(--color-paper-soft)",
               border: "1px solid var(--color-clay-line)",
@@ -200,49 +164,17 @@ export default function JoinPanel({ t }: { t: Record<string, string> }) {
             </div>
             {/* Spacer flexes so Directions pins to the bottom → equal-height cards align. */}
             <div style={{ flex: 1, minHeight: "var(--space-cta)" }} />
+            {/* Editable Directions link (data-cms-link + required label span; keeps the icon). */}
             <a
-              href={loc.mapsUrl}
+              href={t[`visit-dir-${loc.id}-href`] || loc.mapsUrl}
               target="_blank"
               rel="noopener noreferrer"
+              data-cms-link={`visit-dir-${loc.id}`}
               className="btn btn-outline-navy btn-sm inline-flex items-center gap-1.5 self-start"
             >
               <MapPin size={14} />
-              Directions
+              <span data-cms-link-label>{t[`visit-dir-${loc.id}-label`] || "Directions"}</span>
             </a>
-          </div>
-        ))}
-      </div>
-
-      {/* ── What to Expect — FOLDED IN as integrated feature rows ─ */}
-      <div
-        className="grid grid-cols-1 sm:grid-cols-3 gap-8 lg:gap-10"
-        style={{
-          marginTop: "var(--space-block)",
-          paddingTop: "var(--space-block)",
-          borderTop: "1px solid var(--color-clay-line)",
-        }}
-      >
-        {expectBlocks.map(({ id, Icon, title, body }) => (
-          <div key={id} className="flex flex-col">
-            <div style={iconChip} aria-hidden="true">
-              <Icon size={24} strokeWidth={1.75} />
-            </div>
-            <Tx
-              text={t}
-              k={`visit-block-${id}-title`}
-              fallback={title}
-              as="h3"
-              className="heading-3"
-              style={{ color: "var(--color-ink-warm)", marginTop: "var(--space-heading)" }}
-            />
-            <Tx
-              text={t}
-              k={`visit-block-${id}-body`}
-              fallback={body}
-              as="p"
-              className="body-base"
-              style={{ color: "var(--color-stone)", marginTop: "var(--space-eyebrow)", lineHeight: 1.7 }}
-            />
           </div>
         ))}
       </div>

@@ -1,156 +1,58 @@
 import type { Metadata } from "next";
-import Image from "next/image";
-import { assetPath } from "@/lib/asset-path";
 import { getCMSPage } from "@/lib/cms";
-import { imgCss } from "@/lib/home-content";
-import { Tx, EditableLink } from "@/components/cms/Editable";
-import Section from "@/components/ui/Section";
-import SectionHeader from "@/components/ui/SectionHeader";
+import { parseSections, type SectionMeta } from "@/lib/home-content";
+import PageComposer from "@/components/cms/PageComposer";
 import JoinPanel from "@/components/visit/JoinPanel";
-import InboxTile from "@/components/newsletter/InboxTile";
-import IssueBrowser from "@/components/newsletter/IssueBrowser";
-import { newsletterIssues } from "@/data/news";
+import VisitPlan from "@/components/visit/VisitPlan";
+import VisitLocation from "@/components/visit/VisitLocation";
 
 export const metadata: Metadata = {
   title: "Plan Your Visit",
   description:
-    "Everything you need to know before your first visit to Celebration Community Church in Hays or Colby, Kansas — service times, what to expect, and The C3 Weekly.",
+    "Everything you need to know before your first visit to Celebration Community Church in Hays or Colby, Kansas — service times, what to expect, and how to find us.",
 };
 
-const CCB_FORM = "https://celebration.ccbchurch.com/goto/forms/47/responses/new";
-
-/* Responsive gutter for the wide Browse container (mirrors .container-c3 padding). */
-const GUTTER = "clamp(1.25rem, 5vw, 3rem)";
+/**
+ * /visit — rebuilt to the editor-editable SECTION contract (Phase-4).
+ *
+ * Composed via <PageComposer> from THREE editor-native sections whose ids match
+ * c3-backend `defaultSectionsForSlug("/visit")` verbatim:
+ *   • visit-hero     → <JoinPanel>     (logo/socials + service times + Directions)
+ *   • visit-plan     → <VisitPlan>     (What to Expect / Come As You Are / Bring Kids)
+ *   • visit-location → <VisitLocation> (lean "Get directions" locations block)
+ *
+ * PageComposer wraps each visible section in `<div data-section={id}>` and injects
+ * the scoped per-section/per-tile background stylesheet, so the editor rail can
+ * add / reorder / hide / recolor these sections. Every card carries its own
+ * data-cms-bg, every heading/body is a <Tx>, and every button is an editable link.
+ *
+ * REMOVED per product tweak: the "coming this weekend" CCB-form CTA, and the
+ * "Browse The C3 Weekly" block (now its OWN page at /news — The C3 Weekly).
+ *
+ * Server component; reads PUBLISHED CMS overrides (export-safe, no preview branch).
+ */
+const PAGE_DEFAULT_SECTIONS: SectionMeta[] = [
+  { id: "visit-hero", visible: true },
+  { id: "visit-plan", visible: true },
+  { id: "visit-location", visible: true },
+];
 
 export default async function VisitPage() {
   const ov = (await getCMSPage("/visit")) || {};
   const t = ov.text || {};
-  const media = ov.media || {};
+  const sections = parseSections(ov.sections, PAGE_DEFAULT_SECTIONS);
 
-  return (
-    <>
-      {/* ── (a) TOP "Join Us" panel — logo + socials + service times + what to expect ── */}
-      <JoinPanel t={t} />
+  const render = (id: string): React.ReactNode => {
+    switch (id) {
+      case "visit-hero": return <JoinPanel t={t} />;
+      case "visit-plan": return <VisitPlan t={t} />;
+      case "visit-location": return <VisitLocation t={t} />;
+      default: return null;
+    }
+  };
 
-      {/* ── Let Us Know You're Coming — CCB guest form CTA (real, preserved) ── */}
-      <Section
-        container
-        style={{ backgroundColor: "var(--color-paper-soft)", color: "var(--color-ink-warm)" }}
-        bgKey="visit-cta-bg"
-      >
-        <div className="text-center" style={{ maxWidth: "60rem", marginInline: "auto" }}>
-          <div
-            className="relative overflow-hidden"
-            style={{
-              height: "clamp(240px, 34vw, 380px)",
-              borderRadius: "var(--radius-md)",
-              marginBottom: "var(--space-block)",
-            }}
-            data-cms-img="visit-cta-photo"
-          >
-            <Image
-              src={assetPath(media["visit-cta-photo"] || "/images/congregation.webp")}
-              alt="Warm welcome at C3"
-              fill
-              sizes="(min-width: 1024px) 60rem, 100vw"
-              className="object-cover"
-              style={imgCss(ov.img?.["visit-cta-photo"])}
-            />
-          </div>
+  const known = new Set(["visit-hero", "visit-plan", "visit-location"]);
+  const visible = sections.filter((s) => known.has(s.id));
 
-          <Tx
-            text={t}
-            k="visit-cta-eyebrow"
-            fallback="Coming this weekend?"
-            as="p"
-            className="overline"
-            style={{ color: "var(--color-teal-deep)", marginBottom: "var(--space-eyebrow)" }}
-          />
-          <Tx
-            text={t}
-            k="visit-cta-heading"
-            fallback="Let us know you&apos;re coming."
-            as="h2"
-            className="display-2 text-balance"
-            style={{ color: "var(--color-ink-warm)", marginBottom: "var(--space-heading)" }}
-          />
-          <Tx
-            text={t}
-            k="visit-cta-body"
-            fallback="Fill out the form and a member of our greeting team will be ready to meet you at the door, show you around, help you check in your kids, and find you a seat. We even have a gift for you — just to say thank you for checking out our church."
-            as="p"
-            className="body-lg"
-            style={{
-              color: "var(--color-stone)",
-              lineHeight: 1.8,
-              maxWidth: "44rem",
-              marginInline: "auto",
-              marginBottom: "var(--space-cta)",
-            }}
-          />
-          <div className="flex flex-wrap gap-5 justify-center">
-            <EditableLink
-              text={t}
-              k="visit-cta-primary"
-              href={CCB_FORM}
-              label="Let Us Know You're Coming"
-              className="btn btn-primary btn-lg"
-              external
-            />
-            <EditableLink
-              text={t}
-              k="visit-cta-secondary"
-              href="/messages/"
-              label="Watch Online First"
-              className="btn btn-outline-navy btn-lg"
-            />
-          </div>
-        </div>
-      </Section>
-
-      {/* ── (b) Browse C3 Weekly — responsive to window width ──────────── */}
-      <Section
-        style={{ backgroundColor: "var(--color-paper)", color: "var(--color-ink-warm)" }}
-        bgKey="visit-weekly-bg"
-      >
-        <div style={{ width: `min(100% - 2 * ${GUTTER}, 1600px)`, marginInline: "auto" }}>
-          <SectionHeader
-            eyebrow={
-              <Tx text={t} k="newsletter-issues-eyebrow" fallback="The C3 Weekly" />
-            }
-            title={
-              <Tx text={t} k="newsletter-issues-heading" fallback="Browse The C3 Weekly" />
-            }
-            lead={
-              <Tx
-                text={t}
-                k="newsletter-issues-lead"
-                fallback="Filter by week or search a topic &mdash; then open any issue to read it in full."
-              />
-            }
-            style={{ marginBottom: "var(--space-block)" }}
-          />
-
-          <IssueBrowser issues={newsletterIssues} />
-
-          {/* Subscribe — get The C3 Weekly in your inbox (real, preserved keys). */}
-          <div style={{ maxWidth: "34rem", marginInline: "auto", marginTop: "var(--space-block)" }}>
-            <InboxTile
-              sticky={false}
-              title={
-                <Tx text={t} k="newsletter-sub-heading" fallback="Get it in your inbox" />
-              }
-              body={
-                <Tx
-                  text={t}
-                  k="newsletter-sub-body"
-                  fallback="One short email each week &mdash; what&rsquo;s coming up, this week&rsquo;s message, and simple next steps."
-                />
-              }
-            />
-          </div>
-        </div>
-      </Section>
-    </>
-  );
+  return <PageComposer sections={visible} bgFill={ov.bgFill} anim={ov.anim} render={render} />;
 }

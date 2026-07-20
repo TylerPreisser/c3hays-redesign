@@ -51,10 +51,10 @@ function navHrefs(): Set<string> {
 // Reachable WITHOUT a nav-bar link: Home (the logo) + the header CTAs (Plan a Visit, Give).
 const INTENTIONAL_CTA = new Set(["/", "/visit", norm(ctaItem.href)]);
 
-// Phase 3: /news was renamed to Newsletter (/newsletter/). The old /news route is
-// retained ONLY as a redirect → /newsletter (SEO/back-compat), so it is intentionally
-// not a nav destination — the "Newsletter" nav item points at the live /newsletter page.
-const LEGACY_REDIRECTS = new Set(["/news"]);
+// EE-visitweekly: "The C3 Weekly" now lives at its OWN page, /news (a real nav
+// destination via the "C3 Weekly" item). The old /newsletter route is retained ONLY
+// as a redirect → /news (SEO/back-compat), so it is intentionally not a nav destination.
+const LEGACY_REDIRECTS = new Set(["/newsletter"]);
 
 describe("G3 — no public page is orphaned from the nav", () => {
   const reachable = new Set<string>([...navHrefs(), ...INTENTIONAL_CTA, ...LEGACY_REDIRECTS]);
