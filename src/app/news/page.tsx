@@ -1,12 +1,14 @@
 import type { Metadata } from "next";
+import Image from "next/image";
+import { assetPath } from "@/lib/asset-path";
 import { getCMSPage } from "@/lib/cms";
-import { parseSections, type SectionMeta } from "@/lib/home-content";
-import { Tx, EditableLink } from "@/components/cms/Editable";
+import { parseSections, imgCss, type SectionMeta } from "@/lib/home-content";
+import { Tx } from "@/components/cms/Editable";
 import PageComposer from "@/components/cms/PageComposer";
 import Section from "@/components/ui/Section";
 import SectionHeader from "@/components/ui/SectionHeader";
-import InboxTile from "@/components/newsletter/InboxTile";
 import IssueBrowser from "@/components/newsletter/IssueBrowser";
+import WeeklySignup from "@/components/newsletter/WeeklySignup";
 import { newsletterIssues } from "@/data/news";
 
 export const metadata: Metadata = {
@@ -19,16 +21,18 @@ export const metadata: Metadata = {
  * /news — "The C3 Weekly" (its OWN page).
  *
  * Formerly a client redirect stub (→ /newsletter → /visit), which is why the editor's
- * "News" resolved to Visit content. It is now a REAL editor-native content page: the
- * Browse-C3-Weekly experience moved off /visit lives here.
+ * "News" resolved to Visit content. It is now a REAL editor-native content page.
  *
  * Composed via <PageComposer> from two sections — ids coordinated with the c3-backend
- * page-sections default the queen will add for /news:
- *   • weekly-hero → intro + subscribe CTA
- *   • weekly-list → the filterable issue browser + inbox subscribe tile
+ * page-sections default for /news:
+ *   • weekly-hero → image band: LEFT-aligned header over the photo (#8) + a RIGHT-side
+ *     editor-native newsletter-signup OVERLAY (<WeeklySignup>, #9) — heading/body/field/
+ *     button/image all independently editable, and the signup FUNCTIONS.
+ *   • weekly-list → the filterable issue browser.
  *
- * Every section bg (rail), card bg (data-cms-bg), heading/body (<Tx>) and button
- * (<EditableLink>) is editable. Export-safe: no server redirect, no client-router hop.
+ * Round-2 #10: the old bottom "Get it in your inbox" InboxTile is GONE (replaced by the
+ * hero overlay). Every section bg (rail), card bg (data-cms-bg), heading/body (<Tx>) and
+ * button (data-cms-link + label) is editable. Export-safe: no server redirect.
  */
 const PAGE_DEFAULT_SECTIONS: SectionMeta[] = [
   { id: "weekly-hero", visible: true },
@@ -41,52 +45,73 @@ const GUTTER = "clamp(1.25rem, 5vw, 3rem)";
 export default async function NewsPage() {
   const ov = (await getCMSPage("/news")) || {};
   const t = ov.text || {};
+  const media = ov.media || {};
   const sections = parseSections(ov.sections, PAGE_DEFAULT_SECTIONS);
 
   const render = (id: string): React.ReactNode => {
     switch (id) {
       case "weekly-hero":
         return (
-          <Section
-            container
-            centered
-            maxWidth="52rem"
-            style={{ backgroundColor: "var(--color-paper)", color: "var(--color-ink-warm)" }}
-            bgKey="weekly-hero-bg"
+          <section
+            className="relative overflow-hidden"
+            data-cms-bg="weekly-hero-bg"
+            style={{ minHeight: "clamp(30rem, 60vh, 40rem)", display: "flex", alignItems: "center" }}
           >
-            <div data-cms-bg="weekly-hero-card">
-              <SectionHeader
-                align="center"
-                titleAs="h1"
-                eyebrow={<Tx text={t} k="weekly-hero-eyebrow" fallback="The C3 Weekly" />}
-                title={<Tx text={t} k="weekly-hero-heading" fallback="This week at C3." />}
-                lead={
+            {/* Editable background photo (#8: KEEP the top image). */}
+            <div className="absolute inset-0" data-cms-img="weekly-hero-photo">
+              <Image
+                src={assetPath(media["weekly-hero-photo"] || "/images/gather.webp")}
+                alt="The C3 Weekly"
+                fill
+                priority
+                sizes="100vw"
+                className="object-cover"
+                style={imgCss(ov.img?.["weekly-hero-photo"])}
+              />
+            </div>
+            {/* Legibility scrim (click-through so the photo stays hit-testable in the editor). */}
+            <div
+              className="absolute inset-0"
+              aria-hidden
+              style={{ background: "linear-gradient(90deg, rgba(10,12,14,0.78) 0%, rgba(10,12,14,0.55) 42%, rgba(10,12,14,0.25) 100%)", pointerEvents: "none" }}
+            />
+
+            <div className="container-c3 relative" style={{ paddingTop: "var(--section-y)", paddingBottom: "var(--section-y)", width: "100%" }}>
+              <div className="grid grid-cols-1 lg:grid-cols-[1.1fr_minmax(20rem,26rem)] gap-10 lg:gap-16 items-center">
+                {/* LEFT — header, left-aligned over the image (#8). Explicit white text
+                    for legibility over the scrim; each line an independent <Tx>. */}
+                <div data-cms-bg="weekly-hero-copy" style={{ maxWidth: "40rem" }}>
+                  <Tx
+                    text={t}
+                    k="weekly-hero-eyebrow"
+                    fallback="The C3 Weekly"
+                    as="p"
+                    className="overline"
+                    style={{ color: "var(--color-teal)", marginBottom: "var(--space-eyebrow)" }}
+                  />
+                  <Tx
+                    text={t}
+                    k="weekly-hero-heading"
+                    fallback="This week at C3."
+                    as="h1"
+                    className="display-1 text-balance"
+                    style={{ color: "#fff", marginBottom: "var(--space-heading)" }}
+                  />
                   <Tx
                     text={t}
                     k="weekly-hero-lead"
-                    fallback="One short email each week &mdash; what&rsquo;s coming up, this week&rsquo;s message, and simple next steps. Browse past issues below or get it in your inbox."
+                    fallback="One short email each week &mdash; what&rsquo;s coming up, this week&rsquo;s message, and simple next steps. Sign up, or browse past issues below."
+                    as="p"
+                    className="body-lg"
+                    style={{ color: "rgba(255,255,255,0.82)", maxWidth: "34rem", lineHeight: 1.7 }}
                   />
-                }
-                style={{ marginBottom: "var(--space-block)" }}
-              />
-              <div className="flex flex-wrap gap-5 justify-center">
-                <EditableLink
-                  text={t}
-                  k="weekly-hero-primary"
-                  href="#subscribe"
-                  label="Get it in your inbox"
-                  className="btn btn-primary btn-lg"
-                />
-                <EditableLink
-                  text={t}
-                  k="weekly-hero-secondary"
-                  href="/messages/"
-                  label="Watch this week's message"
-                  className="btn btn-outline-navy btn-lg"
-                />
+                </div>
+
+                {/* RIGHT — editor-native signup OVERLAY (#9). */}
+                <WeeklySignup text={t} />
               </div>
             </div>
-          </Section>
+          </section>
         );
       case "weekly-list":
         return (
@@ -109,25 +134,6 @@ export default async function NewsPage() {
               />
 
               <IssueBrowser issues={newsletterIssues} />
-
-              {/* Subscribe — get The C3 Weekly in your inbox. */}
-              <div
-                id="subscribe"
-                data-cms-bg="weekly-subscribe-card"
-                style={{ maxWidth: "34rem", marginInline: "auto", marginTop: "var(--space-block)" }}
-              >
-                <InboxTile
-                  sticky={false}
-                  title={<Tx text={t} k="weekly-sub-heading" fallback="Get it in your inbox" />}
-                  body={
-                    <Tx
-                      text={t}
-                      k="weekly-sub-body"
-                      fallback="One short email each week &mdash; what&rsquo;s coming up, this week&rsquo;s message, and simple next steps."
-                    />
-                  }
-                />
-              </div>
             </div>
           </Section>
         );
