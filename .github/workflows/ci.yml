@@ -1,0 +1,55 @@
+name: CI
+
+# Replaces the retired "Deploy to GitHub Pages" workflow (deploy.yml).
+#
+# WHY RETIRED: production for this site is the Cloudflare Worker (c3hays-live),
+# built + shipped with opennextjs-cloudflare (`npm run cf:build` / `cf:deploy`) —
+# an SSR runtime. The old workflow ran `next build` with CMS_LIVE unset, which
+# forces `output: "export"` (static export). The redesign is fundamentally SSR /
+# CMS_LIVE (draft preview via searchParams, the dynamic `/[slug]` route, live CMS
+# fetch), so the static-export build is incompatible and had been failing:
+#   Error: Page "/[slug]" is missing "generateStaticParams()" so it cannot be used
+#   with "output: export" config.
+# GitHub Pages was a stale mirror at the /c3hays-redesign basePath, not production.
+#
+# This CI instead runs the PRODUCTION-SHAPED build (CMS_LIVE=1 → SSR, output
+# undefined), which is what actually ships. The CMS is optional at build time
+# (NEXT_PUBLIC_CMS_URL unset ⇒ every CMS fetch short-circuits to null), so the
+# build is self-contained and deterministic. Unit tests (vitest) borrow the
+# sibling c3-backend toolchain and run locally / in the integration checkout;
+# they are not run here because CI checks out this repo standalone.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Type-check
+        run: npx tsc --noEmit
+
+      - name: Build (production SSR shape)
+        env:
+          CMS_LIVE: "1"
+        run: npm run build
