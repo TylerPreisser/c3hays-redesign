@@ -38,6 +38,7 @@ function collapsedLinkKeys(html: string): string[] {
 
 let homeHtml = "";
 let connectHtml = "";
+let eventsUpcomingHtml = "";
 
 beforeAll(async () => {
   // Home + Connect pull components that import gsap's ScrollTrigger, which reads
@@ -53,6 +54,17 @@ beforeAll(async () => {
 
   const { default: ConnectClient } = await import("@/app/connect/ConnectClient");
   connectHtml = renderToStaticMarkup(createElement(ConnectClient, { text: {}, media: {}, img: {} }));
+
+  // /events upcoming cards are a client island (skeletons in static markup), so the
+  // ready-state markup is the pure grid the island delegates to, fed sample events.
+  const { default: UpcomingEventsGrid } = await import("@/components/events/UpcomingEventsGrid");
+  const start = new Date(Date.now() + 86_400_000);
+  const ev = {
+    id: "guard-0", title: "Baptism Sunday", start, end: new Date(start.getTime() + 3_600_000),
+    allDay: false, timeLabel: "7:00 PM", description: "Come join us", campus: "Hays" as const,
+    location: "Hays campus", color: "#1cc3af", isHoliday: false, registerUrl: "https://example.com/r",
+  };
+  eventsUpcomingHtml = renderToStaticMarkup(createElement(UpcomingEventsGrid, { events: [ev], text: {}, media: {} }));
 });
 
 describe("invariant (a): the detector itself", () => {
@@ -94,5 +106,12 @@ describe("invariant (a) on real page components", () => {
   // `.fails` marker is therefore removed and this is an ordinary green assertion.
   it("connect: NEXT_STEPS cards must not collapse into one editable link", () => {
     expect(collapsedLinkKeys(connectHtml)).toEqual([]);
+  });
+
+  it("events: upcoming cards are editor-native and carry no collapsed links", () => {
+    // Rebuilt /events: each card emits its own data-cms-bg + a labelled CTA link.
+    expect(eventsUpcomingHtml).toContain('data-cms-bg="events-upcoming-0-bg"');
+    expect(eventsUpcomingHtml).toContain('data-cms-link="events-upcoming-0-cta"');
+    expect(collapsedLinkKeys(eventsUpcomingHtml)).toEqual([]);
   });
 });

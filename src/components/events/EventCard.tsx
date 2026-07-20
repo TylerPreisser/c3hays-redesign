@@ -1,7 +1,7 @@
 import type { CSSProperties, ElementType, ReactNode } from "react";
 import Image from "next/image";
 import { assetPath } from "@/lib/asset-path";
-import { Tx } from "@/components/cms/Editable";
+import { Tx, EditableLink } from "@/components/cms/Editable";
 
 /**
  * <EventCard> — Phase 4, Wave 2F primitive (§3.5, EV1).
@@ -63,6 +63,22 @@ export interface EventCardProps {
   cmsKey?: string;
   /** CMS text override bag (paired with `cmsKey`) — persisted edits render from here. */
   cmsText?: Record<string, string>;
+  /**
+   * `data-cms-bg` hook on the card CONTAINER, so the editor can recolor THIS card's
+   * background independently (buildBgCss paints `bgFill[bgCmsKey]` with !important).
+   * Optional → omitting it leaves the card bg untagged (backward compatible).
+   */
+  bgCmsKey?: string;
+  /**
+   * When set, the card renders an editable CTA link in its body via <EditableLink>
+   * (emits `data-cms-link` + the required `data-cms-link-label` span, contract §2),
+   * and the card is NEVER wrapped as a whole-card `<a>` (that would nest anchors).
+   * `ctaHref`/`ctaLabel` are the live fallbacks; persisted edits render from `cmsText`.
+   */
+  ctaCmsKey?: string;
+  ctaHref?: string;
+  ctaLabel?: string;
+  ctaExternal?: boolean;
   className?: string;
   style?: CSSProperties;
 }
@@ -167,6 +183,11 @@ export default function EventCard({
   imgCmsKey,
   cmsKey,
   cmsText,
+  bgCmsKey,
+  ctaCmsKey,
+  ctaHref,
+  ctaLabel,
+  ctaExternal,
   className,
   style,
 }: EventCardProps) {
@@ -277,6 +298,27 @@ export default function EventCard({
           }}
         />
       )}
+      {ctaCmsKey != null && (
+        <EditableLink
+          text={cmsText}
+          k={ctaCmsKey}
+          href={ctaHref || "#"}
+          label={ctaLabel || "Learn more"}
+          external={ctaExternal}
+          style={{
+            alignSelf: "flex-start",
+            marginTop: "1rem",
+            display: "inline-flex",
+            alignItems: "center",
+            gap: "0.4rem",
+            fontSize: "0.85rem",
+            fontWeight: 700,
+            letterSpacing: "0.01em",
+            color: "var(--color-teal)",
+            textDecoration: "none",
+          }}
+        />
+      )}
     </div>
   );
 
@@ -287,10 +329,15 @@ export default function EventCard({
     </>
   );
 
-  if (href) {
+  // Whole-card link ONLY when a CTA link is NOT present — nesting an <a> (the CTA)
+  // inside the card's own <a> is invalid HTML. An editor-native card (ctaCmsKey set)
+  // is a plain <article> whose single link is the editable CTA (contract §2 "never
+  // wrap heading+body+CTA in one link").
+  if (href && ctaCmsKey == null) {
     return (
       <a
         href={href}
+        data-cms-bg={bgCmsKey}
         className={["bento-tile", className].filter(Boolean).join(" ")}
         style={surface}
       >
@@ -301,6 +348,7 @@ export default function EventCard({
 
   return (
     <article
+      data-cms-bg={bgCmsKey}
       className={["bento-tile", className].filter(Boolean).join(" ")}
       style={surface}
     >
