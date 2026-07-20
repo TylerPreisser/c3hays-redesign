@@ -5,9 +5,10 @@
  * Four invariants the ee-visitweekly workstream must satisfy — written RED-FIRST
  * (they fail against the pre-rebuild code) then driven GREEN:
  *
- *   (a) /visit is section-composed into EXACTLY the 3 contract sections
- *       (visit-hero, visit-plan, visit-location) and NO LONGER carries the removed
- *       "coming this weekend" CTA or the "Browse … C3 Weekly" block.
+ *   (a) /visit is section-composed into EXACTLY the 2 contract sections
+ *       (visit-hero, visit-plan) — the visit-location campus directory was moved to
+ *       the Locations page (#7) — and NO LONGER carries the removed "coming this
+ *       weekend" CTA or the "Browse … C3 Weekly" block.
  *   (b) /news is the REAL "C3 Weekly" page (weekly-hero + weekly-list data-section
  *       wrappers, the issue browser) — NOT a router.replace redirect stub.
  *   (c) /newsletter redirects to /news (the C3 Weekly page), NOT /visit — so the
@@ -71,9 +72,9 @@ beforeAll(async () => {
   headerB = renderToStaticMarkup(createElement(Header, { globals: {} }));
 });
 
-describe("(a) /visit — 3 contract sections, removed blocks gone", () => {
-  it("emits exactly the 3 contract data-section wrappers", () => {
-    expect(sectionIds(visitHtml)).toEqual(["visit-hero", "visit-plan", "visit-location"]);
+describe("(a) /visit — 2 contract sections, removed blocks gone", () => {
+  it("emits exactly the 2 contract data-section wrappers (campus directory moved to Locations, #7)", () => {
+    expect(sectionIds(visitHtml)).toEqual(["visit-hero", "visit-plan"]);
   });
   it("no longer renders the 'coming this weekend' CTA copy", () => {
     expect(visitHtml.toLowerCase()).not.toContain("coming this weekend");
