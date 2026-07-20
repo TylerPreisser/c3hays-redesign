@@ -145,6 +145,12 @@ export default function EditBridge() {
         background:#1cc3af; color:#042e29; font:700 12px/1 -apple-system,system-ui,sans-serif;
         padding:6px 11px; border-radius:999px; border:none; cursor:pointer; box-shadow:0 6px 18px rgba(0,0,0,.28); }
       #c3-img-handle:hover{ background:#15b3a0; }
+      /* #2 events add/remove: the per-card DELETE chip (bottom-right of an authored
+         event card [data-cms-card]) → posts cms:removeCard so the editor drops it. */
+      #c3-card-delete{ position:fixed; z-index:2147483646; display:none; align-items:center; gap:6px;
+        background:#c0392b; color:#fff; font:700 12px/1 -apple-system,system-ui,sans-serif;
+        padding:6px 11px; border-radius:999px; border:none; cursor:pointer; box-shadow:0 6px 18px rgba(0,0,0,.28); }
+      #c3-card-delete:hover{ background:#a93226; }
       [data-cms-edit-badge]{ position:fixed; z-index:2147483646; background:#1cc3af; color:#042e29; font:700 11px/1 -apple-system,sans-serif;
         padding:4px 8px; border-radius:999px; pointer-events:none; transform:translateY(-50%); box-shadow:0 4px 12px rgba(0,0,0,.25); }
       #c3-toolbar{ position:fixed; z-index:2147483647; display:none; gap:2px; align-items:center;
@@ -379,6 +385,33 @@ export default function EditBridge() {
     });
     document.body.appendChild(imgChip);
 
+    // ── #2 events add/remove: per-card DELETE chip ──
+    // Hovering an authored event card ([data-cms-card="events.cards.<id>"]) reveals a
+    // Delete chip; clicking posts cms:removeCard so the editor drops that card from
+    // PageOverrides.cards and reloads the canvas. (Adding a card is the editor's
+    // "Add event card" section control — the first add flips the grid live→authored.)
+    const cardDelChip = document.createElement("button");
+    cardDelChip.id = "c3-card-delete";
+    cardDelChip.type = "button";
+    cardDelChip.innerHTML = `<span aria-hidden="true">🗑</span> Delete event`;
+    let cardDelPath = "";
+    cardDelChip.addEventListener("mousedown", (e) => {
+      e.preventDefault(); e.stopPropagation();
+      if (cardDelPath) {
+        const id = cardDelPath.split(".").slice(2).join("."); // "events.cards.<id>" → <id>
+        post({ type: "cms:removeCard", list: "events.cards", id });
+        log("remove-card", { path: cardDelPath });
+        cardDelChip.style.display = "none"; cardDelPath = "";
+      }
+    });
+    document.body.appendChild(cardDelChip);
+    const positionCardDel = (el: HTMLElement) => {
+      const r = el.getBoundingClientRect();
+      cardDelChip.style.top = `${Math.max(6, Math.min(window.innerHeight - 44, r.bottom - 44))}px`;
+      cardDelChip.style.left = `${Math.max(6, Math.min(window.innerWidth - 136, r.right - 136))}px`;
+      cardDelChip.style.display = "inline-flex";
+    };
+
     let activeEl: HTMLElement | null = null;
     const pathOf = (el: HTMLElement | null) => el?.getAttribute("data-cms") || "";
 
@@ -507,7 +540,12 @@ export default function EditBridge() {
     const onOver = (e: MouseEvent) => {
       const t = e.target as HTMLElement;
       // Keep whichever chip the pointer moved onto (so it can be clicked).
-      if (t === bgChip || t === imgChip) return;
+      if (t === bgChip || t === imgChip || t === cardDelChip) return;
+      // #2: show the per-card Delete chip whenever hovering an authored event card
+      // (independent of the img/bg chips below, which keep their own behavior).
+      const cardEl = t?.closest?.("[data-cms-card]") as HTMLElement | null;
+      if (cardEl) { cardDelPath = cardEl.getAttribute("data-cms-card") || ""; positionCardDel(cardEl); }
+      else { cardDelChip.style.display = "none"; cardDelPath = ""; }
       // v7 R7 + R12: images are NOT recolorable but ARE swappable. A [data-cms-img] often
       // sits INSIDE a recolorable [data-cms-bg] wrapper (e.g. a pillar photo), so suppress
       // the 🎨 recolor chip over images and instead show the discoverable 🖼 Change image chip.
@@ -530,7 +568,7 @@ export default function EditBridge() {
     document.addEventListener("click", onClick, true);
     document.addEventListener("mousedown", onDocClick, true);
     document.addEventListener("mouseover", onOver, true);
-    window.addEventListener("scroll", () => { if (bar.style.display === "flex") positionBar(); bgChip.style.display = "none"; imgChip.style.display = "none"; }, true);
+    window.addEventListener("scroll", () => { if (bar.style.display === "flex") positionBar(); bgChip.style.display = "none"; imgChip.style.display = "none"; cardDelChip.style.display = "none"; }, true);
 
     const onMsg = (e: MessageEvent) => {
       const d = e.data; if (!d || d.source !== "c3editor") return;
@@ -572,7 +610,7 @@ export default function EditBridge() {
       window.removeEventListener("message", onMsg);
       els.forEach((el) => el.removeAttribute("contenteditable"));
       imgObserver.disconnect();
-      bar.remove(); fontMenu.remove(); style.remove(); bgChip.remove(); imgChip.remove(); shimStyle.remove();
+      bar.remove(); fontMenu.remove(); style.remove(); bgChip.remove(); imgChip.remove(); cardDelChip.remove(); shimStyle.remove();
       document.documentElement.removeAttribute("data-cms-edit");
     };
   }, []);

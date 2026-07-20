@@ -384,6 +384,7 @@ export default function EventCard({
   return (
     <article
       data-cms-bg={bgCmsKey}
+      data-cms-card={cardPath}
       className={["bento-tile", className].filter(Boolean).join(" ")}
       style={surface}
     >
