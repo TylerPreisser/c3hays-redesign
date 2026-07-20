@@ -4,7 +4,6 @@ import { parseSections, type SectionMeta } from "@/lib/home-content";
 import PageComposer from "@/components/cms/PageComposer";
 import JoinPanel from "@/components/visit/JoinPanel";
 import VisitPlan from "@/components/visit/VisitPlan";
-import VisitLocation from "@/components/visit/VisitLocation";
 
 export const metadata: Metadata = {
   title: "Plan Your Visit",
@@ -31,10 +30,12 @@ export const metadata: Metadata = {
  *
  * Server component; reads PUBLISHED CMS overrides (export-safe, no preview branch).
  */
+// #7: the campus DIRECTORY (VisitLocation) is REMOVED from /visit — that campus/
+// "find your campus" content lives on the Locations page now. /visit keeps the
+// editable service-time cards (in JoinPanel) + the "what to expect" plan.
 const PAGE_DEFAULT_SECTIONS: SectionMeta[] = [
   { id: "visit-hero", visible: true },
   { id: "visit-plan", visible: true },
-  { id: "visit-location", visible: true },
 ];
 
 export default async function VisitPage() {
@@ -46,12 +47,11 @@ export default async function VisitPage() {
     switch (id) {
       case "visit-hero": return <JoinPanel t={t} />;
       case "visit-plan": return <VisitPlan t={t} />;
-      case "visit-location": return <VisitLocation t={t} />;
       default: return null;
     }
   };
 
-  const known = new Set(["visit-hero", "visit-plan", "visit-location"]);
+  const known = new Set(["visit-hero", "visit-plan"]);
   const visible = sections.filter((s) => known.has(s.id));
 
   return <PageComposer sections={visible} bgFill={ov.bgFill} anim={ov.anim} render={render} />;

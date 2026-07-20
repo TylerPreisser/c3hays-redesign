@@ -71,7 +71,10 @@ export default function JoinPanel({ t }: { t: Record<string, string> }) {
         className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6"
         style={{ marginBottom: "var(--space-block)" }}
       >
-        <Logo variant="dark" size={72} />
+        {/* #5: the single /visit logo is editable — click to replace in C3 Studio
+            (data-cms-img via cmsKey; shares the global dark-logo key so a swap is
+            consistent with the header). */}
+        <Logo variant="dark" size={72} cmsKey="g:logo-dark" />
         <div className="flex flex-wrap items-center gap-3" aria-label="Connect with C3">
           {SOCIALS.map(({ id, label, href, Icon }) => (
             <a
@@ -152,13 +155,20 @@ export default function JoinPanel({ t }: { t: Record<string, string> }) {
                 style={{ color: "var(--color-stone)", lineHeight: 1.7 }}
               />
             </div>
+            {/* #4: the service TIMES + text are editor-native — each row is its own
+                <Tx> region (data-cms), so staff edit the day/times in place. */}
             <div className="flex flex-col gap-3">
-              {loc.services.map((s) => (
+              {loc.services.map((s, i) => (
                 <div key={s.day} className="flex items-center gap-2.5">
                   <Clock size={14} style={{ color: "var(--color-stone)" }} className="shrink-0" />
-                  <span className="body-base" style={{ color: "var(--color-ink-warm)" }}>
-                    <strong className="font-semibold">{s.day}:</strong> {s.times.join(" · ")}
-                  </span>
+                  <Tx
+                    text={t}
+                    k={`visit-campus-${loc.id}-service-${i}`}
+                    fallback={`${s.day}: ${s.times.join(" · ")}`}
+                    as="span"
+                    className="body-base"
+                    style={{ color: "var(--color-ink-warm)" }}
+                  />
                 </div>
               ))}
             </div>

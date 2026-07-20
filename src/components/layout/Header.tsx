@@ -81,7 +81,11 @@ export default function Header({ globals = {} }: { globals?: CMSOverrides }) {
   }, [mobileOpen]);
 
   // Nav scroll effect override: auto (default) | always solid | always transparent.
-  const isScrolled = nav.effect === "solid" ? true : nav.effect === "transparent" ? false : scrolled;
+  // #6: pages with a LIGHT hero (e.g. /visit) make the transparent nav's WHITE logo +
+  // links invisible against the pale background. Force the SOLID treatment (opaque bar +
+  // DARK logo/links) there at every scroll position so the nav is legible for contrast.
+  const lightHeroPage = pathname === "/visit" || pathname === "/visit/";
+  const isScrolled = nav.effect === "solid" ? true : nav.effect === "transparent" ? false : (scrolled || lightHeroPage);
   const navColor = nav.color;
   const base = navColor || (isScrolled ? "rgba(27,28,28,0.7)" : "rgba(255,255,255,0.82)");
   const hover = navColor || (isScrolled ? "#1b1c1c" : "#ffffff");
