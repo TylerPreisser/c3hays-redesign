@@ -10,6 +10,7 @@ import Section from "@/components/ui/Section";
 import SectionHeader from "@/components/ui/SectionHeader";
 import Stack from "@/components/ui/Stack";
 import FeatureCard from "@/components/ui/FeatureCard";
+import { Tx } from "@/components/cms/Editable";
 
 export const metadata: Metadata = {
   title: "Counseling",
@@ -17,22 +18,7 @@ export const metadata: Metadata = {
     "Bible-based counseling at C3 — trained counselors helping you develop spiritually healthy relationships with God and others.",
 };
 
-/** CMS-wired inline node (preserves the editor hook + rich text on a primitive). */
-function Cms({
-  k,
-  t,
-  fallback,
-}: {
-  k: string;
-  t: Record<string, string>;
-  fallback: string;
-}) {
-  return (
-    <span data-cms={`t:${k}`} dangerouslySetInnerHTML={{ __html: tx(t, k, fallback) }} />
-  );
-}
-
-/** One line in a dark policy card (teal check + CMS-wired text). */
+/** One line in a policy card — teal check + CMS-wired (editable) text. */
 function PolicyLine({
   k,
   t,
@@ -44,9 +30,25 @@ function PolicyLine({
 }) {
   return (
     <li className="flex items-start gap-2.5">
-      <CheckCircle size={14} style={{ color: "#1cc3af", marginTop: 3 }} className="shrink-0" />
-      <span data-cms={`t:${k}`} dangerouslySetInnerHTML={{ __html: tx(t, k, fallback) }} />
+      <CheckCircle
+        size={14}
+        style={{ color: "var(--color-teal)", marginTop: 3 }}
+        className="shrink-0"
+      />
+      <Tx text={t} k={k} fallback={fallback} />
     </li>
+  );
+}
+
+/** Small warm micro-label used above lists inside the counselor cards. */
+function CardLabel({ children }: { children: React.ReactNode }) {
+  return (
+    <p
+      className="overline"
+      style={{ color: "var(--color-stone)", fontSize: "0.7rem" }}
+    >
+      {children}
+    </p>
   );
 }
 
@@ -57,8 +59,11 @@ export default async function CounselingPage() {
 
   return (
     <>
-      {/* ── Hero — full-bleed with gradient scrim ── */}
-      <section className="relative flex items-end overflow-hidden" style={{ minHeight: "56vh" }}>
+      {/* ── Hero photo band — warm ink scrim, display headline via SectionHeader ── */}
+      <section
+        className="relative flex items-end overflow-hidden"
+        style={{ minHeight: "60vh" }}
+      >
         <div className="absolute inset-0" data-cms-img="counseling-hero-bg">
           <Image
             src={assetPath(media["counseling-hero-bg"] || "/images/congregation.webp")}
@@ -68,66 +73,87 @@ export default async function CounselingPage() {
             priority
             style={imgCss(ov.img?.["counseling-hero-bg"])}
           />
-          {/* Base scrim */}
-          <div className="absolute inset-0" style={{ background: "rgba(10,10,10,0.55)" }} />
-          {/* Bottom-to-top gradient for headline readability */}
+          {/* Warm base scrim (ink-warm) */}
+          <div className="absolute inset-0" style={{ background: "rgba(26,24,21,0.56)" }} />
+          {/* Bottom-to-top warm gradient for headline readability */}
           <div
             className="absolute inset-0"
             style={{
               background:
-                "linear-gradient(to top, rgba(10,10,10,0.88) 0%, rgba(10,10,10,0.18) 60%, transparent 100%)",
+                "linear-gradient(to top, rgba(26,24,21,0.92) 0%, rgba(26,24,21,0.30) 55%, rgba(26,24,21,0.04) 100%)",
             }}
           />
         </div>
 
-        <div className="relative z-10 container-c3 pb-16 pt-44">
-          <Stack gap="heading" style={{ maxWidth: "36rem" }}>
-            <Stack gap="eyebrow">
-              <p
-                data-cms="t:counseling-hero-eyebrow"
-                className="overline"
-                style={{ color: "#1cc3af" }}
-                dangerouslySetInnerHTML={{ __html: tx(t, "counseling-hero-eyebrow", "C3 Counseling") }}
+        <div className="relative z-10 container-c3 pb-16 pt-44" data-anim="fadeInUp">
+          <SectionHeader
+            titleAs="h1"
+            titleClassName="display-1"
+            leadMaxWidth="34rem"
+            style={{ maxWidth: "40rem" }}
+            eyebrow={
+              <Tx
+                text={t}
+                k="counseling-hero-eyebrow"
+                fallback="C3 Counseling"
+                style={{ color: "var(--color-teal)" }}
               />
-              <h1
-                data-cms="t:counseling-hero-heading"
-                className="display-1 text-white text-balance"
-                dangerouslySetInnerHTML={{ __html: tx(t, "counseling-hero-heading", "Counseling") }}
+            }
+            title={
+              <Tx
+                as="span"
+                text={t}
+                k="counseling-hero-heading"
+                fallback="Counseling"
+                className="text-balance"
+                style={{ color: "#fff" }}
               />
-            </Stack>
-            <p
-              data-cms="t:counseling-hero-sub"
-              className="body-lg text-balance"
-              style={{ color: "rgba(255,255,255,0.72)" }}
-              dangerouslySetInnerHTML={{
-                __html: tx(
-                  t,
-                  "counseling-hero-sub",
-                  "Professional, Bible-based counseling — for people who want to grow in wholeness."
-                ),
-              }}
-            />
-          </Stack>
+            }
+            lead={
+              <Tx
+                as="span"
+                text={t}
+                k="counseling-hero-sub"
+                fallback="Professional, Bible-based counseling — for people who want to grow in wholeness."
+                className="text-balance"
+                style={{ color: "rgba(255,255,255,0.78)" }}
+              />
+            }
+          />
         </div>
       </section>
 
-      {/* ── Vision intro + counselors ── */}
-      <Section tone="white" container>
+      {/* ── Mission intro on warm paper ── */}
+      <Section
+        container
+        style={{ background: "var(--color-paper)", color: "var(--color-ink-warm)" }}
+      >
         <SectionHeader
-          eyebrow={<Cms k="counseling-vision-eyebrow" t={t} fallback="Our Mission" />}
-          title={<Cms k="counseling-vision-heading" t={t} fallback="Whole people, through Christ." />}
-          lead={
-            <Cms
-              k="counseling-vision-body"
-              t={t}
-              fallback="Helping people develop spiritually healthy relationships with God through Jesus Christ — and supporting emotional and relational wellness with a team of trained, Bible-based counselors."
-            />
-          }
           leadMaxWidth="48rem"
           style={{ marginBottom: "var(--space-block)" }}
+          eyebrow={
+            <Tx text={t} k="counseling-vision-eyebrow" fallback="Our Mission" />
+          }
+          title={
+            <Tx
+              as="span"
+              text={t}
+              k="counseling-vision-heading"
+              fallback="Whole people, through Christ."
+            />
+          }
+          lead={
+            <Tx
+              as="span"
+              text={t}
+              k="counseling-vision-body"
+              fallback="Helping people develop spiritually healthy relationships with God through Jesus Christ — and supporting emotional and relational wellness with a team of trained, Bible-based counselors."
+              style={{ color: "var(--color-stone)" }}
+            />
+          }
         />
 
-        {/* ── Counselor cards — contained, equal-height, hover-bloom ── */}
+        {/* Counselor cards — signature premium card language (no initials avatars). */}
         <div
           className="grid grid-cols-1 md:grid-cols-3 items-stretch"
           style={{ gap: "var(--space-body)" }}
@@ -135,70 +161,70 @@ export default async function CounselingPage() {
           {counselors.map((c) => (
             <article
               key={c.id}
+              data-anim="fadeInUp"
               className="bento-tile flex flex-col h-full"
               style={{
                 padding: "clamp(1.75rem, 3vw, 2.5rem)",
-                background: "#fff",
-                border: "1px solid rgba(27,28,28,0.08)",
+                background: "var(--color-paper-soft)",
+                border: "1px solid var(--color-clay-line)",
                 borderRadius: "var(--radius-md)",
                 boxShadow: "var(--shadow-rest)",
               }}
             >
-              {/* Monogram avatar */}
-              <div
-                className="flex items-center justify-center shrink-0"
+              {/* Thin teal accent mark */}
+              <span
+                aria-hidden="true"
                 style={{
-                  width: "3.5rem",
-                  height: "3.5rem",
+                  display: "block",
+                  width: "2.5rem",
+                  height: "3px",
+                  borderRadius: "var(--radius-pill)",
+                  background: "var(--color-teal)",
                   marginBottom: "var(--space-heading)",
-                  borderRadius: 999,
-                  background: "rgba(28, 195, 175, 0.12)",
-                  border: "2px solid #1cc3af",
                 }}
-              >
-                <span className="font-bold tracking-wide" style={{ color: "#179c8c", fontSize: "1.05rem" }}>
-                  {c.name.split(" ").map((n) => n[0]).join("")}
-                </span>
-              </div>
+              />
+
+              {/* Title as teal eyebrow */}
+              <p className="overline">{c.title}</p>
 
               {/* Name + credentials */}
-              <h3 className="heading-3" style={{ color: "#1b1c1c" }}>
+              <h3
+                className="heading-3"
+                style={{ color: "var(--color-ink-warm)", marginTop: "var(--space-eyebrow)" }}
+              >
                 {c.name}
                 {c.credentials && (
-                  <span className="font-normal ml-1.5" style={{ color: "rgba(27,28,28,0.5)", fontSize: "0.9rem" }}>
+                  <span
+                    className="font-normal ml-1.5"
+                    style={{ color: "var(--color-stone)", fontSize: "0.9rem" }}
+                  >
                     {c.credentials}
                   </span>
                 )}
               </h3>
-              <p
-                className="font-semibold"
-                style={{ color: "#179c8c", fontSize: "0.9rem", marginTop: "0.4rem" }}
-              >
-                {c.title}
-              </p>
+
               <p
                 className="body-sm flex-1"
-                style={{ color: "var(--color-mute)", marginTop: "var(--space-body)" }}
+                style={{ color: "var(--color-stone)", marginTop: "var(--space-body)" }}
               >
                 {c.bio}
               </p>
 
               {/* Specialties */}
               <div style={{ marginTop: "var(--space-body)" }}>
-                <p
-                  className="text-xs font-bold uppercase tracking-widest"
-                  style={{ color: "rgba(27,28,28,0.4)", marginBottom: "0.85rem" }}
-                >
-                  Specialties
-                </p>
-                <ul className="flex flex-col gap-2">
+                <CardLabel>Specialties</CardLabel>
+                <ul className="flex flex-col gap-2" style={{ marginTop: "0.75rem" }}>
                   {c.specialties.map((s) => (
                     <li
                       key={s}
                       className="flex items-center gap-2 body-sm"
                       style={{ color: "var(--color-mute)" }}
                     >
-                      <CheckCircle size={13} style={{ color: "#1cc3af" }} className="shrink-0" />
+                      <CheckCircle
+                        size={13}
+                        style={{ color: "var(--color-teal)" }}
+                        className="shrink-0"
+                      />
                       {s}
                     </li>
                   ))}
@@ -207,15 +233,10 @@ export default async function CounselingPage() {
 
               {/* Education */}
               <div style={{ marginTop: "var(--space-body)" }}>
-                <p
-                  className="text-xs font-bold uppercase tracking-widest"
-                  style={{ color: "rgba(27,28,28,0.4)", marginBottom: "0.6rem" }}
-                >
-                  Education
-                </p>
-                <ul className="flex flex-col gap-1.5">
+                <CardLabel>Education</CardLabel>
+                <ul className="flex flex-col gap-1.5" style={{ marginTop: "0.6rem" }}>
                   {c.education.map((e) => (
-                    <li key={e} className="text-xs" style={{ color: "rgba(27,28,28,0.45)" }}>
+                    <li key={e} className="text-xs" style={{ color: "var(--color-stone)" }}>
                       {e}
                     </li>
                   ))}
@@ -226,20 +247,30 @@ export default async function CounselingPage() {
         </div>
       </Section>
 
-      {/* ── Fees & Policies — dark section, equal-height FeatureCards ── */}
-      <Section tone="dark" container>
+      {/* ── Fees & Policies — warm ink section, equal-height FeatureCards ── */}
+      <Section
+        container
+        style={{ background: "var(--color-ink-warm)", color: "#fff" }}
+      >
         <SectionHeader
+          style={{ marginBottom: "var(--space-block)" }}
           eyebrow={
-            <span style={{ color: "#1cc3af" }}>
-              <Cms k="counseling-policies-eyebrow" t={t} fallback="Practical Details" />
-            </span>
+            <Tx
+              text={t}
+              k="counseling-policies-eyebrow"
+              fallback="Practical Details"
+              style={{ color: "var(--color-teal)" }}
+            />
           }
           title={
-            <span className="text-white">
-              <Cms k="counseling-policies-heading" t={t} fallback="Fees &amp; Policies" />
-            </span>
+            <Tx
+              as="span"
+              text={t}
+              k="counseling-policies-heading"
+              fallback="Fees &amp; Policies"
+              style={{ color: "#fff" }}
+            />
           }
-          style={{ marginBottom: "var(--space-block)" }}
         />
 
         <div
@@ -247,91 +278,98 @@ export default async function CounselingPage() {
           style={{ gap: "var(--space-body)" }}
         >
           {/* Fees */}
-          <FeatureCard
-            tone="dark"
-            icon={<DollarSign size={24} />}
-            title={<Cms k="counseling-fees-heading" t={t} fallback="Fees" />}
-          >
-            <ul
-              className="flex flex-col gap-3 body-sm"
-              style={{ color: "rgba(255,255,255,0.62)", marginTop: "var(--space-heading)" }}
+          <div className="h-full" data-anim="fadeInUp">
+            <FeatureCard
+              tone="dark"
+              icon={<DollarSign size={24} />}
+              title={<Tx text={t} k="counseling-fees-heading" fallback="Fees" />}
             >
-              <PolicyLine k="counseling-fee-rate" t={t} fallback="$75 / session (reduced rate)" />
-              <PolicyLine
-                k="counseling-fee-payment"
-                t={t}
-                fallback="Cash, check; some counselors accept credit / Venmo"
-              />
-              <PolicyLine k="counseling-fee-due" t={t} fallback="Payment due at appointment" />
-              <PolicyLine
-                k="counseling-fee-scholarship"
-                t={t}
-                fallback="Scholarships available on a case-by-case basis"
-              />
-            </ul>
-          </FeatureCard>
+              <ul
+                className="flex flex-col gap-3 body-sm"
+                style={{ color: "rgba(255,255,255,0.66)", marginTop: "var(--space-heading)" }}
+              >
+                <PolicyLine k="counseling-fee-rate" t={t} fallback="$75 / session (reduced rate)" />
+                <PolicyLine
+                  k="counseling-fee-payment"
+                  t={t}
+                  fallback="Cash, check; some counselors accept credit / Venmo"
+                />
+                <PolicyLine k="counseling-fee-due" t={t} fallback="Payment due at appointment" />
+                <PolicyLine
+                  k="counseling-fee-scholarship"
+                  t={t}
+                  fallback="Scholarships available on a case-by-case basis"
+                />
+              </ul>
+            </FeatureCard>
+          </div>
 
           {/* Cancellation */}
-          <FeatureCard
-            tone="dark"
-            icon={<Phone size={24} />}
-            title={<Cms k="counseling-cancel-heading" t={t} fallback="Cancellation Policy" />}
-          >
-            <ul
-              className="flex flex-col gap-3 body-sm"
-              style={{ color: "rgba(255,255,255,0.62)", marginTop: "var(--space-heading)" }}
+          <div className="h-full" data-anim="fadeInUp">
+            <FeatureCard
+              tone="dark"
+              icon={<Phone size={24} />}
+              title={<Tx text={t} k="counseling-cancel-heading" fallback="Cancellation Policy" />}
             >
-              <PolicyLine
-                k="counseling-cancel-notice"
-                t={t}
-                fallback="24-hour notice required for cancellations"
-              />
-              <PolicyLine
-                k="counseling-cancel-noshow"
-                t={t}
-                fallback="No-shows are charged the $75 session fee"
-              />
-            </ul>
-          </FeatureCard>
+              <ul
+                className="flex flex-col gap-3 body-sm"
+                style={{ color: "rgba(255,255,255,0.66)", marginTop: "var(--space-heading)" }}
+              >
+                <PolicyLine
+                  k="counseling-cancel-notice"
+                  t={t}
+                  fallback="24-hour notice required for cancellations"
+                />
+                <PolicyLine
+                  k="counseling-cancel-noshow"
+                  t={t}
+                  fallback="No-shows are charged the $75 session fee"
+                />
+              </ul>
+            </FeatureCard>
+          </div>
 
           {/* Getting started */}
-          <FeatureCard
-            tone="dark"
-            icon={<CheckCircle size={24} />}
-            title={<Cms k="counseling-start-heading" t={t} fallback="Getting Started" />}
-          >
-            <ul
-              className="flex flex-col gap-3 body-sm"
-              style={{ color: "rgba(255,255,255,0.62)", marginTop: "var(--space-heading)" }}
+          <div className="h-full" data-anim="fadeInUp">
+            <FeatureCard
+              tone="dark"
+              icon={<CheckCircle size={24} />}
+              title={<Tx text={t} k="counseling-start-heading" fallback="Getting Started" />}
             >
-              <PolicyLine
-                k="counseling-start-step1"
-                t={t}
-                fallback="Reach out via our connect form or call the church office"
-              />
-              <PolicyLine
-                k="counseling-start-step2"
-                t={t}
-                fallback="We&apos;ll match you with the right counselor for your needs"
-              />
-              <PolicyLine
-                k="counseling-start-step3"
-                t={t}
-                fallback="Confidential — your privacy is always protected"
-              />
-            </ul>
-          </FeatureCard>
+              <ul
+                className="flex flex-col gap-3 body-sm"
+                style={{ color: "rgba(255,255,255,0.66)", marginTop: "var(--space-heading)" }}
+              >
+                <PolicyLine
+                  k="counseling-start-step1"
+                  t={t}
+                  fallback="Reach out via our connect form or call the church office"
+                />
+                <PolicyLine
+                  k="counseling-start-step2"
+                  t={t}
+                  fallback="We&apos;ll match you with the right counselor for your needs"
+                />
+                <PolicyLine
+                  k="counseling-start-step3"
+                  t={t}
+                  fallback="Confidential — your privacy is always protected"
+                />
+              </ul>
+            </FeatureCard>
+          </div>
         </div>
       </Section>
 
-      {/* ── Connect CTA — contained, roomy closing moment ── */}
-      <Section tone="mist" container>
+      {/* ── Connect CTA — calm warm closing panel ── */}
+      <Section container style={{ background: "var(--color-paper)" }}>
         <div
           className="mx-auto"
+          data-anim="fadeInUp"
           style={{
             maxWidth: "52rem",
-            background: "#fff",
-            border: "1px solid rgba(27,28,28,0.07)",
+            background: "var(--color-paper-soft)",
+            border: "1px solid var(--color-clay-line)",
             borderRadius: "var(--radius-md)",
             boxShadow: "var(--shadow-rest)",
             padding: "clamp(2.5rem, 5vw, 4rem)",
@@ -340,16 +378,28 @@ export default async function CounselingPage() {
           <Stack gap="cta" align="center">
             <SectionHeader
               align="center"
-              eyebrow={<Cms k="counseling-cta-eyebrow" t={t} fallback="Take the first step" />}
-              title={<Cms k="counseling-cta-heading" t={t} fallback="You don&apos;t have to carry it alone." />}
-              lead={
-                <Cms
-                  k="counseling-cta-body"
-                  t={t}
-                  fallback="Reach out to our team and we&apos;ll connect you with the right counselor for your needs."
+              leadMaxWidth="34rem"
+              eyebrow={
+                <Tx text={t} k="counseling-cta-eyebrow" fallback="Take the first step" />
+              }
+              title={
+                <Tx
+                  as="span"
+                  text={t}
+                  k="counseling-cta-heading"
+                  fallback="You don&apos;t have to carry it alone."
+                  style={{ color: "var(--color-ink-warm)" }}
                 />
               }
-              leadMaxWidth="34rem"
+              lead={
+                <Tx
+                  as="span"
+                  text={t}
+                  k="counseling-cta-body"
+                  fallback="Reach out to our team and we&apos;ll connect you with the right counselor for your needs."
+                  style={{ color: "var(--color-stone)" }}
+                />
+              }
             />
             <Link
               href={t["counseling-cta-btn-href"] || "/connect/"}
