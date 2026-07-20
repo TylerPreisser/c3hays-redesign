@@ -80,6 +80,16 @@ describe("/counseling is editor-native (Layer 2 + Layer 1)", () => {
     }
   });
 
+  it("the hero carries an editable appointment CTA with a label span", () => {
+    expect(html).toContain('data-cms-link="counseling-hero-cta"');
+    const host = document.createElement("div");
+    host.innerHTML = html;
+    const cta = host.querySelector('[data-cms-link="counseling-hero-cta"]');
+    expect(cta?.querySelector("[data-cms-link-label]")?.textContent).toBe(
+      "Make An Appointment",
+    );
+  });
+
   it("no editable link collapses a whole card (every data-cms-link has a label span)", () => {
     expect(collapsedLinkKeys(html)).toEqual([]);
   });
