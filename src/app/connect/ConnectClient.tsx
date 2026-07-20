@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import {
   Hand,
@@ -9,30 +10,32 @@ import {
   CalendarDays,
   Check,
   ArrowUpRight,
+  MapPin,
+  Phone,
+  Mail,
+  Clock,
 } from "lucide-react";
-import { tx } from "@/lib/home-content";
+import { tx, imgCss } from "@/lib/home-content";
+import { assetPath } from "@/lib/asset-path";
+import { site } from "@/data/site";
+import { locations } from "@/data/locations";
+import { Tx, EditableLink } from "@/components/cms/Editable";
 import Section from "@/components/ui/Section";
 import Stack from "@/components/ui/Stack";
 
-/* Connect — a spacious, premium contact card FIRST, then real next-step links.
-   The connect actions on the live site run on Church Community Builder (CCB)
-   forms — those exact URLs are wired below (sourced from the content inventory). */
+/* Connect — a PREMIUM full-bleed photo + glass contact card, then the real
+   next-step links. VISUAL ONLY: the form is intentionally non-functional
+   (onSubmit preventDefault → success state). The connect actions on the live
+   site run on Church Community Builder (CCB) forms — those exact URLs are the
+   real links preserved below (sourced from the content inventory). */
 
 const CCB = "https://celebration.ccbchurch.com/goto/forms";
 const CCB_VISIT = `${CCB}/47/responses/new`; // "Let us know you're coming"
 const CCB_SERVE = `${CCB}/397/responses/new`; // Hays serve
 const CCB_COUNSELING = `${CCB}/258/responses/new`; // Counseling appt
 
-const CAMPUSES = ["Hays", "Colby", "Online"];
-
-const REASONS = [
-  "I'm new here",
-  "I want to know Jesus",
-  "Find a group",
-  "Serve & volunteer",
-  "Share a prayer request",
-  "Something else",
-];
+/* "What's this about?" — visual-only routing hint. */
+const REASONS = ["Visiting", "Prayer", "Serving", "General"];
 
 /* Real next-step destinations (from the inventory). */
 const NEXT_STEPS = [
@@ -74,175 +77,293 @@ const NEXT_STEPS = [
   },
 ];
 
+type ImgOverride = { pos?: string; scale?: number };
+
 interface ConnectClientProps {
   text: Record<string, string>;
+  media?: Record<string, string>;
+  img?: Record<string, ImgOverride>;
 }
 
-export default function ConnectClient({ text }: ConnectClientProps) {
+export default function ConnectClient({ text, media = {}, img = {} }: ConnectClientProps) {
   const [submitted, setSubmitted] = useState(false);
+
+  const addr = site.address;
+  const addressLine = `${addr.street}, ${addr.city}, ${addr.state} ${addr.zip}`;
+  const mapsDir = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(
+    addressLine
+  )}`;
+  const hays = locations.find((l) => l.id === "hays");
+  const serviceLine = hays
+    ? hays.services.map((s) => `${s.day} ${s.times.join(", ")}`).join(" · ")
+    : "Sat 5PM · Sun 8, 9:30 & 11AM";
+
+  /* Monochrome, self-contained faux static-map thumbnail (no API key). */
+  const mapSvg =
+    "<svg xmlns='http://www.w3.org/2000/svg' width='480' height='180' viewBox='0 0 480 180'>" +
+    "<rect width='480' height='180' fill='#e9e2d6'/>" +
+    "<g stroke='#cdc5b7' stroke-width='7' fill='none' stroke-linecap='round'>" +
+    "<path d='M0 46 H480'/><path d='M0 128 H480'/>" +
+    "<path d='M112 0 V180'/><path d='M320 0 V180'/>" +
+    "</g>" +
+    "<path d='M-20 12 L500 150' stroke='#d8d1c4' stroke-width='13' fill='none'/>" +
+    "<path d='M60 180 L260 20' stroke='#d8d1c4' stroke-width='9' fill='none'/>" +
+    "</svg>";
+  const mapBg = `url("data:image/svg+xml,${encodeURIComponent(mapSvg)}")`;
 
   return (
     <>
-      {/* ── Contact form FIRST ─────────────────────────────────── */}
-      <Section tone="mist" container>
-        <div
-          className="mx-auto"
-          style={{
-            maxWidth: 780,
-            background: "#fff",
-            borderRadius: "var(--radius-md)",
-            padding: "clamp(2rem, 5vw, 4rem)",
-            boxShadow: "var(--shadow-hover)",
-            border: "1px solid rgba(27,28,28,0.06)",
-          }}
-        >
-          {submitted ? (
-            /* Success state */
-            <div
-              className="text-center"
-              style={{ padding: "2.5rem 0", animation: "fadeIn 0.5s ease both" }}
-            >
-              <div
-                className="flex items-center justify-center mx-auto"
-                style={{
-                  width: 68,
-                  height: 68,
-                  borderRadius: 999,
-                  marginBottom: "var(--space-heading)",
-                  background: "rgba(28,195,175,0.14)",
-                  border: "2px solid #1cc3af",
-                }}
-              >
-                <Check size={30} style={{ color: "#1cc3af" }} />
-              </div>
-              <h2
-                className="heading-1"
-                style={{ color: "#1b1c1c", marginBottom: "var(--space-heading)" }}
-                data-cms="t:connect-thanks-heading"
-                dangerouslySetInnerHTML={{
-                  __html: tx(text, "connect-thanks-heading", "Thanks &mdash; we&rsquo;ll be in touch."),
-                }}
-              />
-              <p
-                className="body-lg mx-auto"
-                style={{ color: "rgba(27,28,28,0.62)", maxWidth: 460 }}
-                data-cms="t:connect-thanks-body"
-                dangerouslySetInnerHTML={{
-                  __html: tx(
-                    text,
-                    "connect-thanks-body",
-                    "A real person from our team will reach out personally. We&rsquo;d love to see you this weekend."
-                  ),
-                }}
-              />
-            </div>
-          ) : (
-            <form onSubmit={(e) => { e.preventDefault(); setSubmitted(true); }} noValidate>
-              {/* Header */}
-              <Stack gap="heading" style={{ maxWidth: 520, marginBottom: "var(--space-cta)" }}>
-                <Stack gap="eyebrow">
-                  <span
-                    className="overline"
-                    data-cms="t:connect-form-eyebrow"
-                    dangerouslySetInnerHTML={{ __html: tx(text, "connect-form-eyebrow", "Say hello") }}
-                  />
-                  <h2
-                    className="display-2"
-                    style={{ color: "#1b1c1c" }}
-                    data-cms="t:connect-form-heading"
-                    dangerouslySetInnerHTML={{ __html: tx(text, "connect-form-heading", "We&rsquo;d love to hear from you") }}
-                  />
-                </Stack>
-                <p
-                  className="body-lg"
-                  style={{ color: "var(--color-mute)" }}
-                  data-cms="t:connect-form-subhead"
-                  dangerouslySetInnerHTML={{
-                    __html: tx(
-                      text,
-                      "connect-form-subhead",
-                      "Send us a note and someone on our team will personally get back to you."
-                    ),
-                  }}
-                />
-              </Stack>
+      <style>{CONNECT_CSS}</style>
 
-              {/* Fields — generous vertical rhythm */}
-              <div className="grid grid-cols-1 sm:grid-cols-2" style={{ gap: "var(--space-body)" }}>
-                <Field label={tx(text, "connect-field-firstname", "First name")} required>
-                  <input type="text" required autoComplete="given-name" className="input-c3" placeholder="Jane" />
-                </Field>
-                <Field label={tx(text, "connect-field-lastname", "Last name")} required>
-                  <input type="text" required autoComplete="family-name" className="input-c3" placeholder="Smith" />
-                </Field>
-                <Field label={tx(text, "connect-field-email", "Email")} required>
-                  <input type="email" required autoComplete="email" inputMode="email" className="input-c3" placeholder="jane@example.com" />
-                </Field>
-                <Field label={tx(text, "connect-field-phone", "Phone")}>
-                  <input type="tel" autoComplete="tel" inputMode="tel" className="input-c3" placeholder="(785) 555-0100" />
-                </Field>
-                <div className="sm:col-span-2">
-                  <Field label={tx(text, "connect-field-campus", "Which campus?")}>
-                    <select className="input-c3" style={selectStyle} defaultValue="">
-                      <option value="">{tx(text, "connect-field-campus-placeholder", "Select a campus…")}</option>
-                      {CAMPUSES.map((c) => <option key={c} value={c}>{c}</option>)}
-                    </select>
-                  </Field>
+      {/* ── Full-bleed photo + glass contact card ─────────────────── */}
+      <section
+        className="connect-fullbleed"
+        style={{ minHeight: "max(660px, 100svh)" }}
+      >
+        {/* Background photo — CMS-swappable (data-cms-img preserved) */}
+        <div className="connect-hero-media" data-cms-img="connect-hero-bg">
+          <Image
+            src={assetPath(media["connect-hero-bg"] || "/images/community.webp")}
+            alt="The C3 family gathered together"
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover connect-drift connect-bg-img"
+            style={imgCss(img["connect-hero-bg"])}
+          />
+        </div>
+
+        {/* MANDATORY directional scrim: dark on the card side → light on the open
+            side. Guarantees legibility; glass alone fails over a photo. */}
+        <div className="connect-scrim" aria-hidden="true" />
+
+        {/* Card wrapper — anchored lower-left */}
+        <div className="connect-card-wrap container-c3">
+          <div className="glass-card connect-card-rise">
+            {/* Header */}
+            <Stack gap="eyebrow" style={{ marginBottom: "var(--space-heading)" }}>
+              <Tx
+                text={text}
+                k="connect-hero-eyebrow"
+                fallback="Get in touch"
+                className="overline"
+                style={{ color: "var(--color-teal)" }}
+              />
+              <Tx
+                text={text}
+                k="connect-hero-heading"
+                fallback="Come as you are &mdash; we&rsquo;d love to meet you."
+                as="h1"
+                className="connect-card-title"
+              />
+            </Stack>
+            <Tx
+              text={text}
+              k="connect-hero-body"
+              fallback="Send a note and a real person from our team will personally reach out. No pressure &mdash; just a warm welcome."
+              as="p"
+              className="body-base"
+              style={{ color: "rgba(255,255,255,0.82)", marginBottom: "var(--s-8)" }}
+            />
+
+            {submitted ? (
+              /* Success state (visual only) */
+              <div className="text-center connect-stagger" style={{ padding: "1.5rem 0" }}>
+                <div
+                  className="flex items-center justify-center mx-auto"
+                  style={{
+                    width: 64,
+                    height: 64,
+                    borderRadius: 999,
+                    marginBottom: "var(--space-heading)",
+                    background: "rgba(28,195,175,0.18)",
+                    border: "2px solid var(--color-teal)",
+                  }}
+                >
+                  <Check size={28} style={{ color: "var(--color-teal)" }} />
                 </div>
-                <div className="sm:col-span-2">
-                  <Field label={tx(text, "connect-field-reason", "What can we help with?")}>
+                <Tx
+                  text={text}
+                  k="connect-thanks-heading"
+                  fallback="Thanks &mdash; we&rsquo;ll be in touch."
+                  as="h2"
+                  className="connect-card-title"
+                  style={{ marginBottom: "var(--space-eyebrow)" }}
+                />
+                <Tx
+                  text={text}
+                  k="connect-thanks-body"
+                  fallback="A real person from our team will reach out personally. We&rsquo;d love to see you this weekend."
+                  as="p"
+                  className="body-base mx-auto"
+                  style={{ color: "rgba(255,255,255,0.82)", maxWidth: 380 }}
+                />
+              </div>
+            ) : (
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  setSubmitted(true);
+                }}
+                noValidate
+              >
+                <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-body)" }}>
+                  <GlassField
+                    label={tx(text, "connect-field-firstname", "Name")}
+                    delay={120}
+                    required
+                  >
+                    <input
+                      type="text"
+                      required
+                      autoComplete="name"
+                      className="input-c3"
+                      placeholder="Jane Smith"
+                    />
+                  </GlassField>
+
+                  <GlassField
+                    label={tx(text, "connect-field-email", "Email")}
+                    delay={180}
+                    required
+                  >
+                    <input
+                      type="email"
+                      required
+                      autoComplete="email"
+                      inputMode="email"
+                      className="input-c3"
+                      placeholder="jane@example.com"
+                    />
+                  </GlassField>
+
+                  <GlassField
+                    label={tx(text, "connect-field-reason", "What&rsquo;s this about?")}
+                    delay={240}
+                  >
                     <select className="input-c3" style={selectStyle} defaultValue="">
-                      <option value="">{tx(text, "connect-field-reason-placeholder", "Pick what fits best…")}</option>
-                      {REASONS.map((r) => <option key={r} value={r}>{r}</option>)}
+                      <option value="">
+                        {tx(text, "connect-field-reason-placeholder", "Pick what fits best…")}
+                      </option>
+                      {REASONS.map((r) => (
+                        <option key={r} value={r}>
+                          {r}
+                        </option>
+                      ))}
                     </select>
-                  </Field>
-                </div>
-                <div className="sm:col-span-2">
-                  <Field label={tx(text, "connect-field-message", "Your message")}>
+                  </GlassField>
+
+                  <GlassField
+                    label={tx(text, "connect-field-message", "Your message")}
+                    delay={300}
+                  >
                     <textarea
                       className="input-c3 textarea-c3"
-                      rows={4}
-                      placeholder={tx(text, "connect-field-message-placeholder", "Prayer requests, questions, or just say hi…")}
+                      rows={3}
+                      placeholder={tx(
+                        text,
+                        "connect-field-message-placeholder",
+                        "Prayer requests, questions, or just say hi…"
+                      )}
                     />
-                  </Field>
+                  </GlassField>
                 </div>
-              </div>
 
-              {/* Submit */}
-              <button
-                type="submit"
-                className="btn btn-primary btn-lg w-full"
-                style={{ marginTop: "var(--space-cta)" }}
-                data-cms-link="connect-submit"
-              >
-                <span data-cms-link-label>{tx(text, "connect-submit-label", "Send message")}</span>
-              </button>
-
-              {/* Real CCB alternative */}
-              <p
-                className="text-center"
-                style={{ marginTop: "var(--space-body)", fontSize: "0.9rem", color: "rgba(27,28,28,0.55)" }}
-              >
-                {tx(text, "connect-ccb-pretext", "Planning a first visit? ")}
-                <a
-                  href={text["connect-ccb-href"] || CCB_VISIT}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="group font-semibold"
-                  style={{ color: "var(--color-teal-deep, #179c8c)" }}
-                  data-cms-link="connect-ccb"
+                {/* Submit (visual only) */}
+                <button
+                  type="submit"
+                  className="btn btn-primary btn-lg w-full connect-stagger"
+                  style={{ marginTop: "var(--space-cta)", animationDelay: "360ms" }}
+                  data-cms-link="connect-submit"
                 >
-                  <span data-cms-link-label>{tx(text, "connect-ccb-label", "Let us know you're coming")}</span>
+                  <span data-cms-link-label>{tx(text, "connect-submit-label", "Send message")}</span>
+                </button>
+
+                {/* Real CCB alternative — preserved */}
+                <p
+                  className="text-center connect-stagger"
+                  style={{
+                    marginTop: "var(--space-body)",
+                    fontSize: "0.9rem",
+                    color: "rgba(255,255,255,0.7)",
+                    animationDelay: "420ms",
+                  }}
+                >
+                  {tx(text, "connect-ccb-pretext", "Planning a first visit? ")}
+                  <a
+                    href={text["connect-ccb-href"] || CCB_VISIT}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="group font-semibold"
+                    style={{ color: "var(--color-teal)" }}
+                    data-cms-link="connect-ccb"
+                  >
+                    <span data-cms-link-label>
+                      {tx(text, "connect-ccb-label", "Let us know you're coming")}
+                    </span>
+                    <ArrowUpRight
+                      size={15}
+                      className="inline-block ml-0.5 -mt-0.5 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+                    />
+                  </a>
+                </p>
+              </form>
+            )}
+
+            {/* Quick-contact + map ─────────────────────────────── */}
+            <div className="connect-contact connect-stagger" style={{ animationDelay: "480ms" }}>
+              <Tx
+                text={text}
+                k="connect-contact-title"
+                fallback="Visit the Hays campus"
+                as="p"
+                className="overline"
+                style={{ color: "rgba(255,255,255,0.6)", marginBottom: "var(--s-4)" }}
+              />
+              <ul className="connect-contact-list">
+                <li>
+                  <MapPin size={16} aria-hidden="true" />
+                  <span>{addressLine}</span>
+                </li>
+                <li>
+                  <Phone size={16} aria-hidden="true" />
+                  <a href={`tel:${site.phone.replace(/[^0-9+]/g, "")}`}>{site.phone}</a>
+                </li>
+                <li>
+                  <Mail size={16} aria-hidden="true" />
+                  <a href={`mailto:${site.email}`}>{site.email}</a>
+                </li>
+                <li>
+                  <Clock size={16} aria-hidden="true" />
+                  <span>{serviceLine}</span>
+                </li>
+              </ul>
+
+              {/* Monochrome static-map thumbnail → Google Maps directions */}
+              <a
+                href={mapsDir}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="connect-map group"
+                aria-label={`Get directions to the C3 Hays campus at ${addressLine}`}
+                data-cms-link="connect-map"
+                style={{ backgroundImage: mapBg }}
+              >
+                <span className="connect-map-pin" aria-hidden="true">
+                  <MapPin size={20} />
+                </span>
+                <span className="connect-map-label">
+                  <span data-cms-link-label>Get directions</span>
                   <ArrowUpRight
                     size={15}
-                    className="inline-block ml-0.5 -mt-0.5 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+                    className="transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
                   />
-                </a>
-              </p>
-            </form>
-          )}
+                </span>
+              </a>
+            </div>
+          </div>
         </div>
-      </Section>
+      </section>
 
       {/* ── Real next steps ─────────────────────────────────────── */}
       <Section tone="white" container>
@@ -366,15 +487,197 @@ const selectStyle: React.CSSProperties = {
   cursor: "pointer",
 };
 
-/* ── Field wrapper ── */
-function Field({ label, required, children }: { label: string; required?: boolean; children: React.ReactNode }) {
+/* ── Glass field wrapper (staggered) ── */
+function GlassField({
+  label,
+  required,
+  delay,
+  children,
+}: {
+  label: string;
+  required?: boolean;
+  delay: number;
+  children: React.ReactNode;
+}) {
   return (
-    <div className="flex flex-col gap-2.5">
-      <label style={{ fontSize: "0.875rem", fontWeight: 600, color: "rgba(27,28,28,0.85)" }}>
-        {label}
-        {required && <span className="ml-1" style={{ color: "#1cc3af" }}>*</span>}
-      </label>
+    <div className="flex flex-col gap-2 connect-stagger" style={{ animationDelay: `${delay}ms` }}>
+      <label
+        style={{ fontSize: "0.875rem", fontWeight: 600, color: "rgba(255,255,255,0.9)" }}
+        dangerouslySetInnerHTML={{
+          __html: required ? `${label} <span style="color:var(--color-teal)">*</span>` : label,
+        }}
+      />
       {children}
     </div>
   );
 }
+
+/* ── Scoped CSS: glass fallback, motion, mobile solid-sheet degrade.
+   globals.css is off-limits, so the @supports / @media rules that inline
+   styles can't express live here. The global reduced-motion guard also
+   applies; these rules reinforce it for the drift + entrance. ── */
+const CONNECT_CSS = `
+.connect-fullbleed {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: flex-end;
+}
+.connect-hero-media { position: absolute; inset: 0; }
+.connect-bg-img { filter: saturate(0.82) brightness(0.95); transform-origin: center; }
+.connect-drift { animation: connectDrift 26s var(--ease-out) infinite alternate; }
+@keyframes connectDrift { from { transform: scale(1.02); } to { transform: scale(1.08); } }
+
+.connect-scrim {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg, rgba(0,0,0,0.20) 0%, rgba(0,0,0,0.0) 30%),
+    linear-gradient(100deg,
+      rgba(0,0,0,0.62) 0%,
+      rgba(0,0,0,0.52) 32%,
+      rgba(0,0,0,0.28) 62%,
+      rgba(0,0,0,0.12) 100%);
+}
+
+.connect-card-wrap {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  display: flex;
+  justify-content: flex-start;
+  padding-top: 8.5rem;
+  padding-bottom: clamp(2.5rem, 6vw, 5.5rem);
+}
+
+.glass-card {
+  width: clamp(340px, 42vw, 500px);
+  max-width: 100%;
+  padding: clamp(1.75rem, 3vw, 2.5rem);
+  color: #fff;
+  border: 1px solid rgba(255,255,255,0.22);
+  border-radius: var(--radius);
+  box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+  background: rgba(20,20,20,0.82); /* solid fallback (no backdrop-filter) */
+}
+@supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .glass-card {
+    background: rgba(255,255,255,0.16);
+    -webkit-backdrop-filter: blur(12px) saturate(1.25);
+    backdrop-filter: blur(12px) saturate(1.25);
+  }
+}
+
+.connect-card-title {
+  font-family: var(--font-display, inherit);
+  font-weight: 700;
+  line-height: 1.08;
+  letter-spacing: -0.01em;
+  color: #fff;
+  font-size: clamp(1.7rem, 2.6vw, 2.3rem);
+}
+
+/* Inputs sit on glass — keep them near-white for crisp contrast. */
+.glass-card .input-c3 {
+  background: rgba(255,255,255,0.95);
+  border-radius: var(--radius-sm);
+  border-bottom: 1.5px solid rgba(0,0,0,0.12);
+}
+.glass-card .input-c3:focus { border-bottom-color: var(--color-teal); }
+
+.connect-contact {
+  margin-top: var(--s-8);
+  padding-top: var(--s-6);
+  border-top: 1px solid rgba(255,255,255,0.16);
+}
+.connect-contact-list {
+  list-style: none;
+  margin: 0 0 var(--s-6);
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-3);
+}
+.connect-contact-list li {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  font-size: 0.925rem;
+  color: rgba(255,255,255,0.88);
+}
+.connect-contact-list li svg { color: var(--color-teal); flex: 0 0 auto; }
+.connect-contact-list a { color: rgba(255,255,255,0.92); }
+.connect-contact-list a:hover { color: #fff; text-decoration: underline; }
+
+.connect-map {
+  position: relative;
+  display: block;
+  height: 118px;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  background-size: cover;
+  background-position: center;
+  filter: grayscale(1) contrast(1.03);
+  border: 1px solid rgba(255,255,255,0.22);
+  transition: filter var(--dur-base) var(--ease-out), transform var(--dur-base) var(--ease-out);
+}
+.connect-map:hover { filter: grayscale(0.55) contrast(1.05); transform: translateY(-1px); }
+.connect-map-pin {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -60%);
+  color: var(--color-teal-deep);
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+}
+.connect-map-label {
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  padding: 0.5rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #fff;
+  background: linear-gradient(to top, rgba(0,0,0,0.72), rgba(0,0,0,0));
+}
+
+.connect-card-rise { animation: connectRise 600ms var(--ease-out) both; }
+.connect-stagger { animation: connectFade 520ms var(--ease-out) both; }
+@keyframes connectRise { from { opacity: 0; transform: translateY(28px); } to { opacity: 1; transform: none; } }
+@keyframes connectFade { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+
+/* MOBILE — the SAME design degrades: shortened image on top, SOLID (non-glass)
+   sheet stacked beneath. Fully responsive. */
+@media (max-width: 767px) {
+  .connect-fullbleed { display: block; min-height: 0 !important; }
+  .connect-hero-media { position: relative; height: 40vh; min-height: 240px; }
+  .connect-scrim { display: none; }
+  .connect-card-wrap {
+    padding: 0;
+    padding-inline: 0;
+    display: block;
+  }
+  .glass-card {
+    width: 100%;
+    max-width: 100%;
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+    background: #14110e !important;
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+    padding: clamp(1.75rem, 7vw, 2.25rem);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .connect-drift { animation: none !important; transform: scale(1.03); }
+  .connect-card-rise, .connect-stagger {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
+`;
