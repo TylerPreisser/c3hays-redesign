@@ -88,12 +88,11 @@ describe("invariant (a) on real page components", () => {
     expect(collapsedLinkKeys(homeHtml)).toEqual([]);
   });
 
-  // PENDING connect-builder rebuild (contract §4): the four NEXT_STEPS cards each
-  // wrap icon+h3+p+cta in ONE data-cms-link with NO data-cms-link-label, collapsing
-  // the whole card into a single editable "button". This asserts the fixed state;
-  // it currently FAILS, so `it.fails` keeps the suite green today and will FLIP to a
-  // real failure once the cards are un-collapsed — the signal to delete `.fails`.
-  it.fails("connect: NEXT_STEPS cards must not collapse into one editable link (pending connect rebuild)", () => {
+  // DONE (contract §4): the connect-builder rebuild un-collapsed the four NEXT_STEPS
+  // cards — each is now four independent handles (data-cms-bg container, <Tx> title,
+  // <Tx> body, and its OWN data-cms-link CTA with a data-cms-link-label span). The
+  // `.fails` marker is therefore removed and this is an ordinary green assertion.
+  it("connect: NEXT_STEPS cards must not collapse into one editable link", () => {
     expect(collapsedLinkKeys(connectHtml)).toEqual([]);
   });
 });

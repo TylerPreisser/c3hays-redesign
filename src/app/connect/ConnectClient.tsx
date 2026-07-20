@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import Link from "next/link";
 import {
   Hand,
   HeartHandshake,
@@ -19,7 +18,7 @@ import { tx, imgCss } from "@/lib/home-content";
 import { assetPath } from "@/lib/asset-path";
 import { site } from "@/data/site";
 import { locations } from "@/data/locations";
-import { Tx, EditableLink } from "@/components/cms/Editable";
+import { Tx } from "@/components/cms/Editable";
 import Section from "@/components/ui/Section";
 import Stack from "@/components/ui/Stack";
 
@@ -27,7 +26,16 @@ import Stack from "@/components/ui/Stack";
    next-step links. VISUAL ONLY: the form is intentionally non-functional
    (onSubmit preventDefault → success state). The connect actions on the live
    site run on Church Community Builder (CCB) forms — those exact URLs are the
-   real links preserved below (sourced from the content inventory). */
+   real links preserved below (sourced from the content inventory).
+
+   EDITOR-NATIVE REFACTOR (contract 2026-07-20): this page is now composed of two
+   editor-native sections — `connect-hero` (this glass-card hero) and
+   `connect-steps` (the "Ways to get connected" cards) — wired through
+   PageComposer in page.tsx. Each is exported below so the page's render(id)
+   switch can place them inside their own `<div data-section>` wrapper (rail bg).
+   The default export renders BOTH (used by the editable-by-construction guard
+   test, which renders the whole client surface). VISUAL is UNCHANGED — this is an
+   editability refactor, not a redesign. */
 
 const CCB = "https://celebration.ccbchurch.com/goto/forms";
 const CCB_VISIT = `${CCB}/47/responses/new`; // "Let us know you're coming"
@@ -79,13 +87,16 @@ const NEXT_STEPS = [
 
 type ImgOverride = { pos?: string; scale?: number };
 
-interface ConnectClientProps {
+interface ConnectHeroProps {
   text: Record<string, string>;
   media?: Record<string, string>;
   img?: Record<string, ImgOverride>;
 }
 
-export default function ConnectClient({ text, media = {}, img = {} }: ConnectClientProps) {
+/* ── SECTION: connect-hero — full-bleed photo + glass contact card + contact/map.
+   Every authored surface stays editable via <Tx> / data-cms-link / data-cms-img,
+   exactly as before (nothing removed). ─────────────────────────────────────── */
+export function ConnectHero({ text, media = {}, img = {} }: ConnectHeroProps) {
   const [submitted, setSubmitted] = useState(false);
 
   const addr = site.address;
@@ -364,114 +375,150 @@ export default function ConnectClient({ text, media = {}, img = {} }: ConnectCli
           </div>
         </div>
       </section>
+    </>
+  );
+}
 
-      {/* ── Real next steps ─────────────────────────────────────── */}
-      <Section tone="white" container>
-        <Stack gap="heading" style={{ maxWidth: "40rem", marginBottom: "var(--space-block)" }}>
-          <Stack gap="eyebrow">
-            <span
-              className="overline"
-              data-cms="t:connect-intents-eyebrow"
-              dangerouslySetInnerHTML={{ __html: tx(text, "connect-intents-eyebrow", "Take a next step") }}
-            />
-            <h2
-              className="display-2"
-              style={{ color: "#1b1c1c" }}
-              data-cms="t:connect-intents-heading"
-              dangerouslySetInnerHTML={{ __html: tx(text, "connect-intents-heading", "Ways to get connected") }}
-            />
-          </Stack>
-          <p
-            className="body-lg"
-            style={{ color: "var(--color-mute)" }}
-            data-cms="t:connect-intents-body"
-            dangerouslySetInnerHTML={{
-              __html: tx(
-                text,
-                "connect-intents-body",
-                "Pick a step and we&rsquo;ll take it with you &mdash; each one goes straight to the right team."
-              ),
-            }}
+interface ConnectStepsProps {
+  text: Record<string, string>;
+}
+
+/* ── SECTION: connect-steps — "Ways to get connected".
+   EDITOR-NATIVE: each card is FOUR independent handles (contract §1/§2), not one
+   big link:
+     • CONTAINER  <div data-cms-bg="connect-step-<id>-bg">   → tile background
+     • HEADING    <Tx k="connect-step-<id>-title" as="h3">   → card title text
+     • BODY       <Tx k="connect-step-<id>-body"  as="p">    → card body text
+     • BUTTON     <a data-cms-link="connect-step-<id>">      → CTA (own link)
+                    <span data-cms-link-label>…</span> + ArrowUpRight after the span
+   The CTA anchor mirrors <EditableLink> byte-for-byte (reads `${k}-href` and
+   `${k}-label`, falling back to the pre-existing `${k}-cta` value so NO content is
+   lost) — hand-inlined ONLY so the ArrowUpRight flourish can live inside the <a>
+   after the label span, which the primitive can't express. ───────────────────── */
+export function ConnectSteps({ text }: ConnectStepsProps) {
+  return (
+    <Section tone="white" container>
+      <Stack gap="heading" style={{ maxWidth: "40rem", marginBottom: "var(--space-block)" }}>
+        <Stack gap="eyebrow">
+          <Tx
+            text={text}
+            k="connect-intents-eyebrow"
+            fallback="Take a next step"
+            className="overline"
+          />
+          <Tx
+            text={text}
+            k="connect-intents-heading"
+            fallback="Ways to get connected"
+            as="h2"
+            className="display-2"
+            style={{ color: "#1b1c1c" }}
           />
         </Stack>
+        <Tx
+          text={text}
+          k="connect-intents-body"
+          fallback="Pick a step and we&rsquo;ll take it with you &mdash; each one goes straight to the right team."
+          as="p"
+          className="body-lg"
+          style={{ color: "var(--color-mute)" }}
+        />
+      </Stack>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 items-stretch" style={{ gap: "var(--space-body)" }}>
-          {NEXT_STEPS.map((s) => {
-            const Icon = s.icon;
-            const title = tx(text, `connect-step-${s.id}-title`, s.defaultTitle);
-            const body = tx(text, `connect-step-${s.id}-body`, s.defaultBody);
-            const cta = tx(text, `connect-step-${s.id}-cta`, s.defaultCta);
-            const inner = (
-              <>
-                <span
-                  className="inline-flex items-center justify-center"
-                  style={{
-                    width: "3rem",
-                    height: "3rem",
-                    borderRadius: "var(--radius-sm)",
-                    marginBottom: "var(--space-heading)",
-                    background: "rgba(28,195,175,0.12)",
-                    color: "var(--color-teal)",
-                  }}
-                  aria-hidden="true"
-                >
-                  <Icon size={24} />
-                </span>
-                <h3 className="heading-3" style={{ color: "#1b1c1c" }} dangerouslySetInnerHTML={{ __html: title }} />
-                <p
-                  className="body-base"
-                  style={{ color: "var(--color-mute)", marginTop: "var(--space-eyebrow)" }}
-                  dangerouslySetInnerHTML={{ __html: body }}
-                />
-                <span
-                  className="inline-flex items-center gap-1.5 font-semibold"
-                  style={{ color: "var(--color-teal-deep, #179c8c)", marginTop: "var(--space-cta)" }}
-                >
-                  {cta}
-                  <ArrowUpRight
-                    size={17}
-                    className="transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
-                  />
-                </span>
-              </>
-            );
-            const cardStyle: React.CSSProperties = {
-              display: "flex",
-              flexDirection: "column",
-              height: "100%",
-              borderRadius: "var(--radius-md)",
-              padding: "clamp(1.75rem, 3vw, 2.5rem)",
-              minHeight: 240,
-              background: "#fff",
-              border: "1px solid rgba(27,28,28,0.08)",
-              boxShadow: "var(--shadow-rest)",
-            };
-            return s.external ? (
+      <div className="grid grid-cols-1 sm:grid-cols-2 items-stretch" style={{ gap: "var(--space-body)" }}>
+        {NEXT_STEPS.map((s) => {
+          const Icon = s.icon;
+          const k = `connect-step-${s.id}`;
+          const ctaHref = text[`${k}-href`] || s.href;
+          // Prefer a new `${k}-label` override, else the pre-existing `${k}-cta`
+          // value (or the design default) — no authored content is dropped.
+          const ctaLabel =
+            (text[`${k}-label`] && text[`${k}-label`].trim() !== ""
+              ? text[`${k}-label`]
+              : tx(text, `${k}-cta`, s.defaultCta));
+          const cardStyle: React.CSSProperties = {
+            display: "flex",
+            flexDirection: "column",
+            height: "100%",
+            borderRadius: "var(--radius-md)",
+            padding: "clamp(1.75rem, 3vw, 2.5rem)",
+            minHeight: 240,
+            background: "#fff",
+            border: "1px solid rgba(27,28,28,0.08)",
+            boxShadow: "var(--shadow-rest)",
+          };
+          return (
+            <div key={s.id} data-cms-bg={`${k}-bg`} className="bento-tile" style={cardStyle}>
+              <span
+                className="inline-flex items-center justify-center"
+                style={{
+                  width: "3rem",
+                  height: "3rem",
+                  borderRadius: "var(--radius-sm)",
+                  marginBottom: "var(--space-heading)",
+                  background: "rgba(28,195,175,0.12)",
+                  color: "var(--color-teal)",
+                }}
+                aria-hidden="true"
+              >
+                <Icon size={24} />
+              </span>
+              <Tx
+                text={text}
+                k={`${k}-title`}
+                fallback={s.defaultTitle}
+                as="h3"
+                className="heading-3"
+                style={{ color: "#1b1c1c" }}
+              />
+              <Tx
+                text={text}
+                k={`${k}-body`}
+                fallback={s.defaultBody}
+                as="p"
+                className="body-base"
+                style={{ color: "var(--color-mute)", marginTop: "var(--space-eyebrow)" }}
+              />
+              {/* CTA — its OWN editable link (data-cms-link + required label span). */}
               <a
-                key={s.id}
-                href={text[`connect-step-${s.id}-href`] || s.href}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="group bento-tile"
-                style={cardStyle}
-                data-cms-link={`connect-step-${s.id}`}
+                href={ctaHref}
+                data-cms-link={k}
+                className="group inline-flex items-center gap-1.5 font-semibold"
+                style={{
+                  color: "var(--color-teal-deep, #179c8c)",
+                  marginTop: "var(--space-cta)",
+                  alignSelf: "flex-start",
+                }}
+                {...(s.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
               >
-                {inner}
+                <span data-cms-link-label>{ctaLabel}</span>
+                <ArrowUpRight
+                  size={17}
+                  className="transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+                />
               </a>
-            ) : (
-              <Link
-                key={s.id}
-                href={text[`connect-step-${s.id}-href`] || s.href}
-                className="group bento-tile"
-                style={cardStyle}
-                data-cms-link={`connect-step-${s.id}`}
-              >
-                {inner}
-              </Link>
-            );
-          })}
-        </div>
-      </Section>
+            </div>
+          );
+        })}
+      </div>
+    </Section>
+  );
+}
+
+interface ConnectClientProps {
+  text: Record<string, string>;
+  media?: Record<string, string>;
+  img?: Record<string, ImgOverride>;
+}
+
+/* Default export — the FULL connect surface (hero + steps). page.tsx composes the
+   two sections individually through PageComposer; this default renders both and is
+   what the editable-by-construction guard test mounts to scan the whole page. */
+export default function ConnectClient({ text, media = {}, img = {} }: ConnectClientProps) {
+  return (
+    <>
+      <ConnectHero text={text} media={media} img={img} />
+      <ConnectSteps text={text} />
     </>
   );
 }
