@@ -98,7 +98,9 @@ describe("(b) /news — real C3 Weekly page, not a redirect", () => {
     expect(ids).toContain("weekly-list");
   });
   it("renders C3 Weekly browse content (issue browser)", () => {
-    expect(newsHtml).toContain("Browse The C3 Weekly");
+    // The redundant "Browse The C3 Weekly" SectionHeader was removed (the hero already
+    // carries the page identity); assert the actual issue-browser UI renders instead.
+    expect(newsHtml).toContain("Search newsletter topics");
   });
   it("is NOT a client redirect stub", () => {
     const src = readApp("news/page.tsx");

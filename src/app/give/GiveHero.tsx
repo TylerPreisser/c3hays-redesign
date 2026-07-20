@@ -17,19 +17,20 @@ export interface GiveHeroProps {
 }
 
 /**
- * give-hero — headline + intro + the primary "Give Now" button.
+ * give-hero — the page thesis: "Your giving is changing the world," the real
+ * why-we-give lead, and the primary Give CTA. A congregation photo behind a warm
+ * grade (editable via `data-cms-img="give-hero-bg"`) that dissolves into the paper
+ * canvas below, so the hero and the two light sections read as one continuous page
+ * rather than a stack of separate blocks.
  *
- * On-brand LEFT treatment: a real congregation photo behind a warm gradient
- * (editable via `data-cms-img="give-hero-bg"`). This intentionally REPLACES the
- * old invented dollar-amount ($25/$50/$100) motif Tyler didn't love — no dollar
- * tiles, just a clean editable photo band. Text = real celebratejesus.org /give
- * copy ("Your giving is changing the world." / "You can support the work C3 is
- * doing in your community and around the world.").
+ * Two editable buttons: the teal primary → the real Pushpay giving page, and a quiet
+ * ghost secondary that jumps to the "Ways To Give" section (#give-ways). Text is the
+ * real celebratejesus.org /give copy.
  */
 export default function GiveHero({ t, media, img }: GiveHeroProps) {
   return (
-    <section className="relative flex items-end overflow-hidden" style={{ minHeight: "58vh" }}>
-      {/* Editable photo treatment (replaces the removed $-motif). */}
+    <section className="relative flex items-end overflow-hidden" style={{ minHeight: "62vh" }}>
+      {/* Editable photo treatment. */}
       <div className="absolute inset-0" data-cms-img="give-hero-bg" style={{ borderRadius: 0 }}>
         <Image
           src={assetPath(media["give-hero-bg"] || "/images/congregation.webp")}
@@ -46,9 +47,10 @@ export default function GiveHero({ t, media, img }: GiveHeroProps) {
           className="absolute inset-0"
           style={{
             background:
-              "linear-gradient(to top, rgba(26,24,21,0.82) 0%, rgba(26,24,21,0.42) 48%, rgba(26,24,21,0.20) 100%)",
+              "linear-gradient(to top, rgba(26,24,21,0.86) 0%, rgba(26,24,21,0.46) 52%, rgba(26,24,21,0.20) 100%)",
           }}
         />
+        {/* Dissolve into the paper canvas so the next section feels continuous. */}
         <div
           aria-hidden
           className="absolute inset-x-0 bottom-0"
@@ -57,7 +59,7 @@ export default function GiveHero({ t, media, img }: GiveHeroProps) {
       </div>
 
       <div className="relative z-10 container-c3 pb-16 pt-40">
-        <Stack gap="heading" style={{ maxWidth: "34rem" }}>
+        <Stack gap="heading" style={{ maxWidth: "36rem" }}>
           <Stack gap="eyebrow">
             <Tx
               text={t}
@@ -81,17 +83,28 @@ export default function GiveHero({ t, media, img }: GiveHeroProps) {
             k="give-hero-body"
             fallback="You can support the work C3 is doing in your community and around the world."
             className="body-lg"
-            style={{ color: "rgba(255,255,255,0.72)", maxWidth: "32rem" }}
+            style={{ color: "rgba(255,255,255,0.74)", maxWidth: "32rem" }}
           />
-          <EditableLink
-            text={t}
-            k="give-hero-cta"
-            href={GIVE_PUSHPAY_URL}
-            label="Give Now"
-            external
-            className="btn btn-primary btn-lg"
-            style={{ marginTop: "var(--s-2)", alignSelf: "flex-start" }}
-          />
+          <div
+            className="flex flex-wrap items-center"
+            style={{ gap: "var(--s-4)", marginTop: "var(--s-2)" }}
+          >
+            <EditableLink
+              text={t}
+              k="give-hero-cta"
+              href={GIVE_PUSHPAY_URL}
+              label="Give Now"
+              external
+              className="btn btn-primary btn-lg"
+            />
+            <EditableLink
+              text={t}
+              k="give-hero-cta2"
+              href="#give-ways"
+              label="See the ways to give"
+              className="btn btn-hero-ghost btn-lg"
+            />
+          </div>
         </Stack>
       </div>
     </section>

@@ -75,9 +75,11 @@ describe("give — editor-native section composition", () => {
 
   it("every card/tile carries its own data-cms-bg", () => {
     const keys = bgKeys(html);
-    // the three ways-to-give tiles each own a bg key
+    // the three impact-facet cards AND the three ways-to-give tiles each own a bg key
     expect(keys).toEqual(expect.arrayContaining([
-      "give-impact-card",
+      "give-impact-community-bg",
+      "give-impact-world-bg",
+      "give-impact-church-bg",
       "give-way-cash-bg",
       "give-way-online-bg",
       "give-way-app-bg",

@@ -1,6 +1,8 @@
+import { Home, Globe, Church } from "lucide-react";
 import { Tx } from "@/components/cms/Editable";
 import Section from "@/components/ui/Section";
 import Stack from "@/components/ui/Stack";
+import GiveCard from "./GiveCard";
 
 export interface GiveImpactProps {
   /** Page text override bag. */
@@ -8,25 +10,19 @@ export interface GiveImpactProps {
 }
 
 /**
- * give-impact — the real "Why We Give" statement (what giving supports).
+ * give-impact — the "why." The real celebratejesus.org "Why We Give" statement, then
+ * three QUALITATIVE facets of where that generosity goes — grounded in the real /give
+ * line ("the work C3 is doing in your community and around the world") and the C3
+ * mission (Meet · Grow · Serve). No invented numbers or dollar figures.
  *
- * Verbatim celebratejesus.org /give copy, presented as a single recolorable panel.
- * The panel is a TILE with its OWN `data-cms-bg="give-impact-card"` (contract §1
- * thing #2) so the editor can paint it independently of the section background.
+ * Structurally it mirrors give-ways exactly — an eyebrow → heading → lead intro over a
+ * 3-up grid of the shared <GiveCard> — so the two sections read as one system. Each
+ * facet is its own recolorable tile (`data-cms-bg`) with editable <Tx> heading + body.
  */
 export default function GiveImpact({ t }: GiveImpactProps) {
   return (
     <Section container size="default" style={{ backgroundColor: "var(--color-paper)" }}>
-      <div
-        data-cms-bg="give-impact-card"
-        style={{
-          background: "var(--color-bone)",
-          border: "1px solid var(--color-clay-line)",
-          borderRadius: "var(--radius-md)",
-          padding: "clamp(2rem, 5vw, 3.5rem)",
-          boxShadow: "var(--shadow-rest)",
-        }}
-      >
+      <Stack gap="block">
         <Stack gap="heading" style={{ maxWidth: "46rem" }}>
           <Stack gap="eyebrow">
             <Tx
@@ -62,7 +58,69 @@ export default function GiveImpact({ t }: GiveImpactProps) {
             style={{ color: "var(--color-stone)" }}
           />
         </Stack>
-      </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6" style={{ width: "100%" }}>
+          {/* ── In your community ── */}
+          <GiveCard bgKey="give-impact-community-bg" icon={Home}>
+            <Tx
+              as="h3"
+              text={t}
+              k="give-impact-community-title"
+              fallback="In your community"
+              className="heading-3"
+              style={{ color: "var(--color-ink-warm)", marginBottom: "var(--s-3)", fontSize: "1.125rem" }}
+            />
+            <Tx
+              as="p"
+              text={t}
+              k="give-impact-community-body"
+              fallback="Weekend gatherings in Hays and Colby, our next-generation ministries, and care for people right where they are."
+              className="flex-1 text-sm leading-relaxed"
+              style={{ color: "var(--color-stone)" }}
+            />
+          </GiveCard>
+
+          {/* ── Around the world ── */}
+          <GiveCard bgKey="give-impact-world-bg" icon={Globe}>
+            <Tx
+              as="h3"
+              text={t}
+              k="give-impact-world-title"
+              fallback="Around the world"
+              className="heading-3"
+              style={{ color: "var(--color-ink-warm)", marginBottom: "var(--s-3)", fontSize: "1.125rem" }}
+            />
+            <Tx
+              as="p"
+              text={t}
+              k="give-impact-world-body"
+              fallback="Mission partners carrying the hope of Jesus far beyond our walls, in places we may never visit ourselves."
+              className="flex-1 text-sm leading-relaxed"
+              style={{ color: "var(--color-stone)" }}
+            />
+          </GiveCard>
+
+          {/* ── Through the local church ── */}
+          <GiveCard bgKey="give-impact-church-bg" icon={Church}>
+            <Tx
+              as="h3"
+              text={t}
+              k="give-impact-church-title"
+              fallback="Through the local church"
+              className="heading-3"
+              style={{ color: "var(--color-ink-warm)", marginBottom: "var(--s-3)", fontSize: "1.125rem" }}
+            />
+            <Tx
+              as="p"
+              text={t}
+              k="give-impact-church-body"
+              fallback="Keeping the doors open and the lights on, so anyone who walks in can meet with Jesus, grow, and serve."
+              className="flex-1 text-sm leading-relaxed"
+              style={{ color: "var(--color-stone)" }}
+            />
+          </GiveCard>
+        </div>
+      </Stack>
     </Section>
   );
 }

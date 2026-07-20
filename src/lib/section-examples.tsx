@@ -39,6 +39,7 @@ import NT26Feature from "@/components/home/NT26Feature";
 import LocationsSection from "@/components/home/LocationsSection";
 import StayConnected from "@/components/home/StayConnected";
 import GiveSection from "@/components/home/GiveSection";
+import WeeklySignup from "@/components/newsletter/WeeklySignup";
 
 export interface VariantDef { key: string; label: string }
 export interface SectionExampleDef {
@@ -78,6 +79,10 @@ export const SECTION_EXAMPLES: SectionExampleDef[] = [
   { id: "nextSteps", label: "Next Steps", icon: "Footprints", group: "Connect", description: "Guide guests through Visit → Connect → Grow → Serve.", variants: [{ key: "steps", label: "Numbered path" }, { key: "cards", label: "Action cards" }] },
   { id: "scriptureVerse", label: "Scripture", icon: "BookOpen", group: "Media", description: "A featured verse — pairs with the NT26 reading plan.", variants: [{ key: "centered", label: "Centered" }, { key: "left", label: "Editorial left" }] },
   { id: "promo", label: "Announcement", icon: "Megaphone", group: "Connect", description: "A bold promo band for an event, series, or season.", variants: [{ key: "band", label: "Band" }, { key: "split", label: "Split" }, { key: "centered", label: "Centered" }] },
+  // Round-3 — the transparent newsletter signup (the /news hero email-capture), now
+  // ALSO addable as a standalone section. id "weeklySignup" MUST match c3-backend
+  // HOME_SECTION_DEFS + the appended blocks.ts BLOCK_LIST entry verbatim.
+  { id: "weeklySignup", label: "Newsletter signup", icon: "Mail", group: "Calls to action", description: "A transparent email-capture field + button — join The C3 Weekly.", variants: [] },
 ];
 
 /** All example ids (for the shoot harness + preview route param generation). */
@@ -119,6 +124,9 @@ export function renderExample(id: string, c: HomeContent, variant?: string): Rea
     case "nextSteps": return <NextSteps text={c.text} icon={c.icon} variant={variant} />;
     case "scriptureVerse": return <ScriptureVerse text={c.text} variant={variant} />;
     case "promo": return <PromoBanner text={c.text} btnStyle={c.btn["promo.cta"]} variant={variant} />;
+    // Standalone placement → "onLight" tone so the field/label read on a light
+    // section (the hero placement in news/page.tsx uses the default "onDark").
+    case "weeklySignup": return <WeeklySignup text={c.text} tone="onLight" />;
     default: return null;
   }
 }

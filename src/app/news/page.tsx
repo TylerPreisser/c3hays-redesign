@@ -7,7 +7,6 @@ import { parseSections, imgCss, type SectionMeta } from "@/lib/home-content";
 import { Tx } from "@/components/cms/Editable";
 import PageComposer from "@/components/cms/PageComposer";
 import Section from "@/components/ui/Section";
-import SectionHeader from "@/components/ui/SectionHeader";
 import IssueBrowser from "@/components/newsletter/IssueBrowser";
 import WeeklySignup from "@/components/newsletter/WeeklySignup";
 import { newsletterIssues } from "@/data/news";
@@ -132,19 +131,10 @@ export default async function NewsPage({
             bgKey="weekly-list-bg"
           >
             <div style={{ width: `min(100% - 2 * ${GUTTER}, 1600px)`, marginInline: "auto" }}>
-              <SectionHeader
-                eyebrow={<Tx text={t} k="weekly-list-eyebrow" fallback="Past issues" />}
-                title={<Tx text={t} k="weekly-list-heading" fallback="Browse The C3 Weekly" />}
-                lead={
-                  <Tx
-                    text={t}
-                    k="weekly-list-lead"
-                    fallback="Filter by week or search a topic &mdash; then open any issue to read it in full."
-                  />
-                }
-                style={{ marginBottom: "var(--space-block)" }}
-              />
-
+              {/* Round-3 de-dupe: the redundant "Browse The C3 Weekly" SectionHeader
+                  (eyebrow "Past issues" + title + lead) is REMOVED — the hero already
+                  titles the page. The lower section now shows ONLY the filters + list.
+                  IssueBrowser (and its filter controls) are untouched. */}
               <IssueBrowser issues={newsletterIssues} />
             </div>
           </Section>

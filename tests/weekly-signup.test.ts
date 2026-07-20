@@ -58,8 +58,12 @@ describe("#9 — editor-native newsletter signup overlay", () => {
     expect(label).not.toBeNull();
     expect(label?.textContent).toContain("Sign Up");
   });
-  it("has an independently-editable signup heading (data-cms)", () => {
-    expect(q(newsHtml).querySelector('[data-cms="t:weekly-signup-heading"]')).not.toBeNull();
+  it("has an independently-editable signup field label + container bg (data-cms / data-cms-bg)", () => {
+    // The transparent minimal signup drops a standalone heading; its editable text is
+    // the field label (which also drives the input placeholder), plus a recolorable
+    // container background — both independently editable per the contract.
+    expect(q(newsHtml).querySelector('[data-cms="t:weekly-signup-placeholder"]')).not.toBeNull();
+    expect(q(newsHtml).querySelector('[data-cms-bg]')).not.toBeNull();
   });
 });
 

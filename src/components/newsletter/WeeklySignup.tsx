@@ -1,22 +1,24 @@
 "use client";
 
 import { useState, type CSSProperties } from "react";
-import { Mail, Check } from "lucide-react";
+import { Check } from "lucide-react";
 import { Tx } from "@/components/cms/Editable";
 import { tx } from "@/lib/home-content";
 
 /**
- * <WeeklySignup> — the editor-native C3 Weekly newsletter signup (round-2 #9).
+ * <WeeklySignup> — the editor-native C3 Weekly newsletter signup (round-3).
  *
- * A NEW, built-from-scratch editor-native component (NOT the old InboxTile). Every
- * part is independently editable in C3 Studio, by construction:
- *   • heading   → <Tx data-cms="t:weekly-signup-heading">
- *   • body      → <Tx data-cms="t:weekly-signup-body">
+ * MINIMAL + TRANSPARENT: just an editable email field + a "Sign Up" button, laid
+ * directly over the hero photo (NO white card surface, NO icon box, NO heading /
+ * subtext block). It reads legibly on a dark hero photo AND on a light standalone
+ * section via the `tone` prop.
+ *
+ * Every part stays independently editable in C3 Studio, by construction:
  *   • the field placeholder → a real <Tx> label (data-cms) that ALSO drives the
  *     input's placeholder attribute, so editing the label edits the placeholder
  *     (attributes aren't DOM-scannable, so we surface an editable label instead)
- *   • button    → data-cms-link + the required data-cms-link-label span
- *   • card bg   → data-cms-bg
+ *   • button → data-cms-link + the required data-cms-link-label span
+ *   • container bg → data-cms-bg (defaults transparent — no opaque card)
  *
  * FUNCTIONAL: client-side email validation + a success state (no external endpoint
  * exists in the static-export build; the submit is structured so a real subscribe
@@ -26,15 +28,19 @@ import { tx } from "@/lib/home-content";
 export interface WeeklySignupProps {
   /** CMS page/global text override bag. */
   text?: Record<string, string>;
-  /** data-cms-bg key for the card background (editable tile bg). */
+  /** data-cms-bg key for the (transparent-by-default) container background. */
   bgKey?: string;
+  /** Legibility context: "onDark" (over the hero photo, default) or "onLight"
+   *  (standalone on a light section). Affects only label/text color — never the
+   *  editable content. */
+  tone?: "onDark" | "onLight";
   className?: string;
   style?: CSSProperties;
 }
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-export default function WeeklySignup({ text = {}, bgKey = "weekly-signup-card", className, style }: WeeklySignupProps) {
+export default function WeeklySignup({ text = {}, bgKey = "weekly-signup-card", tone = "onDark", className, style }: WeeklySignupProps) {
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState<"idle" | "error" | "done">("idle");
 
@@ -52,49 +58,27 @@ export default function WeeklySignup({ text = {}, bgKey = "weekly-signup-card", 
     setStatus("done");
   };
 
+  const onLight = tone === "onLight";
+  const labelColor = onLight ? "var(--color-ink)" : "#fff";
+  const labelShadow = onLight ? undefined : "0 1px 3px rgba(0,0,0,0.55)";
+  const doneColor = onLight ? "var(--color-teal-deep)" : "#fff";
+  const errColor = onLight ? "#c0392b" : "#ffd7d0";
+
+  // TRANSPARENT: no card surface (no bg/border/shadow/padding) — just the field
+  // + button. Container keeps data-cms-bg so a bg can still be set in the editor,
+  // but defaults transparent so it lays cleanly over the photo.
   const surface: CSSProperties = {
     display: "flex",
     flexDirection: "column",
-    gap: "var(--space-heading)",
-    padding: "clamp(1.75rem, 3vw, 2.25rem)",
-    borderRadius: "var(--radius-md)",
-    background: "linear-gradient(180deg, #ffffff 0%, #fbfffe 100%)",
-    border: "1px solid rgba(28,195,175,0.22)",
-    boxShadow: "0 20px 50px rgba(28,195,175,0.14)",
+    gap: "0.75rem",
+    background: "transparent",
     ...style,
   };
 
   return (
     <div className={className} data-cms-bg={bgKey} style={surface} aria-label="Subscribe to The C3 Weekly">
-      <span
-        className="inline-flex items-center justify-center"
-        style={{ width: "3rem", height: "3rem", borderRadius: "var(--radius-sm)", background: "rgba(28,195,175,0.12)", color: "var(--color-teal)" }}
-        aria-hidden="true"
-      >
-        <Mail size={24} />
-      </span>
-
-      <div>
-        <Tx
-          text={text}
-          k="weekly-signup-heading"
-          fallback="Get The C3 Weekly"
-          as="h3"
-          className="heading-3"
-          style={{ color: "var(--color-ink)" }}
-        />
-        <Tx
-          text={text}
-          k="weekly-signup-body"
-          fallback="One short email each week &mdash; what&rsquo;s coming up, this week&rsquo;s message, and simple next steps."
-          as="p"
-          className="body-sm"
-          style={{ color: "var(--color-mute)", marginTop: "0.6rem", lineHeight: 1.6 }}
-        />
-      </div>
-
       {status === "done" ? (
-        <p className="body-base inline-flex items-center gap-2" style={{ color: "var(--color-teal-deep)", fontWeight: 600 }} role="status">
+        <p className="body-base inline-flex items-center gap-2" style={{ color: doneColor, fontWeight: 600, textShadow: labelShadow }} role="status">
           <Check size={18} /> You&rsquo;re on the list — watch your inbox.
         </p>
       ) : (
@@ -107,29 +91,31 @@ export default function WeeklySignup({ text = {}, bgKey = "weekly-signup-card", 
             fallback="your@email.com"
             as="label"
             className="body-sm"
-            style={{ color: "var(--color-mute)", fontWeight: 600 }}
+            style={{ color: labelColor, fontWeight: 600, textShadow: labelShadow }}
           />
-          <input
-            id="weekly-signup-email"
-            type="email"
-            inputMode="email"
-            autoComplete="email"
-            placeholder={placeholder}
-            value={email}
-            onChange={(e) => { setEmail(e.target.value); if (status === "error") setStatus("idle"); }}
-            className="newsletter-input w-full min-w-0"
-            aria-label="Email address"
-            aria-invalid={status === "error"}
-          />
+          <div className="flex flex-col sm:flex-row gap-2.5 w-full min-w-0">
+            <input
+              id="weekly-signup-email"
+              type="email"
+              inputMode="email"
+              autoComplete="email"
+              placeholder={placeholder}
+              value={email}
+              onChange={(e) => { setEmail(e.target.value); if (status === "error") setStatus("idle"); }}
+              className="newsletter-input w-full min-w-0"
+              aria-label="Email address"
+              aria-invalid={status === "error"}
+            />
+            {/* Editable button: data-cms-link + required data-cms-link-label span. */}
+            <button type="submit" data-cms-link="weekly-signup-cta" className="btn btn-primary">
+              <span data-cms-link-label>{ctaLabel}</span>
+            </button>
+          </div>
           {status === "error" && (
-            <span className="body-sm" style={{ color: "#c0392b" }} role="alert">
+            <span className="body-sm" style={{ color: errColor, textShadow: labelShadow }} role="alert">
               Please enter a valid email address.
             </span>
           )}
-          {/* Editable button: data-cms-link + required data-cms-link-label span. */}
-          <button type="submit" data-cms-link="weekly-signup-cta" className="btn btn-primary w-full">
-            <span data-cms-link-label>{ctaLabel}</span>
-          </button>
         </form>
       )}
     </div>

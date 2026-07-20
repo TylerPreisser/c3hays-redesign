@@ -1,8 +1,9 @@
-import { Banknote, Globe, Smartphone } from "lucide-react";
+import { CreditCard, Smartphone, Banknote } from "lucide-react";
 import { site } from "@/data/site";
 import { Tx, EditableLink } from "@/components/cms/Editable";
 import Section from "@/components/ui/Section";
 import Stack from "@/components/ui/Stack";
+import GiveCard from "./GiveCard";
 
 export interface GiveWaysProps {
   /** Page text override bag. */
@@ -10,82 +11,61 @@ export interface GiveWaysProps {
 }
 
 /**
- * give-ways — the real celebratejesus.org "Ways To Give" (Cash or Check, Online,
- * Mobile App). Each method is its OWN tile with:
- *   • its own `data-cms-bg` (contract §1 thing #2 — recolorable per-card),
- *   • `<Tx>` heading + body (real verbatim copy), and
- *   • SEPARATE `<EditableLink>` buttons (never a whole-card link).
+ * give-ways — the "how." The real celebratejesus.org ways to give: Online (through the
+ * real Pushpay campus links — Hays / Colby / Online), the real iOS Mobile App, and Cash
+ * or Check in person. It shares give-impact's exact skeleton — eyebrow → heading → lead
+ * over a 3-up grid of the shared <GiveCard> — so the two halves of the page (why / how)
+ * read as one system.
  *
- * The Online tile carries the three REAL Pushpay campus destinations (Hays / Colby
- * / Online) exactly as the live /give page does; the App tile links the real iOS
- * app. Cash/Check is in-person (no button — a card is allowed to have no CTA; the
- * collapse rule only forbids wrapping a whole card in one link).
+ * Each method is its own recolorable tile (`data-cms-bg`) with editable <Tx> copy and
+ * SEPARATE <EditableLink> buttons (never a whole-card link). Cash/Check is in person, so
+ * it carries no button — a card is allowed to have no CTA; the rule only forbids wrapping
+ * the whole card in one link.
+ *
+ * `id="give-ways"` is the scroll target for the hero's secondary CTA.
  */
 export default function GiveWays({ t }: GiveWaysProps) {
-  const cardStyle: React.CSSProperties = {
-    background: "var(--color-bone)",
-    border: "1px solid var(--color-clay-line)",
-    borderRadius: "var(--radius-md)",
-    padding: "var(--s-8)",
-  };
-  const iconWrap: React.CSSProperties = {
-    width: 48,
-    height: 48,
-    borderRadius: 14,
-    background: "rgba(28,195,175,0.12)",
-    marginBottom: "var(--s-6)",
-  };
+  const btnFull: React.CSSProperties = { width: "100%", justifyContent: "center" };
 
   return (
-    <Section container size="default" style={{ backgroundColor: "var(--color-paper-soft)" }}>
-      <Stack gap="heading">
-        <Stack gap="eyebrow">
+    <Section
+      id="give-ways"
+      container
+      size="default"
+      style={{ backgroundColor: "var(--color-paper-soft)", scrollMarginTop: "5rem" }}
+    >
+      <Stack gap="block">
+        <Stack gap="heading" style={{ maxWidth: "46rem" }}>
+          <Stack gap="eyebrow">
+            <Tx
+              text={t}
+              k="give-ways-eyebrow"
+              fallback="Three simple ways"
+              className="overline"
+              style={{ color: "var(--color-teal-deep)" }}
+            />
+            <Tx
+              as="h2"
+              text={t}
+              k="give-ways-heading"
+              fallback="Ways To Give"
+              className="display-2 text-balance"
+              style={{ color: "var(--color-ink-warm)" }}
+            />
+          </Stack>
           <Tx
+            as="p"
             text={t}
-            k="give-ways-eyebrow"
-            fallback="Three simple ways"
-            className="overline"
-            style={{ color: "var(--color-teal-deep)" }}
-          />
-          <Tx
-            as="h2"
-            text={t}
-            k="give-ways-heading"
-            fallback="Ways To Give"
-            className="display-2"
-            style={{ color: "var(--color-ink-warm)" }}
+            k="give-ways-lead"
+            fallback="Give a one-time gift or set up recurring giving &mdash; whichever fits you best."
+            className="body-lg"
+            style={{ color: "var(--color-stone)" }}
           />
         </Stack>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6" style={{ width: "100%" }}>
-          {/* ── Cash or Check (in person) ── */}
-          <div className="flex flex-col" data-cms-bg="give-way-cash-bg" style={cardStyle}>
-            <div className="grid place-items-center" style={iconWrap}>
-              <Banknote size={22} strokeWidth={1.75} style={{ color: "var(--color-teal-deep)" }} />
-            </div>
-            <Tx
-              as="h3"
-              text={t}
-              k="give-way-cash-title"
-              fallback="Cash or Check"
-              className="heading-3"
-              style={{ color: "var(--color-ink-warm)", marginBottom: "var(--s-3)", fontSize: "1.125rem" }}
-            />
-            <Tx
-              as="p"
-              text={t}
-              k="give-way-cash-body"
-              fallback="Give at C3 during our weekend services at the boxes located at each entrance into our Worship Center."
-              className="flex-1 text-sm leading-relaxed"
-              style={{ color: "var(--color-stone)" }}
-            />
-          </div>
-
           {/* ── Online (the three real Pushpay campus destinations) ── */}
-          <div className="flex flex-col" data-cms-bg="give-way-online-bg" style={cardStyle}>
-            <div className="grid place-items-center" style={iconWrap}>
-              <Globe size={22} strokeWidth={1.75} style={{ color: "var(--color-teal-deep)" }} />
-            </div>
+          <GiveCard bgKey="give-way-online-bg" icon={CreditCard}>
             <Tx
               as="h3"
               text={t}
@@ -109,8 +89,8 @@ export default function GiveWays({ t }: GiveWaysProps) {
                 href={site.giving.hays}
                 label="Hays Campus"
                 external
-                className="btn btn-sm"
-                style={{ width: "100%", justifyContent: "center", background: "var(--color-teal)", color: "#fff", fontWeight: 700 }}
+                className="btn btn-primary btn-sm"
+                style={btnFull}
               />
               <EditableLink
                 text={t}
@@ -118,8 +98,8 @@ export default function GiveWays({ t }: GiveWaysProps) {
                 href={site.giving.colby}
                 label="Colby Campus"
                 external
-                className="btn btn-outline btn-sm"
-                style={{ width: "100%", justifyContent: "center" }}
+                className="btn btn-outline-ink btn-sm"
+                style={btnFull}
               />
               <EditableLink
                 text={t}
@@ -127,17 +107,14 @@ export default function GiveWays({ t }: GiveWaysProps) {
                 href={site.giving.online}
                 label="Online Campus"
                 external
-                className="btn btn-outline btn-sm"
-                style={{ width: "100%", justifyContent: "center" }}
+                className="btn btn-outline-ink btn-sm"
+                style={btnFull}
               />
             </div>
-          </div>
+          </GiveCard>
 
           {/* ── Mobile App (real iOS app) ── */}
-          <div className="flex flex-col" data-cms-bg="give-way-app-bg" style={cardStyle}>
-            <div className="grid place-items-center" style={iconWrap}>
-              <Smartphone size={22} strokeWidth={1.75} style={{ color: "var(--color-teal-deep)" }} />
-            </div>
+          <GiveCard bgKey="give-way-app-bg" icon={Smartphone}>
             <Tx
               as="h3"
               text={t}
@@ -150,7 +127,7 @@ export default function GiveWays({ t }: GiveWaysProps) {
               as="p"
               text={t}
               k="give-way-app-body"
-              fallback="Give by downloading the Celebration Community Church mobile app."
+              fallback="Give on the go by downloading the Celebration Community Church mobile app."
               className="flex-1 text-sm leading-relaxed"
               style={{ color: "var(--color-stone)", marginBottom: "var(--s-6)" }}
             />
@@ -160,9 +137,30 @@ export default function GiveWays({ t }: GiveWaysProps) {
               href={site.appStore}
               label="Download the App"
               external
-              className="btn btn-outline btn-sm self-start"
+              className="btn btn-outline-ink btn-sm"
+              style={btnFull}
             />
-          </div>
+          </GiveCard>
+
+          {/* ── Cash or Check (in person — no CTA by design) ── */}
+          <GiveCard bgKey="give-way-cash-bg" icon={Banknote}>
+            <Tx
+              as="h3"
+              text={t}
+              k="give-way-cash-title"
+              fallback="Cash or Check"
+              className="heading-3"
+              style={{ color: "var(--color-ink-warm)", marginBottom: "var(--s-3)", fontSize: "1.125rem" }}
+            />
+            <Tx
+              as="p"
+              text={t}
+              k="give-way-cash-body"
+              fallback="Give during our weekend services at the boxes located at each entrance into our Worship Center."
+              className="flex-1 text-sm leading-relaxed"
+              style={{ color: "var(--color-stone)" }}
+            />
+          </GiveCard>
         </div>
       </Stack>
     </Section>
