@@ -47,15 +47,34 @@ export default async function HomePage({
   const preview = typeof sp.preview === "string" ? sp.preview : undefined;
   const c = fromStudioHome(await getHomeContent(preview));
 
+  // Fix 1 — HOME continuous image. The hero + mission share ONE editable hero.bg
+  // photo that bleeds continuously across both (no duplicate). This is only correct
+  // when a classic hero sits IMMEDIATELY above a centered mission in the visible
+  // order — so hiding or reordering either one gracefully falls back to their
+  // independent looks (hero paints its own photo; mission goes solid dark), never a
+  // duplicated or orphaned image. When continuous: the shared image lives in the
+  // mission (bled up); the hero paints none of its own → exactly one hero.bg element.
+  const visOrder = c.sections.filter((s) => s.visible);
+  const hIdx = visOrder.findIndex((s) => s.id === "hero");
+  const mIdx = visOrder.findIndex((s) => s.id === "mission");
+  const heroVar = hIdx >= 0 ? visOrder[hIdx].variant : undefined;
+  const missionVar = mIdx >= 0 ? visOrder[mIdx].variant : undefined;
+  const heroMissionContinuous =
+    hIdx >= 0 &&
+    mIdx === hIdx + 1 &&
+    (!heroVar || heroVar === "classic") &&
+    (!missionVar || missionVar === "centered");
+
   // Each section id → the component for it, given its chosen style `variant`.
   // Wrapped in <div data-section> so a per-section background can be painted.
   const render = (id: string, variant?: string): React.ReactNode => {
     switch (id) {
-      case "hero": return <Hero content={c.hero} btnStyle={c.btn["hero.cta"]} text={c.text} btn={c.btn} variant={variant} />;
-      // #3: pass the hero image so the top photo CONTINUES down through the mission
-      // (one editable image, shared "hero.bg" key). Only the default (centered) variant
-      // paints it; a chosen variant keeps its own look.
-      case "mission": return <MissionBlock content={c.mission} variant={variant} bleed={c.fx?.sectionBleed} bgImage={c.hero?.bgImage ? assetPath(c.hero.bgImage) : undefined} />;
+      case "hero": return <Hero content={c.hero} btnStyle={c.btn["hero.cta"]} text={c.text} btn={c.btn} variant={variant} continuous={heroMissionContinuous} />;
+      // Fix 1: in continuous mode the hero's photo is suppressed and the SINGLE shared
+      // hero.bg image is hosted HERE (bled up behind the hero) so both sections read as
+      // one continuous photo. Passing bgImage only when continuous means a reordered /
+      // hidden mission falls back to solid dark with no orphaned copy.
+      case "mission": return <MissionBlock content={c.mission} variant={variant} bleed={c.fx?.sectionBleed} bgImage={heroMissionContinuous && c.hero?.bgImage ? assetPath(c.hero.bgImage) : undefined} />;
       case "meetGrowServe": return <MeetGrowServe content={c.meetGrowServe} img={c.img} variant={variant} />;
       case "nt26": return <NT26Feature content={c.nt26} btnStyle={c.btn["nt26.cta"]} img={c.img} variant={variant} bleed={c.fx?.sectionBleed} />;
       case "locations": return <LocationsSection text={c.text} btn={c.btn} />;

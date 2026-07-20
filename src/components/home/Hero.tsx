@@ -22,7 +22,7 @@ export function btnCss(b?: BtnStyle): React.CSSProperties | undefined {
 /* Word-stagger easing — snappy pop-in */
 const WORD_EASE = [0.16, 1, 0.3, 1] as const;
 
-export default function Hero({ content = HERO_DEFAULTS, btnStyle, text = {}, btn = {}, variant }: { content?: HeroContent; btnStyle?: BtnStyle; text?: Record<string, string>; btn?: Record<string, BtnStyle>; variant?: string }) {
+export default function Hero({ content = HERO_DEFAULTS, btnStyle, text = {}, btn = {}, variant, continuous = false }: { content?: HeroContent; btnStyle?: BtnStyle; text?: Record<string, string>; btn?: Record<string, BtnStyle>; variant?: string; continuous?: boolean }) {
   const v = variant || "classic";
   const isLive = content.isLive;
 
@@ -61,18 +61,27 @@ export default function Hero({ content = HERO_DEFAULTS, btnStyle, text = {}, btn
       >
         {liveStrip}
 
-        {/* ── Background — B&W worship moment with subtle gradient ── */}
-        <div className="absolute inset-0 z-0">
-          <Image
-            src={assetPath(content.bgImage)}
-            alt=""
-            fill
-            priority
-            sizes="100vw"
-            data-cms-img="hero.bg"
-            className="object-cover animate-ken-burns"
-            style={{ objectPosition: "center 35%" }}
-          />
+        {/* ── Background ──
+            Fix 1 (home): in `continuous` mode the hero paints NO photo of its own.
+            The single shared `hero.bg` image lives in the mission section below and
+            bleeds UP behind the hero, so the hero shows the TOP slice and the mission
+            the continuation — ONE continuous photo, no seam, no duplicate. The scrims
+            still render (bumped to z-1, above that shared image) so the centered white
+            headline reads at AA. Standalone hero / split / minimal keep their OWN
+            full-bleed hero.bg photo (the only hero.bg element in that case). */}
+        <div className="absolute inset-0" style={{ zIndex: continuous ? 1 : 0 }}>
+          {!continuous && (
+            <Image
+              src={assetPath(content.bgImage)}
+              alt=""
+              fill
+              priority
+              sizes="100vw"
+              data-cms-img="hero.bg"
+              className="object-cover animate-ken-burns"
+              style={{ objectPosition: "center 35%" }}
+            />
+          )}
           {/* Scrim — guarantees the centered white headline reads at AA over any
               part of the photo (vertical gradient + a soft center vignette). */}
           {/* v8 iter-2 D3: scrims are click-through so the hero photo underneath is
