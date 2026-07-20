@@ -29,6 +29,18 @@
   --color-bg:         #ffffff;
   --color-text:       #1b1c1c;
 
+  /* ── Warm palette (Phase-5 redesign) — teal stays the ACCENT, these give it a
+     fuller warm-neutral cast (deep ink, warm paper, muted mids). ADDITIVE only:
+     existing bone/mist/ink tokens are untouched so no page shifts unexpectedly;
+     the redesigned premium sections opt in to these. Church-appropriate: warm &
+     quiet, never saturated. */
+  --color-ink-warm:   #1a1815;   /* deep warm near-black — premium dark sections */
+  --color-paper:      #faf7f2;   /* warm off-white — premium light background */
+  --color-paper-soft: #f3efe7;   /* slightly deeper warm surface (cards on paper) */
+  --color-sand:       #e9e2d6;   /* warm light neutral — chips, hairlines on paper */
+  --color-stone:      #8c857a;   /* muted warm mid — secondary text on paper */
+  --color-clay-line:  rgba(26,24,21,0.10); /* warm hairline/border on light */
+
   /* ── Typography ──────────────────────────── */
   --font-sans:        var(--font-hanken), "Hanken Grotesk", "Helvetica Neue", Helvetica, Arial, sans-serif;
   --font-display:     var(--font-hanken), "Helvetica Neue", Helvetica, Arial, sans-serif;
