@@ -78,7 +78,11 @@ async function draftFetch<T>(path: string, preview?: string): Promise<T | null> 
   if (!CMS_BASE || !preview) return null; // no token ⇒ never request draft
   try {
     const url = `${CMS_BASE}/api/content/draft?path=${encodeURIComponent(path)}&preview=${encodeURIComponent(preview)}`;
-    const res = await fetch(url, { cache: "no-store", signal: AbortSignal.timeout(2500) });
+    // Finding 2: the draft route reads D1 and can exceed a tight timeout on a cold
+    // Worker-to-Worker subrequest → the old 2500ms AbortSignal tripped and draftFetch
+    // returned null, so the editor preview silently fell back to PUBLISHED (edits
+    // "disappeared" on reload). 8s gives the cold draft route room.
+    const res = await fetch(url, { cache: "no-store", signal: AbortSignal.timeout(8000) });
     if (!res.ok) return null; // 401/expired/invalid/anything ⇒ caller falls back to published
     return (await res.json()) as T;
   } catch {
