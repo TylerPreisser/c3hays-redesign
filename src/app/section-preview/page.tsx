@@ -66,6 +66,11 @@ const PAGE_LOADERS: Record<string, () => Promise<{ default: PageComponent }>> = 
   "/events": () => import("@/app/events/page"),
   "/visit": () => import("@/app/visit/page"),
   "/news": () => import("@/app/news/page"),
+  "/about": () => import("@/app/about/page"),
+  "/beliefs": () => import("@/app/beliefs/page"),
+  "/locations": () => import("@/app/locations/page"),
+  "/messages": () => import("@/app/messages/page"),
+  "/watch": () => import("@/app/watch/page"),
 };
 
 export default async function LiveSectionPreview({
