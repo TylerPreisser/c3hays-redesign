@@ -165,7 +165,7 @@ export default function CampusMap({ text, className }: CampusMapProps) {
         <h2
           className="campusmap-heading"
           data-cms="t:campusmap-heading"
-          dangerouslySetInnerHTML={{ __html: tx(text, "campusmap-heading", "Two campuses, one church, one highway between them.") }}
+          dangerouslySetInnerHTML={{ __html: tx(text, "campusmap-heading", "Our Campuses") }}
         />
         <p
           className="campusmap-body"
