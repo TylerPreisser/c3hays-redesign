@@ -88,11 +88,15 @@ export function ErrorState() {
 }
 
 /* ───────────────────────── Event pill (month grid) ───────────────────────── */
+// Rendered INSIDE the day-cell <button> (see MonthGrid). A <button> nested in a
+// <button> is invalid HTML → a React hydration warning ("cannot be a descendant of"),
+// so each pill is a <span>, not a button. The day cell is the single interactive
+// control that opens the day; the pill click still bubbles to it (and calls onOpen
+// directly), so behavior is unchanged while the markup is now valid.
 export function EventPill({ ev, onOpen }: { ev: CalEvent; onOpen: () => void }) {
   if (ev.isHoliday) {
     return (
-      <button
-        type="button"
+      <span
         onClick={onOpen}
         title={ev.title}
         style={{
@@ -113,13 +117,12 @@ export function EventPill({ ev, onOpen }: { ev: CalEvent; onOpen: () => void }) 
         }}
       >
         {ev.title}
-      </button>
+      </span>
     );
   }
   const rgb = rgbTriplet(ev.color);
   return (
-    <button
-      type="button"
+    <span
       onClick={onOpen}
       title={ev.title}
       className="lc-pill"
@@ -165,7 +168,7 @@ export function EventPill({ ev, onOpen }: { ev: CalEvent; onOpen: () => void }) 
           {ev.start.toLocaleTimeString("en-US", { hour: "numeric" }).replace(" ", "")}
         </span>
       )}
-    </button>
+    </span>
   );
 }
 

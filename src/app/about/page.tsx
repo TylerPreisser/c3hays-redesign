@@ -228,5 +228,16 @@ export default async function AboutPage({
   const known = new Set(["about-hero", "about-story", "about-values", "about-staff"]);
   const visible = sections.filter((s) => known.has(s.id));
 
-  return <PageComposer sections={visible} bgFill={ov.bgFill} anim={ov.anim} render={render} />;
+  // Drag-anywhere: forward free-drag offsets (+ freeform els) so a dragged element on
+  // /about persists to the PUBLISHED SSR, exactly like home/PageComposer pages.
+  return (
+    <PageComposer
+      sections={visible}
+      bgFill={ov.bgFill}
+      anim={ov.anim}
+      render={render}
+      freeEls={ov.freeEls}
+      freeOffsets={ov.freeOffsets}
+    />
+  );
 }

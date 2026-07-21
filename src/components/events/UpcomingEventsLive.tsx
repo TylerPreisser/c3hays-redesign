@@ -27,7 +27,8 @@ const GRID: React.CSSProperties = {
   alignItems: "stretch",
 };
 
-/** Dark-surface skeleton matching EventCard's contained-tile silhouette. */
+/** Dark-surface skeleton matching EventCard's IMAGE-LESS tile silhouette: a teal date
+ *  chip at the top, then title / detail / campus lines (no photo area). */
 function SkeletonCard() {
   return (
     <div
@@ -39,9 +40,9 @@ function SkeletonCard() {
         border: "1px solid rgba(255,255,255,0.08)",
       }}
     >
-      <div style={{ aspectRatio: "3 / 2", background: "rgba(255,255,255,0.05)" }} />
       <div style={{ padding: "clamp(1.25rem, 2.4vw, 1.6rem)", display: "grid", gap: "0.7rem" }}>
-        <div style={{ height: 22, width: "70%", borderRadius: 6, background: "rgba(255,255,255,0.10)" }} />
+        <div style={{ height: 46, width: 54, borderRadius: "var(--radius-sm)", background: "rgba(28,195,175,0.35)" }} />
+        <div style={{ height: 22, width: "70%", borderRadius: 6, background: "rgba(255,255,255,0.10)", marginTop: "0.3rem" }} />
         <div style={{ height: 14, width: "90%", borderRadius: 6, background: "rgba(255,255,255,0.06)" }} />
         <div style={{ height: 24, width: "40%", borderRadius: 999, background: "rgba(255,255,255,0.06)", marginTop: "0.6rem" }} />
       </div>

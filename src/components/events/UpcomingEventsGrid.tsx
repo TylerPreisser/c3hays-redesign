@@ -29,10 +29,6 @@ const GRID: React.CSSProperties = {
   alignItems: "stretch",
 };
 
-/** Deterministic default photos so a card NEVER shows only the gradient (the
- *  Phase-4 "broken image" note); the editor can still swap each via data-cms-img. */
-const CARD_IMAGES = ["/images/worship.webp", "/images/gather.webp", "/images/community.webp"];
-
 function detailLine(ev: CalEvent): string {
   const desc = ev.description ? ev.description.trim() : "";
   const clipped = desc.length > 60 ? `${desc.slice(0, 60).trimEnd()}…` : desc;
@@ -69,6 +65,11 @@ export default function UpcomingEventsGrid({ events, text, media }: UpcomingEven
       {events.map((ev, i) => {
         const cmsKey = `events-upcoming-${i}`;
         const imgKey = `${cmsKey}-img`;
+        // The live eSpace feed carries NO images, so these tiles are IMAGE-LESS by
+        // default (no rotating default photo, no gradient block) — the chip-topped body
+        // is the whole card. The editor can still opt a card INTO an image by swapping
+        // one via data-cms-img (persisted in `media`); only then does a media area show.
+        const overrideImg = media?.[imgKey];
         // The per-event "Add to calendar" control renders INSIDE the card, in its footer
         // slot (below the CTA, within the card boundary). The card is an <article> here
         // (ctaCmsKey set → no whole-card <a>), so nesting the interactive menu is valid
@@ -80,7 +81,8 @@ export default function UpcomingEventsGrid({ events, text, media }: UpcomingEven
             cmsText={text}
             bgCmsKey={`${cmsKey}-bg`}
             imgCmsKey={imgKey}
-            image={media?.[imgKey] || CARD_IMAGES[i % CARD_IMAGES.length]}
+            image={overrideImg}
+            hideMedia={!overrideImg}
             imageAlt={ev.title}
             month={ev.start.toLocaleDateString("en-US", { month: "short" }).toUpperCase()}
             day={String(ev.start.getDate()).padStart(2, "0")}

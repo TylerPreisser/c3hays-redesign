@@ -52,6 +52,13 @@ export interface EventCardProps {
   /** Local `/images/*.webp` (or absolute URL). Falsy → tasteful gradient. */
   image?: string;
   imageAlt?: string;
+  /**
+   * IMAGE-LESS mode. When true the card renders NO media area at all (no photo, no
+   * gradient fallback) — the date chip moves inline to the top of the body. Used by the
+   * LIVE eSpace upcoming tiles (the live feed carries no images, so a rotating default
+   * would be fake). Authored cards leave this false to keep showing a real image.
+   */
+  hideMedia?: boolean;
   /** Whole card becomes a link. */
   href?: string;
   /** `data-cms-img` hook for the image region (editor recolor/replace). */
@@ -215,6 +222,7 @@ export default function EventCard({
   campus,
   image,
   imageAlt,
+  hideMedia,
   href,
   imgCmsKey,
   cmsKey,
@@ -252,23 +260,21 @@ export default function EventCard({
     ...style,
   };
 
-  const chip = (
-    <div
-      style={{
-        position: "absolute",
-        top: "1rem",
-        left: "1rem",
-        display: "inline-flex",
-        flexDirection: "column",
-        alignItems: "center",
-        background: "var(--color-teal)",
-        color: "#042e29",
-        borderRadius: "var(--radius-sm)",
-        padding: "0.5rem 0.85rem",
-        lineHeight: 1,
-        boxShadow: "0 6px 18px rgba(4,46,41,0.28)",
-      }}
-    >
+  // The teal date chip is shared: it FLOATS over the photo when a media area renders,
+  // and sits INLINE at the top of the body in image-less mode (no absolute overlay).
+  const chipBase: CSSProperties = {
+    display: "inline-flex",
+    flexDirection: "column",
+    alignItems: "center",
+    background: "var(--color-teal)",
+    color: "#042e29",
+    borderRadius: "var(--radius-sm)",
+    padding: "0.5rem 0.85rem",
+    lineHeight: 1,
+    boxShadow: "0 6px 18px rgba(4,46,41,0.28)",
+  };
+  const chipInner = (
+    <>
       <Field
         cmsPath={fieldPath("month")}
         cmsKey={cmsKey}
@@ -287,6 +293,16 @@ export default function EventCard({
         as="span"
         style={{ fontSize: "1.6rem", fontWeight: 800, marginTop: "0.15rem" }}
       />
+    </>
+  );
+  const chip = (
+    <div style={{ position: "absolute", top: "1rem", left: "1rem", ...chipBase }}>
+      {chipInner}
+    </div>
+  );
+  const chipStatic = (
+    <div style={{ alignSelf: "flex-start", marginBottom: "0.6rem", ...chipBase }}>
+      {chipInner}
     </div>
   );
 
@@ -300,6 +316,8 @@ export default function EventCard({
         gap: "0.4rem",
       }}
     >
+      {/* Image-less cards: the date chip sits inline at the top (no photo to float over). */}
+      {hideMedia && chipStatic}
       <Field
         cmsPath={fieldPath("title")}
         cmsKey={cmsKey}
@@ -404,7 +422,11 @@ export default function EventCard({
 
   const inner = (
     <>
-      <Media image={image} imageAlt={imageAlt} imgCmsKey={imgCmsKey} chip={chip} />
+      {/* Image-less (live eSpace) tiles skip the media area entirely — no photo, no
+          gradient fallback — so the chip-topped body IS the card. */}
+      {!hideMedia && (
+        <Media image={image} imageAlt={imageAlt} imgCmsKey={imgCmsKey} chip={chip} />
+      )}
       {body}
     </>
   );

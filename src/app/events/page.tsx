@@ -165,5 +165,16 @@ export default async function EventsPage({
     }
   };
 
-  return <PageComposer sections={sections} bgFill={ov.bgFill} anim={ov.anim} render={render} />;
+  // Drag-anywhere: forward free-drag offsets (+ freeform els) so a dragged element on
+  // /events persists to the PUBLISHED SSR, exactly like home/PageComposer pages.
+  return (
+    <PageComposer
+      sections={sections}
+      bgFill={ov.bgFill}
+      anim={ov.anim}
+      render={render}
+      freeEls={ov.freeEls}
+      freeOffsets={ov.freeOffsets}
+    />
+  );
 }

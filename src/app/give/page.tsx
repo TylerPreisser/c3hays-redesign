@@ -67,5 +67,16 @@ export default async function GivePage({
     }
   };
 
-  return <PageComposer sections={sections} bgFill={ov.bgFill} anim={ov.anim} render={render} />;
+  // Drag-anywhere: forward free-drag offsets (+ freeform els) so a dragged element on
+  // /give persists to the PUBLISHED SSR, exactly like home/PageComposer pages.
+  return (
+    <PageComposer
+      sections={sections}
+      bgFill={ov.bgFill}
+      anim={ov.anim}
+      render={render}
+      freeEls={ov.freeEls}
+      freeOffsets={ov.freeOffsets}
+    />
+  );
 }
