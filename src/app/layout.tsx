@@ -5,6 +5,7 @@ import "./animations.css";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import EditBridge from "@/components/cms/EditBridge";
+import FreeOffsetStyle from "@/components/cms/FreeOffsetStyle";
 import RevealPlayer from "@/components/cms/RevealPlayer";
 import SmoothScrollProvider from "@/providers/SmoothScrollProvider";
 import { site } from "@/data/site";
@@ -112,6 +113,9 @@ export default async function RootLayout({
         {globals.bgFill && Object.keys(globals.bgFill).length > 0 && (
           <style dangerouslySetInnerHTML={{ __html: buildBgCss([], globals.bgFill) }} />
         )}
+        {/* Drag-anywhere: offsets for GLOBAL elements (footer/header/nav), applied on
+            every page as a transform:translate stylesheet (preview + published). */}
+        <FreeOffsetStyle offsets={globals.freeOffsets} />
         {/* On-page editor bridge — mounted globally so EVERY page (not just Home)
             is click-to-edit when loaded in C3 Studio with ?cmsEdit=1. */}
         <EditBridge />

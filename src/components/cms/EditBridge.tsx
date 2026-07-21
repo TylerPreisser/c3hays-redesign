@@ -66,9 +66,11 @@ export default function EditBridge() {
       [data-cms]{ cursor:text; transition:background-color .12s ease; }
       [data-cms]:hover{ background-color: rgba(28,195,175,.05); }
       [data-cms-img], [data-cms-link], [data-cms-icon], [data-cms-bg]{ cursor:pointer; }
-      /* the marching border — shown on hover, and persistently on the selected element */
-      [data-cms]:hover::after, [data-cms-img]:hover::after, [data-cms-link]:hover::after, [data-cms-icon]:hover::after, [data-cms-bg]:hover::after,
-      [data-cms].cms-sel::after, [data-cms-img].cms-sel::after, [data-cms-link].cms-sel::after, [data-cms-icon].cms-sel::after, [data-cms-bg].cms-sel::after{
+      /* the marching border — shown on HOVER only. The SELECTED element's outline is a
+         separate position:fixed overlay ring (#c3-sel-ring), measured from the element's
+         live getBoundingClientRect so it is pixel-accurate regardless of the element's
+         positioning context and never clipped by an ancestor's overflow:hidden (ITEM 2). */
+      [data-cms]:hover::after, [data-cms-img]:hover::after, [data-cms-link]:hover::after, [data-cms-icon]:hover::after, [data-cms-bg]:hover::after{
         content:""; position:absolute;
         /* v8 D3: PIN the geometry with !important. Some tagged elements own their own
            author ::after (e.g. globals.css .nav-link-underline::after sets width:0;
@@ -99,11 +101,25 @@ export default function EditBridge() {
         background-repeat: no-repeat;
         animation: c3ants .5s linear infinite;
       }
-      /* SELECTED = distinct: deeper teal, thicker ants, a touch faster. */
-      [data-cms].cms-sel::after, [data-cms-img].cms-sel::after, [data-cms-link].cms-sel::after, [data-cms-icon].cms-sel::after, [data-cms-bg].cms-sel::after{
-        --ant: #179c8c; background-size: 100% 3px, 100% 3px, 3px 100%, 3px 100%; animation-duration:.38s;
-      }
       @keyframes c3ants{ to{ background-position: 14px 0, -14px 100%, 0 -14px, 100% 14px; } }
+      /* ITEM 2: the SELECTED-element outline — a single fixed overlay ring, positioned in
+         JS from the target's getBoundingClientRect (pixel-accurate, overflow-proof). Deeper
+         teal + thicker ants than hover so selection reads as distinct. */
+      #c3-sel-ring{
+        position:fixed; pointer-events:none; z-index:2147483400; display:none;
+        border-radius:9px; box-sizing:border-box;
+        --ant:#179c8c;
+        background-image:
+          repeating-linear-gradient(90deg, var(--ant) 0 7px, transparent 7px 14px),
+          repeating-linear-gradient(90deg, var(--ant) 0 7px, transparent 7px 14px),
+          repeating-linear-gradient(0deg,  var(--ant) 0 7px, transparent 7px 14px),
+          repeating-linear-gradient(0deg,  var(--ant) 0 7px, transparent 7px 14px);
+        background-size: 100% 3px, 100% 3px, 3px 100%, 3px 100%;
+        background-position: 0 0, 0 100%, 0 0, 100% 0;
+        background-repeat: no-repeat;
+        animation: c3ants .38s linear infinite;
+      }
+      @media (prefers-reduced-motion: reduce){ #c3-sel-ring{ animation:none; } }
       /* ITEM 3: UNIVERSAL selection outline for IMAGES. A full-bleed image wrapper
          (<div class="absolute inset-0" data-cms-img>) fills its section EXACTLY, and the
          shared ring above pins to inset:-3px — i.e. 3px OUTSIDE the wrapper on every side.
@@ -114,7 +130,7 @@ export default function EditBridge() {
          images only: draw the ring a few px INSIDE the element (never clipped by an
          ancestor's overflow:hidden) and lift it above any scrim / next-image layer. The
          --ant color + thicker background-size from the .cms-sel rule above still apply. */
-      [data-cms-img]:hover::after, [data-cms-img].cms-sel::after{
+      [data-cms-img]:hover::after{
         top:2px!important; right:2px!important; bottom:2px!important; left:2px!important;
         z-index:2147483000;
       }
@@ -141,8 +157,7 @@ export default function EditBridge() {
       }
       @media (prefers-reduced-motion: reduce){ [data-section].cms-sel-sec::after{ animation:none; } }
       @media (prefers-reduced-motion: reduce){
-        [data-cms]:hover::after, [data-cms-img]:hover::after, [data-cms-link]:hover::after, [data-cms-icon]:hover::after, [data-cms-bg]:hover::after,
-        [data-cms].cms-sel::after, [data-cms-img].cms-sel::after, [data-cms-link].cms-sel::after, [data-cms-icon].cms-sel::after, [data-cms-bg].cms-sel::after{ animation:none; }
+        [data-cms]:hover::after, [data-cms-img]:hover::after, [data-cms-link]:hover::after, [data-cms-icon]:hover::after, [data-cms-bg]:hover::after{ animation:none; }
       }
       /* v7 R6: selection = the marching-ants ONLY. Kill the solid green box — the
          c3hays brand :focus-visible ring (globals.css: outline 2px solid teal) that
@@ -246,12 +261,47 @@ export default function EditBridge() {
     // node currently matches it, on every DOM mutation (same remount hook the image
     // shim already uses). Empty ⇒ nothing selected. Preview-only; no persistence.
     let selPath = "";
+    // ITEM 2: the fixed overlay selection ring. Positioned from the SELECTED element's
+    // live getBoundingClientRect — always pixel-accurate, never clipped by an ancestor's
+    // overflow, independent of the element's own positioning context (the old `.cms-sel`
+    // ::after mis-laid-out on static/overflow-hidden elements). Resolved fresh from
+    // selPath every reposition, so it survives client re-mounts automatically.
+    const selRing = document.createElement("div");
+    selRing.id = "c3-sel-ring";
+    selRing.setAttribute("aria-hidden", "true");
+    document.body.appendChild(selRing);
+    const ringTarget = (): HTMLElement | null => (selPath ? document.querySelector<HTMLElement>(selPath) : null);
+    let ringLast = "";
+    const positionRing = () => {
+      const el = ringTarget();
+      if (!el || !document.contains(el)) { if (selRing.style.display !== "none") selRing.style.display = "none"; ringLast = ""; return; }
+      const r = el.getBoundingClientRect();
+      if (r.width === 0 && r.height === 0) { if (selRing.style.display !== "none") selRing.style.display = "none"; return; }
+      const pad = 3;
+      // Only write when the geometry actually changed (the rAF loop calls this every
+      // frame) so we never thrash style during a scroll/drag.
+      const key = `${r.left}|${r.top}|${r.width}|${r.height}`;
+      if (key === ringLast && selRing.style.display === "block") return;
+      ringLast = key;
+      selRing.style.left = `${r.left - pad}px`;
+      selRing.style.top = `${r.top - pad}px`;
+      selRing.style.width = `${r.width + pad * 2}px`;
+      selRing.style.height = `${r.height + pad * 2}px`;
+      selRing.style.display = "block";
+    };
+    // ITEM 2: keep the ring GLUED to the selected element every frame — so it stays
+    // pixel-accurate through contenteditable reflow, entrance animations, sticky-header
+    // shifts, and the drag itself (no stale/offset outline like the old ::after).
+    let ringRaf = 0;
+    const ringLoop = () => { positionRing(); ringRaf = requestAnimationFrame(ringLoop); };
+    ringRaf = requestAnimationFrame(ringLoop);
     const reapplySel = () => {
-      if (!selPath) return;
+      if (!selPath) { selRing.style.display = "none"; return; }
       const cur = document.querySelectorAll<HTMLElement>(selPath);
-      if (!cur.length) return; // element not (re)mounted yet — leave prior state
+      if (!cur.length) { return; } // element not (re)mounted yet — leave prior state
       document.querySelectorAll(".cms-sel").forEach((n) => { if (!(n as HTMLElement).matches(selPath)) n.classList.remove("cms-sel"); });
       cur.forEach((el) => el.classList.add("cms-sel"));
+      positionRing();
     };
 
     // keystone A/C: SECTION selection, persisted by data-section id (survives re-render,
@@ -308,7 +358,7 @@ export default function EditBridge() {
       });
     };
 
-    const imgObserver = new MutationObserver(() => { if (Object.keys(shimImg).length) reapplyShimImgs(); reapplySel(); reapplySecSel(); ensureAnchored(); ensureEditable(); });
+    const imgObserver = new MutationObserver(() => { if (Object.keys(shimImg).length) reapplyShimImgs(); reapplySel(); reapplySecSel(); ensureAnchored(); ensureEditable(); reapplyOffsets(); });
     imgObserver.observe(document.body, { childList: true, subtree: true });
 
     // ── build the floating toolbar ──
@@ -481,7 +531,8 @@ export default function EditBridge() {
       // v7 R6: focusing a text region SELECTS it — persistent marching-ants, not a
       // hover-only outline that vanishes when the mouse moves away.
       const p = pathOf(el);
-      clearSel(); el.classList.add("cms-sel"); selPath = p ? `[data-cms="${p}"]` : "";
+      clearSel(); clearSecSel(); secSelId = ""; el.classList.add("cms-sel"); selPath = p ? `[data-cms="${p}"]` : "";
+      positionRing();
       // ITEM 5: a [data-cms] text node inside an element carrying data-cms-href (e.g.
       // the footer phone/email — an <a href=tel:/mailto:> whose LABEL is the editable
       // text) posts the link alongside the focus so the editor can render a link field.
@@ -512,23 +563,23 @@ export default function EditBridge() {
       const icon = tgt?.closest?.("[data-cms-icon]") as HTMLElement | null;
       const text = tgt?.closest?.("[data-cms]") as HTMLElement | null;
       if (icon && !text) {
-        e.preventDefault(); e.stopPropagation(); clearSel(); icon.classList.add("cms-sel");
-        selPath = `[data-cms-icon="${icon.getAttribute("data-cms-icon")}"]`;
+        e.preventDefault(); e.stopPropagation(); clearSel(); clearSecSel(); secSelId = ""; icon.classList.add("cms-sel");
+        selPath = `[data-cms-icon="${icon.getAttribute("data-cms-icon")}"]`; positionRing();
         post({ type: "cms:select", kind: "icon", path: icon.getAttribute("data-cms-icon") });
         log("select-icon", { path: icon.getAttribute("data-cms-icon") });
         return;
       }
       // OBJECT selection: image → open picker; link → edit label/href
       if (img && !text) {
-        e.preventDefault(); e.stopPropagation(); clearSel(); img.classList.add("cms-sel");
-        selPath = `[data-cms-img="${img.getAttribute("data-cms-img")}"]`;
+        e.preventDefault(); e.stopPropagation(); clearSel(); clearSecSel(); secSelId = ""; img.classList.add("cms-sel");
+        selPath = `[data-cms-img="${img.getAttribute("data-cms-img")}"]`; positionRing();
         post({ type: "cms:select", kind: "image", path: img.getAttribute("data-cms-img") });
         log("select-image", { path: img.getAttribute("data-cms-img") });
         return;
       }
       if (link && !text) {
-        e.preventDefault(); e.stopPropagation(); clearSel(); link.classList.add("cms-sel");
-        selPath = `[data-cms-link="${link.getAttribute("data-cms-link")}"]`;
+        e.preventDefault(); e.stopPropagation(); clearSel(); clearSecSel(); secSelId = ""; link.classList.add("cms-sel");
+        selPath = `[data-cms-link="${link.getAttribute("data-cms-link")}"]`; positionRing();
         const lab = (link.querySelector("[data-cms-link-label]") as HTMLElement)?.innerText ?? link.innerText;
         // ITEM 3: carry the button's inner HTML so the editor preview can render an
         // ICON-only button (Facebook/Instagram/YouTube) as its real icon, not "button".
@@ -540,8 +591,8 @@ export default function EditBridge() {
       // clicking its text/image/button/icon still edits those directly.
       const bg = tgt?.closest?.("[data-cms-bg]") as HTMLElement | null;
       if (bg && !text && !img && !link && !icon) {
-        e.preventDefault(); e.stopPropagation(); clearSel(); bg.classList.add("cms-sel");
-        selPath = `[data-cms-bg="${bg.getAttribute("data-cms-bg")}"]`;
+        e.preventDefault(); e.stopPropagation(); clearSel(); clearSecSel(); secSelId = ""; bg.classList.add("cms-sel");
+        selPath = `[data-cms-bg="${bg.getAttribute("data-cms-bg")}"]`; positionRing();
         // ITEM 4: carry the tile's ACTUAL rendered background so the editor's picker
         // swatch shows the CURRENT color even when no bgFill override is saved yet.
         post({ type: "cms:select", kind: "bg", path: bg.getAttribute("data-cms-bg"), value: getComputedStyle(bg).backgroundColor });
@@ -557,6 +608,7 @@ export default function EditBridge() {
       if (sec && !text && !img && !link && !icon && !bg) {
         e.preventDefault(); e.stopPropagation();
         const id = sec.getAttribute("data-section") || "";
+        clearSel(); selPath = ""; positionRing(); // section wins → drop any element ring
         selectSection(id);
         post({ type: "cms:select", kind: "section", path: id });
         log("select-section", { path: id });
@@ -693,13 +745,110 @@ export default function EditBridge() {
     };
     document.addEventListener("mousedown", onFreeDown, true);
 
+    // ── ITEM 1: DRAG-ANYWHERE for ANY in-flow element (button/text/image/icon) ──
+    // Google-Slides / Pic-Collage feel: SELECT an element, then press it and move — it
+    // follows the pointer and is dropped anywhere. We do NOT re-parent it; we persist a
+    // pixel OFFSET keyed by the element's OWN data-cms* attribute selector and apply it
+    // with transform:translate. Round-trips through cms:offset → editor freeOffsets →
+    // <FreeOffsetStyle> on the published/draft page, so the move survives reload + ships
+    // live. In the editor we ALSO apply it inline (from the cms:setOffsets echo the editor
+    // posts on ready) so the preview shows it regardless of the page's SSR wiring.
+    const OFFSET_ATTRS = ["data-cms", "data-cms-link", "data-cms-img", "data-cms-icon"];
+    const offsets: Record<string, { x: number; y: number }> = {};
+    const offsetSelFor = (el: HTMLElement): string => {
+      for (const a of OFFSET_ATTRS) { const v = el.getAttribute(a); if (v !== null) return `[${a}="${v}"]`; }
+      return "";
+    };
+    const applyOffset = (sel: string, o: { x: number; y: number } | undefined) => {
+      document.querySelectorAll<HTMLElement>(sel).forEach((el) => {
+        if (o && (o.x !== 0 || o.y !== 0)) {
+          el.style.transform = `translate(${o.x}px,${o.y}px)`;
+          const pos = getComputedStyle(el).position;
+          if (pos === "static" || pos === "") el.style.position = "relative";
+        } else {
+          el.style.transform = "";
+        }
+      });
+    };
+    const applyAllOffsets = () => { for (const [sel, o] of Object.entries(offsets)) applyOffset(sel, o); };
+    // Re-assert offsets after a client re-render remounts a node (which drops inline
+    // style). Skipped mid-drag so the live transform isn't clobbered by a stale base.
+    const reapplyOffsets = () => { if (!oDragging && Object.keys(offsets).length) applyAllOffsets(); };
+
+    // offset-drag state (parallel to the FreeLayer drag above; transform-based)
+    let oEl: HTMLElement | null = null, oSel = "", oSx = 0, oSy = 0, oBaseX = 0, oBaseY = 0;
+    let oRect0: DOMRect | null = null, oDragging = false;
+    const onOffMove = (e: MouseEvent) => {
+      if (!oEl || !oRect0) return;
+      const dx = e.clientX - oSx, dy = e.clientY - oSy;
+      if (!oDragging && Math.abs(dx) < 5 && Math.abs(dy) < 5) return;
+      if (!oDragging) {
+        oDragging = true; document.body.style.userSelect = "none";
+        try { window.getSelection()?.removeAllRanges(); } catch {}
+        oEl.style.zIndex = "2147483100"; oEl.style.cursor = "grabbing"; hideBar();
+      }
+      e.preventDefault(); e.stopPropagation();
+      let nx = oBaseX + dx, ny = oBaseY + dy;
+      const elemCenter = oRect0.left + dx + oRect0.width / 2;
+      const pageCenter = window.innerWidth / 2;
+      gV.style.display = "none"; gH.style.display = "none";
+      // snap the element's center to the page's horizontal center (dashed guide shows)
+      if (Math.abs(elemCenter - pageCenter) < SNAP) {
+        nx = oBaseX + (pageCenter - (oRect0.left + oRect0.width / 2));
+        gV.style.left = `${pageCenter}px`; gV.style.display = "block";
+      } else if (Math.abs(nx) < SNAP) {
+        // snap back to the element's NATURAL horizontal position (offset 0)
+        nx = 0; gV.style.left = `${oRect0.left - oBaseX + oRect0.width / 2}px`; gV.style.display = "block";
+      }
+      // snap back to natural vertical position (offset 0) with a guide
+      if (Math.abs(ny) < SNAP) { ny = 0; gH.style.top = `${oRect0.top - oBaseY}px`; gH.style.display = "block"; }
+      oEl.style.transform = `translate(${nx}px,${ny}px)`;
+      const pos = getComputedStyle(oEl).position; if (pos === "static" || pos === "") oEl.style.position = "relative";
+      positionRing();
+    };
+    const onOffUp = () => {
+      document.removeEventListener("mousemove", onOffMove, true);
+      document.removeEventListener("mouseup", onOffUp, true);
+      gV.style.display = "none"; gH.style.display = "none"; document.body.style.userSelect = "";
+      if (oDragging && oEl && oSel) {
+        // final offset = the applied translate (parse it back out)
+        const m = /translate\(\s*(-?[\d.]+)px\s*,\s*(-?[\d.]+)px/.exec(oEl.style.transform || "");
+        const nx = m ? Math.round(parseFloat(m[1])) : oBaseX;
+        const ny = m ? Math.round(parseFloat(m[2])) : oBaseY;
+        offsets[oSel] = { x: nx, y: ny };
+        justDragged = true; // swallow the trailing click (don't also open the inspector)
+        post({ type: "cms:offset", sel: oSel, x: nx, y: ny });
+        log("offset", { sel: oSel, x: nx, y: ny });
+      }
+      if (oEl) { oEl.style.zIndex = ""; oEl.style.cursor = ""; }
+      oEl = null; oSel = ""; oDragging = false; oRect0 = null;
+      positionRing();
+    };
+    const onOffDown = (e: MouseEvent) => {
+      const t = e.target as HTMLElement;
+      if (t?.closest?.("[data-cms-free]")) return; // FreeLayer elements use their own drag
+      const el = t?.closest?.(CMS_SELECTOR) as HTMLElement | null;
+      if (!el || !selPath) return;
+      // Only a SELECTED element is draggable — press-and-move on the current selection.
+      if (!el.matches(selPath)) return;
+      oEl = el; oSel = offsetSelFor(el); if (!oSel) { oEl = null; return; }
+      const base = offsets[oSel] || { x: 0, y: 0 };
+      oBaseX = base.x; oBaseY = base.y;
+      oRect0 = el.getBoundingClientRect();
+      oSx = e.clientX; oSy = e.clientY; oDragging = false;
+      document.addEventListener("mousemove", onOffMove, true);
+      document.addEventListener("mouseup", onOffUp, true);
+    };
+    document.addEventListener("mousedown", onOffDown, true);
+
     document.addEventListener("focusin", onFocusIn, true);
     document.addEventListener("input", onInput, true);
     document.addEventListener("selectionchange", onSelChange);
     document.addEventListener("click", onClick, true);
     document.addEventListener("mousedown", onDocMouseDown, true);
     document.addEventListener("mouseover", onOver, true);
-    window.addEventListener("scroll", () => { if (bar.style.display === "flex") positionBar(); bgChip.style.display = "none"; imgChip.style.display = "none"; cardDelChip.style.display = "none"; }, true);
+    window.addEventListener("scroll", () => { if (bar.style.display === "flex") positionBar(); positionRing(); bgChip.style.display = "none"; imgChip.style.display = "none"; cardDelChip.style.display = "none"; }, true);
+    window.addEventListener("resize", () => { positionRing(); if (bar.style.display === "flex") positionBar(); }, true);
 
     const onMsg = (e: MessageEvent) => {
       const d = e.data; if (!d || d.source !== "c3editor") return;
@@ -726,6 +875,14 @@ export default function EditBridge() {
         }
       } else if (d.type === "cms:deselectSection") {
         selectSection("");
+      } else if (d.type === "cms:setOffsets" && d.offsets && typeof d.offsets === "object") {
+        // ITEM 1: the editor echoes the current scope's freeOffsets (on ready + after a
+        // move) so a reloaded/remounted preview re-applies every element's drag offset.
+        for (const k of Object.keys(offsets)) delete offsets[k];
+        for (const [sel, o] of Object.entries(d.offsets as Record<string, { x?: number; y?: number }>)) {
+          if (o && typeof o === "object") offsets[sel] = { x: Number(o.x) || 0, y: Number(o.y) || 0 };
+        }
+        applyAllOffsets(); positionRing();
       }
     };
     window.addEventListener("message", onMsg);
@@ -738,7 +895,11 @@ export default function EditBridge() {
       document.removeEventListener("click", onClick, true);
       document.removeEventListener("mousedown", onDocMouseDown, true);
       document.removeEventListener("mousedown", onFreeDown, true);
-      gV.remove(); gH.remove();
+      document.removeEventListener("mousedown", onOffDown, true);
+      document.removeEventListener("mousemove", onOffMove, true);
+      document.removeEventListener("mouseup", onOffUp, true);
+      cancelAnimationFrame(ringRaf);
+      gV.remove(); gH.remove(); selRing.remove();
       document.removeEventListener("mouseover", onOver, true);
       window.removeEventListener("message", onMsg);
       els.forEach((el) => el.removeAttribute("contenteditable"));

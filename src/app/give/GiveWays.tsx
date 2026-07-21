@@ -1,6 +1,7 @@
 import { Smartphone, Landmark, Mail } from "lucide-react";
 import { site } from "@/data/site";
 import { Tx, EditableLink } from "@/components/cms/Editable";
+import GiveOnline from "./GiveOnline";
 
 export interface GiveWaysProps {
   /** Page text override bag. */
@@ -12,10 +13,12 @@ export interface GiveWaysProps {
  * (eyebrow + heading + lead) over a two-column split:
  *
  *   LEFT  — a DARK feature card (teal radial glow) for the recommended path: "Give
- *           online", a Recurring / One-time toggle (static visual), and the TWO real
- *           campuses (Hays, Colby). Under each campus, editable designation links
- *           (General / Building / Missions) that all open that campus's REAL Pushpay
- *           page — the donor picks the fund at checkout. There is NO online campus.
+ *           online", a WORKING Recurring / One-time toggle, and the TWO real campuses
+ *           (Hays, Colby). Under each campus, editable designation links (General /
+ *           Building / Missions) that all open that campus's REAL Pushpay page — the
+ *           toggle rewrites each link's recurring flag (?r=monthly ↔ bare); the donor
+ *           picks the fund at checkout. This card is the <GiveOnline> client island.
+ *           There is NO online campus.
  *   RIGHT — a `.methods` list of white tiles: the C3 app, in person, and by mail.
  *
  * Server component. Every string is an editable <Tx>; every destination is an
@@ -42,8 +45,8 @@ export default function GiveWays({ t }: GiveWaysProps) {
 .gw-feature__t{font-size:clamp(1.7rem,2.6vw,2.15rem);margin:12px 0 0;color:#fff;font-weight:600;letter-spacing:-.02em;line-height:1.05}
 .gw-feature__p{color:rgba(255,255,255,.72);margin:14px 0 0}
 .gw-toggle{display:inline-flex;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);border-radius:999px;padding:4px;margin:26px 0 4px;gap:4px}
-.gw-toggle span{padding:.5rem 1.15rem;border-radius:999px;font-size:.85rem;font-weight:700;color:rgba(255,255,255,.66)}
-.gw-toggle span.on{background:var(--color-teal);color:#08302b}
+.gw-toggle button{padding:.5rem 1.15rem;border-radius:999px;font-size:.85rem;font-weight:700;color:rgba(255,255,255,.66);background:transparent;border:0;cursor:pointer;font-family:inherit;transition:background .15s,color .15s}
+.gw-toggle button.on{background:var(--color-teal);color:#08302b}
 .gw-campuses{margin-top:26px;display:flex;flex-direction:column;gap:22px}
 .gw-campus-group{display:flex;flex-direction:column;gap:12px}
 .gw-campus-h{margin:0;font-size:1.05rem;font-weight:700;letter-spacing:-.01em;color:#fff}
@@ -75,43 +78,9 @@ export default function GiveWays({ t }: GiveWaysProps) {
         </div>
 
         <div className="gw-grid">
-          {/* LEFT — dark feature: give online */}
-          <div className="gw-feature">
-            <Tx text={t} k="give-ways-feature-eyebrow" fallback="Recommended" className="gw-feature__ey" as="p" />
-            <Tx as="h3" text={t} k="give-ways-feature-title" fallback="Give online" className="gw-feature__t" />
-            <Tx
-              as="p"
-              text={t}
-              k="give-ways-feature-body"
-              fallback="Complete a one-time gift or set up recurring giving through our secure Pushpay platform. Pick your campus, then choose the fund you're giving to at checkout."
-              className="gw-feature__p"
-            />
-            <div className="gw-toggle" aria-hidden>
-              <Tx text={t} k="give-ways-toggle-recurring" fallback="Recurring" className="on" />
-              <Tx text={t} k="give-ways-toggle-onetime" fallback="One-time" />
-            </div>
-            <div className="gw-campuses">
-              {/* Hays campus — each designation opens the real Hays Pushpay page;
-                  the donor selects the fund at checkout. Labels/URLs editable. */}
-              <div className="gw-campus-group">
-                <Tx as="h4" text={t} k="give-ways-hays-title" fallback="Hays Campus" className="gw-campus-h" />
-                <div className="gw-desig">
-                  <EditableLink text={t} k="give-ways-hays-general" href={site.giving.hays} label="General" external />
-                  <EditableLink text={t} k="give-ways-hays-building" href={site.giving.hays} label="Building" external />
-                  <EditableLink text={t} k="give-ways-hays-missions" href={site.giving.hays} label="Missions" external />
-                </div>
-              </div>
-              {/* Colby campus — same pattern against the real Colby Pushpay page. */}
-              <div className="gw-campus-group">
-                <Tx as="h4" text={t} k="give-ways-colby-title" fallback="Colby Campus" className="gw-campus-h" />
-                <div className="gw-desig">
-                  <EditableLink text={t} k="give-ways-colby-general" href={site.giving.colby} label="General" external />
-                  <EditableLink text={t} k="give-ways-colby-building" href={site.giving.colby} label="Building" external />
-                  <EditableLink text={t} k="give-ways-colby-missions" href={site.giving.colby} label="Missions" external />
-                </div>
-              </div>
-            </div>
-          </div>
+          {/* LEFT — dark feature: give online (client island so the Recurring / One-time
+              toggle actually rewrites each designation link's Pushpay destination). */}
+          <GiveOnline t={t} />
 
           {/* RIGHT — the other four ways */}
           <div className="gw-methods">

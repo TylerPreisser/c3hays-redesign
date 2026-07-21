@@ -69,36 +69,30 @@ export default function UpcomingEventsGrid({ events, text, media }: UpcomingEven
       {events.map((ev, i) => {
         const cmsKey = `events-upcoming-${i}`;
         const imgKey = `${cmsKey}-img`;
-        // Card + per-event add-to-calendar stacked in one grid cell. The CTA link and
-        // the interactive AddToCalendar menu are SIBLINGS (never nested — a <button>
-        // inside an <a> is invalid HTML).
+        // The per-event "Add to calendar" control renders INSIDE the card, in its footer
+        // slot (below the CTA, within the card boundary). The card is an <article> here
+        // (ctaCmsKey set → no whole-card <a>), so nesting the interactive menu is valid
+        // HTML — the CTA link and the AddToCalendar button/menu are separate siblings.
         return (
-          <div
+          <EventCard
             key={ev.id}
-            style={{ display: "flex", flexDirection: "column", height: "100%" }}
-          >
-            <EventCard
-              cmsKey={cmsKey}
-              cmsText={text}
-              bgCmsKey={`${cmsKey}-bg`}
-              imgCmsKey={imgKey}
-              image={media?.[imgKey] || CARD_IMAGES[i % CARD_IMAGES.length]}
-              imageAlt={ev.title}
-              month={ev.start.toLocaleDateString("en-US", { month: "short" }).toUpperCase()}
-              day={String(ev.start.getDate()).padStart(2, "0")}
-              title={ev.title}
-              detail={detailLine(ev)}
-              campus={campusLabel(ev)}
-              ctaCmsKey={`${cmsKey}-cta`}
-              ctaHref={ev.registerUrl || ESPACE_FULL_CALENDAR_URL}
-              ctaLabel="Event details"
-              ctaExternal
-              style={{ height: "auto", flex: "1 1 auto" }}
-            />
-            <div style={{ marginTop: "0.75rem" }}>
-              <AddToCalendar event={toCalendarEvent(ev)} />
-            </div>
-          </div>
+            cmsKey={cmsKey}
+            cmsText={text}
+            bgCmsKey={`${cmsKey}-bg`}
+            imgCmsKey={imgKey}
+            image={media?.[imgKey] || CARD_IMAGES[i % CARD_IMAGES.length]}
+            imageAlt={ev.title}
+            month={ev.start.toLocaleDateString("en-US", { month: "short" }).toUpperCase()}
+            day={String(ev.start.getDate()).padStart(2, "0")}
+            title={ev.title}
+            detail={detailLine(ev)}
+            campus={campusLabel(ev)}
+            ctaCmsKey={`${cmsKey}-cta`}
+            ctaHref={ev.registerUrl || ESPACE_FULL_CALENDAR_URL}
+            ctaLabel="Event details"
+            ctaExternal
+            footer={<AddToCalendar event={toCalendarEvent(ev)} />}
+          />
         );
       })}
     </div>

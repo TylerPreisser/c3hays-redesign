@@ -28,7 +28,7 @@ export interface SectionMeta { id: string; visible: boolean; bg?: string; varian
 export interface ImgStyle { pos?: string; scale?: number }
 /** v7 (R4): site-wide visual-effect flags. Tyler-advanced; all OFF by default. */
 export interface FxFlags { sectionBleed?: boolean }
-export interface HomeContent { hero: HeroContent; mission: MissionContent; meetGrowServe: MeetGrowServeContent; nt26: NT26Content; give: GiveContent; stayConnected: StayConnectedContent; text: Record<string, string>; btn: Record<string, BtnStyle>; icon: Record<string, IconStyle>; sections: SectionMeta[]; img: Record<string, ImgStyle>; bgFill: Record<string, string>; anim: Record<string, string>; fx: FxFlags }
+export interface HomeContent { hero: HeroContent; mission: MissionContent; meetGrowServe: MeetGrowServeContent; nt26: NT26Content; give: GiveContent; stayConnected: StayConnectedContent; text: Record<string, string>; btn: Record<string, BtnStyle>; icon: Record<string, IconStyle>; sections: SectionMeta[]; img: Record<string, ImgStyle>; bgFill: Record<string, string>; anim: Record<string, string>; fx: FxFlags; freeOffsets?: Record<string, { x: number; y: number }> }
 
 /** v6 R6: entrance-animation preset for a tagged element (by its data-cms path), or
  *  undefined when none. Hand-mirrors the c3-backend accessor; the reveal player
@@ -174,5 +174,7 @@ export function fromStudioHome(raw: StudioHome | null | undefined): HomeContent 
     anim: (raw.anim && typeof raw.anim === "object" ? raw.anim : {}) as Record<string, string>,
     // v7 R4: site-wide fx flags. sectionBleed is OFF unless the studio explicitly sets true.
     fx: { sectionBleed: raw.fx?.sectionBleed === true },
+    // Drag-anywhere: per-element free-drag offsets (data-cms* selector → {x,y} px).
+    freeOffsets: (raw.freeOffsets && typeof raw.freeOffsets === "object" ? raw.freeOffsets : {}) as Record<string, { x: number; y: number }>,
   };
 }

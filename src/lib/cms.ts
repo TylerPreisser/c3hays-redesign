@@ -155,7 +155,15 @@ export interface CMSOverrides {
   nav?: { items?: { label: string; href: string }[]; bg?: string; color?: string; font?: string; effect?: "auto" | "solid" | "transparent" };
   /** Drag-anywhere: freeform elements placed at arbitrary spots on this page. */
   freeEls?: FreeEl[];
+  /** Drag-anywhere (any element): per-element free-drag OFFSETS applied to an EXISTING
+   *  in-flow element (button/text/image/icon). Keyed by the element's OWN data-cms*
+   *  attribute selector (e.g. `[data-cms="hero.title"]`, `[data-cms-link="give.cta"]`);
+   *  value is a pixel translate. Rendered as one scoped <style> (transform: translate) on
+   *  BOTH preview (draft) and the published site — so a dragged element persists. */
+  freeOffsets?: Record<string, FreeOffset>;
 }
+/** A per-element free-drag offset (px), applied via CSS `transform: translate(x,y)`. */
+export interface FreeOffset { x: number; y: number }
 /** A drag-anywhere freeform element (mirror of c3-backend FreeEl). Position is stored
  *  viewport-independent: x as a % of page width, y as px from the page content top. */
 export interface FreeEl {
@@ -190,4 +198,7 @@ export interface StudioHome {
   anim?: Record<string, string>;
   /** v7 (R4): site-wide visual-effect flags. Tyler-advanced, OFF by default (Kale never toggles). */
   fx?: { sectionBleed?: boolean };
+  /** Drag-anywhere (any element): per-element free-drag offsets on the HOME page.
+   *  Same shape/semantics as CMSOverrides.freeOffsets. */
+  freeOffsets?: Record<string, FreeOffset>;
 }

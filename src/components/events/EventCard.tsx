@@ -87,6 +87,14 @@ export interface EventCardProps {
   ctaHref?: string;
   ctaLabel?: string;
   ctaExternal?: boolean;
+  /**
+   * Optional footer slot rendered INSIDE the card body, at the bottom edge (within the
+   * card's boundary). Used by the live grid to place the per-event "Add to calendar"
+   * control in the card footer instead of underneath the card. Safe to nest interactive
+   * elements here ONLY when the card is an <article> (i.e. `ctaCmsKey` set / no whole-card
+   * <a>) — the footer is suppressed in the whole-card-link branch to avoid nested anchors.
+   */
+  footer?: ReactNode;
   className?: string;
   style?: CSSProperties;
 }
@@ -217,12 +225,17 @@ export default function EventCard({
   ctaHref,
   ctaLabel,
   ctaExternal,
+  footer,
   className,
   style,
 }: EventCardProps) {
   // Structured (authored) card → per-field data-cms path; else undefined (flat/live).
   const fieldPath = (field: string): string | undefined =>
     cardPath != null ? `${cardPath}.${field}` : undefined;
+  // Whole-card link only when a CTA link is NOT present (see the render branch below).
+  // The footer slot may hold interactive elements, so it is suppressed in that branch
+  // to avoid nesting a <button>/<a> inside the card's own <a> (invalid HTML).
+  const isWholeCardLink = Boolean(href) && ctaCmsKey == null;
   const surface: CSSProperties = {
     display: "flex",
     flexDirection: "column",
@@ -374,6 +387,17 @@ export default function EventCard({
             textDecoration: "none",
           }}
         />
+      )}
+      {footer != null && !isWholeCardLink && (
+        <div
+          style={{
+            marginTop: "1rem",
+            paddingTop: "0.9rem",
+            borderTop: "1px solid rgba(255,255,255,0.08)",
+          }}
+        >
+          {footer}
+        </div>
       )}
     </div>
   );

@@ -341,5 +341,5 @@ export default async function WatchPage({
   const known = new Set(["watch-hero", "watch-channels", "watch-ondemand"]);
   const visible = sections.filter((s) => known.has(s.id));
 
-  return <PageComposer sections={visible} bgFill={ov.bgFill} anim={ov.anim} render={render} freeEls={ov.freeEls} />;
+  return <PageComposer sections={visible} bgFill={ov.bgFill} anim={ov.anim} render={render} freeEls={ov.freeEls} freeOffsets={ov.freeOffsets} />;
 }

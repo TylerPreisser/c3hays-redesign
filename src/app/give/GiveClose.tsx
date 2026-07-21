@@ -8,10 +8,11 @@ export interface GiveCloseProps {
 
 /**
  * give-close — the mockup's `.close` band. A dark, centered closing call: eyebrow,
- * a large heading, one line of prose, and two buttons (primary "Give Now" → real
- * Pushpay; ghost "See the ways to give" → the #give-ways anchor above).
+ * a large heading, one line of prose, and a single primary "Give Now" button → real
+ * Pushpay. (The redundant "See the ways to give" ghost button that only scrolled to
+ * the #give-ways section on this same page was removed — no on-page self-links.)
  *
- * Server component. All copy is editable <Tx>; both buttons are <EditableLink>. The
+ * Server component. All copy is editable <Tx>; the button is an <EditableLink>. The
  * whole surface is recolorable via data-cms-bg. Layout in a scoped <style> (prefix `gc-`).
  */
 export default function GiveClose({ t }: GiveCloseProps) {
@@ -53,13 +54,6 @@ export default function GiveClose({ t }: GiveCloseProps) {
             label="Give Now"
             external
             className="btn btn-primary"
-          />
-          <EditableLink
-            text={t}
-            k="give-close-ways"
-            href="#give-ways"
-            label="See the ways to give"
-            className="btn btn-hero-ghost"
           />
         </div>
       </div>

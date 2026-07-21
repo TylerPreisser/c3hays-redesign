@@ -1,8 +1,9 @@
 import { buildBgCss } from "@/lib/backgrounds";
 import RevealPlayer from "@/components/cms/RevealPlayer";
 import FreeLayer from "@/components/cms/FreeLayer";
+import FreeOffsetStyle from "@/components/cms/FreeOffsetStyle";
 import type { SectionMeta } from "@/lib/home-content";
-import type { FreeEl } from "@/lib/cms";
+import type { FreeEl, FreeOffset } from "@/lib/cms";
 
 /**
  * PageComposer — the reusable Layer-2 section composer (generalized from home).
@@ -31,13 +32,15 @@ export interface PageComposerProps {
   render: (id: string, variant?: string) => React.ReactNode;
   /** Drag-anywhere freeform elements placed on this page (absolute overlay). */
   freeEls?: FreeEl[];
+  /** Drag-anywhere per-element offsets keyed by data-cms* selector (transform:translate). */
+  freeOffsets?: Record<string, FreeOffset>;
 }
 
 /** True when a stored bg value is an image (a `url(...)` shorthand), which is the
  *  only kind that renders as a continuous SPAN layer (colors/gradients don't span). */
 const isImageBg = (bg?: string): boolean => !!bg && /^\s*url\(/i.test(bg);
 
-export default function PageComposer({ sections, bgFill, anim, render, freeEls }: PageComposerProps) {
+export default function PageComposer({ sections, bgFill, anim, render, freeEls, freeOffsets }: PageComposerProps) {
   const visible = sections.filter((s) => s.visible);
   // Per-section AND per-tile background overrides → ONE scoped stylesheet (no
   // component edits). buildBgCss is the shared primitive mirrored from c3-backend.
@@ -90,6 +93,8 @@ export default function PageComposer({ sections, bgFill, anim, render, freeEls }
   return (
     <>
       {bgCss && <style dangerouslySetInnerHTML={{ __html: bgCss }} />}
+      {/* Drag-anywhere: per-element free-drag offsets for this page (transform:translate). */}
+      <FreeOffsetStyle offsets={freeOffsets} />
       {/* Play per-element entrance animations for this page's content. */}
       <RevealPlayer anim={anim ?? {}} />
       {hasFree ? (
