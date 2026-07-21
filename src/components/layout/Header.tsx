@@ -26,6 +26,16 @@ type BarEntry = { key: string; label: string; href?: string; cmsLink?: string; c
 export default function Header({ globals = {} }: { globals?: CMSOverrides }) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  // BUG #3 (nav not editable): inside C3 Studio the canvas iframe is ~1180px wide
+  // (<1280 because the right rail eats space), so the bar fell back to the MEDIUM
+  // "grouped" model whose top-level items are plain <button> group toggles with NO
+  // data-cms-link — i.e. not selectable/editable, and the real editable links were
+  // hidden inside closed dropdowns. In edit mode (cmsEdit=1) we force the FULL flat
+  // bar instead, where every top-level item IS a data-cms-link → editable again.
+  const [editMode, setEditMode] = useState(false);
+  useEffect(() => {
+    try { setEditMode(new URLSearchParams(window.location.search).get("cmsEdit") === "1"); } catch { /* noop */ }
+  }, []);
   const [openMenu, setOpenMenu] = useState<string | null>(null); // desktop dropdown open state (by entry key)
   const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({}); // mobile-drawer collapsible groups
   const pathname = usePathname();
@@ -219,14 +229,17 @@ export default function Header({ globals = {} }: { globals?: CMSOverrides }) {
           </Link>
 
           {/* MEDIUM bar (768–1279px): the 8 destinations folded into 4 dropdown GROUPS
-              so the bar never crowds or wraps on tablets / small laptops (G5). */}
-          <ul className="hidden md:flex xl:hidden items-center gap-0.5" role="list">
+              so the bar never crowds or wraps on tablets / small laptops (G5). HIDDEN in
+              edit mode (its group toggles aren't editable — see BUG #3). */}
+          <ul className={`${editMode ? "hidden" : "hidden md:flex xl:hidden"} items-center gap-0.5`} role="list">
             {groupEntries.map((e) => renderEntry(e, "px-2.5"))}
           </ul>
 
-          {/* FULL bar (≥1280px): every primary item inline, About/Locations dropdowns. */}
-          <ul className="hidden xl:flex items-center gap-1" role="list">
-            {fullEntries.map((e) => renderEntry(e, "px-3"))}
+          {/* FULL bar (≥1280px, OR always in edit mode): every primary item inline as an
+              editable data-cms-link, About/Locations dropdowns. In edit mode we show it
+              from md up (tighter px) so the editor canvas gets the editable bar. */}
+          <ul className={`${editMode ? "hidden md:flex" : "hidden xl:flex"} items-center gap-1`} role="list">
+            {fullEntries.map((e) => renderEntry(e, editMode ? "px-2" : "px-3"))}
           </ul>
 
           {/* Desktop right: secondary Give link + primary Plan-a-Visit CTA. Shown from md

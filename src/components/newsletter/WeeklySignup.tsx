@@ -2,7 +2,6 @@
 
 import { useState, type CSSProperties } from "react";
 import { Check } from "lucide-react";
-import { Tx } from "@/components/cms/Editable";
 import { tx } from "@/lib/home-content";
 
 /**
@@ -59,7 +58,6 @@ export default function WeeklySignup({ text = {}, bgKey = "weekly-signup-card", 
   };
 
   const onLight = tone === "onLight";
-  const labelColor = onLight ? "var(--color-ink)" : "#fff";
   const labelShadow = onLight ? undefined : "0 1px 3px rgba(0,0,0,0.55)";
   const doneColor = onLight ? "var(--color-teal-deep)" : "#fff";
   const errColor = onLight ? "#c0392b" : "#ffd7d0";
@@ -83,16 +81,10 @@ export default function WeeklySignup({ text = {}, bgKey = "weekly-signup-card", 
         </p>
       ) : (
         <form className="flex flex-col gap-2.5 w-full min-w-0" onSubmit={onSubmit} noValidate>
-          {/* Editable field label — ALSO the input's placeholder text (editing this
-              in the editor edits what the field prompts for). */}
-          <Tx
-            text={text}
-            k="weekly-signup-placeholder"
-            fallback="your@email.com"
-            as="label"
-            className="body-sm"
-            style={{ color: labelColor, fontWeight: 600, textShadow: labelShadow }}
-          />
+          {/* #6b: the redundant visible "your@email.com" label ABOVE the field is REMOVED
+              (it duplicated the input's own placeholder). The field keeps a screen-reader
+              label via aria-label, and the placeholder is still driven by the
+              `weekly-signup-placeholder` text key below — no visible duplication. */}
           <div className="flex flex-col sm:flex-row gap-2.5 w-full min-w-0">
             <input
               id="weekly-signup-email"

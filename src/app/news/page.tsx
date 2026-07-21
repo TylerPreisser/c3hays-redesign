@@ -71,7 +71,7 @@ export default async function NewsPage({
             {/* Editable background photo (#8: KEEP the top image). */}
             <div className="absolute inset-0" data-cms-img="weekly-hero-photo">
               <Image
-                src={assetPath(media["weekly-hero-photo"] || "/images/gather.webp")}
+                src={assetPath(media["weekly-hero-photo"] || "/images/congregation.webp")}
                 alt="The C3 Weekly"
                 fill
                 priority
@@ -127,7 +127,11 @@ export default async function NewsPage({
       case "weekly-list":
         return (
           <Section
-            style={{ backgroundColor: "var(--color-paper-soft)", color: "var(--color-ink-warm)" }}
+            /* #6c: retheme off the muddy tan (--color-paper-soft) to the clean premium
+               on-brand paper (teal/paper/ink), consistent with the rest of the site —
+               a crisp warm-white field so the white issue cards + teal accents read
+               premium instead of beige. */
+            style={{ backgroundColor: "var(--color-paper)", color: "var(--color-ink)" }}
             bgKey="weekly-list-bg"
           >
             <div style={{ width: `min(100% - 2 * ${GUTTER}, 1600px)`, marginInline: "auto" }}>

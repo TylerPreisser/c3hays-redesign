@@ -134,28 +134,9 @@ export default async function LocationsPage({
         return (
           /* ── Campus cards ── */
           <Section tone="white" container>
-            {/* Section header */}
-            <Stack gap="heading" style={{ maxWidth: 660, marginBottom: "var(--space-block)" }}>
-              <h2
-                className="display-2"
-                data-cms="t:locations-section-heading"
-                dangerouslySetInnerHTML={{
-                  __html: tx(t, "locations-section-heading", "Find your campus."),
-                }}
-              />
-              <p
-                className="body-lg"
-                data-cms="t:locations-section-intro"
-                style={{ color: "var(--color-mute)" }}
-                dangerouslySetInnerHTML={{
-                  __html: tx(
-                    t,
-                    "locations-section-intro",
-                    "We have two locations across northwest Kansas — each with the same heart, the same mission, and a warm welcome waiting for you."
-                  ),
-                }}
-              />
-            </Stack>
+            {/* #5: the redundant lower "Find your campus." header + intro is REMOVED —
+                the hero above ("Two campuses. One church family.") already titles the
+                page, so this section now shows ONLY the campus cards. */}
 
             {/* 2-up campus cards */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">

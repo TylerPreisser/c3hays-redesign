@@ -140,7 +140,7 @@ export default async function BeliefsPage({
 
       case "beliefs-statements":
         return (
-          <section className="section" style={{ backgroundColor: "#ffffff" }}>
+          <section className="section" style={{ backgroundColor: "var(--color-paper)" }}>
             <div className="container-c3">
               <div className="flex flex-col lg:flex-row lg:gap-20 xl:gap-28">
 

@@ -55,6 +55,14 @@ export default function EditBridge() {
          in the editor. Anchoring is now done in JS, only for elements whose COMPUTED
          position is static (see ensureAnchored). */
       [data-cms], [data-cms-img], [data-cms-link], [data-cms-icon], [data-cms-bg]{ border-radius:7px; }
+      /* BUG #1 (mission layout jump): editable headings use text-wrap:balance, which the
+         browser RE-COMPUTES the moment the element becomes a focused contenteditable —
+         re-wrapping e.g. the mission statement 3→4 lines and JUMPING the section height
+         (473→553px) on hover/select/focus. Forcing a stable, non-balanced wrap in EDIT
+         MODE ONLY (this sheet is injected only when cmsEdit=1) makes the idle and focused
+         layouts identical, so the section height is STABLE while editing. The published
+         site (no cmsEdit) keeps text-wrap:balance untouched. */
+      [data-cms]{ text-wrap: normal !important; }
       [data-cms]{ cursor:text; transition:background-color .12s ease; }
       [data-cms]:hover{ background-color: rgba(28,195,175,.05); }
       [data-cms-img], [data-cms-link], [data-cms-icon], [data-cms-bg]{ cursor:pointer; }
