@@ -1,4 +1,4 @@
-import { Smartphone, MessageSquare, Landmark, Mail } from "lucide-react";
+import { Smartphone, Landmark, Mail } from "lucide-react";
 import { site } from "@/data/site";
 import { Tx, EditableLink } from "@/components/cms/Editable";
 
@@ -135,23 +135,6 @@ export default function GiveWays({ t }: GiveWaysProps) {
                   label="Download for iPhone &rarr;"
                   external
                   className="gw-method__link"
-                />
-              </div>
-            </div>
-
-            {/* Text to give */}
-            <div className="gw-method">
-              <div className="gw-method__ic" aria-hidden>
-                <MessageSquare size={22} strokeWidth={1.75} />
-              </div>
-              <div>
-                <Tx as="h3" text={t} k="give-ways-text-title" fallback="Text to give" className="gw-method__t" />
-                <Tx
-                  as="p"
-                  text={t}
-                  k="give-ways-text-body"
-                  fallback='Text <span class="gw-kw">GIVE</span> to <span class="gw-kw">84321</span> and follow the link to give in seconds &mdash; no app required.'
-                  className="gw-method__b"
                 />
               </div>
             </div>

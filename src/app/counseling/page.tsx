@@ -194,7 +194,7 @@ export default async function CounselingPage({
             as="span"
             text={t}
             k="counseling-vision-body"
-            fallback="A team approach to counseling, centered around trained, Biblically-based counselors — helping you develop spiritually, emotionally, and relationally."
+            fallback="Celebration Community Church has a passion to help people to develop and grow in their relationship with God, through His Son, Jesus Christ — a team approach to Biblically-based counseling."
             style={{ color: "var(--color-stone)" }}
           />
         }
@@ -353,17 +353,17 @@ export default async function CounselingPage({
               className="flex flex-col gap-3 body-sm"
               style={{ color: "rgba(255,255,255,0.66)", marginTop: "var(--space-heading)" }}
             >
-              <PolicyLine k="counseling-fee-rate" t={t} fallback="$75 / session (reduced rate)" />
+              <PolicyLine k="counseling-fee-rate" t={t} fallback="$75 / session" />
               <PolicyLine
                 k="counseling-fee-payment"
                 t={t}
-                fallback="Cash, check, credit card (some counselors), or Venmo"
+                fallback="Cash or check — some counselors also accept credit card and Venmo"
               />
-              <PolicyLine k="counseling-fee-due" t={t} fallback="Payment due at the time of appointment" />
+              <PolicyLine k="counseling-fee-due" t={t} fallback="All payments due to your counselor at the time of your appointment" />
               <PolicyLine
                 k="counseling-fee-scholarship"
                 t={t}
-                fallback="Scholarships available on a case-by-case basis"
+                fallback="Scholarships may be available"
               />
             </ul>
           </FeatureCard>
@@ -384,12 +384,12 @@ export default async function CounselingPage({
               <PolicyLine
                 k="counseling-cancel-notice"
                 t={t}
-                fallback="24-hour notice required for cancellations"
+                fallback="Please cancel more than 24 hours prior to your appointment"
               />
               <PolicyLine
                 k="counseling-cancel-noshow"
                 t={t}
-                fallback="No-shows are charged the $75 session fee"
+                fallback="Appointments not cancelled 24 hours prior are charged the $75 session fee"
               />
             </ul>
           </FeatureCard>
@@ -410,17 +410,12 @@ export default async function CounselingPage({
               <PolicyLine
                 k="counseling-start-step1"
                 t={t}
-                fallback="Email office@celebratejesus.org or call (785) 625-5483"
+                fallback="Email office@celebratejesus.org to request an appointment"
               />
               <PolicyLine
                 k="counseling-start-step2"
                 t={t}
-                fallback="We&apos;ll match you with a trained counselor for your needs"
-              />
-              <PolicyLine
-                k="counseling-start-step3"
-                t={t}
-                fallback="In crisis? Call or text 988 (Suicide &amp; Crisis Lifeline)"
+                fallback="Or call the church office at (785) 625-5483"
               />
             </ul>
           </FeatureCard>
