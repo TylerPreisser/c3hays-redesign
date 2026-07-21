@@ -524,7 +524,9 @@ export default function EditBridge() {
         e.preventDefault(); e.stopPropagation(); clearSel(); link.classList.add("cms-sel");
         selPath = `[data-cms-link="${link.getAttribute("data-cms-link")}"]`;
         const lab = (link.querySelector("[data-cms-link-label]") as HTMLElement)?.innerText ?? link.innerText;
-        post({ type: "cms:select", kind: "link", path: link.getAttribute("data-cms-link"), label: lab, href: (link as HTMLAnchorElement).getAttribute?.("href") || "" });
+        // ITEM 3: carry the button's inner HTML so the editor preview can render an
+        // ICON-only button (Facebook/Instagram/YouTube) as its real icon, not "button".
+        post({ type: "cms:select", kind: "link", path: link.getAttribute("data-cms-link"), label: lab, href: (link as HTMLAnchorElement).getAttribute?.("href") || "", html: link.innerHTML });
         log("select-link", { path: link.getAttribute("data-cms-link") });
         return;
       }
@@ -534,7 +536,9 @@ export default function EditBridge() {
       if (bg && !text && !img && !link && !icon) {
         e.preventDefault(); e.stopPropagation(); clearSel(); bg.classList.add("cms-sel");
         selPath = `[data-cms-bg="${bg.getAttribute("data-cms-bg")}"]`;
-        post({ type: "cms:select", kind: "bg", path: bg.getAttribute("data-cms-bg") });
+        // ITEM 4: carry the tile's ACTUAL rendered background so the editor's picker
+        // swatch shows the CURRENT color even when no bgFill override is saved yet.
+        post({ type: "cms:select", kind: "bg", path: bg.getAttribute("data-cms-bg"), value: getComputedStyle(bg).backgroundColor });
         log("select-bg", { path: bg.getAttribute("data-cms-bg") });
         return;
       }
