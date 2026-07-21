@@ -8,10 +8,10 @@ import PageComposer from "@/components/cms/PageComposer";
 
 /* Brand marks as inline SVGs (this lucide build ships no brand icons — matches the
    Footer + Watch page's inline-SVG convention). currentColor drives the fill. */
-function VimeoIcon({ size = 15, style }: { size?: number; style?: React.CSSProperties }) {
+function YouTubeIcon({ size = 15, style }: { size?: number; style?: React.CSSProperties }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" style={style}>
-      <path d="M23.98 6.5c-.1 2.34-1.74 5.55-4.9 9.62C15.8 20.36 13 22.5 10.66 22.5c-1.45 0-2.68-1.34-3.68-4.02L5.31 11.9C4.57 9.22 3.78 7.88 2.93 7.88c-.18 0-.83.39-1.93 1.17L0 7.83c1.26-1.11 2.5-2.22 3.72-3.33 1.68-1.45 2.94-2.21 3.78-2.29 1.98-.19 3.2 1.17 3.66 4.07.5 3.13.84 5.08 1.03 5.84.57 2.61 1.2 3.91 1.89 3.91.54 0 1.34-.85 2.42-2.55 1.07-1.7 1.65-2.99 1.72-3.88.14-1.32-.38-1.98-1.55-1.98-.55 0-1.13.13-1.71.38 1.14-3.74 3.32-5.56 6.54-5.46 2.39.07 3.51 1.62 3.37 4.64z" />
+      <path d="M23.5 6.2a3.02 3.02 0 0 0-2.12-2.14C19.5 3.55 12 3.55 12 3.55s-7.5 0-9.38.51A3.02 3.02 0 0 0 .5 6.2 31.6 31.6 0 0 0 0 12a31.6 31.6 0 0 0 .5 5.8 3.02 3.02 0 0 0 2.12 2.14c1.88.51 9.38.51 9.38.51s7.5 0 9.38-.51a3.02 3.02 0 0 0 2.12-2.14A31.6 31.6 0 0 0 24 12a31.6 31.6 0 0 0-.5-5.8zM9.55 15.57V8.43L15.82 12l-6.27 3.57z" />
     </svg>
   );
 }
@@ -26,12 +26,12 @@ function FacebookIcon({ size = 15, style }: { size?: number; style?: React.CSSPr
 export const metadata: Metadata = {
   title: "Messages",
   description:
-    "Watch and listen to messages from Celebration Community Church — live on Facebook and on demand in our Vimeo archive.",
+    "Watch and listen to messages from Celebration Community Church — live on Facebook and on demand on our YouTube channel.",
 };
 
-/* Real destinations, sourced from celebratejesus.org/messages + /watch-online:
-   past messages live in the Vimeo archive; the weekend service streams on Facebook Live. */
-const VIMEO = "https://vimeo.com/c3hays";
+/* Real destinations (verified platforms): past messages live on YouTube
+   (youtube.com/@c3hays); the weekend service streams on Facebook Live. */
+const YOUTUBE = "https://youtube.com/@c3hays";
 const FACEBOOK_LIVE = "https://facebook.com/c3hays/videos";
 
 /**
@@ -41,7 +41,7 @@ const FACEBOOK_LIVE = "https://facebook.com/c3hays/videos";
  * campus pastors). Three editor-native sections composed via <PageComposer>:
  *   • messages-hero    → full-bleed hero image + dark gradient
  *   • messages-banner  → real service-times band + Watch Live CTA
- *   • messages-archive → "Past Messages" — Vimeo archive + Facebook Live
+ *   • messages-archive → "Past Messages" — YouTube archive + Facebook Live
  *
  * Every heading/body is data-cms tagged and every button is an editable link.
  */
@@ -128,7 +128,7 @@ export default async function MessagesPage({
                   __html: tx(
                     t,
                     "messages-hero-body",
-                    "Miss a Sunday? Every message is on demand in our Vimeo archive — or join the live stream this weekend."
+                    "Miss a Sunday? Every message is on demand on our YouTube channel — or join the live stream this weekend."
                   ),
                 }}
               />
@@ -186,7 +186,7 @@ export default async function MessagesPage({
 
       case "messages-archive":
         return (
-          /* ── Past Messages — Vimeo archive + Facebook Live (REAL) ── */
+          /* ── Past Messages — YouTube archive + Facebook Live (REAL) ── */
           <section className="section" style={{ backgroundColor: "#1b1c1c" }}>
             <div className="container-c3">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-16 lg:gap-24 items-center">
@@ -227,23 +227,23 @@ export default async function MessagesPage({
                       __html: tx(
                         t,
                         "messages-archive-body",
-                        "Missed a weekend? Our full message archive lives on Vimeo — catch up anytime, from anywhere. Or join us live on Facebook every Saturday and Sunday."
+                        "Missed a weekend? Our full message archive lives on YouTube — catch up anytime, from anywhere. Or join us live on Facebook every Saturday and Sunday."
                       ),
                     }}
                   />
                   <div className="flex flex-wrap gap-3">
                     <a
-                      href={t["messages-archive-cta-href"] || VIMEO}
+                      href={t["messages-archive-cta-href"] || YOUTUBE}
                       data-cms-link="messages-archive-cta"
                       target="_blank"
                       rel="noopener noreferrer"
                       className="btn btn-primary btn-lg inline-flex items-center gap-2"
                     >
-                      <VimeoIcon size={16} />
+                      <YouTubeIcon size={16} />
                       <span
                         data-cms-link-label
                         dangerouslySetInnerHTML={{
-                          __html: tx(t, "messages-archive-cta-label", "Past Messages on Vimeo"),
+                          __html: tx(t, "messages-archive-cta-label", "Past Messages on YouTube"),
                         }}
                       />
                     </a>

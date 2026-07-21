@@ -4,7 +4,6 @@ import { isCmsLive } from "@/lib/cms-live";
 import { parseSections, type SectionMeta } from "@/lib/home-content";
 import PageComposer from "@/components/cms/PageComposer";
 import GiveHero from "./GiveHero";
-import GiveImpact from "./GiveImpact";
 import GiveWays from "./GiveWays";
 import GiveClose from "./GiveClose";
 
@@ -21,7 +20,6 @@ export const metadata: Metadata = {
  */
 const PAGE_DEFAULT_SECTIONS: SectionMeta[] = [
   { id: "give-hero", visible: true },
-  { id: "give-impact", visible: true },
   { id: "give-ways", visible: true },
   { id: "give-close", visible: true },
 ];
@@ -60,8 +58,6 @@ export default async function GivePage({
     switch (id) {
       case "give-hero":
         return <GiveHero t={t} media={media} img={img} />;
-      case "give-impact":
-        return <GiveImpact t={t} />;
       case "give-ways":
         return <GiveWays t={t} />;
       case "give-close":

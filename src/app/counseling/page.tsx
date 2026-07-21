@@ -35,6 +35,7 @@ export const metadata: Metadata = {
 /** MUST match c3-backend `page-sections.ts` `/counseling` verbatim (shared key-space). */
 const PAGE_DEFAULT_SECTIONS: SectionMeta[] = [
   { id: "counseling-hero", visible: true },
+  { id: "counseling-vision", visible: true },
   { id: "counseling-team", visible: true },
   { id: "counseling-fees", visible: true },
 ];
@@ -93,6 +94,18 @@ export default async function CounselingPage({
   const t = ov.text || {};
   const media = ov.media || {};
   const sections = parseSections(ov.sections, PAGE_DEFAULT_SECTIONS);
+
+  // Reconcile: the C3-Studio published sections for /counseling predate the
+  // dedicated "Our Vision for Counseling" section, so an already-persisted list
+  // ([counseling-hero, counseling-team, counseling-fees]) would omit it. If it's
+  // missing, insert it right after the hero so the vision always renders
+  // (idempotent — no duplicate when the persisted list already includes it).
+  if (!sections.some((s) => s.id === "counseling-vision")) {
+    const i = sections.findIndex((s) => s.id === "counseling-hero");
+    const item: SectionMeta = { id: "counseling-vision", visible: true };
+    if (i >= 0) sections.splice(i + 1, 0, item);
+    else sections.unshift(item);
+  }
 
   /* ── counseling-hero — top photo band, editable photo + headline + primary CTA ── */
   const heroSection = (
@@ -171,7 +184,58 @@ export default async function CounselingPage({
     </section>
   );
 
-  /* ── counseling-team — mission intro + redesigned, editor-native counselor cards ── */
+  /* ── counseling-vision — the church's real vision for counseling, given its own
+        premium on-brand band so it reads as the heart of the page (not buried in a
+        section header). Content verbatim-grounded in celebratejesus.org/counseling. ── */
+  const visionSection = (
+    <Section
+      container
+      style={{ background: "var(--color-paper-soft)", color: "var(--color-ink-warm)" }}
+    >
+      <div
+        data-anim="fadeInUp"
+        style={{ maxWidth: "50rem", marginInline: "auto", textAlign: "center" }}
+      >
+        <Tx
+          as="p"
+          className="overline"
+          style={{ color: "var(--color-teal)" }}
+          text={t}
+          k="counseling-vision-eyebrow"
+          fallback="Our Vision"
+        />
+        <Tx
+          as="h2"
+          className="display-2 text-balance"
+          style={{ color: "var(--color-ink-warm)", marginTop: "var(--space-eyebrow)" }}
+          text={t}
+          k="counseling-vision-heading"
+          fallback="Our Vision for Counseling"
+        />
+        {/* Teal rule — small on-brand divider under the vision heading. */}
+        <div
+          aria-hidden="true"
+          style={{
+            width: "3rem",
+            height: 3,
+            borderRadius: 2,
+            background: "var(--color-teal)",
+            margin: "var(--space-heading) auto",
+          }}
+        />
+        <Tx
+          as="p"
+          className="body-lg text-balance"
+          text={t}
+          k="counseling-vision-body"
+          fallback="Celebration Community Church has a passion to help people develop and grow in their relationship with God, through His Son, Jesus Christ. Through a team approach to Bible-based counseling, our trained counselors walk with you toward spiritually, emotionally, and relationally healthy relationships with God and others."
+          style={{ color: "var(--color-stone)", marginTop: "var(--space-heading)", lineHeight: 1.75 }}
+        />
+      </div>
+    </Section>
+  );
+
+  /* ── counseling-team — the three real counselors as editor-native cards ── */
   const teamSection = (
     <Section
       container
@@ -180,21 +244,21 @@ export default async function CounselingPage({
       <SectionHeader
         leadMaxWidth="48rem"
         style={{ marginBottom: "var(--space-block)" }}
-        eyebrow={<Tx text={t} k="counseling-vision-eyebrow" fallback="Our Team" />}
+        eyebrow={<Tx text={t} k="counseling-team-eyebrow" fallback="Our Team" />}
         title={
           <Tx
             as="span"
             text={t}
-            k="counseling-vision-heading"
-            fallback="Whole people, through Christ."
+            k="counseling-team-heading"
+            fallback="Meet the counselors"
           />
         }
         lead={
           <Tx
             as="span"
             text={t}
-            k="counseling-vision-body"
-            fallback="Celebration Community Church has a passion to help people to develop and grow in their relationship with God, through His Son, Jesus Christ — a team approach to Biblically-based counseling."
+            k="counseling-team-lead"
+            fallback="A team approach to Bible-based counseling — trained counselors ready to walk with you toward wholeness in Christ."
             style={{ color: "var(--color-stone)" }}
           />
         }
@@ -428,6 +492,8 @@ export default async function CounselingPage({
     switch (id) {
       case "counseling-hero":
         return heroSection;
+      case "counseling-vision":
+        return visionSection;
       case "counseling-team":
         return teamSection;
       case "counseling-fees":

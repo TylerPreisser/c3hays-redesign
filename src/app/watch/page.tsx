@@ -10,10 +10,10 @@ import PageComposer from "@/components/cms/PageComposer";
 
 /* Brand marks as inline SVGs (this lucide build has no brand icons — matches the
    Footer's inline-SVG convention). currentColor drives the fill. */
-function VimeoIcon({ size = 24, style }: { size?: number; style?: React.CSSProperties }) {
+function YouTubeIcon({ size = 24, style }: { size?: number; style?: React.CSSProperties }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" style={style}>
-      <path d="M23.98 6.5c-.1 2.34-1.74 5.55-4.9 9.62C15.8 20.36 13 22.5 10.66 22.5c-1.45 0-2.68-1.34-3.68-4.02L5.31 11.9C4.57 9.22 3.78 7.88 2.93 7.88c-.18 0-.83.39-1.93 1.17L0 7.83c1.26-1.11 2.5-2.22 3.72-3.33 1.68-1.45 2.94-2.21 3.78-2.29 1.98-.19 3.2 1.17 3.66 4.07.5 3.13.84 5.08 1.03 5.84.57 2.61 1.2 3.91 1.89 3.91.54 0 1.34-.85 2.42-2.55 1.07-1.7 1.65-2.99 1.72-3.88.14-1.32-.38-1.98-1.55-1.98-.55 0-1.13.13-1.71.38 1.14-3.74 3.32-5.56 6.54-5.46 2.39.07 3.51 1.62 3.37 4.64z" />
+      <path d="M23.5 6.2a3.02 3.02 0 0 0-2.12-2.14C19.5 3.55 12 3.55 12 3.55s-7.5 0-9.38.51A3.02 3.02 0 0 0 .5 6.2 31.6 31.6 0 0 0 0 12a31.6 31.6 0 0 0 .5 5.8 3.02 3.02 0 0 0 2.12 2.14c1.88.51 9.38.51 9.38.51s7.5 0 9.38-.51a3.02 3.02 0 0 0 2.12-2.14A31.6 31.6 0 0 0 24 12a31.6 31.6 0 0 0-.5-5.8zM9.55 15.57V8.43L15.82 12l-6.27 3.57z" />
     </svg>
   );
 }
@@ -28,13 +28,12 @@ function FacebookIcon({ size = 24, style }: { size?: number; style?: React.CSSPr
 export const metadata: Metadata = {
   title: "Watch Online",
   description:
-    "Watch Celebration Community Church online — live on Facebook and on demand in our Vimeo archive.",
+    "Watch Celebration Community Church online — live on Facebook and on demand on our YouTube channel.",
 };
 
-/* Real destinations, sourced from celebratejesus.org/watch-online:
-   the weekend service streams on Facebook Live; the past-message archive lives on
-   Vimeo. (The real site has no YouTube channel.) */
-const VIMEO = "https://vimeo.com/c3hays";
+/* Real destinations (verified platforms): the weekend service streams on Facebook
+   Live; the past-message archive lives on YouTube (youtube.com/@c3hays). */
+const YOUTUBE = "https://youtube.com/@c3hays";
 const FACEBOOK_LIVE = "https://facebook.com/c3hays/videos";
 
 /**
@@ -43,8 +42,8 @@ const FACEBOOK_LIVE = "https://facebook.com/c3hays/videos";
  * Composed via <PageComposer> from THREE editor-native sections whose ids match
  * the c3-backend page-sections default for /watch:
  *   • watch-hero     → inline hero band (photo + eyebrow/headline/subhead).
- *   • watch-channels → "Two ways to watch" (Facebook Live + Vimeo archive cards).
- *   • watch-ondemand → "Catch up on demand" (messages + Vimeo CTAs).
+ *   • watch-channels → "Two ways to watch" (Facebook Live + YouTube archive cards).
+ *   • watch-ondemand → "Catch up on demand" (messages + YouTube CTAs).
  *
  * PageComposer wraps each visible section in `<div data-section={id}>` and injects
  * the scoped per-section/per-tile background stylesheet, so the editor rail can
@@ -96,15 +95,15 @@ export default async function WatchPage({
       defaultCta: "Watch on Facebook",
     },
     {
-      id: "vimeo",
-      Icon: VimeoIcon,
-      href: VIMEO,
-      accent: "#1ab7ea",
+      id: "youtube",
+      Icon: YouTubeIcon,
+      href: YOUTUBE,
+      accent: "#ff0000",
       image: "/images/gather.webp",
-      defaultLabel: "Vimeo",
+      defaultLabel: "YouTube",
       defaultTitle: "Past Messages",
       defaultBody:
-        "Every past message, on demand in our Vimeo archive — catch up anytime, from anywhere.",
+        "Every past message, on demand on our YouTube channel — catch up anytime, from anywhere.",
       defaultCta: "Open the archive",
     },
   ];
@@ -167,7 +166,7 @@ export default async function WatchPage({
           </section>
         );
 
-      // ── Two ways to watch: Facebook Live + Vimeo archive ─────────
+      // ── Two ways to watch: Facebook Live + YouTube archive ─────────
       case "watch-channels":
         return (
           <section style={{ backgroundColor: "#0a0a0a" }} className="section">
@@ -303,7 +302,7 @@ export default async function WatchPage({
                     __html: tx(
                       t,
                       "watch-ondemand-body",
-                      "Browse every message in one place &mdash; or head to our Vimeo archive."
+                      "Browse every message in one place &mdash; or head to our YouTube channel."
                     ),
                   }}
                 />
@@ -318,14 +317,14 @@ export default async function WatchPage({
                     </span>
                   </Link>
                   <a
-                    href={t["watch-vimeo-btn-href"] || VIMEO}
+                    href={t["watch-youtube-btn-href"] || YOUTUBE}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="btn btn-outline-ink btn-lg"
-                    data-cms-link="watch-vimeo-btn"
+                    data-cms-link="watch-youtube-btn"
                   >
                     <span data-cms-link-label>
-                      {tx(t, "watch-vimeo-btn-label", "Past messages on Vimeo")}
+                      {tx(t, "watch-youtube-btn-label", "Past messages on YouTube")}
                     </span>
                   </a>
                 </div>
