@@ -40,6 +40,15 @@ import LocationsSection from "@/components/home/LocationsSection";
 import StayConnected from "@/components/home/StayConnected";
 import GiveSection from "@/components/home/GiveSection";
 import WeeklySignup from "@/components/newsletter/WeeklySignup";
+// Re-added liked section designs (rebuilt fabrication-free with neutral editable
+// placeholders; CampusMap carries the church's REAL Hays/Colby data + is responsive).
+import EditorialRows from "@/components/home/EditorialRows";
+import ResourceGrid from "@/components/home/ResourceGrid";
+import SermonPlayer from "@/components/home/SermonPlayer";
+import WatchHub from "@/components/home/WatchHub";
+import SeriesArchive from "@/components/home/SeriesArchive";
+import MediaCarousel from "@/components/home/MediaCarousel";
+import CampusMap from "@/components/home/CampusMap";
 
 export interface VariantDef { key: string; label: string }
 export interface SectionExampleDef {
@@ -83,6 +92,14 @@ export const SECTION_EXAMPLES: SectionExampleDef[] = [
   // ALSO addable as a standalone section. id "weeklySignup" MUST match c3-backend
   // HOME_SECTION_DEFS + the appended blocks.ts BLOCK_LIST entry verbatim.
   { id: "weeklySignup", label: "Newsletter signup", icon: "Mail", group: "Calls to action", description: "A transparent email-capture field + button — join The C3 Weekly.", variants: [] },
+  // ── Re-added liked designs (fabrication-free, neutral editable placeholders) ──
+  { id: "editorialRows", label: "Editorial Rows", icon: "Newspaper", group: "Feature", description: "Alternating image/text dispatches — an editorial storytelling stack.", variants: [] },
+  { id: "resourceGrid", label: "Resource Grid", icon: "LayoutGrid", group: "Cards & grids", description: "Filterable cards for messages, articles, guides and a featured resource.", variants: [] },
+  { id: "sermonPlayer", label: "Sermon Player", icon: "PlayCircle", group: "Media", description: "A working message player — art panel, scrubber and transport controls.", variants: [] },
+  { id: "watchHub", label: "Watch / Listen Hub", icon: "Video", group: "Media", description: "Side-by-side watch + listen panels with an episode picker.", variants: [] },
+  { id: "seriesArchive", label: "Series Archive", icon: "LibraryBig", group: "Media", description: "A poster grid of your message series with scripture refs.", variants: [] },
+  { id: "mediaCarousel", label: "Media Carousel", icon: "GalleryHorizontal", group: "Media", description: "A filterable, swipeable carousel of messages, audio and playlists.", variants: [] },
+  { id: "campusMap", label: "Campus Map", icon: "Map", group: "Visit", description: "An interactive map with campus pins and a live details card.", variants: [] },
 ];
 
 /** All example ids (for the shoot harness + preview route param generation). */
@@ -127,6 +144,14 @@ export function renderExample(id: string, c: HomeContent, variant?: string): Rea
     // Standalone placement → "onLight" tone so the field/label read on a light
     // section (the hero placement in news/page.tsx uses the default "onDark").
     case "weeklySignup": return <WeeklySignup text={c.text} tone="onLight" />;
+    // ── Re-added liked designs (fabrication-free) ──
+    case "editorialRows": return <EditorialRows text={c.text} btnStyle={c.btn["editorial.cta"]} variant={variant} />;
+    case "resourceGrid": return <ResourceGrid text={c.text} btnStyle={c.btn["resource.cta"]} variant={variant} />;
+    case "sermonPlayer": return <SermonPlayer text={c.text} btnStyle={c.btn["splayer.cta"]} variant={variant} />;
+    case "watchHub": return <WatchHub text={c.text} btnStyle={c.btn["whub.cta"]} variant={variant} />;
+    case "seriesArchive": return <SeriesArchive text={c.text} btnStyle={c.btn["sarchive.cta"]} variant={variant} />;
+    case "mediaCarousel": return <MediaCarousel text={c.text} btnStyle={c.btn["mcarousel.cta"]} variant={variant} />;
+    case "campusMap": return <CampusMap text={c.text} btnStyle={c.btn["campusmap.cta"]} variant={variant} />;
     default: return null;
   }
 }

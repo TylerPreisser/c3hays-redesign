@@ -561,7 +561,23 @@ export default function EditBridge() {
       if (a && !text) { e.preventDefault(); e.stopPropagation(); log("blocked-nav", { to: (a as HTMLAnchorElement).getAttribute?.("href") || "" }); }
       if (a && text) e.preventDefault();
     };
-    const onDocClick = (e: MouseEvent) => { const t = e.target as HTMLElement; if (!t?.closest?.("[data-cms]") && !t?.closest?.("#c3-toolbar") && !t?.closest?.("#c3-fontmenu")) hideBar(); };
+    const onDocMouseDown = (e: MouseEvent) => {
+      const t = e.target as HTMLElement;
+      if (!t?.closest?.("[data-cms]") && !t?.closest?.("#c3-toolbar") && !t?.closest?.("#c3-fontmenu")) hideBar();
+      // BUG #2 (click section/tile BACKGROUND highlights TEXT): the browser places a
+      // text caret AND starts a text selection on mousedown — BEFORE our click handler
+      // (onClick) gets to route the click to background / section selection. So the
+      // nearest editable text got caret-focused + highlighted instead of the background
+      // being selected. FIX: on mousedown, if the target is NOT inside a tagged text
+      // region ([data-cms]) but IS inside a selectable OBJECT (bg tile / image / link /
+      // icon / section wrapper), preventDefault → no caret, no text-selection. The click
+      // handler below still fires and selects that background/section. Clicking ACTUAL
+      // text ([data-cms] present) is untouched, so normal in-place editing still works.
+      if (t?.closest?.("[data-cms]")) return; // real text — let the caret land
+      if (t === bgChip || t === imgChip || t === cardDelChip || t?.closest?.("#c3-toolbar") || t?.closest?.("#c3-fontmenu")) return;
+      const obj = t?.closest?.("[data-cms-bg],[data-cms-img],[data-cms-link],[data-cms-icon],[data-section]");
+      if (obj) { e.preventDefault(); }
+    };
 
     // v4 R2: position the recolor chip at the top-RIGHT of the hovered tile.
     const positionBgChip = (el: HTMLElement) => {
@@ -606,7 +622,7 @@ export default function EditBridge() {
     document.addEventListener("input", onInput, true);
     document.addEventListener("selectionchange", onSelChange);
     document.addEventListener("click", onClick, true);
-    document.addEventListener("mousedown", onDocClick, true);
+    document.addEventListener("mousedown", onDocMouseDown, true);
     document.addEventListener("mouseover", onOver, true);
     window.addEventListener("scroll", () => { if (bar.style.display === "flex") positionBar(); bgChip.style.display = "none"; imgChip.style.display = "none"; cardDelChip.style.display = "none"; }, true);
 
@@ -645,7 +661,7 @@ export default function EditBridge() {
       document.removeEventListener("input", onInput, true);
       document.removeEventListener("selectionchange", onSelChange);
       document.removeEventListener("click", onClick, true);
-      document.removeEventListener("mousedown", onDocClick, true);
+      document.removeEventListener("mousedown", onDocMouseDown, true);
       document.removeEventListener("mouseover", onOver, true);
       window.removeEventListener("message", onMsg);
       els.forEach((el) => el.removeAttribute("contenteditable"));
