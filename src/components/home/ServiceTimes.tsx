@@ -69,7 +69,7 @@ export default function ServiceTimes({
           <h2 data-cms="t:svc-heading" className="display-2 text-white" style={{ margin: 0 }}
             dangerouslySetInnerHTML={{ __html: tx(text, "svc-heading", "Service Times") }} />
           <p data-cms="t:svc-band-times" className="body-lg" style={{ color: "rgba(255,255,255,0.75)", maxWidth: 620, margin: 0 }}
-            dangerouslySetInnerHTML={{ __html: tx(text, "svc-band-times", "Hays &mdash; Saturday 6:00pm &amp; Sunday 9:00 / 11:00am &nbsp;&bull;&nbsp; Colby &mdash; Sunday 10:00am") }} />
+            dangerouslySetInnerHTML={{ __html: tx(text, "svc-band-times", "Hays &mdash; Saturday 5:00pm &amp; Sunday 8:00, 9:30 &amp; 11:00am &nbsp;&bull;&nbsp; Colby &mdash; Sunday 10:00am") }} />
           <a href={text?.["svc.cta-href"] || "/visit/"} data-cms-link="svc.cta" className="btn"
             style={btnCss(btnStyle) || { background: "#1cc3af", color: "#042e29", borderRadius: 999, fontWeight: 700, padding: "0.9rem 1.9rem", marginTop: "0.5rem" }}>
             <span data-cms-link-label>{text?.["svc.cta-label"] || "Plan Your Visit"}</span>
@@ -89,7 +89,7 @@ export default function ServiceTimes({
             dangerouslySetInnerHTML={{ __html: tx(text, "svc-heading", "Service Times") }} />
         </div>
         <div style={{ display: "flex", flexWrap: "wrap", gap: "clamp(1rem,3vw,1.75rem)", justifyContent: "center" }}>
-          <Campus k="a" city="Hays Campus" days="Saturday &mdash; 6:00pm<br/>Sunday &mdash; 9:00 &amp; 11:00am" />
+          <Campus k="a" city="Hays Campus" days="Saturday &mdash; 5:00pm<br/>Sunday &mdash; 8:00, 9:30 &amp; 11:00am" />
           <Campus k="b" city="Colby Campus" days="Sunday &mdash; 10:00am" />
         </div>
         <div style={{ textAlign: "center", marginTop: "clamp(2rem,4vw,3rem)" }}>

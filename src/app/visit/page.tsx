@@ -6,7 +6,6 @@ import PageComposer from "@/components/cms/PageComposer";
 import JoinPanel from "@/components/visit/JoinPanel";
 import VisitPlan from "@/components/visit/VisitPlan";
 import FaqAccordion from "@/components/home/FaqAccordion";
-import EditorialRows from "@/components/home/EditorialRows";
 
 export const metadata: Metadata = {
   title: "Plan Your Visit",
@@ -40,7 +39,6 @@ const PAGE_DEFAULT_SECTIONS: SectionMeta[] = [
   { id: "visit-hero", visible: true },
   { id: "visit-plan", visible: true },
   { id: "faq", visible: true },
-  { id: "editorialRows", visible: true },
 ];
 
 export const dynamic = "force-dynamic";
@@ -64,12 +62,11 @@ export default async function VisitPage({
       case "visit-hero": return <JoinPanel t={t} />;
       case "visit-plan": return <VisitPlan t={t} />;
       case "faq": return <FaqAccordion text={t} />;
-      case "editorialRows": return <EditorialRows text={t} />;
       default: return null;
     }
   };
 
-  const known = new Set(["visit-hero", "visit-plan", "faq", "editorialRows"]);
+  const known = new Set(["visit-hero", "visit-plan", "faq"]);
   const visible = sections.filter((s) => known.has(s.id));
 
   return <PageComposer sections={visible} bgFill={ov.bgFill} anim={ov.anim} render={render} />;

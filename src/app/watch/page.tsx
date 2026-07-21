@@ -7,18 +7,13 @@ import { getPageContent } from "@/lib/cms";
 import { isCmsLive } from "@/lib/cms-live";
 import { parseSections, tx, imgCss, type SectionMeta } from "@/lib/home-content";
 import PageComposer from "@/components/cms/PageComposer";
-import SermonPlayer from "@/components/home/SermonPlayer";
-import WatchHub from "@/components/home/WatchHub";
-import SeriesArchive from "@/components/home/SeriesArchive";
-import MediaCarousel from "@/components/home/MediaCarousel";
 
 /* Brand marks as inline SVGs (this lucide build has no brand icons — matches the
    Footer's inline-SVG convention). currentColor drives the fill. */
-function YoutubeIcon({ size = 24, style }: { size?: number; style?: React.CSSProperties }) {
+function VimeoIcon({ size = 24, style }: { size?: number; style?: React.CSSProperties }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" style={style}>
-      <path d="M22.54 6.42a2.78 2.78 0 0 0-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46a2.78 2.78 0 0 0-1.95 1.96A29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58A2.78 2.78 0 0 0 3.41 19.6C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 0 0 1.95-1.95A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z" />
-      <polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02" fill="#fff" />
+      <path d="M23.98 6.5c-.1 2.34-1.74 5.55-4.9 9.62C15.8 20.36 13 22.5 10.66 22.5c-1.45 0-2.68-1.34-3.68-4.02L5.31 11.9C4.57 9.22 3.78 7.88 2.93 7.88c-.18 0-.83.39-1.93 1.17L0 7.83c1.26-1.11 2.5-2.22 3.72-3.33 1.68-1.45 2.94-2.21 3.78-2.29 1.98-.19 3.2 1.17 3.66 4.07.5 3.13.84 5.08 1.03 5.84.57 2.61 1.2 3.91 1.89 3.91.54 0 1.34-.85 2.42-2.55 1.07-1.7 1.65-2.99 1.72-3.88.14-1.32-.38-1.98-1.55-1.98-.55 0-1.13.13-1.71.38 1.14-3.74 3.32-5.56 6.54-5.46 2.39.07 3.51 1.62 3.37 4.64z" />
     </svg>
   );
 }
@@ -36,9 +31,10 @@ export const metadata: Metadata = {
     "Watch Celebration Community Church online — live and on demand on YouTube and Facebook Live.",
 };
 
-/* Real destinations, sourced from the content inventory (celebratejesus.org):
-   YouTube channel @c3hays and Facebook Live (facebook.com/c3hays/videos). */
-const YOUTUBE = "https://www.youtube.com/@c3hays";
+/* Real destinations, sourced from celebratejesus.org/watch-online:
+   the weekend service streams on Facebook Live; the past-message archive lives on
+   Vimeo. (The real site has no YouTube channel.) */
+const VIMEO = "https://vimeo.com/c3hays";
 const FACEBOOK_LIVE = "https://facebook.com/c3hays/videos";
 
 /**
@@ -65,11 +61,7 @@ const FACEBOOK_LIVE = "https://facebook.com/c3hays/videos";
  */
 const PAGE_DEFAULT_SECTIONS: SectionMeta[] = [
   { id: "watch-hero", visible: true },
-  { id: "sermonPlayer", visible: true },
   { id: "watch-channels", visible: true },
-  { id: "watchHub", visible: true },
-  { id: "seriesArchive", visible: true },
-  { id: "mediaCarousel", visible: true },
   { id: "watch-ondemand", visible: true },
 ];
 
@@ -92,28 +84,28 @@ export default async function WatchPage({
 
   const channels = [
     {
-      id: "youtube",
-      Icon: YoutubeIcon,
-      href: YOUTUBE,
-      accent: "#ff0033",
-      image: "/images/gather.webp",
-      defaultLabel: "YouTube",
-      defaultTitle: "Watch on YouTube",
-      defaultBody:
-        "Every weekend service and past message, live and on demand — subscribe to the C3 channel.",
-      defaultCta: "Open our channel",
-    },
-    {
       id: "facebook",
       Icon: FacebookIcon,
       href: FACEBOOK_LIVE,
       accent: "#1877f2",
       image: "/images/congregation.webp",
       defaultLabel: "Facebook Live",
-      defaultTitle: "Watch on Facebook Live",
+      defaultTitle: "Watch Live",
       defaultBody:
         "Join the live stream every Saturday and Sunday, and catch replays right in your feed.",
       defaultCta: "Watch on Facebook",
+    },
+    {
+      id: "vimeo",
+      Icon: VimeoIcon,
+      href: VIMEO,
+      accent: "#1ab7ea",
+      image: "/images/gather.webp",
+      defaultLabel: "Vimeo",
+      defaultTitle: "Past Messages",
+      defaultBody:
+        "Every past message, on demand in our Vimeo archive — catch up anytime, from anywhere.",
+      defaultCta: "Open the archive",
     },
   ];
 
@@ -326,14 +318,14 @@ export default async function WatchPage({
                     </span>
                   </Link>
                   <a
-                    href={t["watch-youtube-btn-href"] || YOUTUBE}
+                    href={t["watch-vimeo-btn-href"] || VIMEO}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="btn btn-outline-ink btn-lg"
-                    data-cms-link="watch-youtube-btn"
+                    data-cms-link="watch-vimeo-btn"
                   >
                     <span data-cms-link-label>
-                      {tx(t, "watch-youtube-btn-label", "Our YouTube channel")}
+                      {tx(t, "watch-vimeo-btn-label", "Past messages on Vimeo")}
                     </span>
                   </a>
                 </div>
@@ -342,29 +334,12 @@ export default async function WatchPage({
           </section>
         );
 
-      case "sermonPlayer":
-        return <SermonPlayer text={t} />;
-      case "watchHub":
-        return <WatchHub text={t} />;
-      case "seriesArchive":
-        return <SeriesArchive text={t} />;
-      case "mediaCarousel":
-        return <MediaCarousel text={t} />;
-
       default:
         return null;
     }
   };
 
-  const known = new Set([
-    "watch-hero",
-    "sermonPlayer",
-    "watch-channels",
-    "watchHub",
-    "seriesArchive",
-    "mediaCarousel",
-    "watch-ondemand",
-  ]);
+  const known = new Set(["watch-hero", "watch-channels", "watch-ondemand"]);
   const visible = sections.filter((s) => known.has(s.id));
 
   return <PageComposer sections={visible} bgFill={ov.bgFill} anim={ov.anim} render={render} />;
