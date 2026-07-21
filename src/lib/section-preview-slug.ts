@@ -19,5 +19,10 @@ export function slugForSectionId(id: string): string | null {
   if (id.startsWith("events-")) return "/events";
   if (id.startsWith("visit-")) return "/visit";
   if (id.startsWith("weekly-")) return "/news";
+  if (id.startsWith("about-")) return "/about";
+  if (id.startsWith("beliefs-")) return "/beliefs";
+  if (id.startsWith("locations-")) return "/locations";
+  if (id.startsWith("messages-")) return "/messages";
+  if (id.startsWith("watch-")) return "/watch";
   return null;
 }
