@@ -61,7 +61,7 @@ export default function JoinPanel({ t }: { t: Record<string, string> }) {
   return (
     <Section
       container
-      style={{ backgroundColor: "var(--color-paper)", color: "var(--color-ink-warm)" }}
+      style={{ backgroundColor: "#ffffff", color: "var(--color-ink)" }}
       bgKey="visit-join-bg"
     >
       {/* ── Social icon buttons (connect bar) ──────────────────────
@@ -86,9 +86,9 @@ export default function JoinPanel({ t }: { t: Record<string, string> }) {
                 width: "3rem",
                 height: "3rem",
                 borderRadius: "var(--radius-md)",
-                background: "var(--color-paper-soft)",
-                border: "1px solid var(--color-clay-line)",
-                color: "var(--color-ink-warm)",
+                background: "var(--color-mist)",
+                border: "1px solid rgba(27,28,28,0.08)",
+                color: "var(--color-ink)",
                 boxShadow: "var(--shadow-rest)",
               }}
             >
@@ -114,7 +114,7 @@ export default function JoinPanel({ t }: { t: Record<string, string> }) {
           fallback="When &amp; where we meet"
           as="h2"
           className="display-2 text-balance"
-          style={{ color: "var(--color-ink-warm)" }}
+          style={{ color: "var(--color-ink)" }}
         />
       </Stack>
 
@@ -126,8 +126,8 @@ export default function JoinPanel({ t }: { t: Record<string, string> }) {
             className="flex flex-col h-full"
             data-cms-bg={`visit-service-${loc.id}`}
             style={{
-              background: "var(--color-paper-soft)",
-              border: "1px solid var(--color-clay-line)",
+              background: "#ffffff",
+              border: "1px solid rgba(27,28,28,0.08)",
               borderRadius: "var(--radius-md)",
               padding: "clamp(1.75rem, 3vw, 2.5rem)",
               boxShadow: "var(--shadow-rest)",
@@ -142,14 +142,14 @@ export default function JoinPanel({ t }: { t: Record<string, string> }) {
               style={{ color: "var(--color-teal-deep)", marginBottom: "1.5rem" }}
             />
             <div className="flex items-start gap-3" style={{ marginBottom: "1.5rem" }}>
-              <MapPin size={15} style={{ color: "var(--color-stone)", marginTop: 3 }} className="shrink-0" />
+              <MapPin size={15} style={{ color: "var(--color-mute)", marginTop: 3 }} className="shrink-0" />
               <Tx
                 text={t}
                 k={`visit-campus-${loc.id}-address`}
                 fallback={`${loc.street}, ${loc.city}, ${loc.state} ${loc.zip}`}
                 as="address"
                 className="not-italic body-base"
-                style={{ color: "var(--color-stone)", lineHeight: 1.7 }}
+                style={{ color: "var(--color-mute)", lineHeight: 1.7 }}
               />
             </div>
             {/* #4: the service TIMES + text are editor-native — each row is its own
@@ -157,14 +157,14 @@ export default function JoinPanel({ t }: { t: Record<string, string> }) {
             <div className="flex flex-col gap-3">
               {loc.services.map((s, i) => (
                 <div key={s.day} className="flex items-center gap-2.5">
-                  <Clock size={14} style={{ color: "var(--color-stone)" }} className="shrink-0" />
+                  <Clock size={14} style={{ color: "var(--color-mute)" }} className="shrink-0" />
                   <Tx
                     text={t}
                     k={`visit-campus-${loc.id}-service-${i}`}
                     fallback={`${s.day}: ${s.times.join(" · ")}`}
                     as="span"
                     className="body-base"
-                    style={{ color: "var(--color-ink-warm)" }}
+                    style={{ color: "var(--color-ink)" }}
                   />
                 </div>
               ))}

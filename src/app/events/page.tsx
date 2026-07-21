@@ -67,7 +67,7 @@ export default async function EventsPage({
         return (
           <section
             className="relative flex items-end overflow-hidden"
-            style={{ minHeight: "52vh" }}
+            style={{ minHeight: "58vh" }}
           >
             <div className="absolute inset-0" data-cms-img="events-hero-img">
               <Image

@@ -35,11 +35,11 @@ function SkeletonCard() {
       style={{
         borderRadius: "var(--radius-md)",
         overflow: "hidden",
-        background: "var(--color-ink-soft)",
+        background: "#252727",
         border: "1px solid rgba(255,255,255,0.08)",
       }}
     >
-      <div style={{ aspectRatio: "4 / 5", background: "rgba(255,255,255,0.05)" }} />
+      <div style={{ aspectRatio: "3 / 2", background: "rgba(255,255,255,0.05)" }} />
       <div style={{ padding: "clamp(1.25rem, 2.4vw, 1.6rem)", display: "grid", gap: "0.7rem" }}>
         <div style={{ height: 22, width: "70%", borderRadius: 6, background: "rgba(255,255,255,0.10)" }} />
         <div style={{ height: 14, width: "90%", borderRadius: 6, background: "rgba(255,255,255,0.06)" }} />

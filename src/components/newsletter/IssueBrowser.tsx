@@ -62,32 +62,9 @@ export default function IssueBrowser({ issues }: IssueBrowserProps) {
 
   const openIssue = openId ? issues.find((i) => i.id === openId) ?? null : null;
 
-  // Truly empty (no issues seeded yet) — ready-to-fill honest state.
-  if (issues.length === 0) {
-    return (
-      <div
-        className="flex items-center gap-4"
-        style={{
-          padding: "1.5rem 1.75rem",
-          borderRadius: "var(--radius-md)",
-          background: "var(--color-mist)",
-          border: "1px solid rgba(27,28,28,0.08)",
-        }}
-      >
-        <span
-          className="inline-flex items-center justify-center shrink-0"
-          style={{ width: "2.75rem", height: "2.75rem", borderRadius: "var(--radius-sm)", background: "rgba(28,195,175,0.12)", color: "var(--color-teal)" }}
-          aria-hidden="true"
-        >
-          <Inbox size={20} />
-        </span>
-        <p className="body-base" style={{ color: "var(--color-mute)" }}>
-          The first issue of <strong style={{ color: "var(--color-ink)" }}>The C3 Weekly</strong> is
-          on its way. Subscribe and you&rsquo;ll be the first to read it.
-        </p>
-      </div>
-    );
-  }
+  // NOTE: even with zero issues seeded, we still render the SEARCH + WEEK-FILTER
+  // controls (the browser is always present — never a bare "coming soon" placeholder).
+  // The honest "first issue is on its way" note shows in the results area below.
 
   return (
     <div>
@@ -133,7 +110,30 @@ export default function IssueBrowser({ issues }: IssueBrowserProps) {
       </div>
 
       {/* Results */}
-      {filtered.length === 0 ? (
+      {filtered.length === 0 && issues.length === 0 ? (
+        /* No issues seeded yet — honest, ready-to-fill state (controls stay above). */
+        <div
+          className="flex items-center gap-4"
+          style={{
+            padding: "1.5rem 1.75rem",
+            borderRadius: "var(--radius-md)",
+            background: "var(--color-mist)",
+            border: "1px solid rgba(27,28,28,0.08)",
+          }}
+        >
+          <span
+            className="inline-flex items-center justify-center shrink-0"
+            style={{ width: "2.75rem", height: "2.75rem", borderRadius: "var(--radius-sm)", background: "rgba(28,195,175,0.12)", color: "var(--color-teal)" }}
+            aria-hidden="true"
+          >
+            <Inbox size={20} />
+          </span>
+          <p className="body-base" style={{ color: "var(--color-mute)" }}>
+            The first issue of <strong style={{ color: "var(--color-ink)" }}>The C3 Weekly</strong> is
+            on its way. Subscribe and you&rsquo;ll be the first to read it.
+          </p>
+        </div>
+      ) : filtered.length === 0 ? (
         <div
           style={{
             padding: "1.5rem 1.75rem",

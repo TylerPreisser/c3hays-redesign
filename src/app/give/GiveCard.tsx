@@ -34,7 +34,7 @@ export default function GiveCard({ bgKey, icon: Icon, children, style }: GiveCar
       style={{
         height: "100%",
         background: "var(--color-bone)",
-        border: "1px solid var(--color-clay-line)",
+        border: "1px solid rgba(27,28,28,0.08)",
         borderRadius: "var(--radius-md)",
         padding: "clamp(1.75rem, 3vw, 2.25rem)",
         boxShadow: "var(--shadow-rest)",

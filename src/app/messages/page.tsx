@@ -5,16 +5,11 @@ import { getPageContent } from "@/lib/cms";
 import { isCmsLive } from "@/lib/cms-live";
 import { parseSections, tx, imgCss, type SectionMeta } from "@/lib/home-content";
 import PageComposer from "@/components/cms/PageComposer";
+import PastMessagesGrid from "@/components/messages/PastMessagesGrid";
+import { pastMessages } from "@/data/messages";
 
-/* Brand marks as inline SVGs (this lucide build ships no brand icons — matches the
+/* Brand mark as an inline SVG (this lucide build ships no brand icons — matches the
    Footer + Watch page's inline-SVG convention). currentColor drives the fill. */
-function YouTubeIcon({ size = 15, style }: { size?: number; style?: React.CSSProperties }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" style={style}>
-      <path d="M23.5 6.2a3.02 3.02 0 0 0-2.12-2.14C19.5 3.55 12 3.55 12 3.55s-7.5 0-9.38.51A3.02 3.02 0 0 0 .5 6.2 31.6 31.6 0 0 0 0 12a31.6 31.6 0 0 0 .5 5.8 3.02 3.02 0 0 0 2.12 2.14c1.88.51 9.38.51 9.38.51s7.5 0 9.38-.51a3.02 3.02 0 0 0 2.12-2.14A31.6 31.6 0 0 0 24 12a31.6 31.6 0 0 0-.5-5.8zM9.55 15.57V8.43L15.82 12l-6.27 3.57z" />
-    </svg>
-  );
-}
 function FacebookIcon({ size = 15, style }: { size?: number; style?: React.CSSProperties }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" style={style}>
@@ -186,12 +181,15 @@ export default async function MessagesPage({
 
       case "messages-archive":
         return (
-          /* ── Past Messages — YouTube archive + Facebook Live (REAL) ── */
+          /* ── Past Messages — searchable/filterable YouTube archive (REAL) ── */
           <section className="section" style={{ backgroundColor: "#1b1c1c" }}>
             <div className="container-c3">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-16 lg:gap-24 items-center">
-                {/* Text */}
-                <div>
+              {/* Header — keeps the messages-archive-eyebrow / -heading / -body cms keys */}
+              <div
+                className="flex flex-wrap items-end justify-between gap-6"
+                style={{ marginBottom: "clamp(2rem, 5vw, 3rem)" }}
+              >
+                <div style={{ maxWidth: "42rem" }}>
                   <span
                     data-cms="t:messages-archive-eyebrow"
                     style={{
@@ -210,9 +208,9 @@ export default async function MessagesPage({
                   <h2
                     className="display-2 text-white text-balance"
                     data-cms="t:messages-archive-heading"
-                    style={{ marginBottom: "clamp(1rem, 3vw, 1.75rem)" }}
+                    style={{ marginBottom: "clamp(0.75rem, 2vw, 1.25rem)" }}
                     dangerouslySetInnerHTML={{
-                      __html: tx(t, "messages-archive-heading", "Every message, on demand."),
+                      __html: tx(t, "messages-archive-heading", "Past Messages"),
                     }}
                   />
                   <p
@@ -221,69 +219,37 @@ export default async function MessagesPage({
                       fontSize: "1.125rem",
                       color: "rgba(255,255,255,0.75)",
                       lineHeight: 1.7,
-                      marginBottom: "clamp(1.75rem, 4vw, 2.75rem)",
                     }}
                     dangerouslySetInnerHTML={{
                       __html: tx(
                         t,
                         "messages-archive-body",
-                        "Missed a weekend? Our full message archive lives on YouTube — catch up anytime, from anywhere. Or join us live on Facebook every Saturday and Sunday."
+                        "Search the archive and catch up on any weekend — every message streams on our YouTube channel. Or join us live on Facebook."
                       ),
                     }}
                   />
-                  <div className="flex flex-wrap gap-3">
-                    <a
-                      href={t["messages-archive-cta-href"] || YOUTUBE}
-                      data-cms-link="messages-archive-cta"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="btn btn-primary btn-lg inline-flex items-center gap-2"
-                    >
-                      <YouTubeIcon size={16} />
-                      <span
-                        data-cms-link-label
-                        dangerouslySetInnerHTML={{
-                          __html: tx(t, "messages-archive-cta-label", "Past Messages on YouTube"),
-                        }}
-                      />
-                    </a>
-                    <a
-                      href={t["messages-archive-live-href"] || FACEBOOK_LIVE}
-                      data-cms-link="messages-archive-live"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="btn btn-outline btn-lg inline-flex items-center gap-2"
-                    >
-                      <FacebookIcon size={15} />
-                      <span
-                        data-cms-link-label
-                        dangerouslySetInnerHTML={{
-                          __html: tx(t, "messages-archive-live-label", "Watch Live"),
-                        }}
-                      />
-                    </a>
-                  </div>
                 </div>
 
-                {/* Image */}
-                <div
-                  className="relative overflow-hidden"
-                  data-cms-img="messages-archive-img"
-                  style={{
-                    aspectRatio: "4/3",
-                    borderRadius: "var(--radius-md)",
-                    minHeight: 240,
-                  }}
+                {/* Watch Live on Facebook affordance */}
+                <a
+                  href={t["messages-archive-live-href"] || FACEBOOK_LIVE}
+                  data-cms-link="messages-archive-live"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn btn-outline btn-lg inline-flex items-center gap-2 shrink-0"
                 >
-                  <Image
-                    src={assetPath(media["messages-archive-img"] || "/images/gather.webp")}
-                    alt="Watch past C3 messages"
-                    fill
-                    className="object-cover"
-                    style={imgCss(ov.img?.["messages-archive-img"])}
+                  <FacebookIcon size={15} />
+                  <span
+                    data-cms-link-label
+                    dangerouslySetInnerHTML={{
+                      __html: tx(t, "messages-archive-live-label", "Watch Live on Facebook"),
+                    }}
                   />
-                </div>
+                </a>
               </div>
+
+              {/* Searchable + filterable grid (client component) */}
+              <PastMessagesGrid messages={pastMessages} channelHref={YOUTUBE} />
             </div>
           </section>
         );

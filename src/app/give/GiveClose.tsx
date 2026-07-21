@@ -20,7 +20,7 @@ export default function GiveClose({ t }: GiveCloseProps) {
       <style
         dangerouslySetInnerHTML={{
           __html: `
-.gc-close{background:var(--color-ink-warm);color:#fff;text-align:center;padding:clamp(80px,11vw,132px) 0}
+.gc-close{background:var(--color-ink);color:#fff;text-align:center;padding:clamp(80px,11vw,132px) 0}
 .gc-close__wrap{max-width:1160px;margin-inline:auto;padding-inline:clamp(20px,5vw,64px)}
 .gc-close__ey{color:var(--color-teal-soft)}
 .gc-close__h{color:#fff;max-width:20ch;margin:16px auto 0}

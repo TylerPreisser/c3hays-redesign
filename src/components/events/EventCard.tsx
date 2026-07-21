@@ -151,7 +151,7 @@ function Field({
   );
 }
 
-/** 4:5 media area — image with cover fit, or a teal→ink gradient fallback. */
+/** 3:2 media area — image with cover fit, or a teal→ink gradient fallback. */
 function Media({
   image,
   imageAlt,
@@ -165,7 +165,9 @@ function Media({
 }) {
   const wrap: CSSProperties = {
     position: "relative",
-    aspectRatio: "4 / 5",
+    // Landscape 3:2 keeps three cards a tidy, even row (portrait 4:5 made a tall,
+    // heavy wall). Cleaner, more premium, and lines up with the calendar below.
+    aspectRatio: "3 / 2",
     overflow: "hidden",
     // Gradient sits UNDER the image so an unloaded/absent photo never shows grey.
     background:
@@ -227,7 +229,9 @@ export default function EventCard({
     height: "100%",
     overflow: "hidden",
     borderRadius: "var(--radius-md)",
-    background: "var(--color-ink-soft)",
+    // Mirror home/EventsStrip's dark card exactly (#252727) so /events reads as one
+    // system with the homepage — not a slightly-different dark.
+    background: "#252727",
     border: "1px solid rgba(255,255,255,0.08)",
     boxShadow: "var(--shadow-rest)",
     color: "#fff",
@@ -291,7 +295,16 @@ export default function EventCard({
         value={title}
         as="h3"
         className="heading-3"
-        style={{ color: "#fff", fontSize: "1.3rem", margin: 0 }}
+        style={{
+          color: "#fff",
+          fontSize: "1.3rem",
+          margin: 0,
+          // Clamp so a long live-feed title can't push one card taller than its row.
+          display: "-webkit-box",
+          WebkitLineClamp: 2,
+          WebkitBoxOrient: "vertical",
+          overflow: "hidden",
+        }}
       />
       {detail != null && (
         <Field
@@ -302,7 +315,15 @@ export default function EventCard({
           value={detail}
           as="p"
           className="body-base"
-          style={{ color: "rgba(255,255,255,0.7)", margin: 0 }}
+          style={{
+            color: "rgba(255,255,255,0.7)",
+            margin: 0,
+            // Two-line clamp keeps every card body the same shape → even rows.
+            display: "-webkit-box",
+            WebkitLineClamp: 2,
+            WebkitBoxOrient: "vertical",
+            overflow: "hidden",
+          }}
         />
       )}
       {/* Flex spacer pushes the campus pill to the bottom → equal-height rows align. */}

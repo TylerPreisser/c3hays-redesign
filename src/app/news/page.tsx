@@ -6,8 +6,10 @@ import { isCmsLive } from "@/lib/cms-live";
 import { parseSections, imgCss, type SectionMeta } from "@/lib/home-content";
 import { Tx } from "@/components/cms/Editable";
 import PageComposer from "@/components/cms/PageComposer";
+import Section from "@/components/ui/Section";
+import IssueBrowser from "@/components/newsletter/IssueBrowser";
 import WeeklySignup from "@/components/newsletter/WeeklySignup";
-import WeeklyConnect from "@/components/newsletter/WeeklyConnect";
+import { newsletterIssues } from "@/data/news";
 
 export const metadata: Metadata = {
   title: "The C3 Weekly",
@@ -18,26 +20,28 @@ export const metadata: Metadata = {
 /**
  * /news — "The C3 Weekly" (its OWN page).
  *
- * Formerly a client redirect stub (→ /newsletter → /visit), which is why the editor's
- * "News" resolved to Visit content. It is now a REAL editor-native content page.
+ * REVERTED (per Tyler): the "Stay Connected / Gather with us" WeeklyConnect block is
+ * gone — it had nothing to do with this page. The newsletter ISSUE BROWSER is restored:
+ * a browser that shows different weeks' newsletters with SEARCH + a WEEK FILTER
+ * (<IssueBrowser>). It is fully editor-native and graceful when empty — the search +
+ * week filter controls are always present (never a "coming soon" placeholder); when no
+ * real issues exist yet the results area shows an honest "first issue is on its way"
+ * note. NO fabricated newsletter bodies — real issues fill @/data/news when they exist.
  *
- * Composed via <PageComposer> from two sections — ids coordinated with the c3-backend
- * page-sections default for /news:
- *   • weekly-hero    → image band: LEFT-aligned header over the photo + a RIGHT-side
- *     editor-native newsletter-signup OVERLAY (<WeeklySignup>) — heading/body/field/
- *     button/image all independently editable, and the signup FUNCTIONS.
- *   • weekly-connect → REAL "stay connected" hub (<WeeklyConnect>): the church's genuine
- *     channels (YouTube / Facebook / Instagram / C3 Podcast) + real weekend service
- *     times. NO fabricated articles or issues — the empty "issues coming soon" browser
- *     is gone; this page is a real subscribe + keep-up hub.
+ * Composed via <PageComposer> from two sections (ids match c3-backend page-sections):
+ *   • weekly-hero → image band: LEFT-aligned header over the photo + a RIGHT-side
+ *     editor-native newsletter-signup OVERLAY (<WeeklySignup>) — all editable + it FUNCTIONS.
+ *   • weekly-list → the filterable newsletter issue browser.
  *
- * Every section bg (rail), card bg (data-cms-bg), heading/body (<Tx>) and button
- * (data-cms-link + label) is editable. Export-safe: no server redirect.
+ * Every section bg (rail), heading/body (<Tx>) and the signup are editable. Export-safe.
  */
 const PAGE_DEFAULT_SECTIONS: SectionMeta[] = [
   { id: "weekly-hero", visible: true },
-  { id: "weekly-connect", visible: true },
+  { id: "weekly-list", visible: true },
 ];
+
+/* Responsive gutter for the wide Browse container (mirrors .container-c3 padding). */
+const GUTTER = "clamp(1.25rem, 5vw, 3rem)";
 
 export const dynamic = "force-dynamic";
 
@@ -86,8 +90,7 @@ export default async function NewsPage({
 
             <div className="container-c3 relative" style={{ paddingTop: "var(--section-y)", paddingBottom: "var(--section-y)", width: "100%" }}>
               <div className="grid grid-cols-1 lg:grid-cols-[1.1fr_minmax(20rem,26rem)] gap-10 lg:gap-16 items-center">
-                {/* LEFT — header, left-aligned over the image (#8). Explicit white text
-                    for legibility over the scrim; each line an independent <Tx>. */}
+                {/* LEFT — header, left-aligned over the image. White text over the scrim. */}
                 <div data-cms-bg="weekly-hero-copy" style={{ maxWidth: "40rem" }}>
                   <Tx
                     text={t}
@@ -108,35 +111,46 @@ export default async function NewsPage({
                   <Tx
                     text={t}
                     k="weekly-hero-lead"
-                    fallback="One short email each week &mdash; what&rsquo;s coming up, this week&rsquo;s message, and simple next steps. Subscribe here, and follow along wherever you already are."
+                    fallback="One short email each week &mdash; what&rsquo;s coming up, this week&rsquo;s message, and simple next steps. Sign up, or browse past issues below."
                     as="p"
                     className="body-lg"
                     style={{ color: "rgba(255,255,255,0.82)", maxWidth: "34rem", lineHeight: 1.7 }}
                   />
                 </div>
 
-                {/* RIGHT — editor-native signup OVERLAY (#9). */}
+                {/* RIGHT — editor-native signup OVERLAY. */}
                 <WeeklySignup text={t} />
               </div>
             </div>
           </section>
         );
-      case "weekly-connect":
-        return <WeeklyConnect t={t} />;
+      case "weekly-list":
+        return (
+          <Section
+            /* On-brand clean WHITE field (NOT tan) so the white issue cards + teal
+               accents read premium — mirrors home's light sections. */
+            style={{ backgroundColor: "#ffffff", color: "var(--color-ink)" }}
+            bgKey="weekly-list-bg"
+          >
+            <div style={{ width: `min(100% - 2 * ${GUTTER}, 1600px)`, marginInline: "auto" }}>
+              <IssueBrowser issues={newsletterIssues} />
+            </div>
+          </Section>
+        );
       default:
         return null;
     }
   };
 
-  const known = new Set(["weekly-hero", "weekly-connect"]);
+  const known = new Set(["weekly-hero", "weekly-list"]);
   const visible = sections.filter((s) => known.has(s.id));
 
-  // Reconcile: the C3-Studio published sections for /news predate the real
-  // stay-connected hub (they list the retired empty issue browser), so insert
-  // weekly-connect after the hero when a persisted list omits it (idempotent).
-  if (!visible.some((s) => s.id === "weekly-connect")) {
+  // Reconcile: a C3-Studio persisted list may still carry the retired "weekly-connect"
+  // id (now filtered out by `known`). If the persisted list omits weekly-list, insert it
+  // right after the hero so the issue browser always renders (idempotent — no dup).
+  if (!visible.some((s) => s.id === "weekly-list")) {
     const i = visible.findIndex((s) => s.id === "weekly-hero");
-    const item: SectionMeta = { id: "weekly-connect", visible: true };
+    const item: SectionMeta = { id: "weekly-list", visible: true };
     if (i >= 0) visible.splice(i + 1, 0, item);
     else visible.push(item);
   }

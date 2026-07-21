@@ -112,13 +112,13 @@ export function ConnectHero({ text, media = {}, img = {} }: ConnectHeroProps) {
   /* Monochrome, self-contained faux static-map thumbnail (no API key). */
   const mapSvg =
     "<svg xmlns='http://www.w3.org/2000/svg' width='480' height='180' viewBox='0 0 480 180'>" +
-    "<rect width='480' height='180' fill='#e9e2d6'/>" +
-    "<g stroke='#cdc5b7' stroke-width='7' fill='none' stroke-linecap='round'>" +
+    "<rect width='480' height='180' fill='#eef1f1'/>" +
+    "<g stroke='#d3d9d9' stroke-width='7' fill='none' stroke-linecap='round'>" +
     "<path d='M0 46 H480'/><path d='M0 128 H480'/>" +
     "<path d='M112 0 V180'/><path d='M320 0 V180'/>" +
     "</g>" +
-    "<path d='M-20 12 L500 150' stroke='#d8d1c4' stroke-width='13' fill='none'/>" +
-    "<path d='M60 180 L260 20' stroke='#d8d1c4' stroke-width='9' fill='none'/>" +
+    "<path d='M-20 12 L500 150' stroke='#cdd4d4' stroke-width='13' fill='none'/>" +
+    "<path d='M60 180 L260 20' stroke='#cdd4d4' stroke-width='9' fill='none'/>" +
     "</svg>";
   const mapBg = `url("data:image/svg+xml,${encodeURIComponent(mapSvg)}")`;
 

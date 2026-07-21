@@ -18,13 +18,12 @@ export interface GiveHeroProps {
 
 /**
  * give-hero — the page thesis: "Your giving is changing the world," the real
- * why-we-give lead, and the primary Give CTA. A congregation photo behind a warm
- * grade (editable via `data-cms-img="give-hero-bg"`) that dissolves into the paper
- * canvas below, so the hero and the two light sections read as one continuous page
- * rather than a stack of separate blocks.
+ * why-we-give lead, and the primary Give CTA. A congregation photo behind a neutral
+ * grade (editable via `data-cms-img="give-hero-bg"`) that dissolves into the WHITE
+ * canvas below, so the hero and the give-ways section read as one continuous page
+ * (both surfaces are #ffffff — no seam).
  *
- * Two editable buttons: the teal primary → the real Pushpay giving page, and a quiet
- * ghost secondary that jumps to the "Ways To Give" section (#give-ways). Text is the
+ * One editable button: the teal primary → the real Pushpay giving page. Text is the
  * real celebratejesus.org /give copy.
  */
 export default function GiveHero({ t, media, img }: GiveHeroProps) {
@@ -41,20 +40,20 @@ export default function GiveHero({ t, media, img }: GiveHeroProps) {
           className="object-cover"
           style={imgCss(img?.["give-hero-bg"])}
         />
-        {/* Warm grade — quiet, not a loud dark scrim; blends into the paper below. */}
+        {/* Neutral grade — quiet, not a loud dark scrim; blends into the white below. */}
         <div
           aria-hidden
           className="absolute inset-0"
           style={{
             background:
-              "linear-gradient(to top, rgba(26,24,21,0.86) 0%, rgba(26,24,21,0.46) 52%, rgba(26,24,21,0.20) 100%)",
+              "linear-gradient(to top, rgba(10,10,10,0.86) 0%, rgba(10,10,10,0.46) 52%, rgba(10,10,10,0.20) 100%)",
           }}
         />
-        {/* Dissolve into the paper canvas so the next section feels continuous. */}
+        {/* Dissolve into the WHITE give-ways surface below so the seam disappears. */}
         <div
           aria-hidden
           className="absolute inset-x-0 bottom-0"
-          style={{ height: "34%", background: "linear-gradient(to top, var(--color-paper) 2%, transparent 100%)" }}
+          style={{ height: "34%", background: "linear-gradient(to top, #ffffff 2%, transparent 100%)" }}
         />
       </div>
 
@@ -96,13 +95,6 @@ export default function GiveHero({ t, media, img }: GiveHeroProps) {
               label="Give Now"
               external
               className="btn btn-primary btn-lg"
-            />
-            <EditableLink
-              text={t}
-              k="give-hero-cta2"
-              href="#give-ways"
-              label="See the ways to give"
-              className="btn btn-hero-ghost btn-lg"
             />
           </div>
         </Stack>

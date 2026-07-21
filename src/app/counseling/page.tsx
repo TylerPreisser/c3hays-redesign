@@ -8,7 +8,6 @@ import { isCmsLive } from "@/lib/cms-live";
 import { imgCss, parseSections, type SectionMeta } from "@/lib/home-content";
 import Section from "@/components/ui/Section";
 import SectionHeader from "@/components/ui/SectionHeader";
-import FeatureCard from "@/components/ui/FeatureCard";
 import PageComposer from "@/components/cms/PageComposer";
 import { Tx, EditableLink } from "@/components/cms/Editable";
 
@@ -19,8 +18,8 @@ export const metadata: Metadata = {
 };
 
 /**
- * /counseling is editor-native (contract §1–§3): it composes into the SAME three
- * ordered sections c3-backend's `defaultSectionsForSlug("/counseling")` declares —
+ * /counseling is editor-native (contract §1–§3): it composes into the SAME ordered
+ * sections c3-backend's `defaultSectionsForSlug("/counseling")` declares —
  * counseling-hero / counseling-team / counseling-fees — each wrapped in a
  * `<div data-section>` so the rail can add/reorder/hide/recolor it, and every tile
  * carries its own Layer-1 handles (`data-cms` text, `data-cms-bg` card bg,
@@ -30,17 +29,19 @@ export const metadata: Metadata = {
  * counselors + the "Make An Appointment" primary action live on the real site.
  * The counselor cards keep `@/data/counselors` as fallbacks but route
  * role/name/bio through <Tx>. Server component.
+ *
+ * Theme mirrors HOME's alternating rhythm — hero photo → WHITE counselor-team
+ * section (clean white cards) → subtle MIST fees dropdown. No legacy tan tokens.
  */
 
 /** MUST match c3-backend `page-sections.ts` `/counseling` verbatim (shared key-space). */
 const PAGE_DEFAULT_SECTIONS: SectionMeta[] = [
   { id: "counseling-hero", visible: true },
-  { id: "counseling-vision", visible: true },
   { id: "counseling-team", visible: true },
   { id: "counseling-fees", visible: true },
 ];
 
-/** One line in a policy card — teal check + CMS-wired (editable) text. */
+/** One line in a fees/policy dropdown — teal check + CMS-wired (editable) text. */
 function PolicyLine({
   k,
   t,
@@ -62,15 +63,78 @@ function PolicyLine({
   );
 }
 
-/** Small warm micro-label used above groups inside the counselor cards. */
+/** Small micro-label used above groups inside the counselor cards. */
 function CardLabel({ children }: { children: React.ReactNode }) {
   return (
     <p
       className="overline"
-      style={{ color: "var(--color-stone)", fontSize: "0.7rem" }}
+      style={{ color: "var(--color-mute)", fontSize: "0.7rem" }}
     >
       {children}
     </p>
+  );
+}
+
+/**
+ * One slim, quiet dropdown row in the fees section — native <details>/<summary>
+ * (zero-JS, static-export safe), modeled on home's FaqAccordion but on a LIGHT
+ * surface. Editable title via <Tx>; the practical detail lines are passed as
+ * children (each a CMS-wired <PolicyLine>).
+ */
+function FeeItem({
+  icon,
+  titleK,
+  titleFallback,
+  t,
+  children,
+}: {
+  icon: React.ReactNode;
+  titleK: string;
+  titleFallback: string;
+  t: Record<string, string>;
+  children: React.ReactNode;
+}) {
+  return (
+    <details
+      data-anim="fadeInUp"
+      style={{
+        background: "#fff",
+        border: "1px solid rgba(27,28,28,0.08)",
+        borderRadius: "var(--radius-md)",
+        boxShadow: "var(--shadow-rest)",
+        padding: "1.1rem 1.35rem",
+      }}
+    >
+      <summary
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: "0.75rem",
+          cursor: "pointer",
+          listStyle: "none",
+          color: "var(--color-ink)",
+          fontWeight: 600,
+          fontSize: "1.02rem",
+        }}
+      >
+        <span
+          aria-hidden
+          style={{ color: "var(--color-teal)", display: "inline-flex" }}
+        >
+          {icon}
+        </span>
+        <Tx as="span" text={t} k={titleK} fallback={titleFallback} style={{ flex: 1 }} />
+        <span aria-hidden style={{ color: "var(--color-teal)", flex: "0 0 auto", fontSize: "1.25rem", lineHeight: 1 }}>
+          +
+        </span>
+      </summary>
+      <ul
+        className="flex flex-col gap-2 body-sm"
+        style={{ color: "var(--color-mute)", margin: "0.9rem 0 0.15rem" }}
+      >
+        {children}
+      </ul>
+    </details>
   );
 }
 
@@ -95,18 +159,6 @@ export default async function CounselingPage({
   const media = ov.media || {};
   const sections = parseSections(ov.sections, PAGE_DEFAULT_SECTIONS);
 
-  // Reconcile: the C3-Studio published sections for /counseling predate the
-  // dedicated "Our Vision for Counseling" section, so an already-persisted list
-  // ([counseling-hero, counseling-team, counseling-fees]) would omit it. If it's
-  // missing, insert it right after the hero so the vision always renders
-  // (idempotent — no duplicate when the persisted list already includes it).
-  if (!sections.some((s) => s.id === "counseling-vision")) {
-    const i = sections.findIndex((s) => s.id === "counseling-hero");
-    const item: SectionMeta = { id: "counseling-vision", visible: true };
-    if (i >= 0) sections.splice(i + 1, 0, item);
-    else sections.unshift(item);
-  }
-
   /* ── counseling-hero — top photo band, editable photo + headline + primary CTA ── */
   const heroSection = (
     <section
@@ -123,14 +175,14 @@ export default async function CounselingPage({
           priority
           style={imgCss(ov.img?.["counseling-hero-bg"])}
         />
-        {/* Warm base scrim (ink-warm) */}
-        <div className="absolute inset-0" style={{ background: "rgba(26,24,21,0.56)" }} />
-        {/* Bottom-to-top warm gradient for headline readability */}
+        {/* Neutral base scrim */}
+        <div className="absolute inset-0" style={{ background: "rgba(10,10,10,0.56)" }} />
+        {/* Bottom-to-top neutral gradient for headline readability */}
         <div
           className="absolute inset-0"
           style={{
             background:
-              "linear-gradient(to top, rgba(26,24,21,0.92) 0%, rgba(26,24,21,0.30) 55%, rgba(26,24,21,0.04) 100%)",
+              "linear-gradient(to top, rgba(10,10,10,0.92) 0%, rgba(10,10,10,0.30) 55%, rgba(10,10,10,0.04) 100%)",
           }}
         />
       </div>
@@ -184,63 +236,13 @@ export default async function CounselingPage({
     </section>
   );
 
-  /* ── counseling-vision — the church's real vision for counseling, given its own
-        premium on-brand band so it reads as the heart of the page (not buried in a
-        section header). Content verbatim-grounded in celebratejesus.org/counseling. ── */
-  const visionSection = (
-    <Section
-      container
-      style={{ background: "var(--color-paper-soft)", color: "var(--color-ink-warm)" }}
-    >
-      <div
-        data-anim="fadeInUp"
-        style={{ maxWidth: "50rem", marginInline: "auto", textAlign: "center" }}
-      >
-        <Tx
-          as="p"
-          className="overline"
-          style={{ color: "var(--color-teal)" }}
-          text={t}
-          k="counseling-vision-eyebrow"
-          fallback="Our Vision"
-        />
-        <Tx
-          as="h2"
-          className="display-2 text-balance"
-          style={{ color: "var(--color-ink-warm)", marginTop: "var(--space-eyebrow)" }}
-          text={t}
-          k="counseling-vision-heading"
-          fallback="Our Vision for Counseling"
-        />
-        {/* Teal rule — small on-brand divider under the vision heading. */}
-        <div
-          aria-hidden="true"
-          style={{
-            width: "3rem",
-            height: 3,
-            borderRadius: 2,
-            background: "var(--color-teal)",
-            margin: "var(--space-heading) auto",
-          }}
-        />
-        <Tx
-          as="p"
-          className="body-lg text-balance"
-          text={t}
-          k="counseling-vision-body"
-          fallback="Celebration Community Church has a passion to help people develop and grow in their relationship with God, through His Son, Jesus Christ. Through a team approach to Bible-based counseling, our trained counselors walk with you toward spiritually, emotionally, and relationally healthy relationships with God and others."
-          style={{ color: "var(--color-stone)", marginTop: "var(--space-heading)", lineHeight: 1.75 }}
-        />
-      </div>
-    </Section>
-  );
-
-  /* ── counseling-team — the three real counselors as editor-native cards ── */
+  /* ── counseling-team — the three real counselors as editor-native cards.
+        Clean on-theme WHITE section with white cards (mirrors home's rhythm):
+        teal role eyebrow → ink name + muted credentials → muted bio →
+        teal-tinted specialty CHIPS → muted education footer pinned to the card
+        base (even heights). ── */
   const teamSection = (
-    <Section
-      container
-      style={{ background: "var(--color-paper)", color: "var(--color-ink-warm)" }}
-    >
+    <Section container tone="white" style={{ color: "var(--color-ink)" }}>
       <SectionHeader
         leadMaxWidth="48rem"
         style={{ marginBottom: "var(--space-block)" }}
@@ -259,16 +261,14 @@ export default async function CounselingPage({
             text={t}
             k="counseling-team-lead"
             fallback="A team approach to Bible-based counseling — trained counselors ready to walk with you toward wholeness in Christ."
-            style={{ color: "var(--color-stone)" }}
+            style={{ color: "var(--color-mute)" }}
           />
         }
       />
 
       {/* Counselor cards — each is its OWN editable tile: data-cms-bg on the
           container, role/name/bio routed through <Tx> (keys derived from the
-          counselor id, @/data/counselors values as fallbacks). Redesigned: teal
-          role eyebrow → name → bio → specialty CHIPS → education footer pinned to
-          the card base (even heights, no checklist noise). */}
+          counselor id, @/data/counselors values as fallbacks). */}
       <div
         className="grid grid-cols-1 md:grid-cols-3 items-stretch"
         style={{ gap: "var(--space-body)" }}
@@ -281,8 +281,8 @@ export default async function CounselingPage({
             className="flex flex-col h-full"
             style={{
               padding: "clamp(1.75rem, 3vw, 2.25rem)",
-              background: "var(--color-paper-soft)",
-              border: "1px solid var(--color-clay-line)",
+              background: "#fff",
+              border: "1px solid rgba(27,28,28,0.08)",
               borderRadius: "var(--radius-md)",
               boxShadow: "var(--shadow-rest)",
             }}
@@ -300,7 +300,7 @@ export default async function CounselingPage({
             {/* Name + credentials (name editable) */}
             <h3
               className="heading-3"
-              style={{ color: "var(--color-ink-warm)", marginTop: "var(--space-eyebrow)" }}
+              style={{ color: "var(--color-ink)", marginTop: "var(--space-eyebrow)" }}
             >
               <Tx
                 as="span"
@@ -311,7 +311,7 @@ export default async function CounselingPage({
               {c.credentials && (
                 <span
                   className="font-normal ml-1.5"
-                  style={{ color: "var(--color-stone)", fontSize: "0.85rem" }}
+                  style={{ color: "var(--color-mute)", fontSize: "0.85rem" }}
                 >
                   {c.credentials}
                 </span>
@@ -325,10 +325,10 @@ export default async function CounselingPage({
               text={t}
               k={`counseling-${c.id}-bio`}
               fallback={c.bio}
-              style={{ color: "var(--color-stone)", marginTop: "var(--space-heading)" }}
+              style={{ color: "var(--color-mute)", marginTop: "var(--space-heading)" }}
             />
 
-            {/* Specialties — calm teal-tinted chips (replaces the checklist). */}
+            {/* Specialties — calm teal-tinted chips. */}
             <div style={{ marginTop: "var(--space-body)" }}>
               <CardLabel>Specialties</CardLabel>
               <ul className="flex flex-wrap gap-2" style={{ marginTop: "0.6rem" }}>
@@ -341,7 +341,7 @@ export default async function CounselingPage({
                       padding: "0.34rem 0.68rem",
                       borderRadius: "var(--radius-pill)",
                       background: "rgba(28,195,175,0.10)",
-                      color: "var(--color-ink-warm)",
+                      color: "var(--color-ink)",
                       border: "1px solid rgba(28,195,175,0.22)",
                     }}
                   >
@@ -357,7 +357,7 @@ export default async function CounselingPage({
               style={{
                 marginTop: "auto",
                 paddingTop: "var(--space-body)",
-                borderTop: "1px solid var(--color-clay-line)",
+                borderTop: "1px solid rgba(27,28,28,0.08)",
               }}
             >
               <GraduationCap
@@ -365,7 +365,7 @@ export default async function CounselingPage({
                 style={{ color: "var(--color-teal)", marginTop: 2 }}
                 className="shrink-0"
               />
-              <p className="text-xs" style={{ color: "var(--color-stone)", lineHeight: 1.5 }}>
+              <p className="text-xs" style={{ color: "var(--color-mute)", lineHeight: 1.5 }}>
                 {c.education.join(" · ")}
               </p>
             </div>
@@ -375,11 +375,12 @@ export default async function CounselingPage({
     </Section>
   );
 
-  /* ── counseling-fees — fees + policies (editable FeatureCards). The old bottom
-        "You don't have to carry it alone" CTA panel was REMOVED (Tyler's note);
-        the primary appointment action now lives in the hero. ── */
+  /* ── counseling-fees — practical details as a SUBTLE, quiet dropdown on a light
+        MIST surface (native <details>, modeled on home's FaqAccordion). Replaces
+        the old loud dark 3-card band. All real content retained; counseling-* cms
+        keys preserved so authored overrides survive. ── */
   const feesSection = (
-    <Section container style={{ background: "var(--color-ink-warm)", color: "#fff" }}>
+    <Section container tone="mist" style={{ color: "var(--color-ink)" }}>
       <SectionHeader
         style={{ marginBottom: "var(--space-block)" }}
         eyebrow={
@@ -396,94 +397,77 @@ export default async function CounselingPage({
             text={t}
             k="counseling-policies-heading"
             fallback="Fees &amp; Policies"
-            style={{ color: "#fff" }}
+            style={{ color: "var(--color-ink)" }}
           />
         }
       />
 
       <div
-        className="grid grid-cols-1 md:grid-cols-3 items-stretch"
-        style={{ gap: "var(--space-body)" }}
+        className="flex flex-col"
+        style={{ gap: "0.75rem", maxWidth: "48rem", marginInline: "auto" }}
       >
         {/* Fees */}
-        <div className="h-full" data-anim="fadeInUp">
-          <FeatureCard
-            tone="dark"
-            bgKey="counseling-fees-card-bg"
-            icon={<DollarSign size={24} />}
-            title={<Tx text={t} k="counseling-fees-heading" fallback="Fees" />}
-          >
-            <ul
-              className="flex flex-col gap-3 body-sm"
-              style={{ color: "rgba(255,255,255,0.66)", marginTop: "var(--space-heading)" }}
-            >
-              <PolicyLine k="counseling-fee-rate" t={t} fallback="$75 / session" />
-              <PolicyLine
-                k="counseling-fee-payment"
-                t={t}
-                fallback="Cash or check — some counselors also accept credit card and Venmo"
-              />
-              <PolicyLine k="counseling-fee-due" t={t} fallback="All payments due to your counselor at the time of your appointment" />
-              <PolicyLine
-                k="counseling-fee-scholarship"
-                t={t}
-                fallback="Scholarships may be available"
-              />
-            </ul>
-          </FeatureCard>
-        </div>
+        <FeeItem
+          t={t}
+          icon={<DollarSign size={18} />}
+          titleK="counseling-fees-heading"
+          titleFallback="Fees"
+        >
+          <PolicyLine k="counseling-fee-rate" t={t} fallback="$75 / session" />
+          <PolicyLine
+            k="counseling-fee-payment"
+            t={t}
+            fallback="Cash or check — some counselors also accept credit card and Venmo"
+          />
+          <PolicyLine
+            k="counseling-fee-due"
+            t={t}
+            fallback="All payments due to your counselor at the time of your appointment"
+          />
+          <PolicyLine
+            k="counseling-fee-scholarship"
+            t={t}
+            fallback="Scholarships may be available"
+          />
+        </FeeItem>
 
         {/* Cancellation */}
-        <div className="h-full" data-anim="fadeInUp">
-          <FeatureCard
-            tone="dark"
-            bgKey="counseling-cancel-card-bg"
-            icon={<Phone size={24} />}
-            title={<Tx text={t} k="counseling-cancel-heading" fallback="Cancellation Policy" />}
-          >
-            <ul
-              className="flex flex-col gap-3 body-sm"
-              style={{ color: "rgba(255,255,255,0.66)", marginTop: "var(--space-heading)" }}
-            >
-              <PolicyLine
-                k="counseling-cancel-notice"
-                t={t}
-                fallback="Please cancel more than 24 hours prior to your appointment"
-              />
-              <PolicyLine
-                k="counseling-cancel-noshow"
-                t={t}
-                fallback="Appointments not cancelled 24 hours prior are charged the $75 session fee"
-              />
-            </ul>
-          </FeatureCard>
-        </div>
+        <FeeItem
+          t={t}
+          icon={<Phone size={18} />}
+          titleK="counseling-cancel-heading"
+          titleFallback="Cancellation Policy"
+        >
+          <PolicyLine
+            k="counseling-cancel-notice"
+            t={t}
+            fallback="Please cancel more than 24 hours prior to your appointment"
+          />
+          <PolicyLine
+            k="counseling-cancel-noshow"
+            t={t}
+            fallback="Appointments not cancelled 24 hours prior are charged the $75 session fee"
+          />
+        </FeeItem>
 
         {/* Getting started — real contact path from celebratejesus.org */}
-        <div className="h-full" data-anim="fadeInUp">
-          <FeatureCard
-            tone="dark"
-            bgKey="counseling-start-card-bg"
-            icon={<CheckCircle size={24} />}
-            title={<Tx text={t} k="counseling-start-heading" fallback="Getting Started" />}
-          >
-            <ul
-              className="flex flex-col gap-3 body-sm"
-              style={{ color: "rgba(255,255,255,0.66)", marginTop: "var(--space-heading)" }}
-            >
-              <PolicyLine
-                k="counseling-start-step1"
-                t={t}
-                fallback="Email office@celebratejesus.org to request an appointment"
-              />
-              <PolicyLine
-                k="counseling-start-step2"
-                t={t}
-                fallback="Or call the church office at (785) 625-5483"
-              />
-            </ul>
-          </FeatureCard>
-        </div>
+        <FeeItem
+          t={t}
+          icon={<CheckCircle size={18} />}
+          titleK="counseling-start-heading"
+          titleFallback="Getting Started"
+        >
+          <PolicyLine
+            k="counseling-start-step1"
+            t={t}
+            fallback="Email office@celebratejesus.org to request an appointment"
+          />
+          <PolicyLine
+            k="counseling-start-step2"
+            t={t}
+            fallback="Or call the church office at (785) 625-5483"
+          />
+        </FeeItem>
       </div>
     </Section>
   );
@@ -492,8 +476,6 @@ export default async function CounselingPage({
     switch (id) {
       case "counseling-hero":
         return heroSection;
-      case "counseling-vision":
-        return visionSection;
       case "counseling-team":
         return teamSection;
       case "counseling-fees":

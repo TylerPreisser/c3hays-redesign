@@ -5,7 +5,6 @@ import { parseSections, type SectionMeta } from "@/lib/home-content";
 import PageComposer from "@/components/cms/PageComposer";
 import JoinPanel from "@/components/visit/JoinPanel";
 import VisitPlan from "@/components/visit/VisitPlan";
-import VisitEditorial from "@/components/visit/VisitEditorial";
 
 export const metadata: Metadata = {
   title: "Plan Your Visit",
@@ -16,11 +15,10 @@ export const metadata: Metadata = {
 /**
  * /visit — rebuilt to the editor-editable SECTION contract (Phase-4).
  *
- * Composed via <PageComposer> from THREE editor-native sections whose ids match
+ * Composed via <PageComposer> from TWO editor-native sections whose ids match
  * c3-backend `defaultSectionsForSlug("/visit")` verbatim:
  *   • visit-hero      → <JoinPanel>      (socials + service times + Directions)
  *   • visit-plan      → <VisitPlan>      (What to Expect / Come As You Are / Bring Kids)
- *   • visit-editorial → <VisitEditorial> (on-brand editorial rows — real newcomer copy)
  *
  * PageComposer wraps each visible section in `<div data-section={id}>` and injects
  * the scoped per-section/per-tile background stylesheet, so the editor rail can
@@ -38,7 +36,6 @@ export const metadata: Metadata = {
 const PAGE_DEFAULT_SECTIONS: SectionMeta[] = [
   { id: "visit-hero", visible: true },
   { id: "visit-plan", visible: true },
-  { id: "visit-editorial", visible: true },
 ];
 
 export const dynamic = "force-dynamic";
@@ -61,24 +58,12 @@ export default async function VisitPage({
     switch (id) {
       case "visit-hero": return <JoinPanel t={t} />;
       case "visit-plan": return <VisitPlan t={t} />;
-      case "visit-editorial": return <VisitEditorial t={t} />;
       default: return null;
     }
   };
 
-  const known = new Set(["visit-hero", "visit-plan", "visit-editorial"]);
+  const known = new Set(["visit-hero", "visit-plan"]);
   const visible = sections.filter((s) => known.has(s.id));
-
-  // Reconcile: the C3-Studio published sections for /visit predate the restored
-  // editorial section, so an already-persisted list ([visit-hero, visit-plan])
-  // would omit it. If it's missing, insert it right after visit-plan so the
-  // liked, on-brand editorial section always renders (idempotent — no dup).
-  if (!visible.some((s) => s.id === "visit-editorial")) {
-    const i = visible.findIndex((s) => s.id === "visit-plan");
-    const item: SectionMeta = { id: "visit-editorial", visible: true };
-    if (i >= 0) visible.splice(i + 1, 0, item);
-    else visible.push(item);
-  }
 
   return <PageComposer sections={visible} bgFill={ov.bgFill} anim={ov.anim} render={render} />;
 }
