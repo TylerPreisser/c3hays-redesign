@@ -6,6 +6,7 @@ import PageComposer from "@/components/cms/PageComposer";
 import GiveHero from "./GiveHero";
 import GiveImpact from "./GiveImpact";
 import GiveWays from "./GiveWays";
+import GiveClose from "./GiveClose";
 
 export const metadata: Metadata = {
   title: "Give",
@@ -22,6 +23,7 @@ const PAGE_DEFAULT_SECTIONS: SectionMeta[] = [
   { id: "give-hero", visible: true },
   { id: "give-impact", visible: true },
   { id: "give-ways", visible: true },
+  { id: "give-close", visible: true },
 ];
 
 /**
@@ -62,6 +64,8 @@ export default async function GivePage({
         return <GiveImpact t={t} />;
       case "give-ways":
         return <GiveWays t={t} />;
+      case "give-close":
+        return <GiveClose t={t} />;
       default:
         return null;
     }

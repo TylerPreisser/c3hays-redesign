@@ -7,6 +7,10 @@ import { getPageContent } from "@/lib/cms";
 import { isCmsLive } from "@/lib/cms-live";
 import { parseSections, tx, imgCss, type SectionMeta } from "@/lib/home-content";
 import PageComposer from "@/components/cms/PageComposer";
+import SermonPlayer from "@/components/home/SermonPlayer";
+import WatchHub from "@/components/home/WatchHub";
+import SeriesArchive from "@/components/home/SeriesArchive";
+import MediaCarousel from "@/components/home/MediaCarousel";
 
 /* Brand marks as inline SVGs (this lucide build has no brand icons — matches the
    Footer's inline-SVG convention). currentColor drives the fill. */
@@ -61,7 +65,11 @@ const FACEBOOK_LIVE = "https://facebook.com/c3hays/videos";
  */
 const PAGE_DEFAULT_SECTIONS: SectionMeta[] = [
   { id: "watch-hero", visible: true },
+  { id: "sermonPlayer", visible: true },
   { id: "watch-channels", visible: true },
+  { id: "watchHub", visible: true },
+  { id: "seriesArchive", visible: true },
+  { id: "mediaCarousel", visible: true },
   { id: "watch-ondemand", visible: true },
 ];
 
@@ -334,12 +342,29 @@ export default async function WatchPage({
           </section>
         );
 
+      case "sermonPlayer":
+        return <SermonPlayer text={t} />;
+      case "watchHub":
+        return <WatchHub text={t} />;
+      case "seriesArchive":
+        return <SeriesArchive text={t} />;
+      case "mediaCarousel":
+        return <MediaCarousel text={t} />;
+
       default:
         return null;
     }
   };
 
-  const known = new Set(["watch-hero", "watch-channels", "watch-ondemand"]);
+  const known = new Set([
+    "watch-hero",
+    "sermonPlayer",
+    "watch-channels",
+    "watchHub",
+    "seriesArchive",
+    "mediaCarousel",
+    "watch-ondemand",
+  ]);
   const visible = sections.filter((s) => known.has(s.id));
 
   return <PageComposer sections={visible} bgFill={ov.bgFill} anim={ov.anim} render={render} />;

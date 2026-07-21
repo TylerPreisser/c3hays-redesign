@@ -7,6 +7,9 @@ import { getPageContent } from "@/lib/cms";
 import { isCmsLive } from "@/lib/cms-live";
 import { parseSections, tx, imgCss, type SectionMeta } from "@/lib/home-content";
 import PageComposer from "@/components/cms/PageComposer";
+import SeriesArchive from "@/components/home/SeriesArchive";
+import ResourceGrid from "@/components/home/ResourceGrid";
+import MediaCarousel from "@/components/home/MediaCarousel";
 
 /* Brand mark as an inline SVG (this lucide build ships no brand icons — matches the
    Footer + Watch page's inline-SVG convention). currentColor drives the fill. */
@@ -45,6 +48,9 @@ const PAGE_DEFAULT_SECTIONS: SectionMeta[] = [
   { id: "messages-hero", visible: true },
   { id: "messages-banner", visible: true },
   { id: "messages-recent", visible: true },
+  { id: "seriesArchive", visible: true },
+  { id: "mediaCarousel", visible: true },
+  { id: "resourceGrid", visible: true },
   { id: "messages-youtube", visible: true },
 ];
 
@@ -511,6 +517,13 @@ export default async function MessagesPage({
           </section>
         );
 
+      case "seriesArchive":
+        return <SeriesArchive text={t} />;
+      case "mediaCarousel":
+        return <MediaCarousel text={t} />;
+      case "resourceGrid":
+        return <ResourceGrid text={t} />;
+
       default:
         return null;
     }
@@ -520,6 +533,9 @@ export default async function MessagesPage({
     "messages-hero",
     "messages-banner",
     "messages-recent",
+    "seriesArchive",
+    "mediaCarousel",
+    "resourceGrid",
     "messages-youtube",
   ]);
   const visible = sections.filter((s) => known.has(s.id));

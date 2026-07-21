@@ -10,6 +10,7 @@ import StaffGrid from "@/components/about/StaffGrid";
 import Section from "@/components/ui/Section";
 import Stack from "@/components/ui/Stack";
 import PageComposer from "@/components/cms/PageComposer";
+import EditorialRows from "@/components/home/EditorialRows";
 
 export const metadata: Metadata = {
   title: "About",
@@ -37,6 +38,7 @@ const PAGE_DEFAULT_SECTIONS: SectionMeta[] = [
   { id: "about-hero", visible: true },
   { id: "about-story", visible: true },
   { id: "about-values", visible: true },
+  { id: "editorialRows", visible: true },
   { id: "about-staff", visible: true },
 ];
 
@@ -220,12 +222,14 @@ export default async function AboutPage({
       case "about-staff":
         /* ── Meet Our Staff — real 14-person roster ────────────────────────── */
         return <StaffGrid text={t} img={ov.img} />;
+      case "editorialRows":
+        return <EditorialRows text={t} />;
       default:
         return null;
     }
   };
 
-  const known = new Set(["about-hero", "about-story", "about-values", "about-staff"]);
+  const known = new Set(["about-hero", "about-story", "about-values", "editorialRows", "about-staff"]);
   const visible = sections.filter((s) => known.has(s.id));
 
   return <PageComposer sections={visible} bgFill={ov.bgFill} anim={ov.anim} render={render} />;

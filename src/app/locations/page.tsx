@@ -9,6 +9,8 @@ import { tx, imgCss, parseSections, type SectionMeta } from "@/lib/home-content"
 import PageComposer from "@/components/cms/PageComposer";
 import Section from "@/components/ui/Section";
 import Stack from "@/components/ui/Stack";
+import CampusMap from "@/components/home/CampusMap";
+import ServiceTimes from "@/components/home/ServiceTimes";
 
 export const metadata: Metadata = {
   title: "Locations",
@@ -32,7 +34,9 @@ export const metadata: Metadata = {
  */
 const PAGE_DEFAULT_SECTIONS: SectionMeta[] = [
   { id: "locations-hero", visible: true },
+  { id: "campusMap", visible: true },
   { id: "locations-campuses", visible: true },
+  { id: "serviceTimes", visible: true },
 ];
 
 export const dynamic = "force-dynamic";
@@ -234,12 +238,16 @@ export default async function LocationsPage({
             </div>
           </Section>
         );
+      case "campusMap":
+        return <CampusMap text={t} />;
+      case "serviceTimes":
+        return <ServiceTimes text={t} />;
       default:
         return null;
     }
   };
 
-  const known = new Set(["locations-hero", "locations-campuses"]);
+  const known = new Set(["locations-hero", "campusMap", "locations-campuses", "serviceTimes"]);
   const visible = sections.filter((s) => known.has(s.id));
 
   return <PageComposer sections={visible} bgFill={ov.bgFill} anim={ov.anim} render={render} />;
