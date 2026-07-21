@@ -153,6 +153,18 @@ export interface CMSOverrides {
    */
   sections?: SectionMeta[];
   nav?: { items?: { label: string; href: string }[]; bg?: string; color?: string; font?: string; effect?: "auto" | "solid" | "transparent" };
+  /** Drag-anywhere: freeform elements placed at arbitrary spots on this page. */
+  freeEls?: FreeEl[];
+}
+/** A drag-anywhere freeform element (mirror of c3-backend FreeEl). Position is stored
+ *  viewport-independent: x as a % of page width, y as px from the page content top. */
+export interface FreeEl {
+  id: string;
+  kind: "text" | "button";
+  xPct: number;
+  yPx: number;
+  text: string;
+  href?: string;
 }
 /** Per-page overrides (text/buttons/images) by slug, e.g. "/about/". */
 export const getCMSPage = (slug: string) => cmsFetch<CMSOverrides>(`/api/content/page/${encodeURIComponent(slug)}`);

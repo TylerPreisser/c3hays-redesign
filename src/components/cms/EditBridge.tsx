@@ -439,6 +439,9 @@ export default function EditBridge() {
     };
 
     let activeEl: HTMLElement | null = null;
+    // Drag-anywhere: set true at the end of a free-element DRAG so the click that
+    // follows mouseup is swallowed (a drag must not also open the link/text inspector).
+    let justDragged = false;
     const pathOf = (el: HTMLElement | null) => el?.getAttribute("data-cms") || "";
 
     function positionBar() {
@@ -500,6 +503,9 @@ export default function EditBridge() {
     const onSelChange = () => { if (activeEl && document.activeElement && activeEl.contains(document.activeElement as Node)) positionBar(); };
     const clearSel = () => document.querySelectorAll(".cms-sel").forEach((n) => n.classList.remove("cms-sel"));
     const onClick = (e: MouseEvent) => {
+      // Drag-anywhere: swallow the click that a just-completed free-drag emits, so the
+      // move doesn't also select/open the element's inspector.
+      if (justDragged) { justDragged = false; e.preventDefault(); e.stopPropagation(); return; }
       const tgt = e.target as HTMLElement;
       const img = tgt?.closest?.("[data-cms-img]") as HTMLElement | null;
       const link = tgt?.closest?.("[data-cms-link]") as HTMLElement | null;
@@ -618,6 +624,75 @@ export default function EditBridge() {
       else { bgChip.style.display = "none"; bgPath = ""; }
     };
 
+    // ── DRAG-ANYWHERE: free-move [data-cms-free] elements with snap-to-guides ──
+    // A freeform element (FreeLayer) can be grabbed and dragged to any spot on the page.
+    // Threshold-based: a click without movement still edits (text) / selects (button);
+    // moving past 5px enters DRAG mode — the caret is dropped, the element follows the
+    // pointer, and it SNAPS to the page's vertical center (a dashed guide shows) and to
+    // the left edge. On drop we post cms:moveFree{id,xPct,yPx} (x as % of the page width,
+    // y as px) so the editor can persist it into PageOverrides.freeEls. Preview + public
+    // safe: FreeLayer renders the elements; only the editor iframe wires this drag.
+    const gV = document.createElement("div");
+    gV.style.cssText = "position:fixed;z-index:2147483200;top:0;bottom:0;width:0;border-left:2px dashed #7c3aed;display:none;pointer-events:none;";
+    const gH = document.createElement("div");
+    gH.style.cssText = "position:fixed;z-index:2147483200;left:0;right:0;height:0;border-top:2px dashed #7c3aed;display:none;pointer-events:none;";
+    document.body.appendChild(gV); document.body.appendChild(gH);
+    const SNAP = 7;
+    let dEl: HTMLElement | null = null, dId = "", dStartX = 0, dStartY = 0, dLeft0 = 0, dTop0 = 0, dragging = false;
+    let layerRect: DOMRect | null = null;
+    const freeLayer = () => document.querySelector<HTMLElement>("[data-cms-free-layer]");
+    const onFreeMove = (e: MouseEvent) => {
+      if (!dEl || !layerRect) return;
+      const dx = e.clientX - dStartX, dy = e.clientY - dStartY;
+      if (!dragging && Math.abs(dx) < 5 && Math.abs(dy) < 5) return;
+      if (!dragging) {
+        dragging = true; document.body.style.userSelect = "none";
+        try { window.getSelection()?.removeAllRanges(); } catch {}
+        dEl.classList.add("cms-sel"); dEl.style.zIndex = "2147483100"; hideBar();
+      }
+      e.preventDefault(); e.stopPropagation();
+      const w = dEl.offsetWidth, h = dEl.offsetHeight, lw = layerRect.width;
+      let left = dLeft0 + dx, top = dTop0 + dy;
+      left = Math.max(0, Math.min(Math.max(0, lw - w), left));
+      top = Math.max(0, top);
+      // snap element center to the page's vertical center line
+      const center = left + w / 2, mid = lw / 2;
+      gV.style.display = "none"; gH.style.display = "none";
+      if (Math.abs(center - mid) < SNAP) { left = mid - w / 2; gV.style.left = `${layerRect.left + mid}px`; gV.style.display = "block"; }
+      else if (Math.abs(left) < SNAP) { left = 0; gV.style.left = `${layerRect.left}px`; gV.style.display = "block"; }
+      // snap top to a light 8px grid + show a horizontal guide at the element's top
+      top = Math.round(top / 8) * 8;
+      gH.style.top = `${layerRect.top + top}px`; gH.style.display = "block";
+      dEl.style.left = `${left}px`; dEl.style.top = `${top}px`;
+    };
+    const onFreeUp = () => {
+      document.removeEventListener("mousemove", onFreeMove, true);
+      document.removeEventListener("mouseup", onFreeUp, true);
+      gV.style.display = "none"; gH.style.display = "none"; document.body.style.userSelect = "";
+      if (dragging && dEl && layerRect) {
+        const left = parseFloat(dEl.style.left) || 0, top = parseFloat(dEl.style.top) || 0;
+        const xPct = layerRect.width ? (left / layerRect.width) * 100 : 0;
+        justDragged = true; // swallow the trailing click
+        post({ type: "cms:moveFree", id: dId, xPct, yPx: Math.round(top) });
+        log("move-free", { id: dId, xPct: Math.round(xPct), yPx: Math.round(top) });
+      }
+      if (dEl) dEl.style.zIndex = "";
+      dEl = null; dragging = false; layerRect = null;
+    };
+    const onFreeDown = (e: MouseEvent) => {
+      const fe = (e.target as HTMLElement)?.closest?.("[data-cms-free]") as HTMLElement | null;
+      if (!fe) return;
+      const layer = freeLayer(); if (!layer) return;
+      layerRect = layer.getBoundingClientRect();
+      const r = fe.getBoundingClientRect();
+      dEl = fe; dId = fe.getAttribute("data-cms-free") || "";
+      dLeft0 = r.left - layerRect.left; dTop0 = r.top - layerRect.top;
+      dStartX = e.clientX; dStartY = e.clientY; dragging = false;
+      document.addEventListener("mousemove", onFreeMove, true);
+      document.addEventListener("mouseup", onFreeUp, true);
+    };
+    document.addEventListener("mousedown", onFreeDown, true);
+
     document.addEventListener("focusin", onFocusIn, true);
     document.addEventListener("input", onInput, true);
     document.addEventListener("selectionchange", onSelChange);
@@ -662,6 +737,8 @@ export default function EditBridge() {
       document.removeEventListener("selectionchange", onSelChange);
       document.removeEventListener("click", onClick, true);
       document.removeEventListener("mousedown", onDocMouseDown, true);
+      document.removeEventListener("mousedown", onFreeDown, true);
+      gV.remove(); gH.remove();
       document.removeEventListener("mouseover", onOver, true);
       window.removeEventListener("message", onMsg);
       els.forEach((el) => el.removeAttribute("contenteditable"));

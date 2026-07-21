@@ -1,6 +1,8 @@
 import { buildBgCss } from "@/lib/backgrounds";
 import RevealPlayer from "@/components/cms/RevealPlayer";
+import FreeLayer from "@/components/cms/FreeLayer";
 import type { SectionMeta } from "@/lib/home-content";
+import type { FreeEl } from "@/lib/cms";
 
 /**
  * PageComposer — the reusable Layer-2 section composer (generalized from home).
@@ -27,13 +29,15 @@ export interface PageComposerProps {
   anim?: Record<string, string>;
   /** Render the component for a section id (with its chosen style variant). */
   render: (id: string, variant?: string) => React.ReactNode;
+  /** Drag-anywhere freeform elements placed on this page (absolute overlay). */
+  freeEls?: FreeEl[];
 }
 
 /** True when a stored bg value is an image (a `url(...)` shorthand), which is the
  *  only kind that renders as a continuous SPAN layer (colors/gradients don't span). */
 const isImageBg = (bg?: string): boolean => !!bg && /^\s*url\(/i.test(bg);
 
-export default function PageComposer({ sections, bgFill, anim, render }: PageComposerProps) {
+export default function PageComposer({ sections, bgFill, anim, render, freeEls }: PageComposerProps) {
   const visible = sections.filter((s) => s.visible);
   // Per-section AND per-tile background overrides → ONE scoped stylesheet (no
   // component edits). buildBgCss is the shared primitive mirrored from c3-backend.
@@ -78,12 +82,24 @@ export default function PageComposer({ sections, bgFill, anim, render }: PageCom
     }
   }
 
+  // Drag-anywhere: a page with freeform elements needs a positioning context so the
+  // absolute FreeLayer overlay measures from the page content's top-left. Only wrap
+  // when freeEls exist, so every other page is byte-identical to before.
+  const hasFree = Array.isArray(freeEls) && freeEls.length > 0;
+
   return (
     <>
       {bgCss && <style dangerouslySetInnerHTML={{ __html: bgCss }} />}
       {/* Play per-element entrance animations for this page's content. */}
       <RevealPlayer anim={anim ?? {}} />
-      {wrappers}
+      {hasFree ? (
+        <div style={{ position: "relative" }}>
+          {wrappers}
+          <FreeLayer freeEls={freeEls} />
+        </div>
+      ) : (
+        wrappers
+      )}
     </>
   );
 }
