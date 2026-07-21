@@ -6,10 +6,8 @@ import { isCmsLive } from "@/lib/cms-live";
 import { parseSections, imgCss, type SectionMeta } from "@/lib/home-content";
 import { Tx } from "@/components/cms/Editable";
 import PageComposer from "@/components/cms/PageComposer";
-import Section from "@/components/ui/Section";
-import IssueBrowser from "@/components/newsletter/IssueBrowser";
 import WeeklySignup from "@/components/newsletter/WeeklySignup";
-import { newsletterIssues } from "@/data/news";
+import WeeklyConnect from "@/components/newsletter/WeeklyConnect";
 
 export const metadata: Metadata = {
   title: "The C3 Weekly",
@@ -25,22 +23,21 @@ export const metadata: Metadata = {
  *
  * Composed via <PageComposer> from two sections — ids coordinated with the c3-backend
  * page-sections default for /news:
- *   • weekly-hero → image band: LEFT-aligned header over the photo (#8) + a RIGHT-side
- *     editor-native newsletter-signup OVERLAY (<WeeklySignup>, #9) — heading/body/field/
+ *   • weekly-hero    → image band: LEFT-aligned header over the photo + a RIGHT-side
+ *     editor-native newsletter-signup OVERLAY (<WeeklySignup>) — heading/body/field/
  *     button/image all independently editable, and the signup FUNCTIONS.
- *   • weekly-list → the filterable issue browser.
+ *   • weekly-connect → REAL "stay connected" hub (<WeeklyConnect>): the church's genuine
+ *     channels (YouTube / Facebook / Instagram / C3 Podcast) + real weekend service
+ *     times. NO fabricated articles or issues — the empty "issues coming soon" browser
+ *     is gone; this page is a real subscribe + keep-up hub.
  *
- * Round-2 #10: the old bottom "Get it in your inbox" InboxTile is GONE (replaced by the
- * hero overlay). Every section bg (rail), card bg (data-cms-bg), heading/body (<Tx>) and
- * button (data-cms-link + label) is editable. Export-safe: no server redirect.
+ * Every section bg (rail), card bg (data-cms-bg), heading/body (<Tx>) and button
+ * (data-cms-link + label) is editable. Export-safe: no server redirect.
  */
 const PAGE_DEFAULT_SECTIONS: SectionMeta[] = [
   { id: "weekly-hero", visible: true },
-  { id: "weekly-list", visible: true },
+  { id: "weekly-connect", visible: true },
 ];
-
-/* Responsive gutter for the wide Browse container (mirrors .container-c3 padding). */
-const GUTTER = "clamp(1.25rem, 5vw, 3rem)";
 
 export const dynamic = "force-dynamic";
 
@@ -111,7 +108,7 @@ export default async function NewsPage({
                   <Tx
                     text={t}
                     k="weekly-hero-lead"
-                    fallback="One short email each week &mdash; what&rsquo;s coming up, this week&rsquo;s message, and simple next steps. Sign up, or browse past issues below."
+                    fallback="One short email each week &mdash; what&rsquo;s coming up, this week&rsquo;s message, and simple next steps. Subscribe here, and follow along wherever you already are."
                     as="p"
                     className="body-lg"
                     style={{ color: "rgba(255,255,255,0.82)", maxWidth: "34rem", lineHeight: 1.7 }}
@@ -124,32 +121,25 @@ export default async function NewsPage({
             </div>
           </section>
         );
-      case "weekly-list":
-        return (
-          <Section
-            /* #6c: retheme off the muddy tan (--color-paper-soft) to the clean premium
-               on-brand paper (teal/paper/ink), consistent with the rest of the site —
-               a crisp warm-white field so the white issue cards + teal accents read
-               premium instead of beige. */
-            style={{ backgroundColor: "var(--color-paper)", color: "var(--color-ink)" }}
-            bgKey="weekly-list-bg"
-          >
-            <div style={{ width: `min(100% - 2 * ${GUTTER}, 1600px)`, marginInline: "auto" }}>
-              {/* Round-3 de-dupe: the redundant "Browse The C3 Weekly" SectionHeader
-                  (eyebrow "Past issues" + title + lead) is REMOVED — the hero already
-                  titles the page. The lower section now shows ONLY the filters + list.
-                  IssueBrowser (and its filter controls) are untouched. */}
-              <IssueBrowser issues={newsletterIssues} />
-            </div>
-          </Section>
-        );
+      case "weekly-connect":
+        return <WeeklyConnect t={t} />;
       default:
         return null;
     }
   };
 
-  const known = new Set(["weekly-hero", "weekly-list"]);
+  const known = new Set(["weekly-hero", "weekly-connect"]);
   const visible = sections.filter((s) => known.has(s.id));
+
+  // Reconcile: the C3-Studio published sections for /news predate the real
+  // stay-connected hub (they list the retired empty issue browser), so insert
+  // weekly-connect after the hero when a persisted list omits it (idempotent).
+  if (!visible.some((s) => s.id === "weekly-connect")) {
+    const i = visible.findIndex((s) => s.id === "weekly-hero");
+    const item: SectionMeta = { id: "weekly-connect", visible: true };
+    if (i >= 0) visible.splice(i + 1, 0, item);
+    else visible.push(item);
+  }
 
   return <PageComposer sections={visible} bgFill={ov.bgFill} anim={ov.anim} render={render} />;
 }
