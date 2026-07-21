@@ -28,7 +28,7 @@ function FacebookIcon({ size = 24, style }: { size?: number; style?: React.CSSPr
 export const metadata: Metadata = {
   title: "Watch Online",
   description:
-    "Watch Celebration Community Church online — live and on demand on YouTube and Facebook Live.",
+    "Watch Celebration Community Church online — live on Facebook and on demand in our Vimeo archive.",
 };
 
 /* Real destinations, sourced from celebratejesus.org/watch-online:
@@ -43,8 +43,8 @@ const FACEBOOK_LIVE = "https://facebook.com/c3hays/videos";
  * Composed via <PageComposer> from THREE editor-native sections whose ids match
  * the c3-backend page-sections default for /watch:
  *   • watch-hero     → inline hero band (photo + eyebrow/headline/subhead).
- *   • watch-channels → "Two ways to watch" (YouTube + Facebook Live cards).
- *   • watch-ondemand → "Catch up on demand" (messages + YouTube CTAs).
+ *   • watch-channels → "Two ways to watch" (Facebook Live + Vimeo archive cards).
+ *   • watch-ondemand → "Catch up on demand" (messages + Vimeo CTAs).
  *
  * PageComposer wraps each visible section in `<div data-section={id}>` and injects
  * the scoped per-section/per-tile background stylesheet, so the editor rail can
@@ -167,7 +167,7 @@ export default async function WatchPage({
           </section>
         );
 
-      // ── Two ways to watch: YouTube + Facebook Live ───────────────
+      // ── Two ways to watch: Facebook Live + Vimeo archive ─────────
       case "watch-channels":
         return (
           <section style={{ backgroundColor: "#0a0a0a" }} className="section">
@@ -303,7 +303,7 @@ export default async function WatchPage({
                     __html: tx(
                       t,
                       "watch-ondemand-body",
-                      "Browse every message and series in one place &mdash; or head to our YouTube channel."
+                      "Browse every message in one place &mdash; or head to our Vimeo archive."
                     ),
                   }}
                 />

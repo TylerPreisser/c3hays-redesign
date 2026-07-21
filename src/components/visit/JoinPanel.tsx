@@ -11,7 +11,7 @@ import Stack from "@/components/ui/Stack";
  * <JoinPanel> — the /visit HERO section (data-section="visit-hero").
  *
  * The warm, premium top panel a first-time guest lands on:
- *   • the true C3 Logo + social icon buttons (C3 App / YouTube / Facebook / Instagram)
+ *   • the true C3 Logo + social icon buttons (C3 App / Vimeo / Facebook / Instagram)
  *   • the "Join Us / When & where we meet" heading
  *   • the two service-time cards (Hays + Colby) — TIMES + address + a single
  *     editable "Directions" link (no campus-details filler, per Phase-4).
@@ -26,11 +26,10 @@ import Stack from "@/components/ui/Stack";
 
 /* Brand marks as inline SVGs — this lucide build ships no brand icons (matches the
    Footer / newsletter inline-SVG convention). currentColor drives the fill. */
-function YoutubeIcon({ size = 22, style }: { size?: number; style?: CSSProperties }) {
+function VimeoIcon({ size = 22, style }: { size?: number; style?: CSSProperties }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" style={style}>
-      <path d="M22.54 6.42a2.78 2.78 0 0 0-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46a2.78 2.78 0 0 0-1.95 1.96A29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58A2.78 2.78 0 0 0 3.41 19.6C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 0 0 1.95-1.95A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z" />
-      <polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02" fill="var(--color-paper)" />
+      <path d="M23.98 6.5c-.1 2.34-1.74 5.55-4.9 9.62C15.8 20.36 13 22.5 10.66 22.5c-1.45 0-2.68-1.34-3.68-4.02L5.31 11.9C4.57 9.22 3.78 7.88 2.93 7.88c-.18 0-.83.39-1.93 1.17L0 7.83c1.26-1.11 2.5-2.22 3.72-3.33 1.68-1.45 2.94-2.21 3.78-2.29 1.98-.19 3.2 1.17 3.66 4.07.5 3.13.84 5.08 1.03 5.84.57 2.61 1.2 3.91 1.89 3.91.54 0 1.34-.85 2.42-2.55 1.07-1.7 1.65-2.99 1.72-3.88.14-1.32-.38-1.98-1.55-1.98-.55 0-1.13.13-1.71.38 1.14-3.74 3.32-5.56 6.54-5.46 2.39.07 3.51 1.62 3.37 4.64z" />
     </svg>
   );
 }
@@ -54,7 +53,7 @@ function InstagramIcon({ size = 22, style }: { size?: number; style?: CSSPropert
 /* Real celebratejesus.org channels — pulled from @/data/site (single source of truth). */
 const SOCIALS = [
   { id: "app", label: "Get the C3 App", href: site.appStore, Icon: Smartphone },
-  { id: "youtube", label: "Watch on YouTube", href: site.social.youtube, Icon: YoutubeIcon },
+  { id: "vimeo", label: "Watch on Vimeo", href: site.social.vimeo, Icon: VimeoIcon },
   { id: "facebook", label: "Follow on Facebook", href: site.social.facebook, Icon: FacebookIcon },
   { id: "instagram", label: "Follow on Instagram", href: site.social.instagram, Icon: InstagramIcon },
 ] as const;

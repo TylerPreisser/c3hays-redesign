@@ -93,9 +93,8 @@ function SocialRow({ t }: { t: TextBag }) {
     <div className="flex items-center justify-center md:justify-start gap-3">
       <Social id="footer-social-facebook" href={site.social.facebook} label="Facebook"><svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" /></svg></Social>
       <Social id="footer-social-instagram" href={site.social.instagram} label="Instagram"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><rect width="20" height="20" x="2" y="2" rx="5" ry="5" /><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" /><line x1="17.5" x2="17.51" y1="6.5" y2="6.5" /></svg></Social>
-      <Social id="footer-social-youtube" href={site.social.youtube} label="YouTube"><svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46a2.78 2.78 0 0 0-1.95 1.96A29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58A2.78 2.78 0 0 0 3.41 19.6C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 0 0 1.95-1.95A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z" /><polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02" fill="white" /></svg></Social>
-      {/* Phase 3: the extra streaming/audio icons that shipped in the real site's
-          footer are REMOVED site-wide. Real social bar = Facebook · Instagram · YouTube. */}
+      <Social id="footer-social-vimeo" href={site.social.vimeo} label="Vimeo"><svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M23.98 6.5c-.1 2.34-1.74 5.55-4.9 9.62C15.8 20.36 13 22.5 10.66 22.5c-1.45 0-2.68-1.34-3.68-4.02L5.31 11.9C4.57 9.22 3.78 7.88 2.93 7.88c-.18 0-.83.39-1.93 1.17L0 7.83c1.26-1.11 2.5-2.22 3.72-3.33 1.68-1.45 2.94-2.21 3.78-2.29 1.98-.19 3.2 1.17 3.66 4.07.5 3.13.84 5.08 1.03 5.84.57 2.61 1.2 3.91 1.89 3.91.54 0 1.34-.85 2.42-2.55 1.07-1.7 1.65-2.99 1.72-3.88.14-1.32-.38-1.98-1.55-1.98-.55 0-1.13.13-1.71.38 1.14-3.74 3.32-5.56 6.54-5.46 2.39.07 3.51 1.62 3.37 4.64z" /></svg></Social>
+      {/* Real social bar (verified against celebratejesus.org): Facebook · Instagram · Vimeo. */}
     </div>
   );
 }

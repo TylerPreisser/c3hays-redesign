@@ -73,7 +73,7 @@ export const newsletterIssues: NewsletterIssue[] = [
       {
         heading: "This week's message",
         body:
-          "We continued <em>The Word Became Flesh</em> in John 6 &mdash; Jesus, the bread of life. If you missed it, the full message is up on YouTube and the C3 App.",
+          "Missed a weekend? Every message is on demand in our Vimeo archive and the C3 App.",
       },
       {
         heading: "Baptism Sunday recap",

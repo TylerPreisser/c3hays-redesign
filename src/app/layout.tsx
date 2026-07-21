@@ -80,7 +80,7 @@ const jsonLd = {
   sameAs: [
     site.social.facebook,
     site.social.instagram,
-    site.social.youtube,
+    site.social.vimeo,
   ],
 };
 

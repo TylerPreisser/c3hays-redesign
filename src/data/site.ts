@@ -8,14 +8,15 @@ export const site = {
   email: "office@c3hays.com",
   phone: "(785) 625-5483",
   address: { street: "5790 230th Ave", city: "Hays", state: "KS", zip: "67601" },
-  // Real celebratejesus.org channels ONLY. Phase 3: podcast (anchor.fm) and Vimeo were
-  // REMOVED site-wide — everything moved to YouTube. Do NOT re-add vimeo/podcast, and
-  // do NOT invent a Google Play link (only an iOS app exists on the real site).
+  // Real celebratejesus.org channels ONLY (verified against the live /watch-online and
+  // /messages pages): Facebook + Facebook Live, Instagram, and the Vimeo message archive.
+  // The live site has NO YouTube channel — do NOT re-add one. Do NOT invent a Google Play
+  // link (only an iOS app exists on the real site).
   social: {
     facebook: "https://facebook.com/c3hays",
     facebookLive: "https://facebook.com/c3hays/videos",
     instagram: "https://instagram.com/c3hays",
-    youtube: "https://www.youtube.com/@c3hays",
+    vimeo: "https://vimeo.com/c3hays",
   },
   giving: {
     hays: "https://pushpay.com/g/4390326549?r=monthly",
