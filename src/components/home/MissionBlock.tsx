@@ -17,18 +17,17 @@ export default function MissionBlock({
   content = MISSION_DEFAULTS,
   variant,
   bleed = false,
-  bgImage,
+  continuous = false,
 }: {
   content?: MissionContent;
   variant?: string;
   /** v7 R4 — opt-in gradient section-bleed (Tyler-advanced). Default OFF: clean edges. */
   bleed?: boolean;
-  /** Fix 1: when set (home continuous mode), THIS section hosts the ONE shared
-   *  hero.bg photo, sized to span the whole hero+mission area and bled UP behind the
-   *  hero (which paints none of its own) so the two read as a single continuous
-   *  image — no seam, no duplicate. It is the only data-cms-img="hero.bg" element on
-   *  the page, so one edit swaps the whole photo. Omit → solid dark (standalone). */
-  bgImage?: string;
+  /** Home continuous mode (item 2): hero + mission share ONE seamless background image
+   *  painted by PageComposer's SPAN layer behind both sections. When true this section
+   *  renders TRANSPARENT (so that single image shows through — no seam, no duplicate) and
+   *  keeps a scrim for legibility. Omit/false → standalone solid-dark mission. */
+  continuous?: boolean;
 }) {
   const sectionRef = useRef<HTMLElement>(null);
   const v = variant || "centered";
@@ -58,43 +57,26 @@ export default function MissionBlock({
   /* ── centered (default) ─────────────────────────────────────────────── */
   if (v === "centered") {
     return (
-      /* Full-width ink-dark — centered massive headline. Fix 1: when `bgImage` is set
-         (home continuous mode) this section hosts the ONE shared hero.bg photo, sized
-         to span the whole hero+mission area and anchored to bleed UP behind the hero
-         (which paints none of its own) — so the two sections read as a single
-         continuous image. overflow is left VISIBLE so that upward bleed isn't clipped;
-         standalone (no bgImage) keeps clean clipped edges + the solid dark look. */
+      /* Full-width ink-dark — centered massive headline. Home continuous mode (item 2):
+         when `continuous` this section renders TRANSPARENT so PageComposer's single
+         span-layer image (shared with the hero above) shows through as ONE seamless
+         photo — no seam, no duplicate; only a scrim is painted for legibility. Standalone
+         (not continuous) keeps clean clipped edges + the solid dark look. */
       <section
         ref={sectionRef}
-        className={`relative flex items-center justify-center text-center${bgImage ? "" : " overflow-hidden"}`}
+        className="relative flex items-center justify-center text-center overflow-hidden"
         style={{
-          background: bgImage ? "#0f1111" : bleedBg("#1b1c1c", undefined, bleed),
+          background: continuous ? "transparent" : bleedBg("#1b1c1c", undefined, bleed),
           /* Fluid vertical padding: generous on desktop, proportionate on tablet/phone */
           paddingTop: "clamp(5rem, 10vw, 10rem)",
           paddingBottom: "clamp(5rem, 10vw, 10rem)",
         }}
       >
-        {bgImage && (
-          <>
-            {/* Fix 1: the SINGLE shared hero.bg photo. Sized to cover the combined
-                hero+mission area and anchored to bleed UP (top:-100dvh reaches the
-                hero's top since the hero is exactly 100dvh; height = that 100dvh +
-                this section's own height via 100%). object-cover over that tall box
-                means the hero shows the top slice and the mission the continuation —
-                no seam, no duplicate. This is the ONLY data-cms-img="hero.bg" on the
-                page in continuous mode, so the editor swaps the whole photo at once. */}
-            <div
-              data-cms-img="hero.bg"
-              aria-hidden="true"
-              className="absolute left-0 right-0 z-0"
-              style={{ top: "-100dvh", height: "calc(100dvh + 100%)" }}
-            >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={bgImage} alt="" className="w-full h-full" style={{ objectFit: "cover", objectPosition: "center" }} />
-            </div>
-            {/* scrim keeps the white statement legible over the mission's slice */}
-            <div aria-hidden="true" className="absolute inset-0 z-0" style={{ background: "linear-gradient(180deg, rgba(15,17,17,.74) 0%, rgba(15,17,17,.82) 100%)" }} />
-          </>
+        {continuous && (
+          /* Scrim over the mission's slice of the shared span image — keeps the white
+             statement legible. The image itself is painted by PageComposer's span layer
+             behind this (transparent) section, so there is no per-section photo here. */
+          <div aria-hidden="true" className="absolute inset-0 z-0" style={{ background: "linear-gradient(180deg, rgba(15,17,17,.74) 0%, rgba(15,17,17,.82) 100%)" }} />
         )}
         <div className="container-c3 relative z-10">
           <div className="mission-text max-w-4xl mx-auto">

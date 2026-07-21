@@ -155,11 +155,16 @@ function FooterEditorial({ t, m, preCta = false }: { t: TextBag; m: MediaBag; pr
             <p className="heading-3 mb-4" data-cms="g:footer-brand" style={{ color: "rgba(255,255,255,0.95)" }} dangerouslySetInnerHTML={{ __html: tx(t, "footer-brand", "Celebration Community Church") }} />
             <p className="body-sm leading-relaxed mb-6 mx-auto md:mx-0" data-cms="g:footer-tagline" style={{ color: "rgba(255,255,255,0.52)", maxWidth: "22rem" }} dangerouslySetInnerHTML={{ __html: tx(t, "footer-tagline", "One church family in two places across northwest Kansas — for everyone, just as you are.") }} />
             <div className="flex flex-col gap-2 items-center md:items-start">
-              <a href={t["footer-phone-href"] || `tel:${site.phone.replace(/\D/g, "")}`} data-cms-link="g:footer-phone" className="footer-link body-sm" style={{ color: "rgba(255,255,255,0.60)", transition: "color var(--dur-fast) var(--ease-out)" }}>
-                <span data-cms-link-label>{tx(t, "footer-phone-label", site.phone)}</span>
+              {/* ITEM 5: phone/email are EDITABLE TEXT that carries a link — the inner
+                  label is the editable [data-cms] node, and the <a> keeps real
+                  navigation while exposing its destination via data-cms-href (read by
+                  EditBridge's cms:focus → hrefPath). Clicking selects the text (not the
+                  "Edit button" panel); the anchor no longer carries data-cms-link. */}
+              <a href={t["footer-phone-href"] || `tel:${site.phone.replace(/\D/g, "")}`} data-cms-href="g:footer-phone" className="footer-link body-sm" style={{ color: "rgba(255,255,255,0.60)", transition: "color var(--dur-fast) var(--ease-out)" }}>
+                <span data-cms="t:footer-phone-label">{tx(t, "footer-phone-label", site.phone)}</span>
               </a>
-              <a href={t["footer-email-href"] || `mailto:${site.email}`} data-cms-link="g:footer-email" className="footer-link body-sm" style={{ color: "rgba(255,255,255,0.60)", transition: "color var(--dur-fast) var(--ease-out)" }}>
-                <span data-cms-link-label>{tx(t, "footer-email-label", site.email)}</span>
+              <a href={t["footer-email-href"] || `mailto:${site.email}`} data-cms-href="g:footer-email" className="footer-link body-sm" style={{ color: "rgba(255,255,255,0.60)", transition: "color var(--dur-fast) var(--ease-out)" }}>
+                <span data-cms="t:footer-email-label">{tx(t, "footer-email-label", site.email)}</span>
               </a>
             </div>
           </div>

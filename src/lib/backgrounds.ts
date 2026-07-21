@@ -52,12 +52,23 @@ export function imageUrlOf(value: string | undefined): string {
  * to a specific section/tile id.
  */
 export function buildBgCss(
-  sections: Pick<SectionMeta, "id" | "visible" | "bg">[] = [],
+  sections: Pick<SectionMeta, "id" | "visible" | "bg" | "bgSpan">[] = [],
   bgFill: BgFill = {},
 ): string {
   const rules: string[] = [];
-  for (const s of sections) {
-    if (s && s.visible !== false && s.bg) {
+  // A section with bgSpan>0 paints ONE continuous background across itself and the
+  // next N visible sections (rendered by PageComposer's span wrapper), so those
+  // covered sections are skipped here to avoid a repeated (seamed) per-section paint.
+  const vis = sections.filter((s) => s && s.visible !== false);
+  const covered = new Set<string>();
+  vis.forEach((s, i) => {
+    const span = Math.max(0, Math.floor(Number(s.bgSpan) || 0));
+    if (span > 0 && s.bg) {
+      for (let k = 0; k <= span && i + k < vis.length; k++) covered.add(vis[i + k].id);
+    }
+  });
+  for (const s of vis) {
+    if (s.bg && !covered.has(s.id)) {
       rules.push(`[data-section="${s.id}"]>*{background:${s.bg} !important}`);
     }
   }

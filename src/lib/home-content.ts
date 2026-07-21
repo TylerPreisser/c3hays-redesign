@@ -24,7 +24,7 @@ export interface StayConnectedContent { cards?: StayCard[] }
 export interface GiveContent { heading: string; body: string; ctaLabel: string; ctaHref: string; bgImage: string }
 export interface BtnStyle { bg: string; color: string; radius: number; variant: "filled" | "outline"; font: string }
 export interface IconStyle { color: string; bg: string; name?: string }
-export interface SectionMeta { id: string; visible: boolean; bg?: string; variant?: string }
+export interface SectionMeta { id: string; visible: boolean; bg?: string; variant?: string; bgSpan?: number }
 export interface ImgStyle { pos?: string; scale?: number }
 /** v7 (R4): site-wide visual-effect flags. Tyler-advanced; all OFF by default. */
 export interface FxFlags { sectionBleed?: boolean }
@@ -69,13 +69,16 @@ export function tx(text: Record<string, string> | undefined, key: string, fallba
  */
 export function parseSections(raw: unknown, fallback: SectionMeta[]): SectionMeta[] {
   if (!Array.isArray(raw) || raw.length === 0) return fallback;
-  return (raw as Array<{ id?: unknown; visible?: unknown; bg?: unknown; variant?: unknown }>)
+  return (raw as Array<{ id?: unknown; visible?: unknown; bg?: unknown; variant?: unknown; bgSpan?: unknown }>)
     .filter((s) => !!s && typeof s.id === "string")
     .map((s) => ({
       id: s.id as string,
       visible: s.visible !== false,
       bg: typeof s.bg === "string" ? s.bg : undefined,
       variant: typeof s.variant === "string" ? s.variant : undefined,
+      // v-span: number of ADDITIONAL adjacent visible sections this section's bg
+      // image spans across (0/undefined = normal). Guarded to a number at the boundary.
+      bgSpan: typeof s.bgSpan === "number" ? s.bgSpan : undefined,
     }));
 }
 

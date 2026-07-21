@@ -3,8 +3,10 @@ import Image from "next/image";
 import Link from "next/link";
 import { beliefs } from "@/data/beliefs";
 import { assetPath } from "@/lib/asset-path";
-import { getCMSPage } from "@/lib/cms";
-import { tx, imgCss } from "@/lib/home-content";
+import { getPageContent } from "@/lib/cms";
+import { isCmsLive } from "@/lib/cms-live";
+import { parseSections, tx, imgCss, type SectionMeta } from "@/lib/home-content";
+import PageComposer from "@/components/cms/PageComposer";
 import Stack from "@/components/ui/Stack";
 import BeliefsAccordion from "@/components/beliefs/BeliefsAccordion";
 
@@ -14,8 +16,41 @@ export const metadata: Metadata = {
     "The core doctrinal convictions of Celebration Community Church — rooted in Scripture, centered on Jesus.",
 };
 
-export default async function BeliefsPage() {
-  const ov = (await getCMSPage("/beliefs")) || {};
+/**
+ * /beliefs — rebuilt to the editor-editable SECTION contract.
+ *
+ * Composed via <PageComposer> from THREE editor-native sections whose ids match
+ * the c3-backend page-sections default for /beliefs verbatim:
+ *   • beliefs-hero       → image hero band (eyebrow/title/body over the photo).
+ *   • beliefs-statements → the convictions list (sticky left rail + mobile
+ *     <BeliefsAccordion> + desktop always-open list).
+ *   • beliefs-cta        → bottom "Have questions?" CTA with two editable links.
+ *
+ * PageComposer wraps each visible section in `<div data-section={id}>` and injects
+ * the scoped per-section background stylesheet, so the editor rail can add / reorder
+ * / hide / recolor these sections. All existing data-cms tagging is preserved.
+ *
+ * Server component; reads PUBLISHED CMS overrides (forwards ?preview under CMS_LIVE).
+ */
+const PAGE_DEFAULT_SECTIONS: SectionMeta[] = [
+  { id: "beliefs-hero", visible: true },
+  { id: "beliefs-statements", visible: true },
+  { id: "beliefs-cta", visible: true },
+];
+
+export const dynamic = "force-dynamic";
+
+export default async function BeliefsPage({
+  searchParams,
+}: {
+  searchParams?: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  // Finding 2: forward the editor's ?preview token under CMS_LIVE so the editor
+  // preview reflects DRAFT (published in export / public).
+  const cmsLive = isCmsLive();
+  const sp = cmsLive && searchParams ? await searchParams : {};
+  const preview = typeof sp.preview === "string" ? sp.preview : undefined;
+  const ov = (await getPageContent("/beliefs", preview)) || {};
   const t = ov.text || {};
   const media = ov.media || {};
 
@@ -30,248 +65,264 @@ export default async function BeliefsPage() {
     ),
   }));
 
-  return (
-    <>
-      {/* ── Hero ──────────────────────────────────────────────────────── */}
-      <section
-        className="relative flex items-end overflow-hidden"
-        style={{ minHeight: "65vh" }}
-      >
-        {/* Background image */}
-        <div
-          className="absolute inset-0"
-          data-cms-img="beliefs-hero-img"
-          style={{ borderRadius: 0 }}
-        >
-          <Image
-            src={assetPath(media["beliefs-hero-img"] || "/images/worship.webp")}
-            alt="Congregation in worship"
-            fill
-            priority
-            sizes="100vw"
-            className="object-cover object-center"
-            style={imgCss(ov.img?.["beliefs-hero-img"])}
-          />
-          {/* Base dark scrim */}
-          <div
-            className="absolute inset-0"
-            style={{ background: "rgba(10,10,10,0.55)" }}
-          />
-          {/* Bottom-to-top gradient for text legibility */}
-          <div
-            className="absolute inset-0"
-            style={{
-              background:
-                "linear-gradient(to top, rgba(10,10,10,0.92) 0%, rgba(10,10,10,0.40) 50%, rgba(10,10,10,0.08) 100%)",
-            }}
-          />
-        </div>
+  const sections = parseSections(ov.sections, PAGE_DEFAULT_SECTIONS);
 
-        {/* Hero content */}
-        <div
-          className="relative z-10 container-c3 w-full"
-          style={{ paddingBottom: "clamp(3.5rem, 7vw, 6rem)", paddingTop: "clamp(7rem, 12vw, 10rem)" }}
-        >
-          <p
-            className="overline mb-4"
-            data-cms="t:beliefs-hero-eyebrow"
-            style={{ color: "#1cc3af" }}
-            dangerouslySetInnerHTML={{ __html: tx(t, "beliefs-hero-eyebrow", "Our Foundation") }}
-          />
-          <h1
-            className="display-1 text-white"
-            data-cms="t:beliefs-hero-title"
-            style={{ maxWidth: "20ch" }}
-            dangerouslySetInnerHTML={{ __html: tx(t, "beliefs-hero-title", "What We Believe") }}
-          />
-          <p
-            className="body-lg mt-5"
-            data-cms="t:beliefs-hero-body"
-            style={{ color: "rgba(255,255,255,0.68)", maxWidth: "52ch" }}
-            dangerouslySetInnerHTML={{
-              __html: tx(
-                t,
-                "beliefs-hero-body",
-                "These are the convictions that anchor everything we do at C3 — rooted in Scripture, centered on Jesus."
-              ),
-            }}
-          />
-        </div>
-      </section>
-
-      {/* ── Beliefs list — sticky left rail + scrollable items ─────── */}
-      <section className="section" style={{ backgroundColor: "#ffffff" }}>
-        <div className="container-c3">
-          <div className="flex flex-col lg:flex-row lg:gap-20 xl:gap-28">
-
-            {/* ── Left rail — sticky intro (B1/B2: gap-based rhythm) ──── */}
-            <aside className="lg:w-80 xl:w-96 shrink-0 mb-12 lg:mb-0">
-              <div className="lg:sticky lg:top-32">
-                <Stack gap="heading">
-                  <Stack gap="eyebrow">
-                    <p
-                      className="overline"
-                      data-cms="t:beliefs-rail-eyebrow"
-                      style={{ color: "#1cc3af" }}
-                      dangerouslySetInnerHTML={{ __html: tx(t, "beliefs-rail-eyebrow", "Our Convictions") }}
-                    />
-                    <h2
-                      className="heading-1"
-                      data-cms="t:beliefs-rail-heading"
-                      style={{ color: "#1b1c1c" }}
-                      dangerouslySetInnerHTML={{ __html: tx(t, "beliefs-rail-heading", "The beliefs that anchor us.") }}
-                    />
-                  </Stack>
-                  <p
-                    className="body-base"
-                    data-cms="t:beliefs-rail-body"
-                    style={{ color: "rgba(27,28,28,0.65)", lineHeight: 1.7 }}
-                    dangerouslySetInnerHTML={{
-                      __html: tx(
-                        t,
-                        "beliefs-rail-body",
-                        "At Celebration Community Church, we hold to the historic, orthodox Christian faith as revealed in Scripture. These beliefs are not negotiable — they are the foundation of our community and the source of our hope."
-                      ),
-                    }}
-                  />
-
-                  {/* Teal accent rule */}
-                  <div
-                    className="hidden lg:block"
-                    style={{
-                      width: 40,
-                      height: 3,
-                      borderRadius: 2,
-                      background: "#1cc3af",
-                    }}
-                  />
-                </Stack>
-              </div>
-            </aside>
-
-            {/* ── Right column — belief items ───────────────────────── */}
-            <div className="flex-1 min-w-0">
-              {/* Mobile (<lg): accessible tap-to-expand accordion — the sticky
-                  two-column pattern doesn't work on small screens. */}
-              <div className="lg:hidden">
-                <BeliefsAccordion items={items} />
-              </div>
-
-              {/* Desktop (lg+): the always-open list beside the sticky rail. */}
-              <div className="hidden lg:flex flex-col gap-0">
-                {beliefs.map((belief, i) => (
-                  <div
-                    key={belief.id}
-                    className="py-10 group"
-                    style={{ borderBottom: "1px solid rgba(27,28,28,0.10)" }}
-                  >
-                    <div className="flex gap-6 md:gap-10">
-
-                      {/* Number badge */}
-                      <div className="shrink-0 pt-1">
-                        <span
-                          className="text-sm font-bold tabular-nums"
-                          style={{ color: "#1cc3af", letterSpacing: "0.02em" }}
-                        >
-                          {String(i + 1).padStart(2, "0")}
-                        </span>
-                      </div>
-
-                      {/* Content */}
-                      <div className="flex-1 min-w-0">
-                        <h3
-                          className="heading-2 mb-4"
-                          data-cms={`t:beliefs-item-${belief.id}-title`}
-                          style={{ color: "#1b1c1c" }}
-                          dangerouslySetInnerHTML={{
-                            __html: tx(t, `beliefs-item-${belief.id}-title`, belief.title),
-                          }}
-                        />
-                        <div className="flex flex-col gap-4">
-                          {belief.paragraphs.map((para, pi) => (
-                            <p
-                              key={pi}
-                              className="body-lg"
-                              data-cms={`t:beliefs-item-${belief.id}-p${pi}`}
-                              style={{ color: "rgba(27,28,28,0.68)", lineHeight: 1.75 }}
-                              dangerouslySetInnerHTML={{
-                                __html: tx(t, `beliefs-item-${belief.id}-p${pi}`, para),
-                              }}
-                            />
-                          ))}
-                        </div>
-                      </div>
-
-                    </div>
-                  </div>
-                ))}
-              </div>
+  const render = (id: string): React.ReactNode => {
+    switch (id) {
+      case "beliefs-hero":
+        return (
+          <section
+            className="relative flex items-end overflow-hidden"
+            style={{ minHeight: "65vh" }}
+          >
+            {/* Background image */}
+            <div
+              className="absolute inset-0"
+              data-cms-img="beliefs-hero-img"
+              style={{ borderRadius: 0 }}
+            >
+              <Image
+                src={assetPath(media["beliefs-hero-img"] || "/images/worship.webp")}
+                alt="Congregation in worship"
+                fill
+                priority
+                sizes="100vw"
+                className="object-cover object-center"
+                style={imgCss(ov.img?.["beliefs-hero-img"])}
+              />
+              {/* Base dark scrim */}
+              <div
+                className="absolute inset-0"
+                style={{ background: "rgba(10,10,10,0.55)" }}
+              />
+              {/* Bottom-to-top gradient for text legibility */}
+              <div
+                className="absolute inset-0"
+                style={{
+                  background:
+                    "linear-gradient(to top, rgba(10,10,10,0.92) 0%, rgba(10,10,10,0.40) 50%, rgba(10,10,10,0.08) 100%)",
+                }}
+              />
             </div>
 
-          </div>
-        </div>
-      </section>
-
-      {/* ── Bottom CTA (B3: gap-based rhythm, de-cramped) ─────────────── */}
-      <section className="section" style={{ backgroundColor: "#1b1c1c" }}>
-        <div className="container-c3">
-          <Stack
-            gap="cta"
-            align="center"
-            style={{ maxWidth: "40rem", marginInline: "auto" }}
-          >
-            <Stack gap="heading" align="center">
-              <Stack gap="eyebrow" align="center">
-                {/* Teal eyebrow */}
-                <p
-                  className="overline"
-                  data-cms="t:beliefs-cta-eyebrow"
-                  style={{ color: "#1cc3af" }}
-                  dangerouslySetInnerHTML={{ __html: tx(t, "beliefs-cta-eyebrow", "Questions welcome") }}
-                />
-                <h2
-                  className="display-2 text-white"
-                  data-cms="t:beliefs-cta-heading"
-                  dangerouslySetInnerHTML={{ __html: tx(t, "beliefs-cta-heading", "Have questions?") }}
-                />
-              </Stack>
+            {/* Hero content */}
+            <div
+              className="relative z-10 container-c3 w-full"
+              style={{ paddingBottom: "clamp(3.5rem, 7vw, 6rem)", paddingTop: "clamp(7rem, 12vw, 10rem)" }}
+            >
               <p
-                className="body-lg"
-                data-cms="t:beliefs-cta-body"
-                style={{ color: "rgba(255,255,255,0.60)" }}
+                className="overline mb-4"
+                data-cms="t:beliefs-hero-eyebrow"
+                style={{ color: "#1cc3af" }}
+                dangerouslySetInnerHTML={{ __html: tx(t, "beliefs-hero-eyebrow", "Our Foundation") }}
+              />
+              <h1
+                className="display-1 text-white"
+                data-cms="t:beliefs-hero-title"
+                style={{ maxWidth: "20ch" }}
+                dangerouslySetInnerHTML={{ __html: tx(t, "beliefs-hero-title", "What We Believe") }}
+              />
+              <p
+                className="body-lg mt-5"
+                data-cms="t:beliefs-hero-body"
+                style={{ color: "rgba(255,255,255,0.68)", maxWidth: "52ch" }}
                 dangerouslySetInnerHTML={{
                   __html: tx(
                     t,
-                    "beliefs-cta-body",
-                    "For any questions regarding our statement of beliefs, please email office@celebratejesus.org."
+                    "beliefs-hero-body",
+                    "These are the convictions that anchor everything we do at C3 — rooted in Scripture, centered on Jesus."
                   ),
                 }}
               />
-            </Stack>
-
-            <div className="flex flex-wrap gap-4 justify-center">
-              <a
-                href={t["beliefs-cta-primary-href"] || "mailto:office@celebratejesus.org"}
-                data-cms-link="beliefs-cta-primary"
-                className="btn btn-primary btn-lg"
-              >
-                <span data-cms-link-label>
-                  {tx(t, "beliefs-cta-primary-label", "Email Our Office")}
-                </span>
-              </a>
-              <Link
-                href={t["beliefs-cta-secondary-href"] || "/visit/"}
-                data-cms-link="beliefs-cta-secondary"
-                className="btn btn-outline btn-lg"
-              >
-                <span data-cms-link-label>
-                  {tx(t, "beliefs-cta-secondary-label", "Plan a Visit")}
-                </span>
-              </Link>
             </div>
-          </Stack>
-        </div>
-      </section>
-    </>
-  );
+          </section>
+        );
+
+      case "beliefs-statements":
+        return (
+          <section className="section" style={{ backgroundColor: "#ffffff" }}>
+            <div className="container-c3">
+              <div className="flex flex-col lg:flex-row lg:gap-20 xl:gap-28">
+
+                {/* ── Left rail — sticky intro (B1/B2: gap-based rhythm) ──── */}
+                <aside className="lg:w-80 xl:w-96 shrink-0 mb-12 lg:mb-0">
+                  <div className="lg:sticky lg:top-32">
+                    <Stack gap="heading">
+                      <Stack gap="eyebrow">
+                        <p
+                          className="overline"
+                          data-cms="t:beliefs-rail-eyebrow"
+                          style={{ color: "#1cc3af" }}
+                          dangerouslySetInnerHTML={{ __html: tx(t, "beliefs-rail-eyebrow", "Our Convictions") }}
+                        />
+                        <h2
+                          className="heading-1"
+                          data-cms="t:beliefs-rail-heading"
+                          style={{ color: "#1b1c1c" }}
+                          dangerouslySetInnerHTML={{ __html: tx(t, "beliefs-rail-heading", "The beliefs that anchor us.") }}
+                        />
+                      </Stack>
+                      <p
+                        className="body-base"
+                        data-cms="t:beliefs-rail-body"
+                        style={{ color: "rgba(27,28,28,0.65)", lineHeight: 1.7 }}
+                        dangerouslySetInnerHTML={{
+                          __html: tx(
+                            t,
+                            "beliefs-rail-body",
+                            "At Celebration Community Church, we hold to the historic, orthodox Christian faith as revealed in Scripture. These beliefs are not negotiable — they are the foundation of our community and the source of our hope."
+                          ),
+                        }}
+                      />
+
+                      {/* Teal accent rule */}
+                      <div
+                        className="hidden lg:block"
+                        style={{
+                          width: 40,
+                          height: 3,
+                          borderRadius: 2,
+                          background: "#1cc3af",
+                        }}
+                      />
+                    </Stack>
+                  </div>
+                </aside>
+
+                {/* ── Right column — belief items ───────────────────────── */}
+                <div className="flex-1 min-w-0">
+                  {/* Mobile (<lg): accessible tap-to-expand accordion — the sticky
+                      two-column pattern doesn't work on small screens. */}
+                  <div className="lg:hidden">
+                    <BeliefsAccordion items={items} />
+                  </div>
+
+                  {/* Desktop (lg+): the always-open list beside the sticky rail. */}
+                  <div className="hidden lg:flex flex-col gap-0">
+                    {beliefs.map((belief, i) => (
+                      <div
+                        key={belief.id}
+                        className="py-10 group"
+                        style={{ borderBottom: "1px solid rgba(27,28,28,0.10)" }}
+                      >
+                        <div className="flex gap-6 md:gap-10">
+
+                          {/* Number badge */}
+                          <div className="shrink-0 pt-1">
+                            <span
+                              className="text-sm font-bold tabular-nums"
+                              style={{ color: "#1cc3af", letterSpacing: "0.02em" }}
+                            >
+                              {String(i + 1).padStart(2, "0")}
+                            </span>
+                          </div>
+
+                          {/* Content */}
+                          <div className="flex-1 min-w-0">
+                            <h3
+                              className="heading-2 mb-4"
+                              data-cms={`t:beliefs-item-${belief.id}-title`}
+                              style={{ color: "#1b1c1c" }}
+                              dangerouslySetInnerHTML={{
+                                __html: tx(t, `beliefs-item-${belief.id}-title`, belief.title),
+                              }}
+                            />
+                            <div className="flex flex-col gap-4">
+                              {belief.paragraphs.map((para, pi) => (
+                                <p
+                                  key={pi}
+                                  className="body-lg"
+                                  data-cms={`t:beliefs-item-${belief.id}-p${pi}`}
+                                  style={{ color: "rgba(27,28,28,0.68)", lineHeight: 1.75 }}
+                                  dangerouslySetInnerHTML={{
+                                    __html: tx(t, `beliefs-item-${belief.id}-p${pi}`, para),
+                                  }}
+                                />
+                              ))}
+                            </div>
+                          </div>
+
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+              </div>
+            </div>
+          </section>
+        );
+
+      case "beliefs-cta":
+        return (
+          <section className="section" style={{ backgroundColor: "#1b1c1c" }}>
+            <div className="container-c3">
+              <Stack
+                gap="cta"
+                align="center"
+                style={{ maxWidth: "40rem", marginInline: "auto" }}
+              >
+                <Stack gap="heading" align="center">
+                  <Stack gap="eyebrow" align="center">
+                    {/* Teal eyebrow */}
+                    <p
+                      className="overline"
+                      data-cms="t:beliefs-cta-eyebrow"
+                      style={{ color: "#1cc3af" }}
+                      dangerouslySetInnerHTML={{ __html: tx(t, "beliefs-cta-eyebrow", "Questions welcome") }}
+                    />
+                    <h2
+                      className="display-2 text-white"
+                      data-cms="t:beliefs-cta-heading"
+                      dangerouslySetInnerHTML={{ __html: tx(t, "beliefs-cta-heading", "Have questions?") }}
+                    />
+                  </Stack>
+                  <p
+                    className="body-lg"
+                    data-cms="t:beliefs-cta-body"
+                    style={{ color: "rgba(255,255,255,0.60)" }}
+                    dangerouslySetInnerHTML={{
+                      __html: tx(
+                        t,
+                        "beliefs-cta-body",
+                        "For any questions regarding our statement of beliefs, please email office@celebratejesus.org."
+                      ),
+                    }}
+                  />
+                </Stack>
+
+                <div className="flex flex-wrap gap-4 justify-center">
+                  <a
+                    href={t["beliefs-cta-primary-href"] || "mailto:office@celebratejesus.org"}
+                    data-cms-link="beliefs-cta-primary"
+                    className="btn btn-primary btn-lg"
+                  >
+                    <span data-cms-link-label>
+                      {tx(t, "beliefs-cta-primary-label", "Email Our Office")}
+                    </span>
+                  </a>
+                  <Link
+                    href={t["beliefs-cta-secondary-href"] || "/visit/"}
+                    data-cms-link="beliefs-cta-secondary"
+                    className="btn btn-outline btn-lg"
+                  >
+                    <span data-cms-link-label>
+                      {tx(t, "beliefs-cta-secondary-label", "Plan a Visit")}
+                    </span>
+                  </Link>
+                </div>
+              </Stack>
+            </div>
+          </section>
+        );
+
+      default:
+        return null;
+    }
+  };
+
+  const known = new Set(["beliefs-hero", "beliefs-statements", "beliefs-cta"]);
+  const visible = sections.filter((s) => known.has(s.id));
+
+  return <PageComposer sections={visible} bgFill={ov.bgFill} anim={ov.anim} render={render} />;
 }

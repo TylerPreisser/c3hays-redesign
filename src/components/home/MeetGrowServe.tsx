@@ -172,6 +172,7 @@ export default function MeetGrowServe({
               <div
                 key={pillar.word}
                 className="pillar-tile group flex flex-col md:flex-row items-stretch"
+                data-cms-bg={`tile:meetGrowServe.${pi}`}
                 style={{
                   borderTop: pi === 0 ? "1px solid rgba(27,28,28,0.10)" : undefined,
                   borderBottom: "1px solid rgba(27,28,28,0.10)",
@@ -208,8 +209,15 @@ export default function MeetGrowServe({
                     style={{ fontSize: "1rem", color: "rgba(27,28,28,0.78)", lineHeight: 1.7, maxWidth: "52ch" }}
                     dangerouslySetInnerHTML={{ __html: pillar.body }}
                   />
-                  <Link href={pillar.href} className="arrow-link" style={{ color: "#1b1c1c" }}>
-                    Learn More <span className="arrow">→</span>
+                  {/* De-collapsed (item 4): row = data-cms-bg; only this inner link is
+                      the data-cms-link. */}
+                  <Link
+                    href={pillar.href}
+                    data-cms-link={`meetGrowServe.pillars.${pi}.cta`}
+                    className="arrow-link"
+                    style={{ color: "#1b1c1c" }}
+                  >
+                    <span data-cms-link-label>Learn More</span> <span className="arrow">→</span>
                   </Link>
                 </div>
               </div>
@@ -241,9 +249,8 @@ export default function MeetGrowServe({
             {pillars.map((pillar, pi) => {
               const isHero = pi === 0;
               return (
-                <Link
+                <div
                   key={pillar.word}
-                  href={pillar.href}
                   className={`pillar-tile bento-tile group relative overflow-hidden flex flex-col justify-end ${isHero ? "md:col-span-2 lg:col-span-2 md:row-span-2" : ""}`}
                   data-cms-bg={`tile:meetGrowServe.${pi}`}
                   style={{
@@ -283,11 +290,19 @@ export default function MeetGrowServe({
                         dangerouslySetInnerHTML={{ __html: pillar.body }}
                       />
                     )}
-                    <span className="arrow-link" style={{ color: "#fff", marginTop: "var(--s-4, 16px)", display: "inline-flex" }}>
-                      Learn More <span className="arrow">→</span>
-                    </span>
+                    {/* De-collapsed (item 4): tile = data-cms-bg; only this inner link
+                        is the data-cms-link, so a click selects the tile and the CTA is
+                        an independently editable link. */}
+                    <Link
+                      href={pillar.href}
+                      data-cms-link={`meetGrowServe.pillars.${pi}.cta`}
+                      className="arrow-link"
+                      style={{ color: "#fff", marginTop: "var(--s-4, 16px)", display: "inline-flex" }}
+                    >
+                      <span data-cms-link-label>Learn More</span> <span className="arrow">→</span>
+                    </Link>
                   </div>
-                </Link>
+                </div>
               );
             })}
           </div>
@@ -340,12 +355,11 @@ export default function MeetGrowServe({
                 />
               </div>
 
-              <Link
-                href={pillar.href}
+              <div
                 className="flex items-center justify-between group/link"
+                data-cms-bg={`tile:meetGrowServe.${pi}`}
                 style={{
                   padding: "2.25rem 0",
-                  textDecoration: "none",
                   transition: "gap 0.3s ease",
                 }}
               >
@@ -390,20 +404,32 @@ export default function MeetGrowServe({
                   </div>
                 </div>
 
-                {/* Arrow indicator */}
-                <span
+                {/* CTA — de-collapsed (item 4): row = data-cms-bg; only this inner link
+                    is the data-cms-link. The label is editable (sr-only so the minimal
+                    variant stays arrow-only visually). */}
+                <Link
+                  href={pillar.href}
+                  data-cms-link={`meetGrowServe.pillars.${pi}.cta`}
+                  className="inline-flex items-center"
                   style={{
-                    fontSize: "1.5rem",
-                    color: "#1cc3af",
                     flexShrink: 0,
                     marginLeft: "1.5rem",
-                    transition: "transform 0.25s ease",
+                    textDecoration: "none",
                   }}
-                  className="group-hover/link:translate-x-1"
                 >
-                  →
-                </span>
-              </Link>
+                  <span data-cms-link-label className="sr-only">Learn More</span>
+                  <span
+                    style={{
+                      fontSize: "1.5rem",
+                      color: "#1cc3af",
+                      transition: "transform 0.25s ease",
+                    }}
+                    className="group-hover/link:translate-x-1"
+                  >
+                    →
+                  </span>
+                </Link>
+              </div>
             </div>
           ))}
         </div>

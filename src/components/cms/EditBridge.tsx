@@ -15,6 +15,10 @@ import { FONT_PICKER } from "@/lib/fonts";
  *   {type:"cms:ready"}
  *   {type:"cms:edit", path, html}     // a region's content changed
  *   {type:"cms:focus", path}          // a region was focused (caret placed)
+ *   {type:"cms:focus", path, hrefPath, href} // ITEM 5: focused text sits inside a
+ *                                     // data-cms-href anchor → carries a link the
+ *                                     // editor can expose as a link field (additive;
+ *                                     // plain text still posts the {path}-only shape)
  *   {type:"cms:log", ev, ...}         // debug events for the live runner
  * From parent (source:"c3editor"):
  *   {type:"cms:setHtml", path, html}     // set a region's content (external update)
@@ -92,6 +96,20 @@ export default function EditBridge() {
         --ant: #179c8c; background-size: 100% 3px, 100% 3px, 3px 100%, 3px 100%; animation-duration:.38s;
       }
       @keyframes c3ants{ to{ background-position: 14px 0, -14px 100%, 0 -14px, 100% 14px; } }
+      /* ITEM 3: UNIVERSAL selection outline for IMAGES. A full-bleed image wrapper
+         (<div class="absolute inset-0" data-cms-img>) fills its section EXACTLY, and the
+         shared ring above pins to inset:-3px — i.e. 3px OUTSIDE the wrapper on every side.
+         Hero/photo sections commonly set overflow:hidden, which then clips that entire
+         outer ring → the image read as selected (.cms-sel added, "Change image" chip up)
+         but showed NO marching ants. Text/tile/link/icon/section rings are never clipped
+         because those elements sit INSIDE larger containers, so this override is scoped to
+         images only: draw the ring a few px INSIDE the element (never clipped by an
+         ancestor's overflow:hidden) and lift it above any scrim / next-image layer. The
+         --ant color + thicker background-size from the .cms-sel rule above still apply. */
+      [data-cms-img]:hover::after, [data-cms-img].cms-sel::after{
+        top:2px!important; right:2px!important; bottom:2px!important; left:2px!important;
+        z-index:2147483000;
+      }
       /* keystone A/C: SECTION selection outline. Every page composed by PageComposer
          wraps each section in <div data-section=id>. Clicking a section's own chrome
          (canvas, symptom A) OR its rail card (symptom C) stamps .cms-sel-sec on that
@@ -453,7 +471,17 @@ export default function EditBridge() {
       // hover-only outline that vanishes when the mouse moves away.
       const p = pathOf(el);
       clearSel(); el.classList.add("cms-sel"); selPath = p ? `[data-cms="${p}"]` : "";
-      post({ type: "cms:focus", path: p });
+      // ITEM 5: a [data-cms] text node inside an element carrying data-cms-href (e.g.
+      // the footer phone/email — an <a href=tel:/mailto:> whose LABEL is the editable
+      // text) posts the link alongside the focus so the editor can render a link field.
+      // Additive: with no data-cms-href we post the unchanged {path}-only shape, so the
+      // text is still directly editable regardless of whether the editor reads hrefPath.
+      const linkEl = el.closest("[data-cms-href]");
+      if (linkEl) {
+        post({ type: "cms:focus", path: p, hrefPath: linkEl.getAttribute("data-cms-href"), href: (linkEl as HTMLAnchorElement).getAttribute("href") || "" });
+      } else {
+        post({ type: "cms:focus", path: p });
+      }
       log("focus", { path: p });
     };
     const onInput = (e: Event) => {

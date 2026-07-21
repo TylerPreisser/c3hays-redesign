@@ -145,15 +145,11 @@ export default function StayConnected({
             {renderCards.map((rc, i) => {
               const external = rc.href.startsWith("http");
               return (
-                <a
+                <div
                   key={rc.reactKey}
-                  href={rc.href}
-                  target={external ? "_blank" : undefined}
-                  rel={external ? "noopener noreferrer" : undefined}
                   className="connect-item group block"
                   data-anim="riseUp"
                   data-cms-bg={`tile:${rc.iconKey}`}
-                  data-cms-link={rc.linkPath}
                   style={{
                     animationDelay: cardDelay(i),
                     position: "relative",
@@ -199,11 +195,21 @@ export default function StayConnected({
                   {/* Body */}
                   <p className="text-sm" data-cms={rc.body.path} style={{ color: "rgba(27,28,28,0.62)", lineHeight: 1.65, flex: 1, marginBottom: "1.75rem" }} dangerouslySetInnerHTML={{ __html: rc.body.html }} />
 
-                  {/* CTA — R8: editable link (label + href + color + font persist) */}
-                  <span className="arrow-link" style={{ color: btn[rc.linkPath]?.color || "#179c8c", fontFamily: btn[rc.linkPath]?.font || undefined, fontWeight: 600 }}>
+                  {/* CTA — R8: editable link (label + href + color + font persist).
+                      De-collapsed (item 4): the card itself is data-cms-bg; only this
+                      inner anchor is the data-cms-link, so a click selects the card and
+                      the CTA is an independently editable link. */}
+                  <a
+                    href={rc.href}
+                    target={external ? "_blank" : undefined}
+                    rel={external ? "noopener noreferrer" : undefined}
+                    data-cms-link={rc.linkPath}
+                    className="arrow-link"
+                    style={{ color: btn[rc.linkPath]?.color || "#179c8c", fontFamily: btn[rc.linkPath]?.font || undefined, fontWeight: 600 }}
+                  >
                     <span data-cms-link-label>{rc.cta}</span> <span className="arrow">→</span>
-                  </span>
-                </a>
+                  </a>
+                </div>
               );
             })}
           </div>
@@ -245,14 +251,11 @@ export default function StayConnected({
           {renderCards.map((rc, i) => {
             const external = rc.href.startsWith("http");
             return (
-              <a
+              <div
                 key={rc.reactKey}
-                href={rc.href}
-                target={external ? "_blank" : undefined}
-                rel={external ? "noopener noreferrer" : undefined}
                 className="connect-item group block"
                 data-anim="riseUp"
-                data-cms-link={rc.linkPath}
+                data-cms-bg={`tile:${rc.iconKey}`}
                 style={{
                   animationDelay: cardDelay(i),
                   display: "flex",
@@ -309,11 +312,20 @@ export default function StayConnected({
                   dangerouslySetInnerHTML={{ __html: rc.body.html }}
                 />
 
-                {/* CTA — R8: editable link (label + href + color + font persist) */}
-                <span className="arrow-link" style={{ color: btn[rc.linkPath]?.color || "#1cc3af", fontFamily: btn[rc.linkPath]?.font || undefined, fontWeight: 600, fontSize: "0.875rem" }}>
+                {/* CTA — R8: editable link (label + href + color + font persist).
+                    De-collapsed (item 4): card = data-cms-bg; only this inner anchor
+                    is the data-cms-link. */}
+                <a
+                  href={rc.href}
+                  target={external ? "_blank" : undefined}
+                  rel={external ? "noopener noreferrer" : undefined}
+                  data-cms-link={rc.linkPath}
+                  className="arrow-link"
+                  style={{ color: btn[rc.linkPath]?.color || "#1cc3af", fontFamily: btn[rc.linkPath]?.font || undefined, fontWeight: 600, fontSize: "0.875rem" }}
+                >
                   <span data-cms-link-label>{rc.cta}</span> <span className="arrow">→</span>
-                </span>
-              </a>
+                </a>
+              </div>
             );
           })}
         </div>

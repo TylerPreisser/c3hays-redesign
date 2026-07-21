@@ -62,13 +62,13 @@ export default function Hero({ content = HERO_DEFAULTS, btnStyle, text = {}, btn
         {liveStrip}
 
         {/* ── Background ──
-            Fix 1 (home): in `continuous` mode the hero paints NO photo of its own.
-            The single shared `hero.bg` image lives in the mission section below and
-            bleeds UP behind the hero, so the hero shows the TOP slice and the mission
-            the continuation — ONE continuous photo, no seam, no duplicate. The scrims
-            still render (bumped to z-1, above that shared image) so the centered white
-            headline reads at AA. Standalone hero / split / minimal keep their OWN
-            full-bleed hero.bg photo (the only hero.bg element in that case). */}
+            Home continuous mode (item 2): in `continuous` mode the hero paints NO photo
+            of its own and stays transparent. The single shared `hero.bg` image is painted
+            by PageComposer's SPAN layer behind BOTH the hero and the mission below, so the
+            hero shows the TOP slice and the mission the continuation — ONE seamless photo,
+            no seam, no duplicate. The scrims still render (bumped to z-1, above that shared
+            image) so the centered white headline reads at AA. Standalone hero / split /
+            minimal keep their OWN full-bleed hero.bg photo (the only hero.bg element then). */}
         <div className="absolute inset-0" style={{ zIndex: continuous ? 1 : 0 }}>
           {!continuous && (
             <Image

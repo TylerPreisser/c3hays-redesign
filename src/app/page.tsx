@@ -47,13 +47,15 @@ export default async function HomePage({
   const preview = typeof sp.preview === "string" ? sp.preview : undefined;
   const c = fromStudioHome(await getHomeContent(preview));
 
-  // Fix 1 — HOME continuous image. The hero + mission share ONE editable hero.bg
-  // photo that bleeds continuously across both (no duplicate). This is only correct
-  // when a classic hero sits IMMEDIATELY above a centered mission in the visible
-  // order — so hiding or reordering either one gracefully falls back to their
-  // independent looks (hero paints its own photo; mission goes solid dark), never a
-  // duplicated or orphaned image. When continuous: the shared image lives in the
-  // mission (bled up); the hero paints none of its own → exactly one hero.bg element.
+  // HOME continuous image (item 2) — hero + mission are ONE seamless background image,
+  // driven by the GENERALIZABLE `bgSpan` feature (no CSS hack, no seam). This is only
+  // correct when a classic hero sits IMMEDIATELY above a centered mission in the visible
+  // order — so hiding or reordering either one gracefully falls back to their independent
+  // looks (hero paints its own photo; mission goes solid dark), never a duplicated or
+  // orphaned image. When continuous: the hero SECTION carries the shared hero.bg image as
+  // its section bg with bgSpan:1, and PageComposer paints that one image behind BOTH
+  // sections (both render transparent). buildBgCss/PageComposer clamp the span to the
+  // available visible sections, so a hidden/reordered mission degrades safely.
   const visOrder = c.sections.filter((s) => s.visible);
   const hIdx = visOrder.findIndex((s) => s.id === "hero");
   const mIdx = visOrder.findIndex((s) => s.id === "mission");
@@ -70,11 +72,11 @@ export default async function HomePage({
   const render = (id: string, variant?: string): React.ReactNode => {
     switch (id) {
       case "hero": return <Hero content={c.hero} btnStyle={c.btn["hero.cta"]} text={c.text} btn={c.btn} variant={variant} continuous={heroMissionContinuous} />;
-      // Fix 1: in continuous mode the hero's photo is suppressed and the SINGLE shared
-      // hero.bg image is hosted HERE (bled up behind the hero) so both sections read as
-      // one continuous photo. Passing bgImage only when continuous means a reordered /
-      // hidden mission falls back to solid dark with no orphaned copy.
-      case "mission": return <MissionBlock content={c.mission} variant={variant} bleed={c.fx?.sectionBleed} bgImage={heroMissionContinuous && c.hero?.bgImage ? assetPath(c.hero.bgImage) : undefined} />;
+      // In continuous mode both hero and mission render TRANSPARENT (with their own
+      // scrims) so PageComposer's single span-layer image shows through as one seamless
+      // photo. Standalone (not continuous) → mission is solid dark. The image itself is
+      // no longer bled from here; it lives as the hero section's bg (see `sections`).
+      case "mission": return <MissionBlock content={c.mission} variant={variant} bleed={c.fx?.sectionBleed} continuous={heroMissionContinuous} />;
       case "meetGrowServe": return <MeetGrowServe content={c.meetGrowServe} img={c.img} variant={variant} />;
       case "nt26": return <NT26Feature content={c.nt26} btnStyle={c.btn["nt26.cta"]} img={c.img} variant={variant} bleed={c.fx?.sectionBleed} />;
       case "locations": return <LocationsSection text={c.text} btn={c.btn} />;
@@ -94,7 +96,18 @@ export default async function HomePage({
     "hero", "mission", "meetGrowServe", "nt26", "locations", "stayConnected", "give", "promo",
     ...SECTION_EXAMPLE_IDS,
   ]);
-  const sections = c.sections.filter((s) => known.has(s.id));
+  // In continuous mode, express the hero→mission seamless image via the bgSpan feature:
+  // give the HERO section the shared photo as its section bg and span it over the next 1
+  // visible section (mission). PageComposer renders that as ONE continuous image; an
+  // editor-set hero section bg is respected (only derive when none is set), so the photo
+  // stays swappable via both hero.bgImage content and the section-bg control.
+  const sections = c.sections
+    .filter((s) => known.has(s.id))
+    .map((s) =>
+      heroMissionContinuous && s.id === "hero"
+        ? { ...s, bg: s.bg ?? `url("${assetPath(c.hero.bgImage)}") center / cover no-repeat`, bgSpan: 1 }
+        : s,
+    );
 
   return <PageComposer sections={sections} bgFill={c.bgFill} anim={c.anim} render={render} />;
 }
