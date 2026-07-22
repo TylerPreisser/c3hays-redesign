@@ -9,8 +9,8 @@ export const navItems: NavItem[] = [
     label: "About",
     href: "/about/",
     children: [
-      { label: "Our Story", href: "/about/" },
-      { label: "What We Believe", href: "/beliefs/" },
+      { label: "Who We Are", href: "/about/#who-we-are" },
+      { label: "What We Believe", href: "/about/#what-we-believe" },
     ],
   },
   {
@@ -56,8 +56,8 @@ export const navGroups: NavGroup[] = [
   {
     label: "About",
     children: [
-      { label: "Our Story", href: "/about/" },
-      { label: "What We Believe", href: "/beliefs/" },
+      { label: "Who We Are", href: "/about/#who-we-are" },
+      { label: "What We Believe", href: "/about/#what-we-believe" },
     ],
   },
   {

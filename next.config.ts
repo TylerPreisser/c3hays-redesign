@@ -22,6 +22,14 @@ const nextConfig: NextConfig = {
     qualities: [75, 90],
   },
   devIndicators: false,
+  // /beliefs merged into /about (item #2). Redirect old links + the section-preview
+  // so nothing 404s. Honored in the CMS_LIVE server runtime (the deployed site); the
+  // static-export CI build ignores redirects with a warning (that pipeline is separate).
+  async redirects() {
+    return [
+      { source: "/beliefs", destination: "/about", permanent: true },
+    ];
+  },
 };
 
 export default nextConfig;

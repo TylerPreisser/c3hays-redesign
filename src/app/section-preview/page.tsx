@@ -67,7 +67,6 @@ const PAGE_LOADERS: Record<string, () => Promise<{ default: PageComponent }>> = 
   "/visit": () => import("@/app/visit/page"),
   "/news": () => import("@/app/news/page"),
   "/about": () => import("@/app/about/page"),
-  "/beliefs": () => import("@/app/beliefs/page"),
   "/locations": () => import("@/app/locations/page"),
   "/messages": () => import("@/app/messages/page"),
   "/watch": () => import("@/app/watch/page"),

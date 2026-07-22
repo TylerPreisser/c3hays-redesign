@@ -19,8 +19,9 @@ export function slugForSectionId(id: string): string | null {
   if (id.startsWith("events-")) return "/events";
   if (id.startsWith("visit-")) return "/visit";
   if (id.startsWith("weekly-")) return "/news";
+  // about-* also covers the merged doctrine section (about-believe). beliefs-* ids are
+  // retired — /beliefs folded into /about (item #2) and now redirects there.
   if (id.startsWith("about-")) return "/about";
-  if (id.startsWith("beliefs-")) return "/beliefs";
   if (id.startsWith("locations-")) return "/locations";
   if (id.startsWith("messages-")) return "/messages";
   if (id.startsWith("watch-")) return "/watch";

@@ -29,7 +29,7 @@ import { isCmsLive } from "@/lib/cms-live";
 // equals the actual hand-built routes and FAILS if a hand route is added/removed
 // without updating this list.
 export const STATIC_ROUTES = new Set([
-  "about", "beliefs", "visit", "locations", "messages", "news", "watch", "counseling", "connect", "give",
+  "about", "visit", "locations", "messages", "news", "watch", "counseling", "connect", "give",
   "events", "newsletter", "section-preview",
 ]);
 
