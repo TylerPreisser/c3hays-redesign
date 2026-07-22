@@ -49,6 +49,7 @@ import WatchHub from "@/components/home/WatchHub";
 import SeriesArchive from "@/components/home/SeriesArchive";
 import MediaCarousel from "@/components/home/MediaCarousel";
 import CampusMap from "@/components/home/CampusMap";
+import StickySplit from "@/components/home/StickySplit";
 
 export interface VariantDef { key: string; label: string }
 export interface SectionExampleDef {
@@ -100,6 +101,7 @@ export const SECTION_EXAMPLES: SectionExampleDef[] = [
   { id: "seriesArchive", label: "Series Archive", icon: "LibraryBig", group: "Media", description: "A poster grid of your message series with scripture refs.", variants: [] },
   { id: "mediaCarousel", label: "Media Carousel", icon: "GalleryHorizontal", group: "Media", description: "A filterable, swipeable carousel of messages, audio and playlists.", variants: [] },
   { id: "campusMap", label: "Campus Map", icon: "Map", group: "Visit", description: "An interactive map with campus pins and a live details card.", variants: [] },
+  { id: "stickySplit", label: "Sticky Split", icon: "Columns2", group: "Feature", description: "A pinned heading beside a scrolling list of points — the /about beliefs layout, reusable anywhere.", variants: [] },
 ];
 
 /** All example ids (for the shoot harness + preview route param generation). */
@@ -152,6 +154,7 @@ export function renderExample(id: string, c: HomeContent, variant?: string): Rea
     case "seriesArchive": return <SeriesArchive text={c.text} btnStyle={c.btn["sarchive.cta"]} variant={variant} />;
     case "mediaCarousel": return <MediaCarousel text={c.text} btnStyle={c.btn["mcarousel.cta"]} variant={variant} />;
     case "campusMap": return <CampusMap text={c.text} btnStyle={c.btn["campusmap.cta"]} variant={variant} />;
+    case "stickySplit": return <StickySplit text={c.text} />;
     default: return null;
   }
 }
