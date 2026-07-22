@@ -74,7 +74,7 @@ export default function GiveWays({ t }: GiveWaysProps) {
             as="p"
             text={t}
             k="give-ways-lead"
-            fallback="Choose your campus below to give securely through Pushpay &mdash; or use one of the other ways to give."
+            fallback="Choose your campus below to give securely through Pushpay, or use one of the other ways to give."
             className="gw-lead"
           />
         </div>
@@ -97,7 +97,7 @@ export default function GiveWays({ t }: GiveWaysProps) {
                   as="p"
                   text={t}
                   k="give-ways-app-body"
-                  fallback="Give on the go, watch messages, and stay connected &mdash; right from the Celebration Community Church app."
+                  fallback="Give on the go, watch messages, and stay connected, right from the Celebration Community Church app."
                   className="gw-method__b"
                 />
                 <EditableLink

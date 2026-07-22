@@ -52,7 +52,7 @@ export default function SermonFeature({
       <p data-cms="t:sermon-meta" style={{ color: "#1cc3af", fontWeight: 600, margin: 0 }}
         dangerouslySetInnerHTML={{ __html: tx(text, "sermon-meta", "Pastor &bull; John 14 &bull; 38 min") }} />
       <p data-cms="t:sermon-body" className="body-lg" style={{ color: "rgba(255,255,255,0.72)", maxWidth: 520, margin: 0 }}
-        dangerouslySetInnerHTML={{ __html: tx(text, "sermon-body", "Missed the weekend? Catch this message and every series on demand &mdash; anytime, anywhere.") }} />
+        dangerouslySetInnerHTML={{ __html: tx(text, "sermon-body", "Missed the weekend? Catch this message and every series on demand, anytime, anywhere.") }} />
       <a href={text?.["sermon.cta-href"] || "/messages/"} data-cms-link="sermon.cta" className="btn"
         style={btnCss(btnStyle) || { background: "#1cc3af", color: "#042e29", borderRadius: 999, fontWeight: 700, padding: "0.9rem 1.9rem", marginTop: "0.35rem", alignSelf: "flex-start" }}>
         <span data-cms-link-label>{text?.["sermon.cta-label"] || "Watch Now"}</span>

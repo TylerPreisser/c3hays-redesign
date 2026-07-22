@@ -152,7 +152,7 @@ export default async function EventsPage({
                 <Tx
                   text={t}
                   k="events-cal-body"
-                  fallback="Every service, class, and gathering &mdash; browse the live church calendar below."
+                  fallback="Every service, class, and gathering, browse the live church calendar below."
                 />
               }
             />

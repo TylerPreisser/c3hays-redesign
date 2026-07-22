@@ -192,7 +192,7 @@ export default function ResourceGrid({ text, className }: ResourceGridProps) {
                     __html: tx(
                       text,
                       "resource-feat-body",
-                      "Add your text here &mdash; a short summary of this featured resource.",
+                      "Add your text here, a short summary of this featured resource.",
                     ),
                   }}
                 />

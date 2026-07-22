@@ -124,7 +124,7 @@ export default function WeeklyConnect({ t }: { t: Record<string, string> }) {
             as="span"
             text={t}
             k="weekly-connect-lead"
-            fallback="Subscribe above for a weekly note in your inbox &mdash; or keep up with C3 wherever you already are."
+            fallback="Subscribe above for a weekly note in your inbox, or keep up with C3 wherever you already are."
             style={{ color: "var(--color-stone)" }}
           />
         }

@@ -163,7 +163,7 @@ export function ConnectHero({ text, media = {}, img = {} }: ConnectHeroProps) {
               <Tx
                 text={text}
                 k="connect-hero-heading"
-                fallback="Come as you are &mdash; we&rsquo;d love to meet you."
+                fallback="Come as you are, we&rsquo;d love to meet you."
                 as="h1"
                 className="connect-card-title"
               />
@@ -171,7 +171,7 @@ export function ConnectHero({ text, media = {}, img = {} }: ConnectHeroProps) {
             <Tx
               text={text}
               k="connect-hero-body"
-              fallback="Send a note and a real person from our team will personally reach out. No pressure &mdash; just a warm welcome."
+              fallback="Send a note and a real person from our team will personally reach out. No pressure, just a warm welcome."
               as="p"
               className="body-base"
               style={{ color: "rgba(255,255,255,0.82)", marginBottom: "var(--s-8)" }}
@@ -196,7 +196,7 @@ export function ConnectHero({ text, media = {}, img = {} }: ConnectHeroProps) {
                 <Tx
                   text={text}
                   k="connect-thanks-heading"
-                  fallback="Thanks &mdash; we&rsquo;ll be in touch."
+                  fallback="Thanks, we&rsquo;ll be in touch."
                   as="h2"
                   className="connect-card-title"
                   style={{ marginBottom: "var(--space-eyebrow)" }}
@@ -418,7 +418,7 @@ export function ConnectSteps({ text }: ConnectStepsProps) {
         <Tx
           text={text}
           k="connect-intents-body"
-          fallback="Pick a step and we&rsquo;ll take it with you &mdash; each one goes straight to the right team."
+          fallback="Pick a step and we&rsquo;ll take it with you, each one goes straight to the right team."
           as="p"
           className="body-lg"
           style={{ color: "var(--color-mute)" }}

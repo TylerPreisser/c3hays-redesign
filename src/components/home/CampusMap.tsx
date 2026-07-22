@@ -69,7 +69,7 @@ const CAMPUSES: Campus[] = [
     id: "hays",
     tag: "Hays Campus",
     sub: "Hays Campus",
-    title: "C3 Church &mdash; Hays",
+    title: "C3 Church, Hays",
     left: "76%",
     top: "38%",
     rows: [
@@ -82,7 +82,7 @@ const CAMPUSES: Campus[] = [
     id: "colby",
     tag: "Colby Campus",
     sub: "Colby Campus",
-    title: "C3 Church &mdash; Colby",
+    title: "C3 Church, Colby",
     left: "18%",
     top: "68%",
     rows: [
@@ -170,7 +170,7 @@ export default function CampusMap({ text, className }: CampusMapProps) {
         <p
           className="campusmap-body"
           data-cms="t:campusmap-body"
-          dangerouslySetInnerHTML={{ __html: tx(text, "campusmap-body", "C3 has two campuses in Kansas &mdash; Hays and Colby. Select a pin to see service times and directions.") }}
+          dangerouslySetInnerHTML={{ __html: tx(text, "campusmap-body", "C3 has two campuses in Kansas, Hays and Colby. Select a pin to see service times and directions.") }}
         />
       </div>
 

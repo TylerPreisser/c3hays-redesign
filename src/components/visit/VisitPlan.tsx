@@ -78,7 +78,7 @@ export default function VisitPlan({ t }: { t: Record<string, string> }) {
           <Tx
             text={t}
             k="visit-plan-lead"
-            fallback="Everything you need to know before you walk through the door &mdash; so your first Sunday feels like coming home."
+            fallback="Everything you need to know before you walk through the door, so your first Sunday feels like coming home."
             style={{ color: "rgba(255,255,255,0.70)" }}
           />
         }

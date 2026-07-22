@@ -80,19 +80,19 @@ const ROWS: RowDef[] = [
     key: "row1", art: "wheat", rev: false,
     kicker: "Hays, Kansas",
     heading: "Row heading",
-    body: "Add your text here &mdash; describe what&rsquo;s happening in this section.",
+    body: "Add your text here, describe what&rsquo;s happening in this section.",
   },
   {
     key: "row2", art: "grass", rev: true,
     kicker: "Colby, Kansas",
     heading: "Row heading",
-    body: "Add your text here &mdash; a short editorial paragraph you can edit.",
+    body: "Add your text here, a short editorial paragraph you can edit.",
   },
   {
     key: "row3", art: "river", rev: false,
     kicker: "Kicker",
     heading: "Row heading",
-    body: "Add your text here &mdash; a short editorial paragraph you can edit.",
+    body: "Add your text here, a short editorial paragraph you can edit.",
   },
 ];
 

@@ -24,7 +24,7 @@ export default function NextSteps({
 }) {
   const v = variant || "steps";
   const steps = [
-    { k: "a", icon: "MapPin", title: "Visit", blurb: "Join us this weekend &mdash; we&rsquo;ll save you a seat." },
+    { k: "a", icon: "MapPin", title: "Visit", blurb: "Join us this weekend, we&rsquo;ll save you a seat." },
     { k: "b", icon: "Hand", title: "Connect", blurb: "Say hello at the Welcome Center after any service." },
     { k: "c", icon: "Users", title: "Grow", blurb: "Join a group and do life with others." },
     { k: "d", icon: "Heart", title: "Serve", blurb: "Use your gifts to make a difference." },

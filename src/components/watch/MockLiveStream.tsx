@@ -124,7 +124,7 @@ export default function MockLiveStream({
               as="span"
               text={text}
               k="watch-stream-msg-playing"
-              fallback="Preview playing &mdash; the production build streams the live service here."
+              fallback="Preview playing, the production build streams the live service here."
             />
           ) : isLive ? (
             <Tx

@@ -75,7 +75,7 @@ export default function GiveImpact({ t }: GiveImpactProps) {
               as="p"
               text={t}
               k="give-impact-body-2"
-              fallback="So we invest our time, our talents, and our money in things that matter to God. Generosity isn&rsquo;t a transaction &mdash; it&rsquo;s worship, and it&rsquo;s how we join what God is already doing."
+              fallback="So we invest our time, our talents, and our money in things that matter to God. Generosity isn&rsquo;t a transaction, it&rsquo;s worship, and it&rsquo;s how we join what God is already doing."
               className="body-lg gi-prose gi-mut"
             />
 
@@ -108,7 +108,7 @@ export default function GiveImpact({ t }: GiveImpactProps) {
                     as="p"
                     text={t}
                     k="give-impact-facet2-body"
-                    fallback="Mission partners carrying the hope of Jesus far beyond our walls &mdash; into places we may never visit ourselves."
+                    fallback="Mission partners carrying the hope of Jesus far beyond our walls, into places we may never visit ourselves."
                     className="gi-facet__b"
                   />
                 </div>

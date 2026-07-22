@@ -24,7 +24,7 @@ export default function StatsBand({
 }) {
   const v = variant || "band";
   const stats = [
-    { k: "a", figure: "2", label: "Campuses &mdash; Hays &amp; Colby" },
+    { k: "a", figure: "2", label: "Campuses, Hays &amp; Colby" },
     { k: "b", figure: "1,200+", label: "Gathering each weekend" },
     { k: "c", figure: "40+", label: "Small groups" },
     { k: "d", figure: "150", label: "Serving on a team" },

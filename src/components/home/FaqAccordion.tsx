@@ -21,10 +21,10 @@ export default function FaqAccordion({
 }) {
   const v = variant || "list";
   const faqs = [
-    { k: "a", q: "What should I wear?", a: "Come as you are &mdash; you&rsquo;ll see everything from jeans to Sunday best. There&rsquo;s no dress code here." },
+    { k: "a", q: "What should I wear?", a: "Come as you are, you&rsquo;ll see everything from jeans to Sunday best. There&rsquo;s no dress code here." },
     { k: "b", q: "What about my kids?", a: "C3 Kids runs during every service with safe, fun, age-specific environments for birth through 5th grade." },
-    { k: "c", q: "How long is a service?", a: "About 70 minutes &mdash; worship, a practical message from the Bible, and a chance to connect." },
-    { k: "d", q: "Where do I park?", a: "Look for our team in bright vests &mdash; they&rsquo;ll point you to guest parking right by the main entrance." },
+    { k: "c", q: "How long is a service?", a: "About 70 minutes, worship, a practical message from the Bible, and a chance to connect." },
+    { k: "d", q: "Where do I park?", a: "Look for our team in bright vests, they&rsquo;ll point you to guest parking right by the main entrance." },
   ];
 
   const Item = ({ k, q, a }: { k: string; q: string; a: string }) => (

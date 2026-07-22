@@ -158,7 +158,7 @@ export default async function WatchPage({
                   __html: tx(
                     t,
                     "watch-hero-subhead",
-                    "Every service streams live &mdash; and every past message is on demand. Two ways to join in."
+                    "Every service streams live, and every past message is on demand. Two ways to join in."
                   ),
                 }}
               />
@@ -302,7 +302,7 @@ export default async function WatchPage({
                     __html: tx(
                       t,
                       "watch-ondemand-body",
-                      "Browse every message in one place &mdash; or head to our YouTube channel."
+                      "Browse every message in one place, or head to our YouTube channel."
                     ),
                   }}
                 />
