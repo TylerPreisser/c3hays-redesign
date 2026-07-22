@@ -624,7 +624,7 @@ const CONNECT_CSS = `
   font-size: clamp(1.7rem, 2.6vw, 2.3rem);
 }
 
-/* Inputs sit on glass — keep them near-white for crisp contrast. */
+/* Inputs sit on glass, keep them near-white for crisp contrast. */
 .glass-card .input-c3 {
   background: rgba(255,255,255,0.95);
   border-radius: var(--radius-sm);
@@ -695,7 +695,7 @@ const CONNECT_CSS = `
 @keyframes connectRise { from { opacity: 0; transform: translateY(28px); } to { opacity: 1; transform: none; } }
 @keyframes connectFade { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
 
-/* MOBILE — the SAME design degrades: shortened image on top, SOLID (non-glass)
+/* MOBILE: the SAME design degrades: shortened image on top, SOLID (non-glass)
    sheet stacked beneath. Fully responsive. */
 @media (max-width: 767px) {
   .connect-fullbleed { display: block; min-height: 0 !important; }
