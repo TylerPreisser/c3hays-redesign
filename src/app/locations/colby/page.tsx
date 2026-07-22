@@ -5,6 +5,7 @@ import { MapPin, Clock, Navigation } from "lucide-react";
 import { assetPath } from "@/lib/asset-path";
 import { getCMSPage } from "@/lib/cms";
 import { tx, imgCss } from "@/lib/home-content";
+import StaffGrid from "@/components/about/StaffGrid";
 
 export const metadata: Metadata = {
   title: "Colby Campus",
@@ -263,73 +264,14 @@ export default async function ColbyCampusPage() {
         </div>
       </section>
 
-      {/* ── Campus visual band ────────────────────────────────────── */}
-      <section style={{ backgroundColor: "#1b1c1c" }}>
-        <div className="container-c3 py-12 md:py-16">
-          <div
-            className="relative overflow-hidden"
-            style={{ height: 400, borderRadius: "var(--radius-md)" }}
-            data-cms-img="colby-congregation-img"
-          >
-            <Image
-              src={assetPath(
-                media["colby-congregation-img"] || "/images/congregation.webp"
-              )}
-              alt="C3 Colby congregation"
-              fill
-              className="object-cover"
-              style={imgCss(ov.img?.["colby-congregation-img"])}
-            />
-
-            {/* Gradient scrim */}
-            <div
-              className="absolute inset-0"
-              style={{
-                background:
-                  "linear-gradient(to top, rgba(10,10,10,0.93) 0%, rgba(10,10,10,0.50) 50%, rgba(10,10,10,0.18) 100%)",
-              }}
-            />
-
-            {/* Overlaid content */}
-            <div className="absolute inset-0 flex flex-col justify-end p-8 md:p-12">
-              <p
-                className="overline mb-3"
-                style={{ color: "var(--color-teal)" }}
-                data-cms="t:colby-band-eyebrow"
-                dangerouslySetInnerHTML={{
-                  __html: tx(t, "colby-band-eyebrow", "Campus Location"),
-                }}
-              />
-              <p
-                className="heading-2 text-white mb-2"
-                data-cms="t:colby-band-address"
-                dangerouslySetInnerHTML={{
-                  __html: tx(
-                    t,
-                    "colby-band-address",
-                    "1923 S Range, Colby, KS 67701"
-                  ),
-                }}
-              />
-              <a
-                href={
-                  t["colby-maps-btn-href"] ||
-                  "https://maps.google.com/?q=1923+S+Range,+Colby,+KS+67701"
-                }
-                target="_blank"
-                rel="noopener noreferrer"
-                data-cms-link="colby-maps-btn"
-                className="btn btn-primary btn-sm inline-flex items-center gap-2 mt-5 self-start"
-              >
-                <Navigation size={13} />
-                <span data-cms-link-label>
-                  {tx(t, "colby-maps-btn-label", "Open in Google Maps")}
-                </span>
-              </a>
-            </div>
-          </div>
-        </div>
-      </section>
+      {/* ── Meet the Team ─────────────────────────────────────────── */}
+      <StaffGrid
+        groups={["colby"]}
+        keyPrefix="colby-staff"
+        text={t}
+        img={ov.img}
+        titleText="Meet the Team"
+      />
 
       {/* ── Visit CTA strip ───────────────────────────────────────── */}
       <section

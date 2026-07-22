@@ -9,16 +9,17 @@ import { locations } from "@/data/locations";
 import { assetPath } from "@/lib/asset-path";
 import { tx, type BtnStyle } from "@/lib/home-content";
 import { btnCss } from "./Hero";
-import CampusChooser from "./CampusChooser";
 
 gsap.registerPlugin(ScrollTrigger);
 
-// A 1×1 transparent PNG — the DEFAULT src of the map's swappable photo layer, so the
-// stylized SVG map shows through until someone actually picks a photo (EditBridge swaps
-// this <img>'s src, exactly as it does for the campus-card photos). `unoptimized` images
-// in next.config allow a data-URI src.
+// A genuinely 1×1 FULLY-TRANSPARENT PNG (RGBA 0,0,0,0) — the DEFAULT src of the map's
+// swappable photo layer, so the stylized SVG map shows through until someone actually
+// picks a photo (EditBridge swaps this <img>'s src, exactly as it does for the campus-card
+// photos). `unoptimized` images in next.config allow a data-URI src.
+// NOTE: the previous value here was an OPAQUE BLACK pixel (alpha 255), which the
+// object-cover <Image> painted across the tile and bled as black edges around the map.
 const BLANK_PX =
-  "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==";
+  "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR4nGNgYGBgAAAABQABpfZFQAAAAABJRU5ErkJggg==";
 
 /* "Our Churches" — Church-on-the-Move's campus-chooser pattern, reskinned to C3:
    a stylized northwest-Kansas map with Hays + Colby markers beside a teal
@@ -112,8 +113,7 @@ export default function LocationsSection({ text = {}, btn = {} }: { text?: Recor
             style={{ background: "var(--color-ink)", borderRadius: "var(--radius-md)", padding: "2.5rem 2.25rem" }}
           >
             <h3 className="heading-2 text-white" data-cms="t:findcampus-heading" style={{ marginBottom: "0.875rem" }} dangerouslySetInnerHTML={{ __html: tx(text, "findcampus-heading", "Find your campus") }} />
-            <p className="body-base" data-cms="t:findcampus-body" style={{ color: "rgba(255,255,255,0.6)", marginBottom: "1.75rem" }} dangerouslySetInnerHTML={{ __html: tx(text, "findcampus-body", "Find the campus closest to you, we'd love to see you this weekend.") }} />
-            <CampusChooser variant="teal" id="findcampus-locations" text={text} btn={btn} />
+            <p className="body-base" data-cms="t:findcampus-body" style={{ color: "rgba(255,255,255,0.6)" }} dangerouslySetInnerHTML={{ __html: tx(text, "findcampus-body", "Find the campus closest to you, we'd love to see you this weekend.") }} />
           </div>
         </div>
 

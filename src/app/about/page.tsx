@@ -7,7 +7,6 @@ import { isExampleSection, renderExample, SECTION_EXAMPLE_IDS } from "@/lib/sect
 import { assetPath } from "@/lib/asset-path";
 import { beliefs } from "@/data/beliefs";
 import OurValues from "@/components/about/OurValues";
-import StaffGrid from "@/components/about/StaffGrid";
 import BeliefsAccordion from "@/components/beliefs/BeliefsAccordion";
 import Stack from "@/components/ui/Stack";
 import PageComposer from "@/components/cms/PageComposer";
@@ -41,7 +40,6 @@ const PAGE_DEFAULT_SECTIONS: SectionMeta[] = [
   { id: "about-hero", visible: true },
   { id: "about-values", visible: true },
   { id: "about-believe", visible: true },
-  { id: "about-staff", visible: true },
 ];
 
 export const dynamic = "force-dynamic";
@@ -256,16 +254,12 @@ export default async function AboutPage({
           </section>
         );
 
-      case "about-staff":
-        /* ── Meet Our Staff — real 14-person roster ────────────────────────── */
-        return <StaffGrid text={t} img={ov.img} />;
-
       default:
         return isExampleSection(id) ? renderExample(id, shim, variant) : null;
     }
   };
 
-  const known = new Set(["about-hero", "about-values", "about-believe", "about-staff", ...SECTION_EXAMPLE_IDS]);
+  const known = new Set(["about-hero", "about-values", "about-believe", ...SECTION_EXAMPLE_IDS]);
   const visible = sections.filter((s) => known.has(s.id));
 
   return (

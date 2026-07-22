@@ -6,6 +6,7 @@ import { site } from "@/data/site";
 import { assetPath } from "@/lib/asset-path";
 import { getCMSPage } from "@/lib/cms";
 import { tx, imgCss } from "@/lib/home-content";
+import StaffGrid from "@/components/about/StaffGrid";
 
 export const metadata: Metadata = {
   title: "Hays Campus",
@@ -282,76 +283,14 @@ export default async function HaysCampusPage() {
         </div>
       </section>
 
-      {/* ── Campus Location Visual ────────────────────────────────────── */}
-      <section
-        className="section"
-        style={{ backgroundColor: "#1b1c1c", paddingTop: "3.5rem", paddingBottom: "3.5rem" }}
-      >
-        <div className="container-c3">
-          {/* Section headline */}
-          <div className="mb-8">
-            <p
-              data-cms="t:hays-location-eyebrow"
-              style={{ fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.18em", color: "var(--color-teal)", marginBottom: "0.5rem" }}
-              dangerouslySetInnerHTML={{ __html: tx(t, "hays-location-eyebrow", "Find Us") }}
-            />
-            <h2
-              className="heading-2 text-white"
-              data-cms="t:hays-location-title"
-              dangerouslySetInnerHTML={{ __html: tx(t, "hays-location-title", "Come see us in Hays.") }}
-            />
-          </div>
-
-          {/* Full-bleed campus image card */}
-          <div
-            className="relative overflow-hidden"
-            data-cms-img="hays-building-img"
-            style={{ height: "clamp(280px, 38vw, 480px)", borderRadius: "var(--radius-md)" }}
-          >
-            <Image
-              src={assetPath(media["hays-building-img"] || "/images/building.webp")}
-              alt="C3 Hays campus building"
-              fill
-              className="object-cover"
-              style={imgCss(ov.img?.["hays-building-img"])}
-            />
-            {/* Scrim — bottom reads clearly, top fades to the photo */}
-            <div
-              className="absolute inset-0"
-              style={{
-                background:
-                  "linear-gradient(to top, rgba(10,10,10,0.93) 0%, rgba(10,10,10,0.50) 45%, rgba(10,10,10,0.15) 100%)",
-              }}
-            />
-
-            {/* Address + CTA overlaid at bottom-left */}
-            <div className="absolute inset-0 flex flex-col justify-end p-8 md:p-10">
-              <p
-                data-cms="t:hays-building-address"
-                className="font-semibold text-white mb-1"
-                style={{ fontSize: "1.05rem" }}
-                dangerouslySetInnerHTML={{
-                  __html: tx(
-                    t,
-                    "hays-building-address",
-                    `${site.address.street}, ${site.address.city}, ${site.address.state} ${site.address.zip}`
-                  ),
-                }}
-              />
-              <a
-                href={t["hays-maps-href"] || "https://maps.google.com/?q=5790+230th+Ave,+Hays,+KS+67601"}
-                target="_blank"
-                rel="noopener noreferrer"
-                data-cms-link="hays-maps"
-                className="btn btn-primary btn-sm inline-flex items-center gap-2 mt-4 self-start"
-              >
-                <Navigation size={13} />
-                <span data-cms-link-label>{tx(t, "hays-maps-label", "Open in Google Maps")}</span>
-              </a>
-            </div>
-          </div>
-        </div>
-      </section>
+      {/* ── Meet the Team ─────────────────────────────────────────────── */}
+      <StaffGrid
+        groups={["elder", "hays"]}
+        keyPrefix="hays-staff"
+        text={t}
+        img={ov.img}
+        titleText="Meet the Team"
+      />
     </>
   );
 }

@@ -2,7 +2,7 @@ import { tx, type ImgStyle } from "@/lib/home-content";
 import Section from "@/components/ui/Section";
 import SectionHeader from "@/components/ui/SectionHeader";
 import StaffCard from "@/components/about/StaffCard";
-import { staffGroups } from "@/data/staff";
+import { staffGroups, type StaffGroupKey } from "@/data/staff";
 
 /**
  * About → "Meet Our Leadership" — REDESIGNED (Phase 4, Wave 2A / A3).
@@ -20,10 +20,26 @@ import { staffGroups } from "@/data/staff";
 export default function StaffGrid({
   text,
   img,
+  groups,
+  keyPrefix = "about-staff",
+  eyebrowText = "Here to serve you",
+  titleText = "Meet Our Leadership",
+  blurbText = "Say hi to the staff of Celebration Community Church.",
 }: {
   text?: Record<string, string>;
   img?: Record<string, ImgStyle>;
+  /** Restrict to specific staff groups (e.g. ["elder","hays"] for the Hays campus).
+   *  Omit → all groups (the original About behavior). */
+  groups?: StaffGroupKey[];
+  /** CMS key namespace for the header (so campus pages don't collide with About). */
+  keyPrefix?: string;
+  eyebrowText?: string;
+  titleText?: string;
+  blurbText?: string;
 }) {
+  const shownGroups = groups && groups.length
+    ? staffGroups.filter((g) => groups.includes(g.id))
+    : staffGroups;
   return (
     <Section tone="white" container>
       {/* Intro */}
@@ -32,29 +48,25 @@ export default function StaffGrid({
         style={{ marginBottom: "var(--space-block)" }}
         eyebrow={
           <span
-            data-cms="t:about-staff-eyebrow"
+            data-cms={`t:${keyPrefix}-eyebrow`}
             dangerouslySetInnerHTML={{
-              __html: tx(text, "about-staff-eyebrow", "Here to serve you"),
+              __html: tx(text, `${keyPrefix}-eyebrow`, eyebrowText),
             }}
           />
         }
         title={
           <span
-            data-cms="t:about-staff-title"
+            data-cms={`t:${keyPrefix}-title`}
             dangerouslySetInnerHTML={{
-              __html: tx(text, "about-staff-title", "Meet Our Leadership"),
+              __html: tx(text, `${keyPrefix}-title`, titleText),
             }}
           />
         }
         lead={
           <span
-            data-cms="t:about-staff-blurb"
+            data-cms={`t:${keyPrefix}-blurb`}
             dangerouslySetInnerHTML={{
-              __html: tx(
-                text,
-                "about-staff-blurb",
-                "Say hi to the staff of Celebration Community Church."
-              ),
+              __html: tx(text, `${keyPrefix}-blurb`, blurbText),
             }}
           />
         }
@@ -62,7 +74,7 @@ export default function StaffGrid({
 
       {/* Grouped roster */}
       <div className="flex flex-col" style={{ gap: "var(--space-block)" }}>
-        {staffGroups.map((group, gi) => (
+        {shownGroups.map((group, gi) => (
           <div key={group.id}>
             {/* Group label + hairline */}
             <div
@@ -78,9 +90,9 @@ export default function StaffGrid({
                   letterSpacing: "0.2em",
                   whiteSpace: "nowrap",
                 }}
-                data-cms={`t:about-staff-group-${group.id}`}
+                data-cms={`t:${keyPrefix}-group-${group.id}`}
                 dangerouslySetInnerHTML={{
-                  __html: tx(text, `about-staff-group-${group.id}`, group.label),
+                  __html: tx(text, `${keyPrefix}-group-${group.id}`, group.label),
                 }}
               />
               <span
