@@ -55,10 +55,9 @@ export const metadata: Metadata = {
     title: `${site.name} | ${site.tagline}`,
     description: site.mission,
   },
-  icons: {
-    icon: assetPath("/brand/favicon.png"),
-    apple: assetPath("/brand/logo.png"),
-  },
+  // Favicon/app icons come from the app-dir file convention (src/app/favicon.ico +
+  // icon.png + apple-icon.png — the C3 monogram badge), so Next emits correct,
+  // basePath-aware <link> tags and /favicon.ico is served. No manual icons here.
 };
 
 const jsonLd = {
