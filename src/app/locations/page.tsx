@@ -5,7 +5,8 @@ import { locations } from "@/data/locations";
 import { assetPath } from "@/lib/asset-path";
 import { getPageContent } from "@/lib/cms";
 import { isCmsLive } from "@/lib/cms-live";
-import { tx, imgCss, parseSections, type SectionMeta } from "@/lib/home-content";
+import { tx, imgCss, parseSections, exampleContentShim, type SectionMeta } from "@/lib/home-content";
+import { isExampleSection, renderExample, SECTION_EXAMPLE_IDS } from "@/lib/section-examples";
 import PageComposer from "@/components/cms/PageComposer";
 import Section from "@/components/ui/Section";
 import Stack from "@/components/ui/Stack";
@@ -50,9 +51,10 @@ export default async function LocationsPage({
   const ov = (await getPageContent("/locations", preview)) || {};
   const t = ov.text || {};
   const media = ov.media || {};
+  const shim = exampleContentShim(ov);
   const sections = parseSections(ov.sections, PAGE_DEFAULT_SECTIONS);
 
-  const render = (id: string): React.ReactNode => {
+  const render = (id: string, variant?: string): React.ReactNode => {
     switch (id) {
       case "locations-hero":
         return (
@@ -235,11 +237,11 @@ export default async function LocationsPage({
           </Section>
         );
       default:
-        return null;
+        return isExampleSection(id) ? renderExample(id, shim, variant) : null;
     }
   };
 
-  const known = new Set(["locations-hero", "locations-campuses"]);
+  const known = new Set(["locations-hero", "locations-campuses", ...SECTION_EXAMPLE_IDS]);
   const visible = sections.filter((s) => known.has(s.id));
 
   return <PageComposer sections={visible} bgFill={ov.bgFill} anim={ov.anim} render={render} />;

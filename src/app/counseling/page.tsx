@@ -5,7 +5,8 @@ import { counselors } from "@/data/counselors";
 import { assetPath } from "@/lib/asset-path";
 import { getPageContent } from "@/lib/cms";
 import { isCmsLive } from "@/lib/cms-live";
-import { imgCss, parseSections, type SectionMeta } from "@/lib/home-content";
+import { imgCss, parseSections, exampleContentShim, type SectionMeta } from "@/lib/home-content";
+import { isExampleSection, renderExample } from "@/lib/section-examples";
 import Section from "@/components/ui/Section";
 import SectionHeader from "@/components/ui/SectionHeader";
 import PageComposer from "@/components/cms/PageComposer";
@@ -157,6 +158,7 @@ export default async function CounselingPage({
   const ov = (await getPageContent("/counseling", preview)) || {};
   const t = ov.text || {};
   const media = ov.media || {};
+  const shim = exampleContentShim(ov);
   const sections = parseSections(ov.sections, PAGE_DEFAULT_SECTIONS);
 
   /* ── counseling-hero — top photo band, editable photo + headline + primary CTA ── */
@@ -476,7 +478,7 @@ export default async function CounselingPage({
     </Section>
   );
 
-  const render = (id: string): React.ReactNode => {
+  const render = (id: string, variant?: string): React.ReactNode => {
     switch (id) {
       case "counseling-hero":
         return heroSection;
@@ -485,7 +487,7 @@ export default async function CounselingPage({
       case "counseling-fees":
         return feesSection;
       default:
-        return null;
+        return isExampleSection(id) ? renderExample(id, shim, variant) : null;
     }
   };
 

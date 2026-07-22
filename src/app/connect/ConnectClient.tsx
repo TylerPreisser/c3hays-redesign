@@ -219,6 +219,7 @@ export function ConnectHero({ text, media = {}, img = {} }: ConnectHeroProps) {
                 noValidate
               >
                 <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-body)" }}>
+                  <div className="connect-form-grid2">
                   <GlassField
                     label={tx(text, "connect-field-firstname", "Name")}
                     delay={120}
@@ -247,6 +248,7 @@ export function ConnectHero({ text, media = {}, img = {} }: ConnectHeroProps) {
                       placeholder="jane@example.com"
                     />
                   </GlassField>
+                  </div>
 
                   <GlassField
                     label={tx(text, "connect-field-reason", "What&rsquo;s this about?")}
@@ -588,13 +590,11 @@ const CONNECT_CSS = `
 .connect-scrim {
   position: absolute;
   inset: 0;
+  /* Centered card (not left-pinned): symmetric top/bottom shade + a soft center
+     pool so the wider glass card reads over the photo from the middle. */
   background:
-    linear-gradient(180deg, rgba(0,0,0,0.20) 0%, rgba(0,0,0,0.0) 30%),
-    linear-gradient(100deg,
-      rgba(0,0,0,0.62) 0%,
-      rgba(0,0,0,0.52) 32%,
-      rgba(0,0,0,0.28) 62%,
-      rgba(0,0,0,0.12) 100%);
+    linear-gradient(180deg, rgba(0,0,0,0.24) 0%, rgba(0,0,0,0.06) 34%, rgba(0,0,0,0.14) 70%, rgba(0,0,0,0.42) 100%),
+    radial-gradient(88% 78% at 50% 58%, rgba(0,0,0,0.40) 0%, rgba(0,0,0,0.12) 68%, transparent 100%);
 }
 
 .connect-card-wrap {
@@ -602,13 +602,17 @@ const CONNECT_CSS = `
   z-index: 1;
   width: 100%;
   display: flex;
-  justify-content: flex-start;
+  justify-content: center;
   padding-top: 8.5rem;
   padding-bottom: clamp(2.5rem, 6vw, 5.5rem);
 }
 
+/* Wider centered card: Name + Email share a row, stacking on narrow screens. */
+.connect-form-grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-body); }
+@media (max-width: 560px) { .connect-form-grid2 { grid-template-columns: 1fr; } }
+
 .glass-card {
-  width: clamp(340px, 42vw, 500px);
+  width: clamp(340px, 62vw, 760px);
   max-width: 100%;
   padding: clamp(1.75rem, 3vw, 2.5rem);
   color: #fff;

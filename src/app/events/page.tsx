@@ -3,7 +3,8 @@ import Image from "next/image";
 import { assetPath } from "@/lib/asset-path";
 import { getPageContent } from "@/lib/cms";
 import { isCmsLive } from "@/lib/cms-live";
-import { imgCss, parseSections, type SectionMeta } from "@/lib/home-content";
+import { imgCss, parseSections, exampleContentShim, type SectionMeta } from "@/lib/home-content";
+import { isExampleSection, renderExample } from "@/lib/section-examples";
 import { Tx } from "@/components/cms/Editable";
 import Section from "@/components/ui/Section";
 import SectionHeader from "@/components/ui/SectionHeader";
@@ -56,11 +57,12 @@ export default async function EventsPage({
   const t = ov.text || {};
   const media = ov.media || {};
   const sections = parseSections(ov.sections, PAGE_DEFAULT_SECTIONS);
+  const shim = exampleContentShim(ov);
   // Authored cards (round-2) OVERRIDE the live eSpace feed when present; absent ⇒ the
   // live island keeps auto-populating (live-by-default). See events-content.ts.
   const authoredCards = parseEventCards(ov);
 
-  const render = (id: string): React.ReactNode => {
+  const render = (id: string, variant?: string): React.ReactNode => {
     switch (id) {
       // ── Hero ──────────────────────────────────────────────────────
       case "events-hero":
@@ -161,7 +163,7 @@ export default async function EventsPage({
         );
 
       default:
-        return null;
+        return isExampleSection(id) ? renderExample(id, shim, variant) : null;
     }
   };
 

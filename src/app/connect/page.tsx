@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import { getPageContent } from "@/lib/cms";
 import { isCmsLive } from "@/lib/cms-live";
-import { parseSections, type SectionMeta } from "@/lib/home-content";
+import { parseSections, exampleContentShim, type SectionMeta } from "@/lib/home-content";
+import { isExampleSection, renderExample } from "@/lib/section-examples";
 import PageComposer from "@/components/cms/PageComposer";
 import { ConnectHero, ConnectSteps } from "./ConnectClient";
 
@@ -41,18 +42,19 @@ export default async function ConnectPage({
   const text = ov.text || {};
   const media = ov.media || {};
   const img = ov.img || {};
+  const shim = exampleContentShim(ov);
   const sections = parseSections(ov.sections, PAGE_DEFAULT_SECTIONS);
 
   // Each section id → its component. PageComposer wraps each in a
   // `<div data-section={id}>` (rail-driven section bg) and injects buildBgCss.
-  const render = (id: string): React.ReactNode => {
+  const render = (id: string, variant?: string): React.ReactNode => {
     switch (id) {
       case "connect-hero":
         return <ConnectHero text={text} media={media} img={img} />;
       case "connect-steps":
         return <ConnectSteps text={text} />;
       default:
-        return null;
+        return isExampleSection(id) ? renderExample(id, shim, variant) : null;
     }
   };
 

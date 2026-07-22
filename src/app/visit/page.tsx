@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import { getPageContent } from "@/lib/cms";
 import { isCmsLive } from "@/lib/cms-live";
-import { parseSections, type SectionMeta } from "@/lib/home-content";
+import { parseSections, exampleContentShim, type SectionMeta } from "@/lib/home-content";
+import { isExampleSection, renderExample, SECTION_EXAMPLE_IDS } from "@/lib/section-examples";
 import PageComposer from "@/components/cms/PageComposer";
 import JoinPanel from "@/components/visit/JoinPanel";
 import VisitPlan from "@/components/visit/VisitPlan";
@@ -52,17 +53,18 @@ export default async function VisitPage({
   const preview = typeof sp.preview === "string" ? sp.preview : undefined;
   const ov = (await getPageContent("/visit", preview)) || {};
   const t = ov.text || {};
+  const shim = exampleContentShim(ov);
   const sections = parseSections(ov.sections, PAGE_DEFAULT_SECTIONS);
 
-  const render = (id: string): React.ReactNode => {
+  const render = (id: string, variant?: string): React.ReactNode => {
     switch (id) {
       case "visit-hero": return <JoinPanel t={t} />;
       case "visit-plan": return <VisitPlan t={t} />;
-      default: return null;
+      default: return isExampleSection(id) ? renderExample(id, shim, variant) : null;
     }
   };
 
-  const known = new Set(["visit-hero", "visit-plan"]);
+  const known = new Set(["visit-hero", "visit-plan", ...SECTION_EXAMPLE_IDS]);
   const visible = sections.filter((s) => known.has(s.id));
 
   return <PageComposer sections={visible} bgFill={ov.bgFill} anim={ov.anim} render={render} />;

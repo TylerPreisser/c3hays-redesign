@@ -3,7 +3,8 @@ import Image from "next/image";
 import { assetPath } from "@/lib/asset-path";
 import { getPageContent } from "@/lib/cms";
 import { isCmsLive } from "@/lib/cms-live";
-import { parseSections, imgCss, type SectionMeta } from "@/lib/home-content";
+import { parseSections, imgCss, exampleContentShim, type SectionMeta } from "@/lib/home-content";
+import { isExampleSection, renderExample, SECTION_EXAMPLE_IDS } from "@/lib/section-examples";
 import { Tx } from "@/components/cms/Editable";
 import PageComposer from "@/components/cms/PageComposer";
 import Section from "@/components/ui/Section";
@@ -58,9 +59,10 @@ export default async function NewsPage({
   const ov = (await getPageContent("/news", preview)) || {};
   const t = ov.text || {};
   const media = ov.media || {};
+  const shim = exampleContentShim(ov);
   const sections = parseSections(ov.sections, PAGE_DEFAULT_SECTIONS);
 
-  const render = (id: string): React.ReactNode => {
+  const render = (id: string, variant?: string): React.ReactNode => {
     switch (id) {
       case "weekly-hero":
         return (
@@ -138,11 +140,11 @@ export default async function NewsPage({
           </Section>
         );
       default:
-        return null;
+        return isExampleSection(id) ? renderExample(id, shim, variant) : null;
     }
   };
 
-  const known = new Set(["weekly-hero", "weekly-list"]);
+  const known = new Set(["weekly-hero", "weekly-list", ...SECTION_EXAMPLE_IDS]);
   const visible = sections.filter((s) => known.has(s.id));
 
   // Reconcile: a C3-Studio persisted list may still carry the retired "weekly-connect"

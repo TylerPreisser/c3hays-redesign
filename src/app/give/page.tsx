@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import { getPageContent } from "@/lib/cms";
 import { isCmsLive } from "@/lib/cms-live";
-import { parseSections, type SectionMeta } from "@/lib/home-content";
+import { parseSections, exampleContentShim, type SectionMeta } from "@/lib/home-content";
+import { isExampleSection, renderExample } from "@/lib/section-examples";
 import PageComposer from "@/components/cms/PageComposer";
 import GiveHero from "./GiveHero";
 import GiveWays from "./GiveWays";
@@ -48,18 +49,19 @@ export default async function GivePage({
   const t = ov.text || {};
   const media = ov.media || {};
   const img = ov.img || {};
+  const shim = exampleContentShim(ov);
 
   // Editor-persisted order/visibility/bg, else the canonical default composition.
   const sections = parseSections(ov.sections, PAGE_DEFAULT_SECTIONS);
 
-  const render = (id: string): React.ReactNode => {
+  const render = (id: string, variant?: string): React.ReactNode => {
     switch (id) {
       case "give-hero":
         return <GiveHero t={t} media={media} img={img} />;
       case "give-ways":
         return <GiveWays t={t} />;
       default:
-        return null;
+        return isExampleSection(id) ? renderExample(id, shim, variant) : null;
     }
   };
 

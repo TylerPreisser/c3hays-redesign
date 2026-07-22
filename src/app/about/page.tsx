@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import { getPageContent } from "@/lib/cms";
 import { isCmsLive } from "@/lib/cms-live";
-import { parseSections, tx, imgCss, type SectionMeta } from "@/lib/home-content";
+import { parseSections, tx, imgCss, exampleContentShim, type SectionMeta } from "@/lib/home-content";
+import { isExampleSection, renderExample, SECTION_EXAMPLE_IDS } from "@/lib/section-examples";
 import { assetPath } from "@/lib/asset-path";
 import { beliefs } from "@/data/beliefs";
 import OurValues from "@/components/about/OurValues";
@@ -56,6 +57,7 @@ export default async function AboutPage({
   const ov = (await getPageContent("/about", preview)) || {};
   const t = ov.text || {};
   const media = ov.media || {};
+  const shim = exampleContentShim(ov);
   const sections = parseSections(ov.sections, PAGE_DEFAULT_SECTIONS);
 
   // Pre-resolve each doctrine item (CMS overrides applied) once, so the desktop list
@@ -67,7 +69,7 @@ export default async function AboutPage({
     paragraphs: b.paragraphs.map((para, pi) => tx(t, `beliefs-item-${b.id}-p${pi}`, para)),
   }));
 
-  const render = (id: string): React.ReactNode => {
+  const render = (id: string, variant?: string): React.ReactNode => {
     switch (id) {
       case "about-hero":
         return (
@@ -259,11 +261,11 @@ export default async function AboutPage({
         return <StaffGrid text={t} img={ov.img} />;
 
       default:
-        return null;
+        return isExampleSection(id) ? renderExample(id, shim, variant) : null;
     }
   };
 
-  const known = new Set(["about-hero", "about-values", "about-believe", "about-staff"]);
+  const known = new Set(["about-hero", "about-values", "about-believe", "about-staff", ...SECTION_EXAMPLE_IDS]);
   const visible = sections.filter((s) => known.has(s.id));
 
   return (

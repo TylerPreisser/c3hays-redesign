@@ -3,7 +3,8 @@ import Image from "next/image";
 import { assetPath } from "@/lib/asset-path";
 import { getPageContent } from "@/lib/cms";
 import { isCmsLive } from "@/lib/cms-live";
-import { parseSections, tx, imgCss, type SectionMeta } from "@/lib/home-content";
+import { parseSections, tx, imgCss, exampleContentShim, type SectionMeta } from "@/lib/home-content";
+import { isExampleSection, renderExample, SECTION_EXAMPLE_IDS } from "@/lib/section-examples";
 import PageComposer from "@/components/cms/PageComposer";
 import PastMessagesGrid from "@/components/messages/PastMessagesGrid";
 import { pastMessages } from "@/data/messages";
@@ -57,9 +58,10 @@ export default async function MessagesPage({
   const ov = (await getPageContent("/messages", preview)) || {};
   const t = ov.text || {};
   const media = ov.media || {};
+  const shim = exampleContentShim(ov);
   const sections = parseSections(ov.sections, PAGE_DEFAULT_SECTIONS);
 
-  const render = (id: string): React.ReactNode => {
+  const render = (id: string, variant?: string): React.ReactNode => {
     switch (id) {
       case "messages-hero":
         return (
@@ -205,11 +207,11 @@ export default async function MessagesPage({
         );
 
       default:
-        return null;
+        return isExampleSection(id) ? renderExample(id, shim, variant) : null;
     }
   };
 
-  const known = new Set(["messages-hero", "messages-archive"]);
+  const known = new Set(["messages-hero", "messages-archive", ...SECTION_EXAMPLE_IDS]);
   const visible = sections.filter((s) => known.has(s.id));
 
   return <PageComposer sections={visible} bgFill={ov.bgFill} anim={ov.anim} render={render} />;

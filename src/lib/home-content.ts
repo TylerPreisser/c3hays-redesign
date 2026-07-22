@@ -6,7 +6,7 @@
  * real components). DEFAULTS are the exact canonical content, so with the CMS off
  * the site looks identical to the hand-built original.
  */
-import type { StudioHome, FreeEl } from "@/lib/cms";
+import type { StudioHome, FreeEl, CMSOverrides } from "@/lib/cms";
 
 const TEAL = "#1cc3af";
 
@@ -178,5 +178,26 @@ export function fromStudioHome(raw: StudioHome | null | undefined): HomeContent 
     freeOffsets: (raw.freeOffsets && typeof raw.freeOffsets === "object" ? raw.freeOffsets : {}) as Record<string, { x: number; y: number }>,
     // Drag-anywhere: freeform text/button elements added on the home page.
     freeEls: Array.isArray(raw.freeEls) ? raw.freeEls : [],
+  };
+}
+
+/**
+ * exampleContentShim — build a full HomeContent from the canonical DEFAULTS, overlaid
+ * with a NON-HOME page's own flat overrides (text/btn/icon/img/bgFill). This lets
+ * `renderExample()` render an ADDED library/example section on ANY page, editing against
+ * that page's own overrides (so the added section's text/colors persist per-page). The
+ * structured home fields (hero/mission/…) fall back to defaults — only relevant if a
+ * user adds one of those specific sections to another page. Cheap to build (defaults +
+ * a shallow spread); pages build it once per render.
+ */
+export function exampleContentShim(ov: CMSOverrides): HomeContent {
+  const base = fromStudioHome(null);
+  return {
+    ...base,
+    text: ov.text || {},
+    btn: (ov.btn || {}) as HomeContent["btn"],
+    icon: (ov.icon || {}) as HomeContent["icon"],
+    img: (ov.img || {}) as HomeContent["img"],
+    bgFill: ov.bgFill || {},
   };
 }

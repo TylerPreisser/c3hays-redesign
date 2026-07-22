@@ -5,7 +5,8 @@ import { ArrowUpRight } from "lucide-react";
 import { assetPath } from "@/lib/asset-path";
 import { getPageContent } from "@/lib/cms";
 import { isCmsLive } from "@/lib/cms-live";
-import { parseSections, tx, imgCss, type SectionMeta } from "@/lib/home-content";
+import { parseSections, tx, imgCss, exampleContentShim, type SectionMeta } from "@/lib/home-content";
+import { isExampleSection, renderExample, SECTION_EXAMPLE_IDS } from "@/lib/section-examples";
 import PageComposer from "@/components/cms/PageComposer";
 
 /* Brand marks as inline SVGs (this lucide build has no brand icons — matches the
@@ -79,6 +80,7 @@ export default async function WatchPage({
   const ov = (await getPageContent("/watch", preview)) || {};
   const t = ov.text || {};
   const media = ov.media || {};
+  const shim = exampleContentShim(ov);
   const sections = parseSections(ov.sections, PAGE_DEFAULT_SECTIONS);
 
   const channels = [
@@ -108,7 +110,7 @@ export default async function WatchPage({
     },
   ];
 
-  const render = (id: string): React.ReactNode => {
+  const render = (id: string, variant?: string): React.ReactNode => {
     switch (id) {
       // ── Hero ─────────────────────────────────────────────────────
       case "watch-hero":
@@ -334,11 +336,11 @@ export default async function WatchPage({
         );
 
       default:
-        return null;
+        return isExampleSection(id) ? renderExample(id, shim, variant) : null;
     }
   };
 
-  const known = new Set(["watch-hero", "watch-channels", "watch-ondemand"]);
+  const known = new Set(["watch-hero", "watch-channels", "watch-ondemand", ...SECTION_EXAMPLE_IDS]);
   const visible = sections.filter((s) => known.has(s.id));
 
   return <PageComposer sections={visible} bgFill={ov.bgFill} anim={ov.anim} render={render} freeEls={ov.freeEls} freeOffsets={ov.freeOffsets} />;
