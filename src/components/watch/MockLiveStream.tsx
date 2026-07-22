@@ -40,7 +40,7 @@ export default function MockLiveStream({
       {/* Poster */}
       <Image
         src={assetPath(poster)}
-        alt="C3 worship — live stream"
+        alt="C3 worship live stream"
         fill
         className="object-cover"
         style={{ opacity: playing ? 0.9 : 0.55, transition: "opacity 400ms ease" }}

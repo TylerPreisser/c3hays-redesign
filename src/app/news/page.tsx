@@ -14,7 +14,7 @@ import { newsletterIssues } from "@/data/news";
 export const metadata: Metadata = {
   title: "The C3 Weekly",
   description:
-    "The C3 Weekly — one short email each week from Celebration Community Church in Hays and Colby, Kansas. Browse past issues or get it in your inbox.",
+    "The C3 Weekly: one short email each week from Celebration Community Church in Hays and Colby, Kansas. Browse past issues or get it in your inbox.",
 };
 
 /**

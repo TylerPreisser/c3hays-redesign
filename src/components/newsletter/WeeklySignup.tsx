@@ -77,7 +77,7 @@ export default function WeeklySignup({ text = {}, bgKey = "weekly-signup-card", 
     <div className={className} data-cms-bg={bgKey} style={surface} aria-label="Subscribe to The C3 Weekly">
       {status === "done" ? (
         <p className="body-base inline-flex items-center gap-2" style={{ color: doneColor, fontWeight: 600, textShadow: labelShadow }} role="status">
-          <Check size={18} /> You&rsquo;re on the list — watch your inbox.
+          <Check size={18} /> You&rsquo;re on the list, watch your inbox.
         </p>
       ) : (
         <form className="flex flex-col gap-2.5 w-full min-w-0" onSubmit={onSubmit} noValidate>

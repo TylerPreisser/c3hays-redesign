@@ -16,7 +16,7 @@ import PageComposer from "@/components/cms/PageComposer";
 export const metadata: Metadata = {
   title: "About",
   description:
-    "Who we are and what we believe at Celebration Community Church — a church family in Hays and Colby, Kansas.",
+    "Who we are and what we believe at Celebration Community Church, a church family in Hays and Colby, Kansas.",
 };
 
 /**

@@ -14,7 +14,7 @@ import { Tx, EditableLink } from "@/components/cms/Editable";
 export const metadata: Metadata = {
   title: "Counseling",
   description:
-    "Bible-based counseling at C3 — trained counselors helping you develop spiritually healthy relationships with God and others.",
+    "Bible-based counseling at C3: trained counselors helping you develop spiritually healthy relationships with God and others.",
 };
 
 /**
@@ -216,7 +216,7 @@ export default async function CounselingPage({
               as="span"
               text={t}
               k="counseling-hero-sub"
-              fallback="A team approach to Bible-based counseling — trained counselors helping you grow spiritually, emotionally, and relationally."
+              fallback="A team approach to Bible-based counseling, with trained counselors helping you grow spiritually, emotionally, and relationally."
               className="text-balance"
               style={{ color: "rgba(255,255,255,0.78)" }}
             />
@@ -260,7 +260,7 @@ export default async function CounselingPage({
             as="span"
             text={t}
             k="counseling-team-lead"
-            fallback="A team approach to Bible-based counseling — trained counselors ready to walk with you toward wholeness in Christ."
+            fallback="A team approach to Bible-based counseling, with trained counselors ready to walk with you toward wholeness in Christ."
             style={{ color: "var(--color-mute)" }}
           />
         }
@@ -287,20 +287,10 @@ export default async function CounselingPage({
               boxShadow: "var(--shadow-rest)",
             }}
           >
-            {/* Role — teal eyebrow (editable) */}
-            <Tx
-              as="p"
-              className="overline"
-              style={{ color: "var(--color-teal)" }}
-              text={t}
-              k={`counseling-${c.id}-role`}
-              fallback={c.title}
-            />
-
             {/* Name + credentials (name editable) */}
             <h3
               className="heading-3"
-              style={{ color: "var(--color-ink)", marginTop: "var(--space-eyebrow)" }}
+              style={{ color: "var(--color-ink)", marginTop: 0 }}
             >
               <Tx
                 as="span"
@@ -417,7 +407,7 @@ export default async function CounselingPage({
           <PolicyLine
             k="counseling-fee-payment"
             t={t}
-            fallback="Cash or check — some counselors also accept credit card and Venmo"
+            fallback="Cash or check; some counselors also accept credit card and Venmo"
           />
           <PolicyLine
             k="counseling-fee-due"

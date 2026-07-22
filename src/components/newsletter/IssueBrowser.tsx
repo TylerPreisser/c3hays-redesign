@@ -80,7 +80,7 @@ export default function IssueBrowser({ issues }: IssueBrowserProps) {
             type="search"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search topics — baptism, John, students…"
+            placeholder="Search topics: baptism, John, students…"
             aria-label="Search newsletter topics"
             style={{
               width: "100%",

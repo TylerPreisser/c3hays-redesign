@@ -28,7 +28,7 @@ function FacebookIcon({ size = 24, style }: { size?: number; style?: React.CSSPr
 export const metadata: Metadata = {
   title: "Watch Online",
   description:
-    "Watch Celebration Community Church online — live on Facebook and on demand on our YouTube channel.",
+    "Watch Celebration Community Church online, live on Facebook and on demand on our YouTube channel.",
 };
 
 /* Real destinations (verified platforms): the weekend service streams on Facebook
@@ -103,7 +103,7 @@ export default async function WatchPage({
       defaultLabel: "YouTube",
       defaultTitle: "Past Messages",
       defaultBody:
-        "Every past message, on demand on our YouTube channel — catch up anytime, from anywhere.",
+        "Every past message, on demand on our YouTube channel. Catch up anytime, from anywhere.",
       defaultCta: "Open the archive",
     },
   ];

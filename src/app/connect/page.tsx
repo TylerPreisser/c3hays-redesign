@@ -8,7 +8,7 @@ import { ConnectHero, ConnectSteps } from "./ConnectClient";
 export const metadata: Metadata = {
   title: "Connect | C3 Hays",
   description:
-    "Take your next step at C3 — new here, looking for community, want to serve, or just want to say hi. We'd love to hear from you.",
+    "Take your next step at C3: new here, looking for community, want to serve, or just want to say hi. We'd love to hear from you.",
 };
 
 /**

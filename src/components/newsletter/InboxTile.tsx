@@ -75,7 +75,7 @@ export default function InboxTile({
           className="body-sm"
           style={{ color: "var(--color-mute)", marginTop: "0.6rem", lineHeight: 1.6 }}
         >
-          {body ?? "One short email each week — what's coming up, this week's message, and simple next steps."}
+          {body ?? "One short email each week: what's coming up, this week's message, and simple next steps."}
         </p>
       </div>
 

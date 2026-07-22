@@ -9,7 +9,7 @@ import { tx, imgCss } from "@/lib/home-content";
 export const metadata: Metadata = {
   title: "Colby Campus",
   description:
-    "Celebration Community Church — Colby, Kansas. Sunday 10 AM at 1923 S Range.",
+    "Celebration Community Church, Colby, Kansas. Sunday 10 AM at 1923 S Range.",
 };
 
 export default async function ColbyCampusPage() {
@@ -135,7 +135,7 @@ export default async function ColbyCampusPage() {
                   __html: tx(
                     t,
                     "colby-details-body-1",
-                    "Join us in Colby — Sundays at 10am. You are welcome here, just as you are."
+                    "Join us in Colby, Sundays at 10am. You are welcome here, just as you are."
                   ),
                 }}
               />
@@ -365,7 +365,7 @@ export default async function ColbyCampusPage() {
               __html: tx(
                 t,
                 "colby-cta-body",
-                "Come as you are — join us Sunday at 10am and experience C3 Colby for yourself."
+                "Come as you are, join us Sunday at 10am and experience C3 Colby for yourself."
               ),
             }}
           />

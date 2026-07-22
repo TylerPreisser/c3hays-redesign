@@ -207,7 +207,7 @@ export default function PastMessagesGrid({ messages, channelHref }: PastMessages
                 e.currentTarget.style.borderColor = "rgba(255,255,255,0.10)";
                 e.currentTarget.style.boxShadow = "none";
               }}
-              aria-label={`Watch ${m.title} — ${m.dateLabel} on YouTube`}
+              aria-label={`Watch ${m.title}, ${m.dateLabel} on YouTube`}
             >
               {/* Thumbnail band with a play affordance */}
               <div

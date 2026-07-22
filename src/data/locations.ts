@@ -34,7 +34,7 @@ export const locations: Location[] = [
       "https://maps.google.com/?q=5790+230th+Ave,+Hays,+KS+67601",
     image: "/images/exterior.webp",
     description:
-      "C3 in Hays, Kansas — Saturdays at 5pm and Sundays at 8, 9:30, and 11am.",
+      "C3 in Hays, Kansas. Saturdays at 5pm and Sundays at 8, 9:30, and 11am.",
   },
   {
     id: "colby",
@@ -48,6 +48,6 @@ export const locations: Location[] = [
     mapsUrl: "https://maps.google.com/?q=1923+S+Range,+Colby,+KS+67701",
     image: "/images/hero-2.webp",
     description:
-      "C3 in Colby, Kansas — Sundays at 10am.",
+      "C3 in Colby, Kansas. Sundays at 10am.",
   },
 ];

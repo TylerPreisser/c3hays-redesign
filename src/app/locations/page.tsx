@@ -13,7 +13,7 @@ import Stack from "@/components/ui/Stack";
 export const metadata: Metadata = {
   title: "Locations",
   description:
-    "Find a Celebration Community Church campus near you — Hays and Colby, Kansas.",
+    "Find a Celebration Community Church campus near you, Hays and Colby, Kansas.",
 };
 
 /**

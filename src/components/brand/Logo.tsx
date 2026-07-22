@@ -26,7 +26,7 @@ export default function Logo({ variant = "dark", size = 40, className = "", cmsK
   const img = (
     <Image
       src={src}
-      alt="C3 — Celebration Community Church"
+      alt="C3, Celebration Community Church"
       width={size}
       height={size}
       className={className}

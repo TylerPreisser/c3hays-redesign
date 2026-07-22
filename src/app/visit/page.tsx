@@ -9,7 +9,7 @@ import VisitPlan from "@/components/visit/VisitPlan";
 export const metadata: Metadata = {
   title: "Plan Your Visit",
   description:
-    "Everything you need to know before your first visit to Celebration Community Church in Hays or Colby, Kansas — service times, what to expect, and how to find us.",
+    "Everything you need to know before your first visit to Celebration Community Church in Hays or Colby, Kansas: service times, what to expect, and how to find us.",
 };
 
 /**

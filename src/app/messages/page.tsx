@@ -21,7 +21,7 @@ function FacebookIcon({ size = 15, style }: { size?: number; style?: React.CSSPr
 export const metadata: Metadata = {
   title: "Messages",
   description:
-    "Watch and listen to messages from Celebration Community Church — live on Facebook and on demand on our YouTube channel.",
+    "Watch and listen to messages from Celebration Community Church, live on Facebook and on demand on our YouTube channel.",
 };
 
 /* Real destinations (verified platforms): past messages live on YouTube
@@ -121,7 +121,7 @@ export default async function MessagesPage({
                   __html: tx(
                     t,
                     "messages-hero-body",
-                    "Miss a Sunday? Every message is on demand on our YouTube channel — or join the live stream this weekend."
+                    "Miss a Sunday? Every message is on demand on our YouTube channel, or join the live stream this weekend."
                   ),
                 }}
               />
@@ -174,7 +174,7 @@ export default async function MessagesPage({
                       __html: tx(
                         t,
                         "messages-archive-body",
-                        "Search the archive and catch up on any weekend — every message streams on our YouTube channel. Or join us live on Facebook."
+                        "Search the archive and catch up on any weekend, every message streams on our YouTube channel. Or join us live on Facebook."
                       ),
                     }}
                   />

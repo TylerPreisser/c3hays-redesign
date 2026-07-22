@@ -10,7 +10,7 @@ import { tx, imgCss } from "@/lib/home-content";
 export const metadata: Metadata = {
   title: "Hays Campus",
   description:
-    "Celebration Community Church — Hays, Kansas. Saturday 5 PM and Sunday 8, 9:30, and 11 AM at 5790 230th Ave.",
+    "Celebration Community Church, Hays, Kansas. Saturday 5 PM and Sunday 8, 9:30, and 11 AM at 5790 230th Ave.",
 };
 
 export default async function HaysCampusPage() {
@@ -111,7 +111,7 @@ export default async function HaysCampusPage() {
                   __html: tx(
                     t,
                     "hays-details-body-1",
-                    "Join us for worship in Hays — Saturdays at 5pm and Sundays at 8, 9:30, and 11am. You are welcome here, just as you are."
+                    "Join us for worship in Hays, Saturdays at 5pm and Sundays at 8, 9:30, and 11am. You are welcome here, just as you are."
                   ),
                 }}
               />

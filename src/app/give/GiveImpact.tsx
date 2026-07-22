@@ -14,8 +14,8 @@ export interface GiveImpactProps {
  *
  * Server component. Every eyebrow / verse / cite / paragraph / facet title+body is an
  * editable <Tx>; the whole section surface is recolorable via data-cms-bg. Layout lives
- * in a scoped <style> (class prefix `gi-`) so nothing here can collide with give-ways /
- * give-close or the global sheet.
+ * in a scoped <style> (class prefix `gi-`) so nothing here can collide with give-ways
+ * or the global sheet.
  */
 export default function GiveImpact({ t }: GiveImpactProps) {
   return (

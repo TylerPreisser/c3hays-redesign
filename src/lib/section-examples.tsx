@@ -72,30 +72,30 @@ export const SECTION_EXAMPLES: SectionExampleDef[] = [
   // ONE real preview per id (their editor default look); renderExample feeds them
   // exactly the props src/app/page.tsx uses, so the thumbnail matches the live page.
   { id: "hero", label: "Hero", icon: "PanelTop", group: "Core", description: "Full-bleed welcome with headline and call to action.", variants: [{ key: "classic", label: "Full-bleed Cinematic" }, { key: "split", label: "Editorial Split" }, { key: "minimal", label: "Centered Statement" }] },
-  { id: "mission", label: "Mission statement", icon: "Quote", group: "Core", description: "One emphasized sentence — your why.", variants: [] },
+  { id: "mission", label: "Mission statement", icon: "Quote", group: "Core", description: "One emphasized sentence: your why.", variants: [] },
   { id: "meetGrowServe", label: "Find your place", icon: "LayoutGrid", group: "Core", description: "A grid of tiles linking people to next steps.", variants: [{ key: "cards", label: "3-up Feature Cards" }, { key: "bento", label: "Bento Grid" }, { key: "list", label: "Editorial List" }] },
   { id: "nt26", label: "Bible reading feature", icon: "BookOpen", group: "Core", description: "Split feature with image, heading and CTA.", variants: [{ key: "imageRight", label: "Media Right" }, { key: "imageLeft", label: "Media Left" }, { key: "stacked", label: "Centered Stack" }] },
   { id: "locations", label: "Our churches", icon: "MapPin", group: "Core", description: "Campus cards with service times and directions.", variants: [] },
   { id: "stayConnected", label: "Get in Touch", icon: "Mail", group: "Core", description: "Contact cards with recolorable icons.", variants: [] },
-  { id: "serviceTimes", label: "Service Times", icon: "Clock", group: "Visit", description: "When & where you gather — campuses and weekend times.", variants: [{ key: "cards", label: "Campus cards" }, { key: "band", label: "Centered band" }] },
+  { id: "serviceTimes", label: "Service Times", icon: "Clock", group: "Visit", description: "When & where you gather: campuses and weekend times.", variants: [{ key: "cards", label: "Campus cards" }, { key: "band", label: "Centered band" }] },
   { id: "sermonFeature", label: "Message Spotlight", icon: "PlayCircle", group: "Media", description: "Feature this weekend's message with a play thumbnail.", variants: [{ key: "spotlight", label: "Spotlight" }, { key: "split", label: "Split" }] },
   { id: "eventsStrip", label: "Upcoming Events", icon: "CalendarDays", group: "Connect", description: "A short list of what's coming up, with dates.", variants: [{ key: "cards", label: "Cards" }, { key: "list", label: "Agenda list" }] },
   { id: "ministriesGrid", label: "Ministries", icon: "LayoutGrid", group: "Connect", description: "Tiles for Kids, Students, Groups, Worship and more.", variants: [{ key: "grid", label: "Grid" }, { key: "list", label: "List" }] },
   { id: "staffGrid", label: "Meet the Team", icon: "Users", group: "About", description: "Portrait cards for your leaders and staff.", variants: [{ key: "grid", label: "Portrait grid" }, { key: "row", label: "Avatar row" }] },
   { id: "testimonial", label: "Story / Quote", icon: "Quote", group: "About", description: "A member story or pull-quote in your church's voice.", variants: [{ key: "centered", label: "Centered" }, { key: "panel", label: "Accent panel" }] },
   { id: "faq", label: "Questions (FAQ)", icon: "HelpCircle", group: "Visit", description: "Answer the questions a first-time guest asks.", variants: [{ key: "list", label: "Accordion" }, { key: "split", label: "Intro + list" }] },
-  { id: "statsBand", label: "Impact Numbers", icon: "BarChart3", group: "About", description: "A band of at-a-glance figures — campuses, groups, serving.", variants: [{ key: "band", label: "Teal band" }, { key: "cards", label: "Cards" }] },
+  { id: "statsBand", label: "Impact Numbers", icon: "BarChart3", group: "About", description: "A band of at-a-glance figures: campuses, groups, serving.", variants: [{ key: "band", label: "Teal band" }, { key: "cards", label: "Cards" }] },
   { id: "nextSteps", label: "Next Steps", icon: "Footprints", group: "Connect", description: "Guide guests through Visit → Connect → Grow → Serve.", variants: [{ key: "steps", label: "Numbered path" }, { key: "cards", label: "Action cards" }] },
-  { id: "scriptureVerse", label: "Scripture", icon: "BookOpen", group: "Media", description: "A featured verse — pairs with the NT26 reading plan.", variants: [{ key: "centered", label: "Centered" }, { key: "left", label: "Editorial left" }] },
+  { id: "scriptureVerse", label: "Scripture", icon: "BookOpen", group: "Media", description: "A featured verse that pairs with the NT26 reading plan.", variants: [{ key: "centered", label: "Centered" }, { key: "left", label: "Editorial left" }] },
   { id: "promo", label: "Announcement", icon: "Megaphone", group: "Connect", description: "A bold promo band for an event, series, or season.", variants: [{ key: "band", label: "Band" }, { key: "split", label: "Split" }, { key: "centered", label: "Centered" }] },
   // Round-3 — the transparent newsletter signup (the /news hero email-capture), now
   // ALSO addable as a standalone section. id "weeklySignup" MUST match c3-backend
   // HOME_SECTION_DEFS + the appended blocks.ts BLOCK_LIST entry verbatim.
-  { id: "weeklySignup", label: "Newsletter signup", icon: "Mail", group: "Calls to action", description: "A transparent email-capture field + button — join The C3 Weekly.", variants: [] },
+  { id: "weeklySignup", label: "Newsletter signup", icon: "Mail", group: "Calls to action", description: "A transparent email-capture field + button to join The C3 Weekly.", variants: [] },
   // ── Re-added liked designs (fabrication-free, neutral editable placeholders) ──
-  { id: "editorialRows", label: "Editorial Rows", icon: "Newspaper", group: "Feature", description: "Alternating image/text dispatches — an editorial storytelling stack.", variants: [] },
+  { id: "editorialRows", label: "Editorial Rows", icon: "Newspaper", group: "Feature", description: "Alternating image/text dispatches: an editorial storytelling stack.", variants: [] },
   { id: "resourceGrid", label: "Resource Grid", icon: "LayoutGrid", group: "Cards & grids", description: "Filterable cards for messages, articles, guides and a featured resource.", variants: [] },
-  { id: "sermonPlayer", label: "Sermon Player", icon: "PlayCircle", group: "Media", description: "A working message player — art panel, scrubber and transport controls.", variants: [] },
+  { id: "sermonPlayer", label: "Sermon Player", icon: "PlayCircle", group: "Media", description: "A working message player: art panel, scrubber and transport controls.", variants: [] },
   { id: "watchHub", label: "Watch / Listen Hub", icon: "Video", group: "Media", description: "Side-by-side watch + listen panels with an episode picker.", variants: [] },
   { id: "seriesArchive", label: "Series Archive", icon: "LibraryBig", group: "Media", description: "A poster grid of your message series with scripture refs.", variants: [] },
   { id: "mediaCarousel", label: "Media Carousel", icon: "GalleryHorizontal", group: "Media", description: "A filterable, swipeable carousel of messages, audio and playlists.", variants: [] },

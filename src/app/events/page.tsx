@@ -16,7 +16,7 @@ import { parseEventCards } from "@/components/events/events-content";
 export const metadata: Metadata = {
   title: "Events",
   description:
-    "What's on at Celebration Community Church — upcoming events, gatherings, and the full C3 calendar across both campuses.",
+    "What's on at Celebration Community Church: upcoming events, gatherings, and the full C3 calendar across both campuses.",
 };
 
 /**

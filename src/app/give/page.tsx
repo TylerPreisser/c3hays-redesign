@@ -5,12 +5,11 @@ import { parseSections, type SectionMeta } from "@/lib/home-content";
 import PageComposer from "@/components/cms/PageComposer";
 import GiveHero from "./GiveHero";
 import GiveWays from "./GiveWays";
-import GiveClose from "./GiveClose";
 
 export const metadata: Metadata = {
   title: "Give",
   description:
-    "Your giving is changing the world. Support the work of Celebration Community Church — online through Pushpay, by cash or check, or in the C3 app.",
+    "Your giving is changing the world. Support the work of Celebration Community Church: online through Pushpay, by cash or check, or in the C3 app.",
 };
 
 /**
@@ -21,7 +20,6 @@ export const metadata: Metadata = {
 const PAGE_DEFAULT_SECTIONS: SectionMeta[] = [
   { id: "give-hero", visible: true },
   { id: "give-ways", visible: true },
-  { id: "give-close", visible: true },
 ];
 
 /**
@@ -60,8 +58,6 @@ export default async function GivePage({
         return <GiveHero t={t} media={media} img={img} />;
       case "give-ways":
         return <GiveWays t={t} />;
-      case "give-close":
-        return <GiveClose t={t} />;
       default:
         return null;
     }

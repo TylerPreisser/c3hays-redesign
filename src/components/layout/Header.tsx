@@ -249,7 +249,7 @@ export default function Header({ globals = {} }: { globals?: CMSOverrides }) {
           <Link
             href="/"
             prefetch={false}
-            aria-label="C3 — Celebration Community Church — Home"
+            aria-label="C3, Celebration Community Church, Home"
             className="shrink-0 flex items-center"
           >
             <Logo size={38} variant={isScrolled ? "dark" : "light"} cmsKey={`g:logo-${isScrolled ? "dark" : "light"}`} srcOverride={m[isScrolled ? "logo-dark" : "logo-light"]} />

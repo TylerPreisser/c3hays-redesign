@@ -46,7 +46,7 @@ export default function LocationsSection({ text = {}, btn = {} }: { text?: Recor
         {/* Header */}
         <div className="locations-heading" style={{ marginBottom: "clamp(2rem, 4vw, 3.5rem)", maxWidth: 640 }}>
           <h2 className="display-2" data-cms="t:our-churches-heading" style={{ color: "#1b1c1c" }} dangerouslySetInnerHTML={{ __html: tx(text, "our-churches-heading", "Our churches.") }} />
-          <p className="body-lg" data-cms="t:our-churches-intro" style={{ color: "rgba(27,28,28,0.6)", marginTop: "1.25rem" }} dangerouslySetInnerHTML={{ __html: tx(text, "our-churches-intro", "We gather in Hays and Colby, Kansas. Find the campus closest to you — and come just as you are this weekend.") }} />
+          <p className="body-lg" data-cms="t:our-churches-intro" style={{ color: "rgba(27,28,28,0.6)", marginTop: "1.25rem" }} dangerouslySetInnerHTML={{ __html: tx(text, "our-churches-intro", "We gather in Hays and Colby, Kansas. Find the campus closest to you, and come just as you are this weekend.") }} />
         </div>
 
         {/* Map + chooser card — 2-col from md (768px), 5-col weighting at lg */}
@@ -112,7 +112,7 @@ export default function LocationsSection({ text = {}, btn = {} }: { text?: Recor
             style={{ background: "var(--color-ink)", borderRadius: "var(--radius-md)", padding: "2.5rem 2.25rem" }}
           >
             <h3 className="heading-2 text-white" data-cms="t:findcampus-heading" style={{ marginBottom: "0.875rem" }} dangerouslySetInnerHTML={{ __html: tx(text, "findcampus-heading", "Find your campus") }} />
-            <p className="body-base" data-cms="t:findcampus-body" style={{ color: "rgba(255,255,255,0.6)", marginBottom: "1.75rem" }} dangerouslySetInnerHTML={{ __html: tx(text, "findcampus-body", "Find the campus closest to you — we'd love to see you this weekend.") }} />
+            <p className="body-base" data-cms="t:findcampus-body" style={{ color: "rgba(255,255,255,0.6)", marginBottom: "1.75rem" }} dangerouslySetInnerHTML={{ __html: tx(text, "findcampus-body", "Find the campus closest to you, we'd love to see you this weekend.") }} />
             <CampusChooser variant="teal" id="findcampus-locations" text={text} btn={btn} />
           </div>
         </div>

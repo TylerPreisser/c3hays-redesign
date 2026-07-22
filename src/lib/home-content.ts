@@ -99,9 +99,9 @@ export const MEET_GROW_SERVE_DEFAULTS: MeetGrowServeContent = {
   // Real celebratejesus.org home section header.
   heading: "Meet. Grow. Serve.",
   pillars: [
-    { word: "About", headline: "Who We Are", body: "A church family in Hays and Colby, Kansas — where everyone is welcome, just as you are.", image: "/images/congregation.webp", href: "/about/" },
-    { word: "Messages", headline: "Watch &amp; Listen", body: "Catch up on any message, any series — anytime, online or in person.", image: "/images/gather.webp", href: "/messages/" },
-    { word: "Connect", headline: "Connect with Us", body: "You're welcome to join us just as you are — there isn't a mold you have to fit before you walk through our doors.", image: "/images/exterior.webp", href: "/connect/" },
+    { word: "About", headline: "Who We Are", body: "A church family in Hays and Colby, Kansas, where everyone is welcome, just as you are.", image: "/images/congregation.webp", href: "/about/" },
+    { word: "Messages", headline: "Watch &amp; Listen", body: "Catch up on any message, any series, anytime, online or in person.", image: "/images/gather.webp", href: "/messages/" },
+    { word: "Connect", headline: "Connect with Us", body: "You're welcome to join us just as you are. There isn't a mold you have to fit before you walk through our doors.", image: "/images/exterior.webp", href: "/connect/" },
   ],
 };
 export const NT26_DEFAULTS: NT26Content = {

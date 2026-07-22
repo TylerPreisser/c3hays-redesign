@@ -38,7 +38,7 @@ const connectItems = [
     icon: Video,
     overline: "Sermons",
     title: "Past Messages",
-    body: "Catch up on any message — anytime, online or in person.",
+    body: "Catch up on any message, anytime, online or in person.",
     cta: "Browse messages",
     href: "/messages/",
   },
@@ -46,7 +46,7 @@ const connectItems = [
     icon: Smartphone,
     overline: "App",
     title: "C3 App",
-    body: "Messages, giving, and more — right from the C3 app.",
+    body: "Messages, giving, and more, right from the C3 app.",
     cta: "Download the app",
     href: site.appStore,
   },
@@ -108,7 +108,7 @@ export default function StayConnected({
         linkPath: `stayConnected.cards.${c.id}.cta`,
       }))
     : Array.from({ length: cardCount }, (_, i) => {
-        const item = connectItems[i] || { icon: Sparkles, overline: "New", title: "New card", body: "Describe this card — click any text to edit it.", cta: "Learn more", href: "/connect/" };
+        const item = connectItems[i] || { icon: Sparkles, overline: "New", title: "New card", body: "Describe this card. Click any text to edit it.", cta: "Learn more", href: "/connect/" };
         return {
           reactKey: String(i),
           iconKey: `connect-${i}`,
@@ -131,9 +131,9 @@ export default function StayConnected({
     return (
       /* Soft mist section — premium rounded cards */
       <section className="section" style={{ backgroundColor: "transparent" }}>
-        <div className="container-c3">
+        <div className="container-c3" style={{ maxWidth: "1400px" }}>
           {/* Header — heading + supporting line, centered */}
-          <div className="connect-heading" data-anim="fadeInUp" style={{ marginBottom: "clamp(2rem, 4vw, 3.5rem)", maxWidth: 640 }}>
+          <div className="connect-heading" data-anim="fadeInUp" style={{ marginBottom: "clamp(2rem, 4vw, 3.5rem)", maxWidth: 720, marginInline: "auto", textAlign: "center" }}>
             <span data-cms="t:getintouch-eyebrow" style={{ display: "inline-block", textTransform: "uppercase", letterSpacing: "0.16em", fontSize: "0.75rem", fontWeight: 700, color: "#1cc3af", marginBottom: "1rem" }} dangerouslySetInnerHTML={{ __html: tx(text, "getintouch-eyebrow", "Connect with us") }} />
             <h2 className="display-2" data-cms="t:getintouch-heading" style={{ color: "#1b1c1c", marginBottom: "1rem" }} dangerouslySetInnerHTML={{ __html: tx(text, "getintouch-heading", "Get in Touch") }} />
             <p data-cms="t:getintouch-intro" style={{ fontSize: "1.125rem", color: "rgba(27,28,28,0.62)", lineHeight: 1.6 }} dangerouslySetInnerHTML={{ __html: tx(text, "getintouch-intro", "A few simple ways to stay connected with C3.") }} />

@@ -153,7 +153,7 @@ function FooterEditorial({ t, m, preCta = false }: { t: TextBag; m: MediaBag; pr
           <div className="lg:col-span-4 max-w-xs md:max-w-none">
             <Link href="/" prefetch={false} className="inline-block mb-6" aria-label="C3 Home"><Logo size={56} variant="light" cmsKey="g:logo-light" srcOverride={m["logo-light"]} /></Link>
             <p className="heading-3 mb-4" data-cms="g:footer-brand" style={{ color: "rgba(255,255,255,0.95)" }} dangerouslySetInnerHTML={{ __html: tx(t, "footer-brand", "Celebration Community Church") }} />
-            <p className="body-sm leading-relaxed mb-6 mx-auto md:mx-0" data-cms="g:footer-tagline" style={{ color: "rgba(255,255,255,0.52)", maxWidth: "22rem" }} dangerouslySetInnerHTML={{ __html: tx(t, "footer-tagline", "C3 in Hays and Colby, Kansas — for everyone, just as you are.") }} />
+            <p className="body-sm leading-relaxed mb-6 mx-auto md:mx-0" data-cms="g:footer-tagline" style={{ color: "rgba(255,255,255,0.52)", maxWidth: "22rem" }} dangerouslySetInnerHTML={{ __html: tx(t, "footer-tagline", "C3 in Hays and Colby, Kansas, for everyone, just as you are.") }} />
             <div className="flex flex-col gap-2 items-center md:items-start">
               {/* ITEM 5: phone/email are EDITABLE TEXT that carries a link — the inner
                   label is the editable [data-cms] node, and the <a> keeps real
@@ -197,7 +197,7 @@ function FooterEditorial({ t, m, preCta = false }: { t: TextBag; m: MediaBag; pr
           {/* Newsletter + social */}
           <div className="lg:col-span-3 w-full max-w-sm md:max-w-none">
             <FooterHeading id="footer-news-head" t={t}>Stay in the loop</FooterHeading>
-            <p className="body-sm" data-cms="g:footer-news-blurb" style={{ color: "rgba(255,255,255,0.65)", lineHeight: 1.65 }} dangerouslySetInnerHTML={{ __html: tx(t, "footer-news-blurb", "The C3 Weekly — what's happening at C3, straight to your inbox.") }} />
+            <p className="body-sm" data-cms="g:footer-news-blurb" style={{ color: "rgba(255,255,255,0.65)", lineHeight: 1.65 }} dangerouslySetInnerHTML={{ __html: tx(t, "footer-news-blurb", "The C3 Weekly: what's happening at C3, straight to your inbox.") }} />
             {/* v8 P3: widen the cramped blurb→form gap. The blurb is a <p>, and globals.css
                has an UNLAYERED `p{margin:0}` reset that beats Tailwind's layered `mb-*`
                utility, so `mb-5`/`mb-8` on the blurb compute to 0 (verified live). The
@@ -226,7 +226,7 @@ function FooterMinimal({ t, m }: { t: TextBag; m: MediaBag }) {
       <div className="container-c3" style={{ paddingTop: "var(--s-24, 96px)", paddingBottom: "var(--s-12, 48px)", textAlign: "center", display: "flex", flexDirection: "column", alignItems: "center", gap: "var(--s-8, 32px)" }}>
         <Link href="/" prefetch={false} aria-label="C3 Home"><Logo size={56} variant="light" cmsKey="g:logo-light" srcOverride={m["logo-light"]} /></Link>
 
-        <p className="body-lg" data-cms="g:footer-tagline" style={{ color: "rgba(255,255,255,0.60)", maxWidth: "42ch", margin: 0 }} dangerouslySetInnerHTML={{ __html: tx(t, "footer-tagline", "C3 in Hays and Colby, Kansas — for everyone, just as you are.") }} />
+        <p className="body-lg" data-cms="g:footer-tagline" style={{ color: "rgba(255,255,255,0.60)", maxWidth: "42ch", margin: 0 }} dangerouslySetInnerHTML={{ __html: tx(t, "footer-tagline", "C3 in Hays and Colby, Kansas, for everyone, just as you are.") }} />
 
         {/* Single row of primary links */}
         <nav className="flex flex-wrap items-center justify-center gap-x-7 gap-y-3 body-sm">

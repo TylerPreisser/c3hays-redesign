@@ -24,9 +24,9 @@ export const counselors: Counselor[] = [
     ],
     approach: "Integrating cognitive/behavioral therapy with a Christ-centered foundation.",
     education: [
-      "S. Horticultural Therapy — Kansas State University",
-      "Pastoral License & Ordination — Charis Bible College",
-      "A. Counseling — Liberty University",
+      "S. Horticultural Therapy, Kansas State University",
+      "Pastoral License & Ordination, Charis Bible College",
+      "A. Counseling, Liberty University",
     ],
   },
   {
@@ -42,7 +42,7 @@ export const counselors: Counselor[] = [
       "Faith struggles",
     ],
     approach: "Christ-centered, solution-focused, and reality-based therapy.",
-    education: ["M.S. — Fort Hays State University"],
+    education: ["M.S., Fort Hays State University"],
   },
   {
     id: "patrick-mcginnis",
@@ -58,6 +58,6 @@ export const counselors: Counselor[] = [
     ],
     approach:
       "Using CBT, DBT, and solution-focused therapy to help clients reach their God-given potential.",
-    education: ["M.S. — Licensed Master's Social Work (2022)"],
+    education: ["M.S., Licensed Master's Social Work (2022)"],
   },
 ];

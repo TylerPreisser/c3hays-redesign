@@ -68,7 +68,7 @@ const CHANNELS: Channel[] = [
   {
     id: "youtube",
     label: "YouTube",
-    desc: "Every weekend message, on demand — catch up anytime.",
+    desc: "Every weekend message, on demand. Catch up anytime.",
     href: site.social.youtube,
     Icon: YouTubeIcon,
   },

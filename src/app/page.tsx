@@ -23,7 +23,7 @@ export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
   title: "Celebration Community Church | Welcome Home.",
   description:
-    "A church family in Hays and Colby, Kansas — for everyone, just as you are. Services Saturday and Sunday.",
+    "A church family in Hays and Colby, Kansas, for everyone, just as you are. Services Saturday and Sunday.",
 };
 
 /**
