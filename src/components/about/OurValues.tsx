@@ -18,19 +18,19 @@ const VALUE_DEFAULTS = [
     id: "meet",
     word: "Meet",
     line: "meet with Him",
-    body: "We gather to welcome the presence of God — meeting with Him together in worship, prayer, and His Word.",
+    body: "We exist to meet with Him.",
   },
   {
     id: "grow",
     word: "Grow",
     line: "grow in Him",
-    body: "We grow in Him — rooted in Scripture and shaped by community, becoming more like Jesus one step at a time.",
+    body: "We exist to grow in Him.",
   },
   {
     id: "serve",
     word: "Serve",
     line: "serve through Him",
-    body: "We serve through Him — carrying His love beyond our walls into Hays, Colby, and to the ends of the earth.",
+    body: "We exist to serve through Him.",
   },
 ];
 

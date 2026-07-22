@@ -53,7 +53,7 @@ export default function StaffGrid({
               __html: tx(
                 text,
                 "about-staff-blurb",
-                "Say hi to the staff of Celebration Community Church — a team here to help you take your next step."
+                "Say hi to the staff of Celebration Community Church."
               ),
             }}
           />

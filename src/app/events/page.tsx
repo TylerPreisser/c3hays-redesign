@@ -107,7 +107,7 @@ export default async function EventsPage({
                 as="p"
                 text={t}
                 k="events-hero-body"
-                fallback="From baptisms to serve days to student nights &mdash; here&rsquo;s what&rsquo;s coming up across both campuses."
+                fallback="Here&rsquo;s what&rsquo;s coming up across both campuses."
                 className="body-lg mt-5 max-w-xl"
                 style={{ color: "rgba(255,255,255,0.68)" }}
               />

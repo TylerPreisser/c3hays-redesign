@@ -2,7 +2,7 @@
 
 import { useMemo } from "react";
 import { groupByDay, monthMatrix, dayKey, type CalEvent } from "@/lib/espace";
-import { HAIR, sameMonth, daySubhead, EventPill } from "./calendar-shared";
+import { HAIR, sameMonth, EventPill } from "./calendar-shared";
 
 /**
  * The two large calendar bodies for <LiveCalendar> — the desktop month grid and the
@@ -13,6 +13,21 @@ import { HAIR, sameMonth, daySubhead, EventPill } from "./calendar-shared";
 const WEEKDAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
 /* ───────────────────────── Agenda / list view ───────────────────────── */
+const AGENDA_WD = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+const AGENDA_MON = [
+  "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+  "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
+];
+
+/**
+ * Agenda / list view — a premium timeline. Each day is an obvious group: a bold
+ * date block (weekday + big day number, with the month shown when it changes, and a
+ * teal "today" treatment) pins the left rail while the day's events read as tidy,
+ * vertically-aligned rows (time column · color dot · title · campus pill). Days are
+ * separated by a hairline so the eye instantly knows which day it's looking at.
+ * Events arrive pre-sorted chronologically (see espace.groupByDay), so both the day
+ * order and the rows within a day are already in time order.
+ */
 export function AgendaView({
   monthEvents,
   onOpen,
@@ -22,20 +37,87 @@ export function AgendaView({
 }) {
   const grouped = useMemo(() => groupByDay(monthEvents), [monthEvents]);
   const keys = Array.from(grouped.keys());
+  const todayKey = dayKey(new Date());
+
+  let prevMonth = -1;
   return (
-    <div style={{ display: "grid", gap: "1.6rem" }}>
-      {keys.map((k) => {
+    <div style={{ display: "grid", gap: 0 }}>
+      {keys.map((k, gi) => {
         const list = grouped.get(k)!;
         const d = list[0].start;
+        const isToday = k === todayKey;
+        const showMonth = d.getMonth() !== prevMonth;
+        prevMonth = d.getMonth();
         return (
-          <div key={k}>
-            <p
-              className="overline"
-              style={{ color: "var(--color-teal-deep)", marginBottom: "0.7rem" }}
+          <div
+            key={k}
+            style={{
+              display: "grid",
+              gridTemplateColumns: "clamp(52px, 15vw, 68px) 1fr",
+              gap: "clamp(0.75rem, 3vw, 1.4rem)",
+              padding: "1.15rem 0",
+              borderTop: gi === 0 ? "none" : "1px solid rgba(27,28,28,0.09)",
+            }}
+          >
+            {/* ── Day block (left rail, sticks while its events scroll) ── */}
+            <div
+              style={{
+                position: "sticky",
+                top: 12,
+                alignSelf: "start",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                textAlign: "center",
+                lineHeight: 1,
+              }}
             >
-              {daySubhead(d)}
-            </p>
-            <ul style={{ listStyle: "none", margin: 0, padding: 0, display: "grid", gap: 2 }}>
+              {showMonth && (
+                <span
+                  style={{
+                    fontSize: "0.6rem",
+                    fontWeight: 800,
+                    letterSpacing: "0.1em",
+                    textTransform: "uppercase",
+                    color: "var(--color-teal-deep)",
+                    marginBottom: "0.35rem",
+                  }}
+                >
+                  {AGENDA_MON[d.getMonth()]}
+                </span>
+              )}
+              <span
+                style={{
+                  fontSize: "0.64rem",
+                  fontWeight: 700,
+                  letterSpacing: "0.08em",
+                  textTransform: "uppercase",
+                  color: isToday ? "var(--color-teal-deep)" : "var(--color-mute)",
+                  marginBottom: "0.3rem",
+                }}
+              >
+                {AGENDA_WD[d.getDay()]}
+              </span>
+              <span
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  minWidth: 40,
+                  height: 40,
+                  borderRadius: 12,
+                  fontSize: "1.4rem",
+                  fontWeight: 800,
+                  color: isToday ? "#fff" : "var(--color-ink)",
+                  background: isToday ? "var(--color-teal)" : "transparent",
+                }}
+              >
+                {d.getDate()}
+              </span>
+            </div>
+
+            {/* ── Event rows for the day ── */}
+            <ul style={{ listStyle: "none", margin: 0, padding: 0, display: "grid", gap: 4 }}>
               {list.map((ev) => (
                 <li key={ev.id}>
                   <button
@@ -44,76 +126,99 @@ export function AgendaView({
                     className="lc-agenda-row"
                     style={{
                       display: "grid",
-                      gridTemplateColumns: "clamp(64px, 20vw, 96px) auto 1fr",
+                      gridTemplateColumns: "clamp(58px, 15vw, 82px) 14px 1fr",
                       alignItems: "baseline",
-                      gap: "0.75rem",
+                      gap: "0.7rem",
                       width: "100%",
                       textAlign: "left",
                       cursor: "pointer",
                       background: "transparent",
                       border: "none",
-                      borderTop: HAIR,
-                      padding: "0.85rem 0.5rem",
+                      padding: "0.6rem 0.6rem",
                     }}
                   >
+                    {/* Time column — right-aligned so times form a clean vertical rule */}
                     <span
                       style={{
-                        fontSize: "0.8rem",
-                        fontWeight: 600,
+                        textAlign: "right",
+                        fontSize: "0.78rem",
+                        fontWeight: 700,
+                        fontVariantNumeric: "tabular-nums",
                         color: ev.isHoliday ? "var(--color-mute)" : "var(--color-ink)",
                         whiteSpace: "nowrap",
                       }}
                     >
                       {ev.allDay
                         ? "All day"
-                        : ev.start.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" })}
+                        : ev.start
+                            .toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" })
+                            .replace(" ", " ")}
                     </span>
+                    {/* Campus / holiday color dot (preserves legend meaning) */}
                     <span
                       aria-hidden="true"
                       style={{
+                        justifySelf: "center",
                         width: 9,
                         height: 9,
                         borderRadius: 999,
-                        marginTop: 6,
+                        transform: "translateY(4px)",
                         background: ev.isHoliday ? "var(--color-rule)" : ev.color,
+                        boxShadow: ev.isHoliday
+                          ? "none"
+                          : `0 0 0 3px rgba(28,195,175,0.10)`,
                       }}
                     />
                     <span style={{ minWidth: 0 }}>
                       <span
-                        className="body-base"
                         style={{
-                          fontWeight: 600,
-                          color: "var(--color-ink)",
-                          fontStyle: ev.isHoliday ? "italic" : undefined,
+                          display: "flex",
+                          alignItems: "center",
+                          flexWrap: "wrap",
+                          gap: "0.5rem",
                         }}
                       >
-                        {ev.title}
-                      </span>
-                      {ev.campus && (
                         <span
+                          className="body-base"
                           style={{
-                            marginLeft: "0.6rem",
-                            fontSize: "0.68rem",
-                            fontWeight: 700,
-                            letterSpacing: "0.04em",
-                            textTransform: "uppercase",
-                            color: "var(--color-teal-deep)",
+                            fontWeight: 600,
+                            color: "var(--color-ink)",
+                            fontStyle: ev.isHoliday ? "italic" : undefined,
                           }}
                         >
-                          {ev.campus}
+                          {ev.title}
                         </span>
-                      )}
+                        {ev.campus && (
+                          <span
+                            style={{
+                              display: "inline-block",
+                              padding: "0.1rem 0.5rem",
+                              borderRadius: 999,
+                              fontSize: "0.64rem",
+                              fontWeight: 700,
+                              letterSpacing: "0.04em",
+                              textTransform: "uppercase",
+                              color: "var(--color-teal-deep)",
+                              background: "rgba(28,195,175,0.10)",
+                              border: "1px solid rgba(28,195,175,0.22)",
+                              whiteSpace: "nowrap",
+                            }}
+                          >
+                            {ev.campus}
+                          </span>
+                        )}
+                      </span>
                       {ev.description && (
                         <span
                           className="body-sm"
                           style={{
                             display: "block",
                             color: "var(--color-mute)",
-                            marginTop: "0.15rem",
+                            marginTop: "0.2rem",
                             whiteSpace: "nowrap",
                             overflow: "hidden",
                             textOverflow: "ellipsis",
-                            maxWidth: "48ch",
+                            maxWidth: "52ch",
                           }}
                         >
                           {ev.description}

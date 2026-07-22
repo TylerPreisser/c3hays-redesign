@@ -33,8 +33,8 @@ export const metadata: Metadata = {
 
 /* Real destinations (verified platforms): the weekend service streams on Facebook
    Live; the past-message archive lives on YouTube (youtube.com/@c3hays). */
-const YOUTUBE = "https://youtube.com/@c3hays";
-const FACEBOOK_LIVE = "https://facebook.com/c3hays/videos";
+const YOUTUBE = "https://www.youtube.com/@c3hays";
+const FACEBOOK_LIVE = "https://www.facebook.com/c3hays/live";
 
 /**
  * /watch — rebuilt to the editor-native SECTION contract (Phase-4).

@@ -13,10 +13,10 @@ export const site = {
   // Anchor. Do NOT use Vimeo — the church does not use it. Do NOT invent a Google Play
   // link (only an iOS app exists on the real site).
   social: {
-    facebook: "https://facebook.com/c3hays",
-    facebookLive: "https://facebook.com/c3hays/videos",
-    instagram: "https://instagram.com/c3hays",
-    youtube: "https://youtube.com/@c3hays",
+    facebook: "https://www.facebook.com/c3hays",
+    facebookLive: "https://www.facebook.com/c3hays/live",
+    instagram: "https://www.instagram.com/c3hays/",
+    youtube: "https://www.youtube.com/@c3hays",
     podcast: "https://anchor.fm/c3pod",
   },
   giving: {
@@ -24,6 +24,6 @@ export const site = {
     colby: "https://pushpay.com/g/celebratejesus?r=monthly",
     online: "https://pushpay.com/g/4553051606?r=monthly",
   },
-  // iOS "C3 Hays" app (App ID 1028509278). No Android/Play link exists on the real site.
-  appStore: "https://apps.apple.com/us/app/c3-hays/id1028509278",
+  // iOS "C3 KS" app (App ID 1028509278). No Android/Play link exists on the real site.
+  appStore: "https://apps.apple.com/us/app/c3-ks/id1028509278",
 } as const;

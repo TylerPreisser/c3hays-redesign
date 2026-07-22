@@ -76,7 +76,7 @@ export default async function HaysCampusPage() {
           <h1
             className="display-1 text-white"
             data-cms="t:hays-hero-title"
-            dangerouslySetInnerHTML={{ __html: tx(t, "hays-hero-title", "Our main campus.") }}
+            dangerouslySetInnerHTML={{ __html: tx(t, "hays-hero-title", "Our Hays campus.") }}
           />
         </div>
       </section>
@@ -100,7 +100,7 @@ export default async function HaysCampusPage() {
                 className="heading-1 mb-6"
                 data-cms="t:hays-details-title"
                 style={{ color: "#1b1c1c" }}
-                dangerouslySetInnerHTML={{ __html: tx(t, "hays-details-title", "Where C3 began.") }}
+                dangerouslySetInnerHTML={{ __html: tx(t, "hays-details-title", "Gather with us in Hays.") }}
               />
 
               <p
@@ -111,7 +111,7 @@ export default async function HaysCampusPage() {
                   __html: tx(
                     t,
                     "hays-details-body-1",
-                    "Our Hays campus is home base — where C3 began and where we continue to grow. Four weekend services give you options that fit your schedule. Whether you&apos;re a first-time guest or a decades-long family, you belong here."
+                    "Join us for worship in Hays — Saturdays at 5pm and Sundays at 8, 9:30, and 11am. You are welcome here, just as you are."
                   ),
                 }}
               />
@@ -124,7 +124,7 @@ export default async function HaysCampusPage() {
                   __html: tx(
                     t,
                     "hays-details-body-2",
-                    "Kids programming runs during all services for infants through 5th grade. Student ministry meets on Friday evenings. Come check us out — we&apos;re glad you&apos;re here."
+                    "C3Kids is available for children ages 3 through 5th grade during our 9:30am Sunday service. CrossCurrent student ministry meets on Wednesday nights."
                   ),
                 }}
               />

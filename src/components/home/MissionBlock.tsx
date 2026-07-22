@@ -76,7 +76,7 @@ export default function MissionBlock({
           /* Scrim over the mission's slice of the shared span image — keeps the white
              statement legible. The image itself is painted by PageComposer's span layer
              behind this (transparent) section, so there is no per-section photo here. */
-          <div aria-hidden="true" className="absolute inset-0 z-0" style={{ background: "linear-gradient(180deg, rgba(15,17,17,.74) 0%, rgba(15,17,17,.82) 100%)" }} />
+          <div aria-hidden="true" className="absolute inset-0 z-0" style={{ background: "linear-gradient(180deg, #1b1c1c 0%, rgba(27,28,28,.86) 14%, rgba(27,28,28,.82) 100%)" }} />
         )}
         <div className="container-c3 relative z-10">
           <div className="mission-text max-w-4xl mx-auto">

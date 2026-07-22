@@ -46,7 +46,7 @@ export default function LocationsSection({ text = {}, btn = {} }: { text?: Recor
         {/* Header */}
         <div className="locations-heading" style={{ marginBottom: "clamp(2rem, 4vw, 3.5rem)", maxWidth: 640 }}>
           <h2 className="display-2" data-cms="t:our-churches-heading" style={{ color: "#1b1c1c" }} dangerouslySetInnerHTML={{ __html: tx(text, "our-churches-heading", "Our churches.") }} />
-          <p className="body-lg" data-cms="t:our-churches-intro" style={{ color: "rgba(27,28,28,0.6)", marginTop: "1.25rem" }} dangerouslySetInnerHTML={{ __html: tx(text, "our-churches-intro", "We're one church family in two places across northwest Kansas. Find the campus closest to you — and come just as you are this weekend.") }} />
+          <p className="body-lg" data-cms="t:our-churches-intro" style={{ color: "rgba(27,28,28,0.6)", marginTop: "1.25rem" }} dangerouslySetInnerHTML={{ __html: tx(text, "our-churches-intro", "We gather in Hays and Colby, Kansas. Find the campus closest to you — and come just as you are this weekend.") }} />
         </div>
 
         {/* Map + chooser card — 2-col from md (768px), 5-col weighting at lg */}
@@ -84,7 +84,7 @@ export default function LocationsSection({ text = {}, btn = {} }: { text?: Recor
               {/* I-70 corridor — teal, connects the two campuses */}
               <path d="M70 175 C 170 150, 300 195, 410 168" stroke="var(--color-teal)" strokeWidth="4" fill="none" strokeLinecap="round" strokeDasharray="2 10" opacity="0.7" />
               {/* state label */}
-              <text x="250" y="40" textAnchor="middle" fill="rgba(27,28,28,0.30)" fontSize="13" fontWeight="700" letterSpacing="3">NORTHWEST KANSAS</text>
+              <text x="250" y="40" textAnchor="middle" fill="rgba(27,28,28,0.30)" fontSize="13" fontWeight="700" letterSpacing="3">KANSAS</text>
               {/* Colby marker (NW) */}
               <g>
                 <circle cx="80" cy="172" r="9" fill="var(--color-teal)" />
@@ -97,7 +97,6 @@ export default function LocationsSection({ text = {}, btn = {} }: { text?: Recor
                 <circle cx="408" cy="166" r="15" fill="none" stroke="var(--color-teal)" strokeWidth="2" opacity="0.35" />
                 <text x="408" y="144" textAnchor="middle" fill="#1b1c1c" fontSize="16" fontWeight="700">Hays</text>
               </g>
-              <text x="245" y="205" textAnchor="middle" fill="rgba(27,28,28,0.30)" fontSize="11" fontWeight="600" letterSpacing="2">I-70 · ~100 MILES</text>
             </svg>
             {/* B1: a bottom hit-zone that is a data-cms-bg descendant but NOT the image, so
                 — exactly like the campus card's bottom content zone — hovering here yields
@@ -113,7 +112,7 @@ export default function LocationsSection({ text = {}, btn = {} }: { text?: Recor
             style={{ background: "var(--color-ink)", borderRadius: "var(--radius-md)", padding: "2.5rem 2.25rem" }}
           >
             <h3 className="heading-2 text-white" data-cms="t:findcampus-heading" style={{ marginBottom: "0.875rem" }} dangerouslySetInnerHTML={{ __html: tx(text, "findcampus-heading", "Find your campus") }} />
-            <p className="body-base" data-cms="t:findcampus-body" style={{ color: "rgba(255,255,255,0.6)", marginBottom: "1.75rem" }} dangerouslySetInnerHTML={{ __html: tx(text, "findcampus-body", "Two campuses, one mission. Pick the one closest to you and we'll see you Sunday.") }} />
+            <p className="body-base" data-cms="t:findcampus-body" style={{ color: "rgba(255,255,255,0.6)", marginBottom: "1.75rem" }} dangerouslySetInnerHTML={{ __html: tx(text, "findcampus-body", "Find the campus closest to you — we'd love to see you this weekend.") }} />
             <CampusChooser variant="teal" id="findcampus-locations" text={text} btn={btn} />
           </div>
         </div>

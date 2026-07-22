@@ -130,7 +130,7 @@ export default async function BeliefsPage({
                   __html: tx(
                     t,
                     "beliefs-hero-body",
-                    "These are the convictions that anchor everything we do at C3 — rooted in Scripture, centered on Jesus."
+                    "The essentials we believe."
                   ),
                 }}
               />
@@ -170,7 +170,7 @@ export default async function BeliefsPage({
                           __html: tx(
                             t,
                             "beliefs-rail-body",
-                            "At Celebration Community Church, we hold to the historic, orthodox Christian faith as revealed in Scripture. These beliefs are not negotiable — they are the foundation of our community and the source of our hope."
+                            "These are the essentials we believe at Celebration Community Church."
                           ),
                         }}
                       />

@@ -90,7 +90,7 @@ export default async function ColbyCampusPage() {
               __html: tx(
                 t,
                 "colby-hero-tagline",
-                "One service. Every Sunday. Welcome home."
+                "Sundays at 10am. Welcome home."
               ),
             }}
           />
@@ -122,7 +122,7 @@ export default async function ColbyCampusPage() {
                   __html: tx(
                     t,
                     "colby-details-title",
-                    "Northwest Kansas, welcome home."
+                    "Colby, Kansas. Welcome home."
                   ),
                 }}
               />
@@ -135,7 +135,7 @@ export default async function ColbyCampusPage() {
                   __html: tx(
                     t,
                     "colby-details-body-1",
-                    "The Colby campus brings the same heart, the same vision, and the same Jesus-centered community that defines C3 — to northwest Kansas. One service on Sunday morning, with everything you&apos;d expect from a full C3 experience."
+                    "Join us in Colby — Sundays at 10am. You are welcome here, just as you are."
                   ),
                 }}
               />
@@ -148,7 +148,7 @@ export default async function ColbyCampusPage() {
                   __html: tx(
                     t,
                     "colby-details-body-2",
-                    "Kids programming runs during Sunday service. We&apos;d love to see you."
+                    "We&apos;d love to see you this Sunday."
                   ),
                 }}
               />
@@ -365,7 +365,7 @@ export default async function ColbyCampusPage() {
               __html: tx(
                 t,
                 "colby-cta-body",
-                "No perfect person required. Just show up Sunday at 10 AM and experience C3 Colby for yourself."
+                "Come as you are — join us Sunday at 10am and experience C3 Colby for yourself."
               ),
             }}
           />

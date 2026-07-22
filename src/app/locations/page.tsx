@@ -108,7 +108,7 @@ export default async function LocationsPage({
                     data-cms="t:locations-hero-heading"
                     style={{ maxWidth: 720 }}
                     dangerouslySetInnerHTML={{
-                      __html: tx(t, "locations-hero-heading", "Two campuses. One church family."),
+                      __html: tx(t, "locations-hero-heading", "C3 in Hays and Colby."),
                     }}
                   />
                 </Stack>
@@ -135,7 +135,7 @@ export default async function LocationsPage({
           /* ── Campus cards ── */
           <Section tone="white" container>
             {/* #5: the redundant lower "Find your campus." header + intro is REMOVED —
-                the hero above ("Two campuses. One church family.") already titles the
+                the hero above ("C3 in Hays and Colby.") already titles the
                 page, so this section now shows ONLY the campus cards. */}
 
             {/* 2-up campus cards */}

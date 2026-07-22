@@ -94,7 +94,8 @@ function SocialRow({ t }: { t: TextBag }) {
       <Social id="footer-social-facebook" href={site.social.facebook} label="Facebook"><svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" /></svg></Social>
       <Social id="footer-social-instagram" href={site.social.instagram} label="Instagram"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><rect width="20" height="20" x="2" y="2" rx="5" ry="5" /><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" /><line x1="17.5" x2="17.51" y1="6.5" y2="6.5" /></svg></Social>
       <Social id="footer-social-youtube" href={site.social.youtube} label="YouTube"><svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M23.5 6.2a3.02 3.02 0 0 0-2.12-2.14C19.5 3.55 12 3.55 12 3.55s-7.5 0-9.38.51A3.02 3.02 0 0 0 .5 6.2 31.6 31.6 0 0 0 0 12a31.6 31.6 0 0 0 .5 5.8 3.02 3.02 0 0 0 2.12 2.14c1.88.51 9.38.51 9.38.51s7.5 0 9.38-.51a3.02 3.02 0 0 0 2.12-2.14A31.6 31.6 0 0 0 24 12a31.6 31.6 0 0 0-.5-5.8zM9.55 15.57V8.43L15.82 12l-6.27 3.57z" /></svg></Social>
-      {/* Real social bar (verified platforms): Facebook · Instagram · YouTube. */}
+      <Social id="footer-social-app" href={site.appStore} label="C3 app on the App Store"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><rect x="5" y="2" width="14" height="20" rx="2" ry="2" /><line x1="12" x2="12.01" y1="18" y2="18" /></svg></Social>
+      {/* Real channels (verified): Facebook · Instagram · YouTube · C3 iOS app. */}
     </div>
   );
 }
@@ -152,7 +153,7 @@ function FooterEditorial({ t, m, preCta = false }: { t: TextBag; m: MediaBag; pr
           <div className="lg:col-span-4 max-w-xs md:max-w-none">
             <Link href="/" prefetch={false} className="inline-block mb-6" aria-label="C3 Home"><Logo size={56} variant="light" cmsKey="g:logo-light" srcOverride={m["logo-light"]} /></Link>
             <p className="heading-3 mb-4" data-cms="g:footer-brand" style={{ color: "rgba(255,255,255,0.95)" }} dangerouslySetInnerHTML={{ __html: tx(t, "footer-brand", "Celebration Community Church") }} />
-            <p className="body-sm leading-relaxed mb-6 mx-auto md:mx-0" data-cms="g:footer-tagline" style={{ color: "rgba(255,255,255,0.52)", maxWidth: "22rem" }} dangerouslySetInnerHTML={{ __html: tx(t, "footer-tagline", "One church family in two places across northwest Kansas — for everyone, just as you are.") }} />
+            <p className="body-sm leading-relaxed mb-6 mx-auto md:mx-0" data-cms="g:footer-tagline" style={{ color: "rgba(255,255,255,0.52)", maxWidth: "22rem" }} dangerouslySetInnerHTML={{ __html: tx(t, "footer-tagline", "C3 in Hays and Colby, Kansas — for everyone, just as you are.") }} />
             <div className="flex flex-col gap-2 items-center md:items-start">
               {/* ITEM 5: phone/email are EDITABLE TEXT that carries a link — the inner
                   label is the editable [data-cms] node, and the <a> keeps real
@@ -225,7 +226,7 @@ function FooterMinimal({ t, m }: { t: TextBag; m: MediaBag }) {
       <div className="container-c3" style={{ paddingTop: "var(--s-24, 96px)", paddingBottom: "var(--s-12, 48px)", textAlign: "center", display: "flex", flexDirection: "column", alignItems: "center", gap: "var(--s-8, 32px)" }}>
         <Link href="/" prefetch={false} aria-label="C3 Home"><Logo size={56} variant="light" cmsKey="g:logo-light" srcOverride={m["logo-light"]} /></Link>
 
-        <p className="body-lg" data-cms="g:footer-tagline" style={{ color: "rgba(255,255,255,0.60)", maxWidth: "42ch", margin: 0 }} dangerouslySetInnerHTML={{ __html: tx(t, "footer-tagline", "One church family in two places across northwest Kansas — for everyone, just as you are.") }} />
+        <p className="body-lg" data-cms="g:footer-tagline" style={{ color: "rgba(255,255,255,0.60)", maxWidth: "42ch", margin: 0 }} dangerouslySetInnerHTML={{ __html: tx(t, "footer-tagline", "C3 in Hays and Colby, Kansas — for everyone, just as you are.") }} />
 
         {/* Single row of primary links */}
         <nav className="flex flex-wrap items-center justify-center gap-x-7 gap-y-3 body-sm">

@@ -22,7 +22,7 @@ const connectItems = [
     icon: Mail,
     overline: "Email",
     title: "Write to Us",
-    body: "Questions, prayer requests, or just want to say hello — our team reads every message.",
+    body: "Questions or prayer requests? Send us a note.",
     cta: "Send an email",
     href: `mailto:${site.email}`,
   },
@@ -30,7 +30,7 @@ const connectItems = [
     icon: Phone,
     overline: "Phone",
     title: "Give Us a Call",
-    body: "Prefer to talk? Our office is happy to help Mon–Fri during regular business hours.",
+    body: "Prefer to talk? Give the church office a call.",
     cta: site.phone,
     href: `tel:${site.phone.replace(/\D/g, "")}`,
   },
@@ -38,7 +38,7 @@ const connectItems = [
     icon: Video,
     overline: "Sermons",
     title: "Past Messages",
-    body: "Catch up on any message, any series — anytime you want, as many times as you want.",
+    body: "Catch up on any message — anytime, online or in person.",
     cta: "Browse messages",
     href: "/messages/",
   },
@@ -46,7 +46,7 @@ const connectItems = [
     icon: Smartphone,
     overline: "App",
     title: "C3 App",
-    body: "Sermons, sermon notes, giving, and more — all in your pocket wherever you go.",
+    body: "Messages, giving, and more — right from the C3 app.",
     cta: "Download the app",
     href: site.appStore,
   },
@@ -136,7 +136,7 @@ export default function StayConnected({
           <div className="connect-heading" data-anim="fadeInUp" style={{ marginBottom: "clamp(2rem, 4vw, 3.5rem)", maxWidth: 640 }}>
             <span data-cms="t:getintouch-eyebrow" style={{ display: "inline-block", textTransform: "uppercase", letterSpacing: "0.16em", fontSize: "0.75rem", fontWeight: 700, color: "#1cc3af", marginBottom: "1rem" }} dangerouslySetInnerHTML={{ __html: tx(text, "getintouch-eyebrow", "Connect with us") }} />
             <h2 className="display-2" data-cms="t:getintouch-heading" style={{ color: "#1b1c1c", marginBottom: "1rem" }} dangerouslySetInnerHTML={{ __html: tx(text, "getintouch-heading", "Get in Touch") }} />
-            <p data-cms="t:getintouch-intro" style={{ fontSize: "1.125rem", color: "rgba(27,28,28,0.62)", lineHeight: 1.6 }} dangerouslySetInnerHTML={{ __html: tx(text, "getintouch-intro", "However you want to connect, there's a way in. Reach out, catch a message, or take C3 with you.") }} />
+            <p data-cms="t:getintouch-intro" style={{ fontSize: "1.125rem", color: "rgba(27,28,28,0.62)", lineHeight: 1.6 }} dangerouslySetInnerHTML={{ __html: tx(text, "getintouch-intro", "A few simple ways to stay connected with C3.") }} />
           </div>
 
           {/* Rounded card grid — legacy count is editable (1–6); a published
@@ -241,7 +241,7 @@ export default function StayConnected({
             <p
               data-cms="t:getintouch-intro"
               style={{ fontSize: "1rem", color: "rgba(255,255,255,0.5)", lineHeight: 1.55, margin: 0, maxWidth: 480 }}
-              dangerouslySetInnerHTML={{ __html: tx(text, "getintouch-intro", "However you want to connect, there's a way in. Reach out, catch a message, or take C3 with you.") }}
+              dangerouslySetInnerHTML={{ __html: tx(text, "getintouch-intro", "A few simple ways to stay connected with C3.") }}
             />
           </div>
         </div>

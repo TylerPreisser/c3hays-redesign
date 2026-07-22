@@ -170,7 +170,7 @@ export default function CampusMap({ text, className }: CampusMapProps) {
         <p
           className="campusmap-body"
           data-cms="t:campusmap-body"
-          dangerouslySetInnerHTML={{ __html: tx(text, "campusmap-body", "C3 sits along the I-70 corridor in northwest Kansas &mdash; Hays to the east, Colby about an hour west. Select a pin to see service times, address, and where to park.") }}
+          dangerouslySetInnerHTML={{ __html: tx(text, "campusmap-body", "C3 has two campuses in Kansas &mdash; Hays and Colby. Select a pin to see service times and directions.") }}
         />
       </div>
 

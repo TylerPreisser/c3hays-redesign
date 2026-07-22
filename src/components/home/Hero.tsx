@@ -90,7 +90,7 @@ export default function Hero({ content = HERO_DEFAULTS, btnStyle, text = {}, btn
             className="absolute inset-0"
             style={{
               background:
-                "linear-gradient(180deg, rgba(10,10,10,0.6) 0%, rgba(10,10,10,0.42) 45%, rgba(10,10,10,0.8) 100%)",
+                "linear-gradient(180deg, rgba(27,28,28,0.58) 0%, rgba(27,28,28,0.40) 45%, rgba(27,28,28,0.86) 92%, #1b1c1c 100%)",
               pointerEvents: "none",
             }}
           />

@@ -16,7 +16,7 @@
  */
 
 /** The real C3 message archive on YouTube. Cards default here. */
-export const YOUTUBE_CHANNEL = "https://youtube.com/@c3hays";
+export const YOUTUBE_CHANNEL = "https://www.youtube.com/@c3hays";
 
 export interface PastMessage {
   id: string;

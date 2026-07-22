@@ -100,13 +100,13 @@ export const MEET_GROW_SERVE_DEFAULTS: MeetGrowServeContent = {
   heading: "Meet. Grow. Serve.",
   pillars: [
     { word: "About", headline: "Who We Are", body: "A church family in Hays and Colby, Kansas — where everyone is welcome, just as you are.", image: "/images/congregation.webp", href: "/about/" },
-    { word: "Messages", headline: "Watch &amp; Listen", body: "Catch up on any message, any series — anytime, anywhere. New sermons every week.", image: "/images/gather.webp", href: "/messages/" },
-    { word: "Connect", headline: "Connect with Us", body: "Whether you're new or have been here a while, there's a place for you. Let us know how to help.", image: "/images/exterior.webp", href: "/connect/" },
+    { word: "Messages", headline: "Watch &amp; Listen", body: "Catch up on any message, any series — anytime, online or in person.", image: "/images/gather.webp", href: "/messages/" },
+    { word: "Connect", headline: "Connect with Us", body: "You're welcome to join us just as you are — there isn't a mold you have to fit before you walk through our doors.", image: "/images/exterior.webp", href: "/connect/" },
   ],
 };
 export const NT26_DEFAULTS: NT26Content = {
   heading: `Have you read your <span style="color:${TEAL}">Bible</span> today?`,
-  body: "The NT26 Reading Plan takes you through the entire New Testament in 2026 — one chapter at a time, together as a church family. No experience required. Just a willing heart.",
+  body: "Read through the New Testament in 2026. Click for today's reading plan and devotional.",
   ctaLabel: "Start Reading",
   ctaHref: "/messages/",
   image: "/images/nt26.webp",

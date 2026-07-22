@@ -26,23 +26,21 @@ export const metadata: Metadata = {
 
 /* Real destinations (verified platforms): past messages live on YouTube
    (youtube.com/@c3hays); the weekend service streams on Facebook Live. */
-const YOUTUBE = "https://youtube.com/@c3hays";
-const FACEBOOK_LIVE = "https://facebook.com/c3hays/videos";
+const YOUTUBE = "https://www.youtube.com/@c3hays";
+const FACEBOOK_LIVE = "https://www.facebook.com/c3hays/live";
 
 /**
  * /messages — editor-editable SECTION contract.
  *
  * Rebuilt to REAL content only (no fabricated sermon series, podcast episodes, or
- * campus pastors). Three editor-native sections composed via <PageComposer>:
+ * campus pastors). Two editor-native sections composed via <PageComposer>:
  *   • messages-hero    → full-bleed hero image + dark gradient
- *   • messages-banner  → real service-times band + Watch Live CTA
  *   • messages-archive → "Past Messages" — YouTube archive + Facebook Live
  *
  * Every heading/body is data-cms tagged and every button is an editable link.
  */
 const PAGE_DEFAULT_SECTIONS: SectionMeta[] = [
   { id: "messages-hero", visible: true },
-  { id: "messages-banner", visible: true },
   { id: "messages-archive", visible: true },
 ];
 
@@ -131,54 +129,6 @@ export default async function MessagesPage({
           </section>
         );
 
-      case "messages-banner":
-        return (
-          /* ── Live times banner — REAL service times ── */
-          <div style={{ backgroundColor: "#1b1c1c" }}>
-            <div className="container-c3 py-4 flex flex-wrap items-center justify-between gap-4">
-              <div
-                className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm"
-                style={{ color: "rgba(255,255,255,0.65)" }}
-              >
-                <span
-                  className="font-semibold text-white"
-                  data-cms="t:messages-banner-label"
-                  dangerouslySetInnerHTML={{
-                    __html: tx(t, "messages-banner-label", "Join us live:"),
-                  }}
-                />
-                <span
-                  data-cms="t:messages-banner-hays"
-                  dangerouslySetInnerHTML={{
-                    __html: tx(
-                      t,
-                      "messages-banner-hays",
-                      "Hays — Sat 5pm · Sun 8am, 9:30am, 11am"
-                    ),
-                  }}
-                />
-                <span
-                  data-cms="t:messages-banner-colby"
-                  dangerouslySetInnerHTML={{
-                    __html: tx(t, "messages-banner-colby", "Colby — Sun 10am"),
-                  }}
-                />
-              </div>
-              <a
-                href={t["messages-banner-cta-href"] || FACEBOOK_LIVE}
-                data-cms-link="messages-banner-cta"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="btn btn-primary btn-sm"
-              >
-                <span data-cms-link-label>
-                  {tx(t, "messages-banner-cta-label", "Watch Live")}
-                </span>
-              </a>
-            </div>
-          </div>
-        );
-
       case "messages-archive":
         return (
           /* ── Past Messages — searchable/filterable YouTube archive (REAL) ── */
@@ -259,7 +209,7 @@ export default async function MessagesPage({
     }
   };
 
-  const known = new Set(["messages-hero", "messages-banner", "messages-archive"]);
+  const known = new Set(["messages-hero", "messages-archive"]);
   const visible = sections.filter((s) => known.has(s.id));
 
   return <PageComposer sections={visible} bgFill={ov.bgFill} anim={ov.anim} render={render} />;

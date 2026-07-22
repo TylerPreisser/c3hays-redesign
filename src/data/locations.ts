@@ -34,7 +34,7 @@ export const locations: Location[] = [
       "https://maps.google.com/?q=5790+230th+Ave,+Hays,+KS+67601",
     image: "/images/exterior.webp",
     description:
-      "Our main campus in Hays, Kansas — where it all began. Four services every weekend with something for every age and stage.",
+      "C3 in Hays, Kansas — Saturdays at 5pm and Sundays at 8, 9:30, and 11am.",
   },
   {
     id: "colby",
@@ -48,6 +48,6 @@ export const locations: Location[] = [
     mapsUrl: "https://maps.google.com/?q=1923+S+Range,+Colby,+KS+67701",
     image: "/images/hero-2.webp",
     description:
-      "Bringing the same heart and vision to northwest Kansas. Join us Sunday morning at our Colby campus.",
+      "C3 in Colby, Kansas — Sundays at 10am.",
   },
 ];

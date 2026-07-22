@@ -50,6 +50,8 @@ export default function GiveWays({ t }: GiveWaysProps) {
 .gw-campuses{margin-top:26px;display:flex;flex-direction:column;gap:22px}
 .gw-campus-group{display:flex;flex-direction:column;gap:12px}
 .gw-campus-h{margin:0;font-size:1.05rem;font-weight:700;letter-spacing:-.01em;color:#fff}
+.gw-give-btn{display:flex;align-items:center;justify-content:center;text-align:center;padding:15px 18px;border-radius:12px;background:var(--color-teal);color:#08302b;font-size:1rem;font-weight:700;letter-spacing:-.01em;transition:filter .15s}
+.gw-give-btn:hover{filter:brightness(1.06)}
 .gw-desig{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
 .gw-desig a{display:flex;align-items:center;justify-content:center;text-align:center;padding:12px 14px;border-radius:12px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);color:#fff;font-size:.9rem;font-weight:700}
 .gw-desig a:hover{background:rgba(255,255,255,.1)}
