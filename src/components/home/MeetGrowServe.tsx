@@ -139,8 +139,11 @@ export default function MeetGrowServe({
                   style={{ fontSize: "1rem", color: "rgba(27,28,28,0.80)", lineHeight: 1.65 }}
                   dangerouslySetInnerHTML={{ __html: pillar.body }}
                 />
-                <Link href={pillar.href} className="arrow-link" style={{ color: "#1b1c1c" }}>
-                  Learn More <span className="arrow">→</span>
+                {/* De-collapsed: tile = data-cms-bg; only this inner link is the
+                    data-cms-link, so a click on "Learn More" selects the CTA (edit
+                    label + href), not the tile background. */}
+                <Link href={pillar.href} data-cms-link={`meetGrowServe.pillars.${pi}.cta`} className="arrow-link" style={{ color: "#1b1c1c" }}>
+                  <span data-cms-link-label>Learn More</span> <span className="arrow">→</span>
                 </Link>
               </div>
             ))}

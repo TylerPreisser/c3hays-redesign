@@ -338,11 +338,21 @@ export function ConnectHero({ text, media = {}, img = {} }: ConnectHeroProps) {
                 </li>
                 <li>
                   <Phone size={16} aria-hidden="true" />
-                  <a href={`tel:${site.phone.replace(/[^0-9+]/g, "")}`}>{site.phone}</a>
+                  <a
+                    href={text["connect-phone-href"] || `tel:${site.phone.replace(/[^0-9+]/g, "")}`}
+                    data-cms-link="connect-phone"
+                  >
+                    <span data-cms-link-label>{tx(text, "connect-phone-label", site.phone)}</span>
+                  </a>
                 </li>
                 <li>
                   <Mail size={16} aria-hidden="true" />
-                  <a href={`mailto:${site.email}`}>{site.email}</a>
+                  <a
+                    href={text["connect-email-href"] || `mailto:${site.email}`}
+                    data-cms-link="connect-email"
+                  >
+                    <span data-cms-link-label>{tx(text, "connect-email-label", site.email)}</span>
+                  </a>
                 </li>
                 <li>
                   <Clock size={16} aria-hidden="true" />

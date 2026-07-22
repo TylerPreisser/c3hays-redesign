@@ -109,5 +109,5 @@ export default async function HomePage({
         : s,
     );
 
-  return <PageComposer sections={sections} bgFill={c.bgFill} anim={c.anim} render={render} freeOffsets={c.freeOffsets} />;
+  return <PageComposer sections={sections} bgFill={c.bgFill} anim={c.anim} render={render} freeEls={c.freeEls} freeOffsets={c.freeOffsets} />;
 }

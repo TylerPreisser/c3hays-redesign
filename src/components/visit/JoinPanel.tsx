@@ -76,11 +76,12 @@ export default function JoinPanel({ t }: { t: Record<string, string> }) {
           {SOCIALS.map(({ id, label, href, Icon }) => (
             <a
               key={id}
-              href={href}
+              href={t[`visit-social-${id}-href`] || href}
               target="_blank"
               rel="noopener noreferrer"
               aria-label={label}
               title={label}
+              data-cms-link={`visit-social-${id}`}
               className="bento-tile inline-flex items-center justify-center"
               style={{
                 width: "3rem",

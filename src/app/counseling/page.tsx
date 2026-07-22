@@ -299,12 +299,14 @@ export default async function CounselingPage({
                 fallback={c.name}
               />
               {c.credentials && (
-                <span
+                <Tx
+                  as="span"
+                  text={t}
+                  k={`counseling-${c.id}-credentials`}
+                  fallback={c.credentials}
                   className="font-normal ml-1.5"
                   style={{ color: "var(--color-mute)", fontSize: "0.85rem" }}
-                >
-                  {c.credentials}
-                </span>
+                />
               )}
             </h3>
 
@@ -320,9 +322,16 @@ export default async function CounselingPage({
 
             {/* Specialties — calm teal-tinted chips. */}
             <div style={{ marginTop: "var(--space-body)" }}>
-              <CardLabel>Specialties</CardLabel>
+              <CardLabel>
+                <Tx
+                  as="span"
+                  text={t}
+                  k={`counseling-${c.id}-specialties-label`}
+                  fallback="Specialties"
+                />
+              </CardLabel>
               <ul className="flex flex-wrap gap-2" style={{ marginTop: "0.6rem" }}>
-                {c.specialties.map((s) => (
+                {c.specialties.map((s, si) => (
                   <li
                     key={s}
                     style={{
@@ -335,7 +344,7 @@ export default async function CounselingPage({
                       border: "1px solid rgba(28,195,175,0.22)",
                     }}
                   >
-                    {s}
+                    <Tx text={t} k={`counseling-${c.id}-specialty-${si}`} fallback={s} />
                   </li>
                 ))}
               </ul>
@@ -355,9 +364,14 @@ export default async function CounselingPage({
                 style={{ color: "var(--color-teal)", marginTop: 2 }}
                 className="shrink-0"
               />
-              <p className="text-xs" style={{ color: "var(--color-mute)", lineHeight: 1.5 }}>
-                {c.education.join(" · ")}
-              </p>
+              <Tx
+                as="p"
+                className="text-xs"
+                text={t}
+                k={`counseling-${c.id}-education`}
+                fallback={c.education.join(" · ")}
+                style={{ color: "var(--color-mute)", lineHeight: 1.5 }}
+              />
             </div>
           </article>
         ))}

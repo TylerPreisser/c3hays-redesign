@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import Image from "next/image";
-import Link from "next/link";
 import { getPageContent } from "@/lib/cms";
 import { isCmsLive } from "@/lib/cms-live";
 import { parseSections, tx, imgCss, type SectionMeta } from "@/lib/home-content";
@@ -9,7 +8,6 @@ import { beliefs } from "@/data/beliefs";
 import OurValues from "@/components/about/OurValues";
 import StaffGrid from "@/components/about/StaffGrid";
 import BeliefsAccordion from "@/components/beliefs/BeliefsAccordion";
-import Section from "@/components/ui/Section";
 import Stack from "@/components/ui/Stack";
 import PageComposer from "@/components/cms/PageComposer";
 
@@ -40,7 +38,6 @@ export const metadata: Metadata = {
  */
 const PAGE_DEFAULT_SECTIONS: SectionMeta[] = [
   { id: "about-hero", visible: true },
-  { id: "about-who", visible: true },
   { id: "about-values", visible: true },
   { id: "about-believe", visible: true },
   { id: "about-staff", visible: true },
@@ -74,10 +71,12 @@ export default async function AboutPage({
     switch (id) {
       case "about-hero":
         return (
-          /* ── Hero ──────────────────────────────────────────────────────────── */
+          /* ── Hero — also the single "Who We Are" section (id anchor for the nav
+              jump-link; the duplicate 2-column Who-We-Are block was removed). ────── */
           <section
+            id="who-we-are"
             className="relative flex items-end overflow-hidden"
-            style={{ minHeight: "clamp(480px, 62vh, 740px)" }}
+            style={{ minHeight: "clamp(480px, 62vh, 740px)", scrollMarginTop: "6rem" }}
           >
             <div className="absolute inset-0" data-cms-img="about-hero-bg" style={{ borderRadius: 0 }}>
               <Image
@@ -131,94 +130,15 @@ export default async function AboutPage({
           </section>
         );
 
-      case "about-who":
-        return (
-          /* ── Who We Are (id anchor for the nav jump-link) — real corpus copy. ── */
-          <div id="who-we-are" style={{ scrollMarginTop: "6rem" }}>
-            <Section tone="white" container>
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-14 lg:gap-24 items-start">
-                {/* Text column */}
-                <div className="flex flex-col">
-                  <Stack gap="eyebrow">
-                    <p
-                      className="overline"
-                      style={{ color: "#1cc3af" }}
-                      data-cms="t:about-who-eyebrow"
-                      dangerouslySetInnerHTML={{ __html: tx(t, "about-who-eyebrow", "About Us") }}
-                    />
-                    <h2
-                      className="display-2 text-balance"
-                      style={{ color: "#1b1c1c" }}
-                      data-cms="t:about-who-title"
-                      dangerouslySetInnerHTML={{ __html: tx(t, "about-who-title", "Who We Are") }}
-                    />
-                  </Stack>
-
-                  <Stack gap="body" style={{ marginTop: "var(--space-heading)" }}>
-                    <p
-                      className="body-lg"
-                      style={{ color: "rgba(27,28,28,0.80)", fontWeight: 500, lineHeight: 1.7 }}
-                      data-cms="t:about-who-lead"
-                      dangerouslySetInnerHTML={{
-                        __html: tx(
-                          t,
-                          "about-who-lead",
-                          "We believe that being a part of the local church is not about religion, but a relationship with Jesus."
-                        ),
-                      }}
-                    />
-                    <p
-                      className="body-base"
-                      style={{ color: "rgba(27,28,28,0.65)", lineHeight: 1.8 }}
-                      data-cms="t:about-who-body"
-                      dangerouslySetInnerHTML={{
-                        __html: tx(
-                          t,
-                          "about-who-body",
-                          "We want you to join us as you are; there isn&apos;t a mold you have to fit before you walk through our doors."
-                        ),
-                      }}
-                    />
-                  </Stack>
-
-                  <div style={{ marginTop: "var(--space-cta)" }}>
-                    <Link
-                      href={t["about-believe-btn-href"] || "#what-we-believe"}
-                      data-cms-link="about-believe-btn"
-                      className="btn btn-primary btn-lg"
-                    >
-                      <span data-cms-link-label>{tx(t, "about-believe-btn-label", "What We Believe")}</span>
-                    </Link>
-                  </div>
-                </div>
-
-                {/* Image column */}
-                <div
-                  className="relative overflow-hidden lg:min-h-[460px] min-h-[320px]"
-                  data-cms-img="about-who-img"
-                  style={{ borderRadius: "var(--radius-md)" }}
-                >
-                  <Image
-                    src={assetPath(media["about-who-img"] || media["about-mission-img"] || "/images/gather.webp")}
-                    alt="Church family gathered together"
-                    fill
-                    className="object-cover"
-                    style={imgCss(ov.img?.["about-who-img"])}
-                  />
-                </div>
-              </div>
-            </Section>
-          </div>
-        );
-
       case "about-values":
         /* ── Our Values — Meet / Grow / Serve (the real mission). ─────────────── */
         return <OurValues text={t} />;
 
       case "about-believe":
         return (
-          /* ── What We Believe (id anchor) — verbatim-real doctrine from the corpus
-              "The Essentials We Believe". Numbered list on desktop, accordion on
+          /* ── What We Believe (id anchor) — STICKY-SPLIT: the left column (heading +
+              intro) stays pinned while the RIGHT column scrolls through the 14
+              verbatim-real doctrine points ("The Essentials We Believe"). Accordion on
               mobile. Closes with the real "Have questions?" office email. ──────── */
           <section
             id="what-we-believe"
@@ -226,101 +146,110 @@ export default async function AboutPage({
             style={{ backgroundColor: "var(--color-paper)", scrollMarginTop: "6rem" }}
           >
             <div className="container-c3">
-              {/* Intro header */}
-              <div className="max-w-2xl" style={{ marginBottom: "clamp(2.5rem, 5vw, 3.5rem)" }}>
-                <Stack gap="heading">
-                  <Stack gap="eyebrow">
-                    <p
-                      className="overline"
-                      style={{ color: "#1cc3af" }}
-                      data-cms="t:about-believe-eyebrow"
-                      dangerouslySetInnerHTML={{ __html: tx(t, "about-believe-eyebrow", "What We Believe") }}
-                    />
-                    <h2
-                      className="display-2"
-                      style={{ color: "#1b1c1c" }}
-                      data-cms="t:about-believe-title"
-                      dangerouslySetInnerHTML={{ __html: tx(t, "about-believe-title", "The Essentials We Believe") }}
-                    />
-                  </Stack>
+              <div className="flex flex-col lg:flex-row lg:gap-20 xl:gap-28">
+
+                {/* LEFT — sticky heading + intro (pinned while the doctrine scrolls). */}
+                <aside className="lg:w-96 shrink-0 mb-12 lg:mb-0">
+                  <div className="lg:sticky lg:top-32">
+                    <Stack gap="heading">
+                      <Stack gap="eyebrow">
+                        <p
+                          className="overline"
+                          style={{ color: "#1cc3af" }}
+                          data-cms="t:about-believe-eyebrow"
+                          dangerouslySetInnerHTML={{ __html: tx(t, "about-believe-eyebrow", "What We Believe") }}
+                        />
+                        <h2
+                          className="display-2"
+                          style={{ color: "#1b1c1c" }}
+                          data-cms="t:about-believe-title"
+                          dangerouslySetInnerHTML={{ __html: tx(t, "about-believe-title", "The Essentials We Believe") }}
+                        />
+                      </Stack>
+                      <p
+                        className="body-lg"
+                        style={{ color: "rgba(27,28,28,0.65)", lineHeight: 1.7 }}
+                        data-cms="t:about-believe-body"
+                        dangerouslySetInnerHTML={{
+                          __html: tx(
+                            t,
+                            "about-believe-body",
+                            "These are the essentials we believe at Celebration Community Church."
+                          ),
+                        }}
+                      />
+                      <div
+                        className="hidden lg:block"
+                        style={{ width: 40, height: 3, borderRadius: 2, background: "#1cc3af" }}
+                      />
+                    </Stack>
+                  </div>
+                </aside>
+
+                {/* RIGHT — the 14 doctrine points scroll past the pinned left column. */}
+                <div className="flex-1 min-w-0">
+                  {/* Mobile (<lg): accessible tap-to-expand accordion. */}
+                  <div className="lg:hidden">
+                    <BeliefsAccordion items={beliefItems} />
+                  </div>
+
+                  {/* Desktop (lg+): numbered always-open list. */}
+                  <div className="hidden lg:flex flex-col gap-0">
+                    {beliefs.map((belief, i) => (
+                      <div
+                        key={belief.id}
+                        className={`pb-10 group ${i === 0 ? "" : "pt-10"}`}
+                        style={{ borderBottom: "1px solid rgba(27,28,28,0.10)" }}
+                      >
+                        <div className="flex gap-6 md:gap-10">
+                          <div className="shrink-0 pt-1">
+                            <span
+                              className="text-sm font-bold tabular-nums"
+                              style={{ color: "#1cc3af", letterSpacing: "0.02em" }}
+                            >
+                              {String(i + 1).padStart(2, "0")}
+                            </span>
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <h3
+                              className="heading-2 mb-4"
+                              data-cms={`t:beliefs-item-${belief.id}-title`}
+                              style={{ color: "#1b1c1c" }}
+                              dangerouslySetInnerHTML={{ __html: tx(t, `beliefs-item-${belief.id}-title`, belief.title) }}
+                            />
+                            <div className="flex flex-col gap-4">
+                              {belief.paragraphs.map((para, pi) => (
+                                <p
+                                  key={pi}
+                                  className="body-lg"
+                                  data-cms={`t:beliefs-item-${belief.id}-p${pi}`}
+                                  style={{ color: "rgba(27,28,28,0.68)", lineHeight: 1.75 }}
+                                  dangerouslySetInnerHTML={{ __html: tx(t, `beliefs-item-${belief.id}-p${pi}`, para) }}
+                                />
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Real "Have questions?" closer. */}
                   <p
-                    className="body-lg"
-                    style={{ color: "rgba(27,28,28,0.65)", lineHeight: 1.7 }}
-                    data-cms="t:about-believe-body"
+                    className="body-base mt-12"
+                    style={{ color: "rgba(27,28,28,0.65)" }}
+                    data-cms="t:about-believe-questions"
                     dangerouslySetInnerHTML={{
                       __html: tx(
                         t,
-                        "about-believe-body",
-                        "These are the essentials we believe at Celebration Community Church."
+                        "about-believe-questions",
+                        'For any questions regarding our statement of beliefs, please email <a href="mailto:office@celebratejesus.org" style="color:#1cc3af;font-weight:600">office@celebratejesus.org</a>.'
                       ),
                     }}
                   />
-                  <div
-                    className="hidden lg:block"
-                    style={{ width: 40, height: 3, borderRadius: 2, background: "#1cc3af" }}
-                  />
-                </Stack>
-              </div>
+                </div>
 
-              {/* Mobile (<lg): accessible tap-to-expand accordion. */}
-              <div className="lg:hidden">
-                <BeliefsAccordion items={beliefItems} />
               </div>
-
-              {/* Desktop (lg+): numbered always-open list. */}
-              <div className="hidden lg:flex flex-col gap-0">
-                {beliefs.map((belief, i) => (
-                  <div
-                    key={belief.id}
-                    className="py-10 group"
-                    style={{ borderBottom: "1px solid rgba(27,28,28,0.10)" }}
-                  >
-                    <div className="flex gap-6 md:gap-10">
-                      <div className="shrink-0 pt-1">
-                        <span
-                          className="text-sm font-bold tabular-nums"
-                          style={{ color: "#1cc3af", letterSpacing: "0.02em" }}
-                        >
-                          {String(i + 1).padStart(2, "0")}
-                        </span>
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <h3
-                          className="heading-2 mb-4"
-                          data-cms={`t:beliefs-item-${belief.id}-title`}
-                          style={{ color: "#1b1c1c" }}
-                          dangerouslySetInnerHTML={{ __html: tx(t, `beliefs-item-${belief.id}-title`, belief.title) }}
-                        />
-                        <div className="flex flex-col gap-4">
-                          {belief.paragraphs.map((para, pi) => (
-                            <p
-                              key={pi}
-                              className="body-lg"
-                              data-cms={`t:beliefs-item-${belief.id}-p${pi}`}
-                              style={{ color: "rgba(27,28,28,0.68)", lineHeight: 1.75 }}
-                              dangerouslySetInnerHTML={{ __html: tx(t, `beliefs-item-${belief.id}-p${pi}`, para) }}
-                            />
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              {/* Real "Have questions?" closer. */}
-              <p
-                className="body-base mt-12"
-                style={{ color: "rgba(27,28,28,0.65)" }}
-                data-cms="t:about-believe-questions"
-                dangerouslySetInnerHTML={{
-                  __html: tx(
-                    t,
-                    "about-believe-questions",
-                    'For any questions regarding our statement of beliefs, please email <a href="mailto:office@celebratejesus.org" style="color:#1cc3af;font-weight:600">office@celebratejesus.org</a>.'
-                  ),
-                }}
-              />
             </div>
           </section>
         );
@@ -334,7 +263,7 @@ export default async function AboutPage({
     }
   };
 
-  const known = new Set(["about-hero", "about-who", "about-values", "about-believe", "about-staff"]);
+  const known = new Set(["about-hero", "about-values", "about-believe", "about-staff"]);
   const visible = sections.filter((s) => known.has(s.id));
 
   return (

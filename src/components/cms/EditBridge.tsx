@@ -488,6 +488,33 @@ export default function EditBridge() {
       cardDelChip.style.display = "inline-flex";
     };
 
+    // ── DRAG-ANYWHERE DELETE: per-freeform-element Delete chip ──
+    // Hovering a freeform element ([data-cms-free] — an "+ Add Text/Button" element)
+    // reveals a Delete chip; clicking posts cms:removeFree so the editor drops it from
+    // freeEls (home model or that page's PageOverrides) and reloads.
+    const freeDelChip = document.createElement("button");
+    freeDelChip.id = "c3-free-delete";
+    freeDelChip.type = "button";
+    freeDelChip.style.cssText =
+      "position:fixed;z-index:2147483646;display:none;align-items:center;gap:5px;background:#e5484d;color:#fff;font:700 11px/1 -apple-system,sans-serif;border:none;border-radius:7px;padding:6px 9px;cursor:pointer;box-shadow:0 4px 14px rgba(0,0,0,.25);";
+    freeDelChip.innerHTML = `<span aria-hidden="true">🗑</span> Delete`;
+    let freeDelId = "";
+    freeDelChip.addEventListener("mousedown", (e) => {
+      e.preventDefault(); e.stopPropagation();
+      if (freeDelId) {
+        post({ type: "cms:removeFree", id: freeDelId });
+        log("remove-free", { id: freeDelId });
+        freeDelChip.style.display = "none"; freeDelId = "";
+      }
+    });
+    document.body.appendChild(freeDelChip);
+    const positionFreeDel = (el: HTMLElement) => {
+      const r = el.getBoundingClientRect();
+      freeDelChip.style.top = `${Math.max(6, r.top - 34)}px`;
+      freeDelChip.style.left = `${Math.max(6, Math.min(window.innerWidth - 96, r.right - 96))}px`;
+      freeDelChip.style.display = "inline-flex";
+    };
+
     let activeEl: HTMLElement | null = null;
     // Drag-anywhere: set true at the end of a free-element DRAG so the click that
     // follows mouseup is swallowed (a drag must not also open the link/text inspector).
@@ -654,12 +681,16 @@ export default function EditBridge() {
     const onOver = (e: MouseEvent) => {
       const t = e.target as HTMLElement;
       // Keep whichever chip the pointer moved onto (so it can be clicked).
-      if (t === bgChip || t === imgChip || t === cardDelChip) return;
+      if (t === bgChip || t === imgChip || t === cardDelChip || t === freeDelChip) return;
       // #2: show the per-card Delete chip whenever hovering an authored event card
       // (independent of the img/bg chips below, which keep their own behavior).
       const cardEl = t?.closest?.("[data-cms-card]") as HTMLElement | null;
       if (cardEl) { cardDelPath = cardEl.getAttribute("data-cms-card") || ""; positionCardDel(cardEl); }
       else { cardDelChip.style.display = "none"; cardDelPath = ""; }
+      // Drag-anywhere: show the Delete chip whenever hovering a freeform element.
+      const freeHov = t?.closest?.("[data-cms-free]") as HTMLElement | null;
+      if (freeHov) { freeDelId = freeHov.getAttribute("data-cms-free") || ""; positionFreeDel(freeHov); }
+      else { freeDelChip.style.display = "none"; freeDelId = ""; }
       // v7 R7 + R12: images are NOT recolorable but ARE swappable. A [data-cms-img] often
       // sits INSIDE a recolorable [data-cms-bg] wrapper (e.g. a pillar photo), so suppress
       // the 🎨 recolor chip over images and instead show the discoverable 🖼 Change image chip.

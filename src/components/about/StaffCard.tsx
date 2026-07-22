@@ -47,7 +47,7 @@ export default function StaffCard({
       {/* Portrait */}
       <div
         data-cms-img={`${key}-photo`}
-        className="relative w-full overflow-hidden transition-shadow duration-500 group-hover:shadow-[var(--shadow-hover)]"
+        className="relative w-full overflow-hidden transition-[transform,box-shadow] duration-500 ease-out group-hover:-translate-y-1.5 group-hover:shadow-[var(--shadow-hover)] motion-reduce:transition-none motion-reduce:group-hover:translate-y-0"
         style={{
           aspectRatio: "4 / 5",
           borderRadius: "1.25rem",
@@ -80,6 +80,16 @@ export default function StaffCard({
             {initials(member.name)}
           </span>
         )}
+        {/* Hover bloom — a teal inset ring + soft bottom gradient for a premium lift. */}
+        <div
+          aria-hidden="true"
+          className="absolute inset-0 pointer-events-none transition-opacity duration-500 opacity-0 group-hover:opacity-100"
+          style={{
+            borderRadius: "1.25rem",
+            boxShadow: "inset 0 0 0 2px rgba(28,195,175,0.55)",
+            background: "linear-gradient(to top, rgba(28,195,175,0.16) 0%, transparent 42%)",
+          }}
+        />
       </div>
 
       {/* Name + role */}

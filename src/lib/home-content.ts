@@ -6,7 +6,7 @@
  * real components). DEFAULTS are the exact canonical content, so with the CMS off
  * the site looks identical to the hand-built original.
  */
-import type { StudioHome } from "@/lib/cms";
+import type { StudioHome, FreeEl } from "@/lib/cms";
 
 const TEAL = "#1cc3af";
 
@@ -28,7 +28,7 @@ export interface SectionMeta { id: string; visible: boolean; bg?: string; varian
 export interface ImgStyle { pos?: string; scale?: number }
 /** v7 (R4): site-wide visual-effect flags. Tyler-advanced; all OFF by default. */
 export interface FxFlags { sectionBleed?: boolean }
-export interface HomeContent { hero: HeroContent; mission: MissionContent; meetGrowServe: MeetGrowServeContent; nt26: NT26Content; give: GiveContent; stayConnected: StayConnectedContent; text: Record<string, string>; btn: Record<string, BtnStyle>; icon: Record<string, IconStyle>; sections: SectionMeta[]; img: Record<string, ImgStyle>; bgFill: Record<string, string>; anim: Record<string, string>; fx: FxFlags; freeOffsets?: Record<string, { x: number; y: number }> }
+export interface HomeContent { hero: HeroContent; mission: MissionContent; meetGrowServe: MeetGrowServeContent; nt26: NT26Content; give: GiveContent; stayConnected: StayConnectedContent; text: Record<string, string>; btn: Record<string, BtnStyle>; icon: Record<string, IconStyle>; sections: SectionMeta[]; img: Record<string, ImgStyle>; bgFill: Record<string, string>; anim: Record<string, string>; fx: FxFlags; freeOffsets?: Record<string, { x: number; y: number }>; freeEls?: FreeEl[] }
 
 /** v6 R6: entrance-animation preset for a tagged element (by its data-cms path), or
  *  undefined when none. Hand-mirrors the c3-backend accessor; the reveal player
@@ -176,5 +176,7 @@ export function fromStudioHome(raw: StudioHome | null | undefined): HomeContent 
     fx: { sectionBleed: raw.fx?.sectionBleed === true },
     // Drag-anywhere: per-element free-drag offsets (data-cms* selector → {x,y} px).
     freeOffsets: (raw.freeOffsets && typeof raw.freeOffsets === "object" ? raw.freeOffsets : {}) as Record<string, { x: number; y: number }>,
+    // Drag-anywhere: freeform text/button elements added on the home page.
+    freeEls: Array.isArray(raw.freeEls) ? raw.freeEls : [],
   };
 }

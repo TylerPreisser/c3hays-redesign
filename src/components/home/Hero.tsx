@@ -5,7 +5,7 @@ import Image from "next/image";
 import { motion } from "framer-motion";
 import { assetPath } from "@/lib/asset-path";
 import CampusChooser from "./CampusChooser";
-import { HERO_DEFAULTS, type HeroContent, type BtnStyle } from "@/lib/home-content";
+import { HERO_DEFAULTS, tx, type HeroContent, type BtnStyle } from "@/lib/home-content";
 
 /** Build inline button CSS from an editable button style (overrides the class). */
 export function btnCss(b?: BtnStyle): React.CSSProperties | undefined {
@@ -165,7 +165,12 @@ export default function Hero({ content = HERO_DEFAULTS, btnStyle, text = {}, btn
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.8, ease: WORD_EASE, delay: 0.1 }}
             >
-              <p className="overline" style={{ color: "#1cc3af" }}>Welcome home</p>
+              <p
+                className="overline"
+                style={{ color: "#1cc3af" }}
+                data-cms="t:hero-eyebrow"
+                dangerouslySetInnerHTML={{ __html: tx(text, "hero-eyebrow", "Welcome home") }}
+              />
               <h1
                 className="display-hero text-white"
                 data-cms="hero.heading"
@@ -241,12 +246,12 @@ export default function Hero({ content = HERO_DEFAULTS, btnStyle, text = {}, btn
         <motion.p
           className="overline"
           style={{ marginBottom: "var(--s-6, 24px)" }}
+          data-cms="t:hero-eyebrow"
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, ease: "easeOut", delay: 0.1 }}
-        >
-          Welcome home
-        </motion.p>
+          dangerouslySetInnerHTML={{ __html: tx(text, "hero-eyebrow", "Welcome home") }}
+        />
 
         <motion.h1
           className="display-hero"

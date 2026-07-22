@@ -201,4 +201,7 @@ export interface StudioHome {
   /** Drag-anywhere (any element): per-element free-drag offsets on the HOME page.
    *  Same shape/semantics as CMSOverrides.freeOffsets. */
   freeOffsets?: Record<string, FreeOffset>;
+  /** Drag-anywhere: NEW freeform text/button elements added to the HOME page (the
+   *  "+ Add Text / + Button" tools). Same shape as CMSOverrides.freeEls. */
+  freeEls?: FreeEl[];
 }
