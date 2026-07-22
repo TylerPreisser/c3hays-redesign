@@ -74,7 +74,7 @@ export default function GiveWays({ t }: GiveWaysProps) {
             as="p"
             text={t}
             k="give-ways-lead"
-            fallback="Give a one-time gift or set up recurring giving &mdash; whichever fits you best. Start online, or choose one of the ways below."
+            fallback="Choose your campus below to give securely through Pushpay &mdash; or use one of the other ways to give."
             className="gw-lead"
           />
         </div>

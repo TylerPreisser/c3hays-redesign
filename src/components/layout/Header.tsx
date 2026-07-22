@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X, ChevronDown } from "lucide-react";
@@ -38,6 +38,7 @@ export default function Header({ globals = {} }: { globals?: CMSOverrides }) {
   }, []);
   const [openMenu, setOpenMenu] = useState<string | null>(null); // desktop dropdown open state (by entry key)
   const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({}); // mobile-drawer collapsible groups
+  const navRef = useRef<HTMLElement | null>(null); // desktop nav bar — bounds for outside-click close
   const pathname = usePathname();
   const t = globals.text || {};
   const nav = globals.nav || {};
@@ -65,6 +66,28 @@ export default function Header({ globals = {} }: { globals?: CMSOverrides }) {
     window.addEventListener("resize", onResize);
     return () => window.removeEventListener("resize", onResize);
   }, []);
+
+  // Desktop dropdown dismissal: a dropdown OPENS on hover and on click (see renderEntry)
+  // and never toggles closed on a repeat click. It closes on Escape or a click OUTSIDE
+  // the nav bar. Only armed while a menu is open, so there is no idle global listener.
+  useEffect(() => {
+    if (!openMenu) return;
+    const onPointerDown = (e: Event) => {
+      const el = navRef.current;
+      if (el && !el.contains(e.target as Node)) setOpenMenu(null);
+    };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setOpenMenu(null);
+    };
+    document.addEventListener("mousedown", onPointerDown);
+    document.addEventListener("touchstart", onPointerDown);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("mousedown", onPointerDown);
+      document.removeEventListener("touchstart", onPointerDown);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [openMenu]);
 
   // iOS scroll-lock: position:fixed + capture scrollY prevents bounce-scroll
   useEffect(() => {
@@ -167,7 +190,11 @@ export default function Header({ globals = {} }: { globals?: CMSOverrides }) {
             aria-haspopup="true"
             aria-expanded={isOpen}
             onFocus={() => setOpenMenu(entry.key)}
-            onClick={() => setOpenMenu((cur) => (cur === entry.key ? null : entry.key))}
+            // A click always OPENS this dropdown; it must NEVER toggle closed on a
+            // repeat click (the prior toggle logic closed a hover-opened menu). Close
+            // is handled by Escape / outside-click (see the openMenu effect above) and
+            // by hover-out (onMouseLeave on the <li>).
+            onClick={() => setOpenMenu(entry.key)}
             className={`${parentCls} bg-transparent cursor-pointer`}
             style={{ color: base }}
             onMouseEnter={(e) => { e.currentTarget.style.color = hover; }}
@@ -216,7 +243,7 @@ export default function Header({ globals = {} }: { globals?: CMSOverrides }) {
           ...(nav.bg && isScrolled ? { backgroundColor: nav.bg } : {}),
         }}
       >
-        <nav className="container-c3 flex items-center justify-between h-16 lg:h-[4.5rem]">
+        <nav ref={navRef} className="container-c3 flex items-center justify-between h-16 lg:h-[4.5rem]">
 
           {/* Logo — light on transparent dark hero, dark on scrolled white header */}
           <Link
