@@ -11,6 +11,7 @@
 import { describe, it, expect } from "vitest";
 import { readFileSync, existsSync } from "fs";
 import path from "path";
+import { site } from "@/data/site";
 
 const app = (p: string) => path.resolve(process.cwd(), "src/app", p);
 const read = (p: string) => readFileSync(app(p), "utf8");
@@ -31,7 +32,19 @@ describe("Watch — YouTube + Facebook Live only (no podcast / Vimeo / service t
   });
   it("links the real YouTube channel and Facebook Live", () => {
     expect(src).toContain("youtube.com/@c3hays");
-    expect(src).toContain("facebook.com/c3hays/videos");
+    // The Facebook Live URL is no longer a literal in this file, and that is the
+    // fix rather than a regression. It used to be a LOCAL COPY reading
+    // `facebook.com/c3hays/live` — a path that appears zero times in the mirror
+    // of the real celebratejesus.org. When `site.ts` was corrected to `/videos`,
+    // this page kept serving the invented one, because a source-text assertion
+    // cannot tell a page that links the right thing from a page that merely
+    // contains the right string.
+    //
+    // So assert the real guarantee in two halves: this page sources the URL from
+    // the single source of truth, and that source is the real destination.
+    expect(src).toContain('from "@/data/site"');
+    expect(src).toContain("site.social.facebookLive");
+    expect(site.social.facebookLive).toBe("https://www.facebook.com/c3hays/videos");
   });
 });
 

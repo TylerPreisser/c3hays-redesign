@@ -16,7 +16,26 @@ import { describe, it, expect } from "vitest";
 import { readFileSync } from "fs";
 import path from "path";
 
-const read = (p: string) => readFileSync(path.resolve(process.cwd(), p), "utf8");
+const readRaw = (p: string) => readFileSync(path.resolve(process.cwd(), p), "utf8");
+
+/**
+ * Strip comments before asserting.
+ *
+ * The guarantee is that this PAGE does not RENDER a podcast/Vimeo link — not that
+ * the word may never be written down. Grepping raw source conflated the two, so
+ * the file's own header comment ("Rebuilt to REAL content only — no fabricated
+ * sermon series, podcast episodes, or campus pastors") FAILED the very rule it
+ * documents. A guard you cannot explain in a comment is a guard people delete.
+ *
+ * This is round-7 D169's ruling applied to its sibling: "the test assertion is
+ * over-broad — fix the TESTS, not the feature. Replace the grep with the real
+ * guarantee." The real guarantee is about emitted markup, so comments come out
+ * first. Strings and JSX text still count, which is what actually ships.
+ */
+const stripComments = (src: string) =>
+  src.replace(/\/\*[\s\S]*?\*\//g, " ").replace(/(^|[^:])\/\/.*$/gm, "$1");
+
+const read = (p: string) => stripComments(readRaw(p));
 const BANNED = ["vimeo", "anchor.fm", "podcast", "spotify", "apple podcasts"];
 
 describe("Messages — ZERO Vimeo / podcast; YouTube archive only", () => {

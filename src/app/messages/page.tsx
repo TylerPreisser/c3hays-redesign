@@ -8,6 +8,7 @@ import { isExampleSection, renderExample, SECTION_EXAMPLE_IDS } from "@/lib/sect
 import PageComposer from "@/components/cms/PageComposer";
 import PastMessagesGrid from "@/components/messages/PastMessagesGrid";
 import { pastMessages } from "@/data/messages";
+import { site } from "@/data/site";
 
 /* Brand mark as an inline SVG (this lucide build ships no brand icons — matches the
    Footer + Watch page's inline-SVG convention). currentColor drives the fill. */
@@ -26,9 +27,13 @@ export const metadata: Metadata = {
 };
 
 /* Real destinations (verified platforms): past messages live on YouTube
-   (youtube.com/@c3hays); the weekend service streams on Facebook Live. */
+   (youtube.com/@c3hays); the weekend service streams on Facebook Live.
+
+   READ FROM `site.social`, NOT redeclared here — see the note in
+   src/app/watch/page.tsx. `facebook.com/c3hays/live` is invented (zero
+   occurrences in the real-site mirror); `/videos` is the real one. */
 const YOUTUBE = "https://www.youtube.com/@c3hays";
-const FACEBOOK_LIVE = "https://www.facebook.com/c3hays/live";
+const FACEBOOK_LIVE = site.social.facebookLive;
 
 /**
  * /messages — editor-editable SECTION contract.

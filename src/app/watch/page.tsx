@@ -8,6 +8,7 @@ import { isCmsLive } from "@/lib/cms-live";
 import { parseSections, tx, imgCss, exampleContentShim, type SectionMeta } from "@/lib/home-content";
 import { isExampleSection, renderExample, SECTION_EXAMPLE_IDS } from "@/lib/section-examples";
 import PageComposer from "@/components/cms/PageComposer";
+import { site } from "@/data/site";
 
 /* Brand marks as inline SVGs (this lucide build has no brand icons — matches the
    Footer's inline-SVG convention). currentColor drives the fill. */
@@ -33,9 +34,16 @@ export const metadata: Metadata = {
 };
 
 /* Real destinations (verified platforms): the weekend service streams on Facebook
-   Live; the past-message archive lives on YouTube (youtube.com/@c3hays). */
+   Live; the past-message archive lives on YouTube (youtube.com/@c3hays).
+
+   READ FROM `site.social`, NOT redeclared here. This file used to hardcode
+   `facebook.com/c3hays/live`, a path that appears ZERO times in the captured
+   mirror of the real celebratejesus.org — the real one is `/videos`, which the
+   mirror carries. A local copy is how the invented URL survived a correction to
+   `site.ts`: that fix landed on a constant nothing imported, while this page —
+   one of the two that actually renders the link — kept serving the fabrication. */
 const YOUTUBE = "https://www.youtube.com/@c3hays";
-const FACEBOOK_LIVE = "https://www.facebook.com/c3hays/live";
+const FACEBOOK_LIVE = site.social.facebookLive;
 
 /**
  * /watch — rebuilt to the editor-native SECTION contract (Phase-4).
