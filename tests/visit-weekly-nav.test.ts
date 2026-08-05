@@ -91,6 +91,54 @@ describe("(a) /visit — 2 contract sections, removed blocks gone", () => {
   });
 });
 
+/**
+ * The four social buttons in the visit-hero connect bar are ICON-ONLY <a>s. They were
+ * the last collapsed links on /visit: `data-cms-link` with no `[data-cms-link-label]`
+ * descendant, so EditBridge fell through to `link.innerText` (EditBridge.tsx:610) —
+ * which for an svg-only anchor is the empty string. The editor therefore offered a
+ * label field that showed nothing and, once typed into, wrote a `-label` key the site
+ * never read: a silent drop, and no way to retitle the button.
+ *
+ * The fix follows the house pattern already used for the same shape in
+ * MeetGrowServe.tsx:423 — a `sr-only` `[data-cms-link-label]` span. It is the anchor's
+ * accessible name (the old hard-coded `aria-label` is gone, so editing the label
+ * actually changes what a screen reader announces and what the tooltip says), it
+ * round-trips through the text bag, and the button stays visually icon-only.
+ */
+describe("(a2) /visit — icon-only social buttons are editable, not collapsed", () => {
+  it("each social button carries an sr-only label span AND keeps its icon", async () => {
+    const { default: JoinPanel } = await import("@/components/visit/JoinPanel");
+    const html = renderToStaticMarkup(createElement(JoinPanel, { t: {} }));
+    const host = document.createElement("div");
+    host.innerHTML = html;
+    for (const id of ["app", "youtube", "facebook", "instagram"]) {
+      const a = host.querySelector(`[data-cms-link="visit-social-${id}"]`);
+      expect(a, `visit-social-${id} missing`).not.toBeNull();
+      const label = a!.querySelector("[data-cms-link-label]");
+      expect(label, `visit-social-${id} has no label span`).not.toBeNull();
+      // Visually hidden — the button stays an icon, the label is for the editor + AT.
+      expect(label!.className).toContain("sr-only");
+      expect(label!.textContent).toBeTruthy();
+      // The icon still renders (the label did not replace the mark).
+      expect(a!.querySelector("svg")).not.toBeNull();
+    }
+  });
+
+  it("an edited label round-trips from the text bag (not a silent drop)", async () => {
+    const { default: JoinPanel } = await import("@/components/visit/JoinPanel");
+    const html = renderToStaticMarkup(
+      createElement(JoinPanel, { t: { "visit-social-youtube-label": "C3 on YouTube" } }),
+    );
+    const host = document.createElement("div");
+    host.innerHTML = html;
+    const a = host.querySelector('[data-cms-link="visit-social-youtube"]')!;
+    expect(a.querySelector("[data-cms-link-label]")!.textContent).toBe("C3 on YouTube");
+    // …and it drives the accessible name, so a hard-coded aria-label cannot shadow it.
+    expect(a.getAttribute("aria-label")).toBeNull();
+    expect(a.getAttribute("title")).toBe("C3 on YouTube");
+  });
+});
+
 describe("(b) /news — real C3 Weekly page, not a redirect", () => {
   it("emits the weekly-hero + weekly-list data-section wrappers", () => {
     const ids = sectionIds(newsHtml);

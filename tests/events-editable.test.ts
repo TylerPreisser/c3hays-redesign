@@ -63,6 +63,7 @@ function sampleEvent(i: number, title: string): CalEvent {
 
 let pageHtml = "";
 let gridHtml = "";
+let gridWithImgHtml = "";
 let authoredHtml = "";
 
 beforeAll(async () => {
@@ -83,6 +84,14 @@ beforeAll(async () => {
   const events = [sampleEvent(0, "Baptism Sunday"), sampleEvent(1, "Student Night")];
   gridHtml = renderToStaticMarkup(
     createElement(UpcomingEventsGrid, { events, text: {}, media: {} }),
+  );
+  // Same grid with a photo swapped onto card 0 — the editor-opt-in path (ITEM A).
+  gridWithImgHtml = renderToStaticMarkup(
+    createElement(UpcomingEventsGrid, {
+      events,
+      text: {},
+      media: { "events-upcoming-0-img": "/images/worship.webp" },
+    }),
   );
 
   // Round-2 authored path: server-rendered, add/removable, structured data-cms paths.
@@ -117,12 +126,28 @@ describe("upcoming cards are editor-native (contract §1 a–e)", () => {
     expect(bgKeys).toContain("events-upcoming-1-bg");
   });
 
-  it("each card has a swappable image (data-cms-img) rendering a real asset", () => {
-    const imgKeys = attrValues(gridHtml, "data-cms-img");
+  /**
+   * D169 RECONCILIATION (2026-08-05): this asserted that EVERY live card ships a
+   * `data-cms-img` handle over a real `worship.webp`. Commit e2bdeed ITEM A removed
+   * that on purpose — "LIVE eSpace upcoming tiles render image-less (no rotating
+   * default photo, no gradient block)" — because the eSpace feed carries no images, so
+   * a stock photo under a real event name would be an INVENTED fact about the church.
+   * That ruling outranks the guard. What the guard was actually protecting, though, is
+   * that a staffer can still put a photo on a card; that half is asserted directly now
+   * by driving the opt-in, which is stronger than the old grep (it proves the swap
+   * path renders, where the old one only proved a default existed).
+   */
+  it("live cards are image-less by default (no invented stock photo)", () => {
+    expect(attrValues(gridHtml, "data-cms-img")).toEqual([]);
+    expect(gridHtml).not.toContain("worship.webp");
+  });
+
+  it("a swapped-in image opts that card INTO a handle + renders the real asset", () => {
+    const imgKeys = attrValues(gridWithImgHtml, "data-cms-img");
     expect(imgKeys).toContain("events-upcoming-0-img");
-    expect(imgKeys).toContain("events-upcoming-1-img");
-    // A real asset is rendered (not just the gradient fallback).
-    expect(gridHtml).toContain("worship.webp");
+    expect(gridWithImgHtml).toContain("worship.webp");
+    // …and ONLY that card — the swap is per-card, not a page-wide default.
+    expect(imgKeys).not.toContain("events-upcoming-1-img");
   });
 
   it("each card CTA is an editable link with the mandatory label span", () => {

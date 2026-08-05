@@ -16,6 +16,17 @@
  *
  * RED-FIRST: against the pre-rebuild page this fails at (1) (zero data-section
  * wrappers) — proving it reproduces the gap before the fix makes it green.
+ *
+ * D169 RECONCILIATION (2026-08-05): the per-counselor check demanded
+ * `data-cms="t:counseling-<id>-role"`. Commit 3a0f90f item #3 deleted that field on
+ * purpose ("counseling: remove the teal uppercase role eyebrow above each counselor
+ * name"), so the guard was pinned to a field the page no longer renders — and it was
+ * enumerating a FIXED list of three keys, which means any field added to the card
+ * later could ship untagged and this test would still pass. Both problems have the
+ * same root: it asserted a list of names instead of the invariant. Replaced with
+ * "every authored string on a counselor card sits inside a tagged region", derived
+ * from the card markup itself, so removing a field is fine and adding an untagged one
+ * fails here.
  */
 import { describe, it, expect, beforeAll } from "vitest";
 import { renderToStaticMarkup } from "react-dom/server";
@@ -72,11 +83,43 @@ describe("/counseling is editor-native (Layer 2 + Layer 1)", () => {
     }
   });
 
-  it("each counselor's name/role/bio is independently editable (data-cms)", () => {
+  it("each counselor's name and bio are independently editable (data-cms)", () => {
     for (const c of counselors) {
       expect(html).toContain(`data-cms="t:counseling-${c.id}-name"`);
-      expect(html).toContain(`data-cms="t:counseling-${c.id}-role"`);
       expect(html).toContain(`data-cms="t:counseling-${c.id}-bio"`);
+    }
+  });
+
+  it("no counselor card carries an untagged authored string", () => {
+    // THE invariant behind "independently editable": every visible word inside a card
+    // must sit under a [data-cms] region, or a staffer can see copy they cannot change
+    // (the exact gap the -role/-credentials/-specialties keys each closed in turn).
+    const host = document.createElement("div");
+    host.innerHTML = html;
+    const cards = Array.from(
+      host.querySelectorAll('[data-cms-bg^="counseling-"][data-cms-bg$="-bg"]'),
+    );
+    expect(cards.length).toBe(counselors.length);
+
+    const orphans: string[] = [];
+    for (const card of cards) {
+      const walker = document.createTreeWalker(card, NodeFilter.SHOW_TEXT);
+      for (let n = walker.nextNode(); n; n = walker.nextNode()) {
+        const value = (n.nodeValue || "").trim();
+        if (!value) continue;
+        if (!(n.parentElement as Element | null)?.closest("[data-cms]")) {
+          orphans.push(`${card.getAttribute("data-cms-bg")}: "${value}"`);
+        }
+      }
+    }
+    expect(orphans, "untagged copy on a counselor card").toEqual([]);
+  });
+
+  it("the role eyebrow stays retired (ruling #3) — no orphan role key", () => {
+    // Deleted deliberately; if it comes back it must come back TAGGED, and the
+    // untagged-string guard above is what will catch a bare re-add.
+    for (const c of counselors) {
+      expect(html).not.toContain(`data-cms="t:counseling-${c.id}-role"`);
     }
   });
 

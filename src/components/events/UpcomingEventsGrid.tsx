@@ -15,7 +15,10 @@ import type { CalendarEvent } from "@/lib/calendar";
  *   • title / date / detail / campus → data-cms via EventCard's `cmsKey` path,
  *   • the card container background   → data-cms-bg (`events-upcoming-${i}-bg`),
  *   • the card image                  → data-cms-img (`events-upcoming-${i}-img`),
- *     swappable via the page's `media` map and defaulting to a real asset,
+ *     present ONLY once a photo has been swapped in via the page's `media` map. There
+ *     is no default asset: ITEM A (e2bdeed) made live tiles image-less because the
+ *     eSpace feed carries no photos, and a stock image under a real event name would
+ *     be an invented fact about the church,
  *   • the CTA                         → an <EditableLink> (data-cms-link + label).
  * Live event fields are the FALLBACKS; a saved override wins (tx() pattern). Because
  * the rows are positional/live, keys are index-based by design — a caveat the editor
@@ -67,8 +70,13 @@ export default function UpcomingEventsGrid({ events, text, media }: UpcomingEven
         const imgKey = `${cmsKey}-img`;
         // The live eSpace feed carries NO images, so these tiles are IMAGE-LESS by
         // default (no rotating default photo, no gradient block) — the chip-topped body
-        // is the whole card. The editor can still opt a card INTO an image by swapping
-        // one via data-cms-img (persisted in `media`); only then does a media area show.
+        // is the whole card. A card is opted INTO an image by a `media` override, and
+        // only then does the media area (and with it the data-cms-img swap handle)
+        // render. NOTE the consequence: with no media area there is no on-canvas
+        // target, so the FIRST photo has to arrive from Studio's media panel by key
+        // (`events-upcoming-${i}-img`) — after that the handle is on the card and the
+        // usual click-to-swap works. Authored cards (UpcomingEventsAuthored) always
+        // carry the handle; only these positional live tiles behave this way.
         const overrideImg = media?.[imgKey];
         // The per-event "Add to calendar" control renders INSIDE the card, in its footer
         // slot (below the CTA, within the card boundary). The card is an <article> here

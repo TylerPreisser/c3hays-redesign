@@ -7,9 +7,9 @@
  * "$25/$50/$100" impact tiles, and cards whose backgrounds were inline styles with
  * NO `data-cms-bg`. This locks the rebuilt, editor-native shape:
  *
- *   (a) exactly the 3 registry ids the c3-backend defaultSectionsForSlug("/give")
- *       expects — give-hero, give-impact, give-ways — each emitted as a
- *       `<div data-section="…">` wrapper (via PageComposer);
+ *   (a) exactly the registry ids the c3-backend defaultSectionsForSlug("/give")
+ *       declares, each emitted as a `<div data-section="…">` wrapper (via
+ *       PageComposer);
  *   (b) every card/tile carries its OWN `data-cms-bg`;
  *   (c) every button is a `data-cms-link` with a REQUIRED `data-cms-link-label`
  *       child (no whole-card-collapse, no label concatenation);
@@ -17,6 +17,26 @@
  *
  * RED-FIRST: against the pre-rebuild page this FAILS — the old page emits zero
  * `data-section` wrappers and its cards have no `data-cms-bg`.
+ *
+ * D169 RECONCILIATION (2026-08-05): (a) and (b) were pinned to a shape TWO product
+ * rulings have since superseded, so they asserted prose rather than the guarantee.
+ *
+ *   (a) named `give-impact` as a required id. Commit 3c6d509 item #7 removed that
+ *       section on purpose ("/give: remove give-impact ('Why we give') — flow is
+ *       hero → ways-to-give → close"), and the registry this test cites as its own
+ *       source of truth — c3-backend src/lib/content/page-sections.ts:25 — now reads
+ *       `"/give": [v("give-hero"), v("give-ways")]`. The guarantee was never "three
+ *       sections"; it is "the page emits EXACTLY the backend-declared ids, in order".
+ *       Asserted against a list mirrored from that registry, so the next registry
+ *       change fails here loudly instead of drifting.
+ *
+ *   (b) named six tiles (`give-impact-*`, `give-way-cash/online/app`) that no longer
+ *       exist — three died with give-impact, and the ways-to-give tiles are now
+ *       feature / app / person / mail. This one was HALF a stale grep: the real
+ *       guarantee ("every card/tile owns a bg handle") was genuinely BROKEN — only
+ *       the give-ways SECTION carried `give-ways-bg`, so a staffer could recolor the
+ *       whole band but not one tile. Fixed in GiveWays/GiveOnline; asserted below on
+ *       the tiles the page actually renders.
  */
 import { describe, it, expect, beforeAll } from "vitest";
 import { renderToStaticMarkup } from "react-dom/server";
@@ -60,9 +80,21 @@ beforeAll(async () => {
   html = renderToStaticMarkup(await GivePage({}));
 });
 
+/**
+ * The backend registry's /give entry, mirrored verbatim from c3-backend
+ * src/lib/content/page-sections.ts (`DEFAULT_PAGE_SECTIONS["/give"]`). The site's
+ * PAGE_DEFAULT_SECTIONS must equal this or the editor rail composes a page the site
+ * cannot render — the cross-repo contract this file exists to hold.
+ */
+const REGISTRY_GIVE_SECTIONS = ["give-hero", "give-ways"];
+
 describe("give — editor-native section composition", () => {
-  it("emits exactly the 3 registry section wrappers in order", () => {
-    expect(sectionIds(html)).toEqual(["give-hero", "give-impact", "give-ways"]);
+  it("emits exactly the registry section wrappers, in registry order", () => {
+    expect(sectionIds(html)).toEqual(REGISTRY_GIVE_SECTIONS);
+  });
+
+  it("carries no give-impact section (removed by ruling #7 — hero → ways-to-give)", () => {
+    expect(sectionIds(html)).not.toContain("give-impact");
   });
 
   it("every button is a labelled data-cms-link (no card-collapse, no concatenation)", () => {
@@ -75,15 +107,24 @@ describe("give — editor-native section composition", () => {
 
   it("every card/tile carries its own data-cms-bg", () => {
     const keys = bgKeys(html);
-    // the three impact-facet cards AND the three ways-to-give tiles each own a bg key
+    // The give-ways BAND owns one (section-level recolor)…
+    expect(keys).toContain("give-ways-bg");
+    // …and every tile INSIDE it owns its own, so a staffer can recolor one tile
+    // without repainting the band: the dark "Give online" feature card plus the
+    // three method tiles (the C3 app / in person / by mail).
     expect(keys).toEqual(expect.arrayContaining([
-      "give-impact-community-bg",
-      "give-impact-world-bg",
-      "give-impact-church-bg",
-      "give-way-cash-bg",
-      "give-way-online-bg",
+      "give-way-feature-bg",
       "give-way-app-bg",
+      "give-way-person-bg",
+      "give-way-mail-bg",
     ]));
+  });
+
+  it("no tile shares a bg handle with another (independent recolor)", () => {
+    // A duplicated key would repaint two tiles at once — the failure per-tile
+    // handles exist to prevent. buildBgCss keys on the attribute value alone.
+    const keys = bgKeys(html);
+    expect(new Set(keys).size).toBe(keys.length);
   });
 
   it("primary Give button points at the real Pushpay destination", () => {

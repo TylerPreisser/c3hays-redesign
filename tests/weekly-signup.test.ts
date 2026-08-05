@@ -58,12 +58,36 @@ describe("#9 — editor-native newsletter signup overlay", () => {
     expect(label).not.toBeNull();
     expect(label?.textContent).toContain("Sign Up");
   });
-  it("has an independently-editable signup field label + container bg (data-cms / data-cms-bg)", () => {
-    // The transparent minimal signup drops a standalone heading; its editable text is
-    // the field label (which also drives the input placeholder), plus a recolorable
-    // container background — both independently editable per the contract.
-    expect(q(newsHtml).querySelector('[data-cms="t:weekly-signup-placeholder"]')).not.toBeNull();
-    expect(q(newsHtml).querySelector('[data-cms-bg]')).not.toBeNull();
+  /**
+   * D169 RECONCILIATION (2026-08-05): this required a
+   * `[data-cms="t:weekly-signup-placeholder"]` node — the visible field label that
+   * ALSO drove the input's placeholder. Item #6b (c7330f3 follow-up) deleted it as
+   * redundant: it printed "your@email.com" directly above an input whose placeholder
+   * already said "your@email.com". The overlay's editable surface is now the CTA
+   * label and the container background, which is what this asserts. See the
+   * WeeklySignup docblock for the consequence that ruling carries — the placeholder
+   * key survives as an override the site honours but the canvas cannot originate.
+   */
+  it("exposes its editable surface: a recolorable container + the CTA label", () => {
+    const cta = q(newsHtml).querySelector('[data-cms-link="weekly-signup-cta"]');
+    expect(cta).not.toBeNull();
+    // The signup must own the NEAREST bg handle. If its closest [data-cms-bg] were the
+    // weekly-hero band instead, "recolor this signup" would repaint the whole hero.
+    const container = cta!.closest("[data-cms-bg]") as HTMLElement | null;
+    expect(container).not.toBeNull();
+    expect(container!.querySelector('form input[type="email"]')).not.toBeNull();
+    // The transparent default is the whole point of the minimal overlay: a card
+    // surface here would re-introduce the opaque box #9 removed.
+    expect(container!.getAttribute("style") || "").toMatch(/background:\s*transparent/);
+  });
+
+  it("does not print the placeholder twice (ruling #6b)", () => {
+    // The removed label duplicated the input's own placeholder verbatim.
+    const host = q(newsHtml);
+    const input = host.querySelector('form input[type="email"]') as HTMLInputElement;
+    const placeholder = input.getAttribute("placeholder") || "";
+    expect(placeholder).toBeTruthy();
+    expect(host.textContent || "").not.toContain(placeholder);
   });
 });
 

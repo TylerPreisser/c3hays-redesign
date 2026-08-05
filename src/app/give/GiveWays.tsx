@@ -84,10 +84,14 @@ export default function GiveWays({ t }: GiveWaysProps) {
               toggle actually rewrites each designation link's Pushpay destination). */}
           <GiveOnline t={t} />
 
-          {/* RIGHT — the other four ways */}
+          {/* RIGHT — the other ways. Each tile owns its OWN data-cms-bg: buildBgCss
+              paints `[data-cms-bg=key]{background:… !important}`, which beats the
+              scoped `.gw-method{background:#fff}` above, so a staffer recolors ONE
+              tile. Before these keys existed the section's `give-ways-bg` was the
+              only handle on the band, so every tile repainted together. */}
           <div className="gw-methods">
             {/* The C3 app */}
-            <div className="gw-method">
+            <div className="gw-method" data-cms-bg="give-way-app-bg">
               <div className="gw-method__ic" aria-hidden>
                 <Smartphone size={22} strokeWidth={1.75} />
               </div>
@@ -112,7 +116,7 @@ export default function GiveWays({ t }: GiveWaysProps) {
             </div>
 
             {/* In person */}
-            <div className="gw-method">
+            <div className="gw-method" data-cms-bg="give-way-person-bg">
               <div className="gw-method__ic" aria-hidden>
                 <Landmark size={22} strokeWidth={1.75} />
               </div>
@@ -129,7 +133,7 @@ export default function GiveWays({ t }: GiveWaysProps) {
             </div>
 
             {/* By mail */}
-            <div className="gw-method">
+            <div className="gw-method" data-cms-bg="give-way-mail-bg">
               <div className="gw-method__ic" aria-hidden>
                 <Mail size={22} strokeWidth={1.75} />
               </div>

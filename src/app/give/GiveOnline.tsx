@@ -16,13 +16,19 @@ export interface GiveOnlineProps {
  * nothing else: each opens that campus's single REAL Pushpay page (Pushpay handles the
  * fund choice and recurring/one-time on their end). No fund designations, no frequency
  * toggle. Labels + hrefs stay editable via <EditableLink>.
+ *
+ * Owns `data-cms-bg="give-way-feature-bg"` so this card recolors INDEPENDENTLY of the
+ * give-ways band. Without it the only handle on the whole section was the band's
+ * `give-ways-bg`, so recoloring this dark card repainted every method tile with it —
+ * the per-tile-bg half of the give editor-native contract, and the reason a staffer
+ * could not restyle one tile.
  */
 export default function GiveOnline({ t }: GiveOnlineProps) {
   const haysHref = base(site.giving.hays);
   const colbyHref = base(site.giving.colby);
 
   return (
-    <div className="gw-feature">
+    <div className="gw-feature" data-cms-bg="give-way-feature-bg">
       <Tx text={t} k="give-ways-feature-eyebrow" fallback="Recommended" className="gw-feature__ey" as="p" />
       <Tx as="h3" text={t} k="give-ways-feature-title" fallback="Give online" className="gw-feature__t" />
       <Tx

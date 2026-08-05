@@ -12,12 +12,20 @@ import { tx } from "@/lib/home-content";
  * subtext block). It reads legibly on a dark hero photo AND on a light standalone
  * section via the `tone` prop.
  *
- * Every part stays independently editable in C3 Studio, by construction:
- *   • the field placeholder → a real <Tx> label (data-cms) that ALSO drives the
- *     input's placeholder attribute, so editing the label edits the placeholder
- *     (attributes aren't DOM-scannable, so we surface an editable label instead)
+ * Editable in C3 Studio, by construction:
  *   • button → data-cms-link + the required data-cms-link-label span
  *   • container bg → data-cms-bg (defaults transparent — no opaque card)
+ *
+ * The field placeholder is the ONE part with no on-canvas handle, and that is a known
+ * consequence of a ruling, not an oversight. It used to be surfaced as a visible <Tx>
+ * label above the input — the workaround for attributes not being DOM-scannable — but
+ * item #6b removed that label because it printed "your@email.com" directly above an
+ * input already placeheld with "your@email.com". `weekly-signup-placeholder` is still
+ * read here, so a value set through the content API renders; there is simply no region
+ * to click to originate one. Do NOT "fix" this with an sr-only <Tx>: EditBridge edits
+ * regions in place and a 1px-clipped region cannot be clicked, so that would look like
+ * a handle without being one. If the placeholder needs to be authorable, it needs an
+ * attribute-editing path in Studio (cross-repo), not another hidden node here.
  *
  * FUNCTIONAL: client-side email validation + a success state (no external endpoint
  * exists in the static-export build; the submit is structured so a real subscribe
