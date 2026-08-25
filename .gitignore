@@ -17,3 +17,5 @@ screenshots/
 _redesign-home-hero.png
 _preview*.png
 tsconfig.tsbuildinfo
+.claude/settings.local.json
+CLAUDE.local.md
