@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "playwright": {
+      "command": "/Users/tylerpreisser/.npm-global/bin/playwright-mcp",
+      "args": []
+    }
+  }
+}
