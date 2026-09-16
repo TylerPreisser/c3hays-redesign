@@ -1,0 +1,112 @@
+name: Deploy
+
+# Ships the production Cloudflare Worker `c3hays-live` (wrangler.jsonc `name`) with
+# exactly what `npm run cf:build` + `npm run cf:deploy` do (opennextjs-cloudflare).
+#
+# TRIGGER / GATE — workflow_run on "CI", not a push trigger with `needs:`.
+#   `needs:` only reaches jobs in the SAME workflow. Gating a push-triggered deploy
+#   on ci.yml would mean making ci.yml a reusable workflow and calling it from here:
+#   every push to main would then run the CI build twice, and the two copies share
+#   ci.yml's `ci-${{ github.ref }}` concurrency group with cancel-in-progress, so the
+#   standalone run can cancel the called one and fail the deploy. workflow_run fires
+#   after CI finishes for each push to main, leaves ci.yml untouched, and deploys the
+#   exact commit CI validated (workflow_run.head_sha), not whatever main is by then.
+#   Manual runs (workflow_dispatch) are held to the same gate by the "CI passed" step.
+#
+# Build-time config (not secrets — both values are public):
+#   CMS_LIVE=1            SSR build shape (next.config.ts: output undefined).
+#   NEXT_PUBLIC_CMS_URL   INLINED at build (src/lib/cms.ts). Unset => every CMS read
+#                         short-circuits to null and the site ignores C3 Studio. The
+#                         Worker deployed 2026-07-22 was built with this value.
+# Runtime vars (CMS_LIVE, NODE_ENV) and the CMS service binding to `c3-studio` come
+# from wrangler.jsonc. The Worker has no Worker secrets.
+#
+# Repository secret: CLOUDFLARE_API_TOKEN (Workers Scripts: Edit on the account).
+
+on:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: production-deploy
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  actions: read
+
+env:
+  LIVE_URL: https://c3hays-live.tylerpreisser.workers.dev/
+  WRANGLER_VERSION: 4.110.0
+
+jobs:
+  deploy:
+    if: >-
+      (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main') ||
+      (github.event_name == 'workflow_run' &&
+       github.event.workflow_run.event == 'push' &&
+       github.event.workflow_run.conclusion == 'success')
+    runs-on: ubuntu-latest
+    env:
+      DEPLOY_SHA: ${{ github.event.workflow_run.head_sha || github.sha }}
+    steps:
+      - name: CI passed for this commit
+        if: github.event_name == 'workflow_dispatch'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          conclusion="$(gh run list --repo "$GITHUB_REPOSITORY" --workflow CI --commit "$DEPLOY_SHA" --event push --limit 1 --json conclusion --jq '.[0].conclusion // "none"')"
+          echo "CI conclusion for $DEPLOY_SHA: $conclusion"
+          test "$conclusion" = "success"
+
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ env.DEPLOY_SHA }}
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Wrangler is the pinned version
+        run: |
+          installed="$(node -p 'require("wrangler/package.json").version')"
+          echo "wrangler $installed (expected $WRANGLER_VERSION)"
+          test "$installed" = "$WRANGLER_VERSION"
+
+      - name: Build (cf:build)
+        env:
+          CMS_LIVE: "1"
+          NEXT_PUBLIC_CMS_URL: https://c3-studio.tylerpreisser.workers.dev
+        run: npm run cf:build
+
+      - name: Deploy (cf:deploy)
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: af76b8aeaa433c3fd3c17ce77375062f
+        run: npm run cf:deploy
+
+      # The served HTML carries the Next build id ("b":"<BUILD_ID>"); a 200 alone
+      # would also be returned by the previous Worker version.
+      - name: Live URL serves this build
+        run: |
+          build_id="$(cat .next/BUILD_ID)"
+          for attempt in 1 2 3 4 5 6 7 8 9 10 11 12; do
+            status="$(curl -sS -o live.html -w '%{http_code}' "$LIVE_URL" || echo 000)"
+            if [ "$status" = "200" ] && grep -qF "$build_id" live.html; then
+              echo "$LIVE_URL -> $status, serving build $build_id ($DEPLOY_SHA)"
+              exit 0
+            fi
+            echo "attempt $attempt: status $status, build $build_id not served yet"
+            sleep 10
+          done
+          echo "::error::$LIVE_URL did not serve build $build_id within 120s (last status $status)"
+          exit 1
