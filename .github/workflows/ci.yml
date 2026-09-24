@@ -19,11 +19,9 @@ name: CI
 # sibling c3-backend toolchain and run locally / in the integration checkout;
 # they are not run here because CI checks out this repo standalone.
 
+# MANUAL FALLBACK ONLY (workspace CLAUDE.md §4a): CI is the local ci-local gate (scripts/ci-steps.sh, posted as the
+# ci-local commit status). Never on push or pull_request; `gh workflow run ci.yml` invokes this by hand.
 on:
-  push:
-    branches: [main]
-  pull_request:
-    branches: [main]
   workflow_dispatch:
 
 concurrency:
