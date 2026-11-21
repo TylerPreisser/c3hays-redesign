@@ -30,7 +30,7 @@ import { isCmsLive } from "@/lib/cms-live";
 // without updating this list.
 export const STATIC_ROUTES = new Set([
   "about", "visit", "locations", "messages", "news", "watch", "counseling", "connect", "give",
-  "events", "newsletter", "section-preview",
+  "events", "newsletter", "section-preview", "search",
 ]);
 
 export async function generateStaticParams(): Promise<{ slug: string }[]> {

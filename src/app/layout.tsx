@@ -143,8 +143,9 @@ export default async function RootLayout({
         <ServiceTimesProvider value={serviceTimes}>
           <SignupConfigProvider turnstileSiteKey={getTurnstileSiteKey()}>
             <SmoothScrollProvider>
+              <a href="#main" className="skip-link">Skip to main content</a>
               <Header globals={globals} menu={menu.items} announcement={announcements[0] ?? null} />
-              <main>{children}</main>
+              <main id="main" tabIndex={-1}>{children}</main>
               <Footer globals={globals} menu={menu.items} />
             </SmoothScrollProvider>
           </SignupConfigProvider>

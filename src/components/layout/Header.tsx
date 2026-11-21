@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useState, useEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X, ChevronDown } from "lucide-react";
+import { Menu, X, ChevronDown, Search } from "lucide-react";
 import { navItems, navGroups, ctaItem } from "@/data/navigation";
 import type { NavItem as StudioNavItem } from "@/lib/cms";
 import Logo from "@/components/brand/Logo";
@@ -92,6 +92,17 @@ export default function Header({ globals = {}, menu = null, announcement = null 
       document.removeEventListener("keydown", onKey);
     };
   }, [openMenu]);
+
+  // The open drawer is a modal: Escape closes it and focus returns to the button that opened it.
+  const burgerRef = useRef<HTMLButtonElement | null>(null);
+  const closeRef = useRef<HTMLButtonElement | null>(null);
+  useEffect(() => {
+    if (!mobileOpen) return;
+    closeRef.current?.focus();
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") { setMobileOpen(false); burgerRef.current?.focus(); } };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [mobileOpen]);
 
   // iOS scroll-lock: position:fixed + capture scrollY prevents bounce-scroll
   useEffect(() => {
@@ -305,6 +316,9 @@ export default function Header({ globals = {}, menu = null, announcement = null 
           {/* Desktop right: secondary Give link + primary Plan-a-Visit CTA. Shown from md
               up (alongside both the grouped and full bars). */}
           <div className="hidden md:flex items-center gap-3 lg:gap-4">
+            <Link href="/search/" prefetch={false} aria-label="Search the site" className="inline-flex items-center justify-center w-11 h-11 -mr-1" style={{ color: base }}>
+              <Search size={18} aria-hidden="true" />
+            </Link>
             <Link
               href={giveHref}
               prefetch={false}
@@ -323,6 +337,7 @@ export default function Header({ globals = {}, menu = null, announcement = null 
 
           {/* Mobile hamburger — only on small phones (below md/768px) */}
           <button
+            ref={burgerRef}
             className="md:hidden flex items-center justify-center w-11 h-11 transition-colors duration-200"
             onClick={() => setMobileOpen(!mobileOpen)}
             aria-label={mobileOpen ? "Close menu" : "Open menu"}
@@ -352,6 +367,7 @@ export default function Header({ globals = {}, menu = null, announcement = null 
               paddingTop: "env(safe-area-inset-top)",
               paddingBottom: "env(safe-area-inset-bottom)",
             }}
+            role="dialog"
             aria-modal="true"
             aria-label="Mobile navigation"
           >
@@ -367,6 +383,7 @@ export default function Header({ globals = {}, menu = null, announcement = null 
                 <Logo size={34} variant="light" cmsKey="g:logo-light" srcOverride={m["logo-light"]} />
               </Link>
               <button
+                ref={closeRef}
                 onClick={() => setMobileOpen(false)}
                 className="flex items-center justify-center w-11 h-11 text-white/70 hover:text-white transition-colors"
                 aria-label="Close menu"
@@ -387,6 +404,16 @@ export default function Header({ globals = {}, menu = null, announcement = null 
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: i * 0.05 + 0.1, duration: 0.3, ease: "easeOut" }}
                     >
+                      {g.children.length === 0 && g.href ? (
+                        <Link
+                          href={g.href}
+                          prefetch={false}
+                          onClick={() => setMobileOpen(false)}
+                          className="block w-full py-4 text-2xl font-bold text-white/85 hover:text-white transition-colors border-b border-white/10"
+                        >
+                          {g.label}
+                        </Link>
+                      ) : (
                       <button
                         type="button"
                         onClick={() => toggleGroup(g.key)}
@@ -396,6 +423,7 @@ export default function Header({ globals = {}, menu = null, announcement = null 
                         <span>{g.label}</span>
                         <ChevronDown size={22} aria-hidden className={`shrink-0 transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`} style={{ color: "rgba(255,255,255,0.5)" }} />
                       </button>
+                      )}
                       <AnimatePresence initial={false}>
                         {isOpen && (
                           <motion.ul
@@ -440,6 +468,14 @@ export default function Header({ globals = {}, menu = null, announcement = null 
                   onClick={() => setMobileOpen(false)}
                 >
                   <span data-cms-link-label>{tx(t, "nav-cta-label", "Plan a Visit")}</span>
+                </Link>
+                <Link
+                  href="/search/"
+                  prefetch={false}
+                  className="btn btn-outline btn-lg w-full text-center"
+                  onClick={() => setMobileOpen(false)}
+                >
+                  Search the site
                 </Link>
                 {/* Give — reachable secondary action on mobile too (G5). */}
                 <Link
