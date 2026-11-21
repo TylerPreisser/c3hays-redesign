@@ -13,7 +13,7 @@ const TEAL = "#1cc3af";
 /* ── Per-section content types (text fields hold HTML) ───────── */
 export interface HeroContent { heading: string; bgImage: string; ctaLabel: string; ctaHref: string; isLive: boolean }
 export interface MissionContent { html: string }
-export interface Pillar { word: string; headline: string; body: string; image: string; href: string }
+export interface Pillar { /** Stable key of this pillar: the canvas addresses it as `meetGrowServe.pillars.<id>.*`, never by position. */ id: string; word: string; headline: string; body: string; image: string; href: string }
 export interface MeetGrowServeContent { heading: string; pillars: Pillar[] }
 export interface NT26Content { heading: string; body: string; ctaLabel: string; ctaHref: string; image: string }
 /** A single editable "connect" tile in the StayConnected collection (camelCase, R2). */
@@ -99,9 +99,9 @@ export const MEET_GROW_SERVE_DEFAULTS: MeetGrowServeContent = {
   // Real celebratejesus.org home section header.
   heading: "Meet. Grow. Serve.",
   pillars: [
-    { word: "About", headline: "Who We Are", body: "A church family in Hays and Colby, Kansas, where everyone is welcome, just as you are.", image: "/images/congregation.webp", href: "/about/" },
-    { word: "Messages", headline: "Watch &amp; Listen", body: "Catch up on any message, any series, anytime, online or in person.", image: "/images/gather.webp", href: "/messages/" },
-    { word: "Connect", headline: "Connect with Us", body: "You're welcome to join us just as you are. There isn't a mold you have to fit before you walk through our doors.", image: "/images/exterior.webp", href: "/connect/" },
+    { id: "about", word: "About", headline: "Who We Are", body: "A church family in Hays and Colby, Kansas, where everyone is welcome, just as you are.", image: "/images/congregation.webp", href: "/about/" },
+    { id: "messages", word: "Messages", headline: "Watch &amp; Listen", body: "Catch up on any message, any series, anytime, online or in person.", image: "/images/gather.webp", href: "/messages/" },
+    { id: "connect", word: "Connect", headline: "Connect with Us", body: "You're welcome to join us just as you are. There isn't a mold you have to fit before you walk through our doors.", image: "/images/exterior.webp", href: "/connect/" },
   ],
 };
 export const NT26_DEFAULTS: NT26Content = {
@@ -120,6 +120,20 @@ export const HOME_DEFAULTS: HomeContent = {
 
 const str = (v: unknown, fallback: string): string => (typeof v === "string" && v.trim() !== "" ? v : fallback);
 
+/**
+ * A pillar's key in a canvas path. Studio gives each stored pillar an `id`; a record without one (old content) takes
+ * the default pillar's id at its position, then `tile-<n>`. Only [A-Za-z0-9_-] survive (a dot would split the path),
+ * and a repeated id gets a suffix so two pillars never share one key.
+ */
+export function pillarId(raw: unknown, i: number, all: unknown[] = []): string {
+  const clean = (v: unknown) => (typeof v === "string" ? v.replace(/[^A-Za-z0-9_-]/g, "-").replace(/^-+|-+$/g, "") : "");
+  const base = clean(raw) || MEET_GROW_SERVE_DEFAULTS.pillars[i]?.id || `tile-${i}`;
+  const before = all.slice(0, i).map(clean);
+  let id = base;
+  for (let n = 2; before.includes(id); n++) id = `${base}-${n}`;
+  return id;
+}
+
 /* ── Map C3 Studio's structured home content → HomeContent (per-field fallback) ── */
 export function fromStudioHome(raw: StudioHome | null | undefined): HomeContent {
   if (!raw) return HOME_DEFAULTS;
@@ -137,6 +151,7 @@ export function fromStudioHome(raw: StudioHome | null | undefined): HomeContent 
       heading: str(raw.meetGrowServe?.heading, MEET_GROW_SERVE_DEFAULTS.heading),
       pillars: Array.isArray(pillarsRaw) && pillarsRaw.length
         ? pillarsRaw.map((p, i) => ({
+            id: pillarId(p?.id, i, pillarsRaw.map((q) => q?.id)),
             word: str(p?.word, MEET_GROW_SERVE_DEFAULTS.pillars[i]?.word ?? `tile-${i}`),
             headline: str(p?.headline, MEET_GROW_SERVE_DEFAULTS.pillars[i]?.headline ?? ""),
             body: str(p?.body, MEET_GROW_SERVE_DEFAULTS.pillars[i]?.body ?? ""),

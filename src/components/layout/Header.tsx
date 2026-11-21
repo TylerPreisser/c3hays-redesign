@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X, ChevronDown } from "lucide-react";
 import { navItems, navGroups, ctaItem } from "@/data/navigation";
+import type { NavItem as StudioNavItem } from "@/lib/cms";
 import Logo from "@/components/brand/Logo";
 import type { CMSOverrides } from "@/lib/cms";
 import { tx } from "@/lib/home-content";
@@ -19,11 +20,11 @@ const navKey = (href: string) => href.replace(/\//g, "") || "home";
 type NavEntry = { label: string; href: string; children?: { label: string; href: string }[] };
 
 /** One child link, normalized (label/href tx-resolved, CMS id derived). */
-type BarChild = { key: string; label: string; href: string; cmsLink: string };
+type BarChild = { key: string; label: string; href: string; cmsLink?: string };
 /** One bar entry — a link-parent (has `href`) OR a pure toggle group (no `href`). */
 type BarEntry = { key: string; label: string; href?: string; cmsLink?: string; children: BarChild[] };
 
-export default function Header({ globals = {} }: { globals?: CMSOverrides }) {
+export default function Header({ globals = {}, menu = null }: { globals?: CMSOverrides; menu?: StudioNavItem[] | null }) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   // BUG #3 (nav not editable): inside C3 Studio the canvas iframe is ~1180px wide
@@ -41,13 +42,16 @@ export default function Header({ globals = {} }: { globals?: CMSOverrides }) {
   const navRef = useRef<HTMLElement | null>(null); // desktop nav bar — bounds for outside-click close
   const pathname = usePathname();
   const t = globals.text || {};
-  const nav = globals.nav || {};
+  // THE one menu is Studio's `navigation` item (passed in as `menu`). `globals.nav` is not read for the list, only for
+  // the bar's look (colour, font, scroll effect), which is not a menu. Null (Studio down, or an empty list) keeps the code list.
+  const nav = { ...(globals.nav || {}), items: undefined } as NonNullable<CMSOverrides["nav"]>;
   const m = globals.media || {}; // v3 (R4): editable logo sources by globals key
   // Full (xl+) bar items come from the editor's nav config when set, else the code
   // defaults. The code default carries `children` (About → Our Story / What We Believe,
   // Locations → Hays / Colby) so those pages are reachable via dropdowns — never
   // orphaned (G5 drift-guard).
-  const navList: NavEntry[] = nav.items && nav.items.length ? nav.items : navItems;
+  const navList: NavEntry[] = menu && menu.length ? menu : navItems;
+  const fromStudio = !!(menu && menu.length);
   // /give was orphaned: Header exported ctaItem (Give) but never rendered it. Surface it
   // as a secondary CTA so it's reachable from the bar (G5).
   const giveHref = t["nav-give-href"] || ctaItem.href;
@@ -126,11 +130,14 @@ export default function Header({ globals = {} }: { globals?: CMSOverrides }) {
   // ── Normalize the two bar models into one render shape ────────────────────
   const toChild = (c: { label: string; href: string }): BarChild => {
     const ck = navKey(c.href);
+    // Menu words come from the menu item itself: an old text override on the same key must not mask them.
+    if (fromStudio) return { key: ck, label: c.label, href: c.href };
     return { key: ck, label: tx(t, `nav-${ck}-label`, c.label), href: t[`nav-${ck}-href`] || c.href, cmsLink: `g:nav-${ck}` };
   };
   // Full bar (xl+): all 8 primary items inline, About/Locations as link-parent dropdowns.
   const fullEntries: BarEntry[] = navList.map((item) => {
     const k = navKey(item.href);
+    if (fromStudio) return { key: k, label: item.label, href: item.href, children: (item.children || []).map(toChild) };
     return {
       key: k,
       label: tx(t, `nav-${k}-label`, item.label),
@@ -140,11 +147,24 @@ export default function Header({ globals = {} }: { globals?: CMSOverrides }) {
     };
   });
   // Medium bar (768–1279) + mobile drawer: 4 toggle groups (no page of their own).
-  const groupEntries: BarEntry[] = navGroups.map((g) => ({
-    key: `grp-${g.label.toLowerCase()}`,
-    label: g.label,
-    children: g.children.map(toChild),
-  }));
+  // With Studio's menu there is no hand-made grouping: the first four entries stay as they are and the rest fold into
+  // one "More" toggle, so the order the church chose is the order shown.
+  const groupEntries: BarEntry[] = fromStudio
+    ? [
+        ...fullEntries.slice(0, 4),
+        ...(fullEntries.length > 4
+          ? [{
+              key: "grp-more",
+              label: "More",
+              children: fullEntries.slice(4).flatMap((e) => [{ key: e.key, label: e.label, href: e.href ?? "#" } as BarChild, ...e.children]),
+            }]
+          : []),
+      ]
+    : navGroups.map((g) => ({
+        key: `grp-${g.label.toLowerCase()}`,
+        label: g.label,
+        children: g.children.map(toChild),
+      }));
 
   // PERF: the inert /section-preview thumbnail is chromeless — render NO header at all so
   // a rail thumbnail never boots framer-motion (the mobile drawer) or the scroll listener.

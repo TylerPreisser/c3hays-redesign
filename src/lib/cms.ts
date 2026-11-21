@@ -14,6 +14,7 @@
 // renders its hand-built pages — keeping `output: "export"` statically
 // buildable. Set NEXT_PUBLIC_CMS_URL (and run a server runtime) to let C3 Studio
 // drive the site once the admin backend is live.
+import { cache } from "react";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 import type { SectionMeta } from "@/lib/home-content";
 
@@ -115,33 +116,92 @@ export const getCMSHome = () => cmsFetch<StudioHome>("/api/content/home");
  *     to PUBLISHED content. We never surface an error and never render draft to a
  *     tokenless/public request. c3-backend's validation is the real gate.
  * `path` mirrors the published surface: "home" | "globals" | "/<slug>". */
-async function draftFetch<T>(path: string, preview?: string): Promise<T | null> {
-  if (!CMS_BASE || !preview) return null; // no token ⇒ never request draft
+/** Header that carries the editor's preview token to Studio. Never the query: a query lands in access logs. */
+export const PREVIEW_HEADER = "x-c3-preview";
+
+type DraftRead<T> = { ok: true; data: T } | { ok: false };
+
+/**
+ * One draft read per (path, token) per request. The layout (for the draft mark and the chrome) and the page (for its
+ * own content) ask for the same path; `cache` makes that a single round trip to Studio.
+ */
+const draftOnce = cache(async (path: string, preview: string): Promise<DraftRead<unknown>> => {
+  if (!CMS_BASE || !preview) return { ok: false }; // no token => never request draft
   try {
-    const url = `${CMS_BASE}/api/content/draft?path=${encodeURIComponent(path)}&preview=${encodeURIComponent(preview)}`;
-    // Finding 2: the draft route reads D1 and can exceed a tight timeout on a cold
-    // Worker-to-Worker subrequest → the old 2500ms AbortSignal tripped and draftFetch
-    // returned null, so the editor preview silently fell back to PUBLISHED (edits
-    // "disappeared" on reload). 8s gives the cold draft route room.
-    const res = await cmsFetcher()(url, { cache: "no-store", signal: AbortSignal.timeout(8000) });
-    if (!res.ok) return null; // 401/expired/invalid/anything ⇒ caller falls back to published
-    return (await res.json()) as T;
+    const url = `${CMS_BASE}/api/content/draft?path=${encodeURIComponent(path)}`;
+    // The draft route reads D1 and can exceed a tight timeout on a cold Worker-to-Worker subrequest; 8 s gives it room.
+    const res = await cmsFetcher()(url, { cache: "no-store", headers: { [PREVIEW_HEADER]: preview }, signal: AbortSignal.timeout(8000) });
+    if (!res.ok) return { ok: false }; // 401 / expired / invalid / anything => the caller falls back to published
+    return { ok: true, data: await res.json() };
   } catch {
-    return null; // draft endpoint offline/slow ⇒ fall back to published
+    return { ok: false }; // draft endpoint offline or slow => published
   }
+});
+async function draftFetch<T>(path: string, preview?: string): Promise<T | null> {
+  const r = await draftOnce(path, preview ?? "");
+  return r.ok ? (r.data as T) : null;
 }
 
-/** Home content — DRAFT when a valid `preview` token is present, else PUBLISHED. */
+/** Home content: DRAFT when a valid `preview` token is present, else PUBLISHED. */
 export async function getHomeContent(preview?: string): Promise<StudioHome | null> {
   return (preview ? await draftFetch<StudioHome>("home", preview) : null) ?? getCMSHome();
 }
-/** Per-page overrides — DRAFT under a valid preview token, else PUBLISHED. */
+/** Per-page overrides: DRAFT under a valid preview token, else PUBLISHED. */
 export async function getPageContent(slug: string, preview?: string): Promise<CMSOverrides | null> {
   return (preview ? await draftFetch<CMSOverrides>(slug, preview) : null) ?? getCMSPage(slug);
 }
-/** Shared globals (header/footer) — DRAFT under a valid preview token, else PUBLISHED. */
+/** Shared globals (header/footer text): DRAFT under a valid preview token, else PUBLISHED. */
 export async function getGlobalsContent(preview?: string): Promise<CMSOverrides | null> {
   return (preview ? await draftFetch<CMSOverrides>("globals", preview) : null) ?? getCMSGlobals();
+}
+
+/** The menu as Studio stores it (`navigation.web`). Items without a label or an href are dropped. */
+function cleanMenu(raw: unknown): NavItem[] | null {
+  const list = Array.isArray(raw) ? raw : raw && typeof raw === "object" && Array.isArray((raw as { web?: unknown }).web) ? (raw as { web: unknown[] }).web : null;
+  if (!list) return null;
+  const one = (v: unknown, i: number): NavItem | null => {
+    if (!v || typeof v !== "object") return null;
+    const o = v as { id?: unknown; label?: unknown; href?: unknown; children?: unknown };
+    if (typeof o.label !== "string" || !o.label.trim() || typeof o.href !== "string" || !o.href.trim()) return null;
+    const kids = Array.isArray(o.children) ? o.children.map(one).filter((k): k is NavItem => !!k) : [];
+    return { id: typeof o.id === "string" && o.id ? o.id : `nav-${i}`, label: o.label.trim(), href: o.href.trim(), ...(kids.length ? { children: kids } : {}) };
+  };
+  return list.map(one).filter((n): n is NavItem => !!n);
+}
+
+/**
+ * THE one menu: Studio's `navigation` item (web list). Draft under a valid token, else published. Returns null when
+ * Studio is down or the list is empty, so the header and footer keep the code list (`src/data/navigation.ts`).
+ * `globals.nav` is not read.
+ */
+export async function getMenu(preview?: string): Promise<{ items: NavItem[] | null; draft: boolean }> {
+  if (preview) {
+    const d = cleanMenu(await draftFetch<unknown>("navigation", preview));
+    if (d && d.length) return { items: d, draft: true };
+  }
+  const pub = cleanMenu(await cmsFetch<unknown>("/api/content/navigation?surface=web"));
+  return { items: pub && pub.length ? pub : null, draft: false };
+}
+
+/** The path the draft route knows a page by: "home" for the front page, "/slug" for the rest. */
+export function draftPathFor(pathname: string): string {
+  const p = ("/" + pathname.replace(/^\/+/, "")).replace(/\/+$/, "");
+  return p === "" || p === "/" ? "home" : p;
+}
+
+/**
+ * The mark the root carries so the editor knows what it is looking at. "served" only when the page, the globals and
+ * the menu ALL came from the draft; "fallback" when a token was sent but any of them did not (expired, forged, Studio
+ * down). No token means a visitor: no mark at all.
+ */
+export async function getDraftMark(preview: string | undefined, pathname: string): Promise<{ mark?: "served" | "fallback"; asOf?: string }> {
+  if (!preview) return {};
+  const [page, globals, menu] = await Promise.all([
+    draftOnce(draftPathFor(pathname), preview),
+    draftOnce("globals", preview),
+    draftOnce("navigation", preview),
+  ]);
+  return page.ok && globals.ok && menu.ok ? { mark: "served", asOf: new Date().toISOString() } : { mark: "fallback" };
 }
 
 /** Generic override bag for a page or the shared globals (footer/header). */
@@ -195,7 +255,7 @@ export const getCMSGlobals = () => cmsFetch<CMSOverrides>("/api/content/globals"
 export interface StudioHome {
   hero?: { heading?: string; bgImage?: string; ctaLabel?: string; ctaHref?: string; isLive?: boolean };
   mission?: { html?: string };
-  meetGrowServe?: { heading?: string; pillars?: Array<{ word?: string; headline?: string; body?: string; image?: string; href?: string }> };
+  meetGrowServe?: { heading?: string; pillars?: Array<{ id?: string; word?: string; headline?: string; body?: string; image?: string; href?: string }> };
   nt26?: { heading?: string; body?: string; ctaLabel?: string; ctaHref?: string; image?: string };
   stayConnected?: { cards?: Array<{ id?: string; title?: string; body?: string; icon?: string; href?: string; cta?: string }> };
   text?: Record<string, string>;

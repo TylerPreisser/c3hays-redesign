@@ -106,11 +106,11 @@ export default function MeetGrowServe({
           {/* 3-up tile grid */}
           <div className="pillar-grid grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-6 lg:gap-10">
             {pillars.map((pillar, pi) => (
-              <div key={pillar.word} className="pillar-tile group" data-cms-bg={`tile:meetGrowServe.${pi}`}>
+              <div key={pillar.word} className="pillar-tile group" data-cms-bg={`tile:meetGrowServe.${pillar.id}`}>
                 {/* Image */}
                 <div
                   className="pillar-img-wrap relative overflow-hidden mb-6"
-                  data-cms-img={`meetGrowServe.pillars.${pi}.image`}
+                  data-cms-img={`meetGrowServe.pillars.${pillar.id}.image`}
                   style={{ borderRadius: "var(--radius-md)" }}
                 >
                   <Image
@@ -118,7 +118,7 @@ export default function MeetGrowServe({
                     alt={pillar.headline}
                     fill
                     className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.04]"
-                    style={imgCss(img[`meetGrowServe.pillars.${pi}.image`])}
+                    style={imgCss(img[`meetGrowServe.pillars.${pillar.id}.image`])}
                   />
                   <div
                     className="absolute inset-0 transition-opacity duration-500 opacity-0 group-hover:opacity-100"
@@ -129,20 +129,20 @@ export default function MeetGrowServe({
                 {/* Text */}
                 <h3
                   className="heading-2 mb-4"
-                  data-cms={`meetGrowServe.pillars.${pi}.headline`}
+                  data-cms={`meetGrowServe.pillars.${pillar.id}.headline`}
                   style={{ color: "#1b1c1c" }}
                   dangerouslySetInnerHTML={{ __html: pillar.headline }}
                 />
                 <p
                   className="mb-5 leading-relaxed"
-                  data-cms={`meetGrowServe.pillars.${pi}.body`}
+                  data-cms={`meetGrowServe.pillars.${pillar.id}.body`}
                   style={{ fontSize: "1rem", color: "rgba(27,28,28,0.80)", lineHeight: 1.65 }}
                   dangerouslySetInnerHTML={{ __html: pillar.body }}
                 />
                 {/* De-collapsed: tile = data-cms-bg; only this inner link is the
                     data-cms-link, so a click on "Learn More" selects the CTA (edit
                     label + href), not the tile background. */}
-                <Link href={pillar.href} data-cms-link={`meetGrowServe.pillars.${pi}.cta`} className="arrow-link" style={{ color: "#1b1c1c" }}>
+                <Link href={pillar.href} data-cms-link={`meetGrowServe.pillars.${pillar.id}.cta`} className="arrow-link" style={{ color: "#1b1c1c" }}>
                   <span data-cms-link-label>Learn More</span> <span className="arrow">→</span>
                 </Link>
               </div>
@@ -175,7 +175,7 @@ export default function MeetGrowServe({
               <div
                 key={pillar.word}
                 className="pillar-tile group flex flex-col md:flex-row items-stretch"
-                data-cms-bg={`tile:meetGrowServe.${pi}`}
+                data-cms-bg={`tile:meetGrowServe.${pillar.id}`}
                 style={{
                   borderTop: pi === 0 ? "1px solid rgba(27,28,28,0.10)" : undefined,
                   borderBottom: "1px solid rgba(27,28,28,0.10)",
@@ -186,7 +186,7 @@ export default function MeetGrowServe({
                 {/* Image — full-width 16:9 on mobile, 38% 4:3 on md+ */}
                 <div
                   className="pillar-img-wrap relative overflow-hidden shrink-0 w-full aspect-video md:w-[38%] md:aspect-[4/3]"
-                  data-cms-img={`meetGrowServe.pillars.${pi}.image`}
+                  data-cms-img={`meetGrowServe.pillars.${pillar.id}.image`}
                   style={{ borderRadius: "var(--radius-md)" }}
                 >
                   <Image
@@ -194,7 +194,7 @@ export default function MeetGrowServe({
                     alt={pillar.headline}
                     fill
                     className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.03]"
-                    style={imgCss(img[`meetGrowServe.pillars.${pi}.image`])}
+                    style={imgCss(img[`meetGrowServe.pillars.${pillar.id}.image`])}
                   />
                 </div>
 
@@ -202,13 +202,13 @@ export default function MeetGrowServe({
                 <div className="flex flex-col justify-center flex-1 min-w-0">
                   <h3
                     className="heading-2 mb-3"
-                    data-cms={`meetGrowServe.pillars.${pi}.headline`}
+                    data-cms={`meetGrowServe.pillars.${pillar.id}.headline`}
                     style={{ color: "#1b1c1c" }}
                     dangerouslySetInnerHTML={{ __html: pillar.headline }}
                   />
                   <p
                     className="mb-5 leading-relaxed"
-                    data-cms={`meetGrowServe.pillars.${pi}.body`}
+                    data-cms={`meetGrowServe.pillars.${pillar.id}.body`}
                     style={{ fontSize: "1rem", color: "rgba(27,28,28,0.78)", lineHeight: 1.7, maxWidth: "52ch" }}
                     dangerouslySetInnerHTML={{ __html: pillar.body }}
                   />
@@ -216,7 +216,7 @@ export default function MeetGrowServe({
                       the data-cms-link. */}
                   <Link
                     href={pillar.href}
-                    data-cms-link={`meetGrowServe.pillars.${pi}.cta`}
+                    data-cms-link={`meetGrowServe.pillars.${pillar.id}.cta`}
                     className="arrow-link"
                     style={{ color: "#1b1c1c" }}
                   >
@@ -255,7 +255,7 @@ export default function MeetGrowServe({
                 <div
                   key={pillar.word}
                   className={`pillar-tile bento-tile group relative overflow-hidden flex flex-col justify-end ${isHero ? "md:col-span-2 lg:col-span-2 md:row-span-2" : ""}`}
-                  data-cms-bg={`tile:meetGrowServe.${pi}`}
+                  data-cms-bg={`tile:meetGrowServe.${pillar.id}`}
                   style={{
                     borderRadius: "var(--radius-md)",
                     minHeight: isHero ? "clamp(320px, 42vw, 460px)" : "clamp(220px, 26vw, 300px)",
@@ -265,13 +265,13 @@ export default function MeetGrowServe({
                   }}
                 >
                   {/* Image backdrop */}
-                  <div className="pillar-img-wrap absolute inset-0" data-cms-img={`meetGrowServe.pillars.${pi}.image`} aria-hidden>
+                  <div className="pillar-img-wrap absolute inset-0" data-cms-img={`meetGrowServe.pillars.${pillar.id}.image`} aria-hidden>
                     <Image
                       src={assetPath(pillar.image)}
                       alt=""
                       fill
                       className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.05]"
-                      style={imgCss(img[`meetGrowServe.pillars.${pi}.image`])}
+                      style={imgCss(img[`meetGrowServe.pillars.${pillar.id}.image`])}
                     />
                   </div>
                   {/* Scrim for AA-legible overlaid label */}
@@ -281,14 +281,14 @@ export default function MeetGrowServe({
                   <div className="relative p-6 lg:p-8">
                     <h3
                       className={isHero ? "heading-1" : "heading-3"}
-                      data-cms={`meetGrowServe.pillars.${pi}.headline`}
+                      data-cms={`meetGrowServe.pillars.${pillar.id}.headline`}
                       style={{ color: "#fff", marginBottom: isHero ? "var(--s-3, 12px)" : "var(--s-2, 8px)" }}
                       dangerouslySetInnerHTML={{ __html: pillar.headline }}
                     />
                     {isHero && (
                       <p
                         className="body-base"
-                        data-cms={`meetGrowServe.pillars.${pi}.body`}
+                        data-cms={`meetGrowServe.pillars.${pillar.id}.body`}
                         style={{ color: "rgba(255,255,255,0.82)", maxWidth: "46ch", margin: 0 }}
                         dangerouslySetInnerHTML={{ __html: pillar.body }}
                       />
@@ -298,7 +298,7 @@ export default function MeetGrowServe({
                         an independently editable link. */}
                     <Link
                       href={pillar.href}
-                      data-cms-link={`meetGrowServe.pillars.${pi}.cta`}
+                      data-cms-link={`meetGrowServe.pillars.${pillar.id}.cta`}
                       className="arrow-link"
                       style={{ color: "#fff", marginTop: "var(--s-4, 16px)", display: "inline-flex" }}
                     >
@@ -346,7 +346,7 @@ export default function MeetGrowServe({
               {/* Hidden image wrapper — preserves data-cms-img for CMS editability */}
               <div
                 className="pillar-img-wrap sr-only"
-                data-cms-img={`meetGrowServe.pillars.${pi}.image`}
+                data-cms-img={`meetGrowServe.pillars.${pillar.id}.image`}
                 aria-hidden="true"
                 style={{ position: "absolute", width: 0, height: 0, overflow: "hidden" }}
               >
@@ -354,13 +354,13 @@ export default function MeetGrowServe({
                   src={assetPath(pillar.image)}
                   alt=""
                   fill
-                  style={imgCss(img[`meetGrowServe.pillars.${pi}.image`])}
+                  style={imgCss(img[`meetGrowServe.pillars.${pillar.id}.image`])}
                 />
               </div>
 
               <div
                 className="flex items-center justify-between group/link"
-                data-cms-bg={`tile:meetGrowServe.${pi}`}
+                data-cms-bg={`tile:meetGrowServe.${pillar.id}`}
                 style={{
                   padding: "2.25rem 0",
                   transition: "gap 0.3s ease",
@@ -384,7 +384,7 @@ export default function MeetGrowServe({
                   <div className="min-w-0">
                     <h3
                       className="display-3 md:display-2"
-                      data-cms={`meetGrowServe.pillars.${pi}.headline`}
+                      data-cms={`meetGrowServe.pillars.${pillar.id}.headline`}
                       style={{
                         color: "#1b1c1c",
                         transition: "color 0.25s ease",
@@ -394,7 +394,7 @@ export default function MeetGrowServe({
                     />
                     <p
                       className="mt-2"
-                      data-cms={`meetGrowServe.pillars.${pi}.body`}
+                      data-cms={`meetGrowServe.pillars.${pillar.id}.body`}
                       style={{
                         fontSize: "1rem",
                         color: "rgba(27,28,28,0.65)",
@@ -412,7 +412,7 @@ export default function MeetGrowServe({
                     variant stays arrow-only visually). */}
                 <Link
                   href={pillar.href}
-                  data-cms-link={`meetGrowServe.pillars.${pi}.cta`}
+                  data-cms-link={`meetGrowServe.pillars.${pillar.id}.cta`}
                   className="inline-flex items-center"
                   style={{
                     flexShrink: 0,

@@ -4,7 +4,8 @@ import { site } from "@/data/site";
 import Logo from "@/components/brand/Logo";
 import NewsletterForm from "./NewsletterForm";
 import ServiceTimesText from "@/components/ServiceTimesText";
-import type { CMSOverrides } from "@/lib/cms";
+import type { CMSOverrides, NavItem as StudioNavItem } from "@/lib/cms";
+import { ctaItem } from "@/data/navigation";
 import { tx } from "@/lib/home-content";
 
 /**
@@ -27,14 +28,19 @@ import { tx } from "@/lib/home-content";
  * other text. Content comes from the global overrides bag (falls back to the
  * hand-built defaults when the CMS is off).
  */
-export default function Footer({ globals = {} }: { globals?: CMSOverrides }) {
+export default function Footer({ globals = {}, menu = null }: { globals?: CMSOverrides; menu?: StudioNavItem[] | null }) {
   const t = globals.text || {};
+  // THE one menu: the Explore links are Studio's `navigation` items (top level), then Give. Without it (Studio down, or
+  // an empty list) the code list below stays. Menu words are not text-overridable here: the Menu form owns them.
+  const links: ExploreLink[] = menu && menu.length
+    ? [...menu.map((n) => ({ id: `footer-menu-${n.id}`, label: n.label, href: n.href, fixed: true })), { id: "footer-menu-give", label: ctaItem.label, href: ctaItem.href, fixed: true }]
+    : EXPLORE_LINKS;
   const m = globals.media || {}; // v3 (R4): editable logo sources by globals key
   const variant = (t["footer-variant"] || "editorial").toLowerCase();
 
-  if (variant === "minimal") return <FooterMinimal t={t} m={m} />;
-  if (variant === "bigcta") return <FooterEditorial t={t} m={m} preCta />;
-  return <FooterEditorial t={t} m={m} />;
+  if (variant === "minimal") return <FooterMinimal t={t} m={m} links={links} />;
+  if (variant === "bigcta") return <FooterEditorial t={t} m={m} preCta links={links} />;
+  return <FooterEditorial t={t} m={m} links={links} />;
 }
 
 /* ─────────────────────────────────────────────────────────────────────────
@@ -42,7 +48,8 @@ export default function Footer({ globals = {} }: { globals?: CMSOverrides }) {
    ───────────────────────────────────────────────────────────────────────── */
 const YEAR = 2026;
 
-const EXPLORE_LINKS = [
+type ExploreLink = { id: string; label: string; href: string; fixed?: boolean };
+const EXPLORE_LINKS: ExploreLink[] = [
   { id: "footer-explore-0", label: "About", href: "/about/" },
   { id: "footer-explore-1", label: "Locations", href: "/locations/" },
   { id: "footer-explore-2", label: "Messages", href: "/messages/" },
@@ -68,8 +75,11 @@ type TextBag = Record<string, string>;
 type MediaBag = Record<string, string>;
 
 /** R8: a footer link whose label + destination are BOTH editable on the page. */
-function FLink({ t, id, label, href, tone = "muted" }: { t: TextBag; id: string; label: string; href: string; tone?: "muted" | "bright" }) {
+function FLink({ t, id, label, href, fixed, tone = "muted" }: { t: TextBag; id: string; label: string; href: string; fixed?: boolean; tone?: "muted" | "bright" }) {
   const color = tone === "bright" ? "rgba(255,255,255,0.80)" : "rgba(255,255,255,0.60)";
+  if (fixed) {
+    return <Link href={href} prefetch={false} className="footer-link" style={{ color, transition: "color var(--dur-fast) var(--ease-out)" }}>{label}</Link>;
+  }
   return (
     <Link href={t[`${id}-href`] || href} prefetch={false} data-cms-link={`g:${id}`} className="footer-link" style={{ color, transition: "color var(--dur-fast) var(--ease-out)" }}>
       <span data-cms-link-label>{tx(t, `${id}-label`, label)}</span>
@@ -123,7 +133,7 @@ function BottomBar({ t }: { t: TextBag }) {
 /* ─────────────────────────────────────────────────────────────────────────
    VARIANT: Editorial Dark (default) — optional Big-CTA pre-band (preCta)
    ───────────────────────────────────────────────────────────────────────── */
-function FooterEditorial({ t, m, preCta = false }: { t: TextBag; m: MediaBag; preCta?: boolean }) {
+function FooterEditorial({ t, m, links, preCta = false }: { t: TextBag; m: MediaBag; links: ExploreLink[]; preCta?: boolean }) {
   return (
     <footer data-cms-bg="g:footer" style={{ backgroundColor: "#1b1c1c", color: "rgba(255,255,255,0.75)" }}>
       {/* Seamless entry from the page canvas */}
@@ -174,7 +184,7 @@ function FooterEditorial({ t, m, preCta = false }: { t: TextBag; m: MediaBag; pr
           <div className="lg:col-span-2">
             <FooterHeading id="footer-explore-head" t={t}>Explore</FooterHeading>
             <ul className="flex flex-col gap-3 body-sm">
-              {EXPLORE_LINKS.map((l) => <li key={l.id}><FLink t={t} {...l} /></li>)}
+              {links.map((l) => <li key={l.id}><FLink t={t} {...l} /></li>)}
             </ul>
           </div>
 
@@ -218,7 +228,7 @@ function FooterEditorial({ t, m, preCta = false }: { t: TextBag; m: MediaBag; pr
 /* ─────────────────────────────────────────────────────────────────────────
    VARIANT: Minimal Centered — lean, single row of links + social
    ───────────────────────────────────────────────────────────────────────── */
-function FooterMinimal({ t, m }: { t: TextBag; m: MediaBag }) {
+function FooterMinimal({ t, m, links }: { t: TextBag; m: MediaBag; links: ExploreLink[] }) {
   return (
     <footer data-cms-bg="g:footer" style={{ backgroundColor: "#1b1c1c", color: "rgba(255,255,255,0.75)" }}>
       <GradientBleed />
@@ -231,7 +241,7 @@ function FooterMinimal({ t, m }: { t: TextBag; m: MediaBag }) {
 
         {/* Single row of primary links */}
         <nav className="flex flex-wrap items-center justify-center gap-x-7 gap-y-3 body-sm">
-          {EXPLORE_LINKS.slice(0, 6).map((l) => <FLink key={l.id} t={t} {...l} tone="bright" />)}
+          {links.slice(0, 6).map((l) => <FLink key={l.id} t={t} {...l} tone="bright" />)}
         </nav>
 
         {/* Campuses collapsed to one line */}

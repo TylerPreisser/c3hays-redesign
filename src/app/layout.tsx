@@ -10,7 +10,9 @@ import RevealPlayer from "@/components/cms/RevealPlayer";
 import SmoothScrollProvider from "@/providers/SmoothScrollProvider";
 import { site } from "@/data/site";
 import { assetPath } from "@/lib/asset-path";
-import { getCMSGlobals } from "@/lib/cms";
+import { headers } from "next/headers";
+import { getGlobalsContent, getMenu, getDraftMark } from "@/lib/cms";
+import { isCmsLive } from "@/lib/cms-live";
 import { getServiceTimes } from "@/lib/service-times";
 import { ServiceTimesProvider } from "@/providers/ServiceTimesProvider";
 import { SignupConfigProvider } from "@/providers/SignupConfigProvider";
@@ -94,10 +96,21 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   // Fetch shared (footer/header/nav) overrides once and feed both bars.
-  const globals = (await getCMSGlobals()) || {};
+  // In edit mode the canvas carries the editor's preview token (handed over by src/proxy.ts): the header, footer and
+  // menu are then read from the DRAFT too, so the canvas shows draft words everywhere. A static export has no request
+  // to read, so the headers are touched only by the live server build.
+  let preview: string | undefined;
+  let pathname = "/";
+  if (isCmsLive()) {
+    const h = await headers();
+    preview = h.get("x-c3-preview") || undefined;
+    pathname = h.get("x-c3-path") || "/";
+  }
+  const [globalsRaw, menu, draft] = await Promise.all([getGlobalsContent(preview), getMenu(preview), getDraftMark(preview, pathname)]);
+  const globals = globalsRaw || {};
   const serviceTimes = await getServiceTimes();
   return (
-    <html lang="en" suppressHydrationWarning className={hankenGrotesk.variable}>
+    <html lang="en" suppressHydrationWarning className={hankenGrotesk.variable} data-cms-draft={draft.mark} data-cms-asof={draft.asOf}>
       <head>
         {/* Font library — selectable in the C3 Studio editor; loaded so the live
             site renders whatever font staff choose. */}
@@ -129,9 +142,9 @@ export default async function RootLayout({
         <ServiceTimesProvider value={serviceTimes}>
           <SignupConfigProvider turnstileSiteKey={getTurnstileSiteKey()}>
             <SmoothScrollProvider>
-              <Header globals={globals} />
+              <Header globals={globals} menu={menu.items} />
               <main>{children}</main>
-              <Footer globals={globals} />
+              <Footer globals={globals} menu={menu.items} />
             </SmoothScrollProvider>
           </SignupConfigProvider>
         </ServiceTimesProvider>

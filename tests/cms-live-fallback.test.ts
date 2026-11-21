@@ -71,7 +71,7 @@ describe("U6 — CMS live-fetch + church-site fallback", () => {
     await expect(cms.getCMSBundle()).resolves.toBeNull();
   });
 
-  it("PREVIEW: a valid ?preview token is FORWARDED to the editor's draft endpoint (draft wins)", async () => {
+  it("PREVIEW: a valid token is FORWARDED to the draft endpoint in a HEADER, never in the URL (draft wins)", async () => {
     const fetchFn = mockFetch((url) =>
       url.includes("/api/content/draft")
         ? { ok: true, json: () => ({ hero: { heading: "DRAFT copy" } }) }
@@ -83,7 +83,10 @@ describe("U6 — CMS live-fetch + church-site fallback", () => {
     const draftCall = fetchFn.mock.calls.find((c) => String(c[0]).includes("/api/content/draft"));
     expect(draftCall).toBeTruthy();
     expect(String(draftCall![0])).toContain("path=home");
-    expect(String(draftCall![0])).toContain("preview=tok-abc");
+    // The token stays out of the URL (access logs) and rides the x-c3-preview header instead.
+    expect(String(draftCall![0])).not.toContain("tok-abc");
+    expect(String(draftCall![0])).not.toContain("preview=");
+    expect((draftCall![1] as RequestInit).headers).toEqual({ "x-c3-preview": "tok-abc" });
   });
 
   it("PREVIEW SECURITY: a forged/expired token (draft 401) falls back to PUBLISHED, never errors", async () => {
