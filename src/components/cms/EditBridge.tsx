@@ -175,7 +175,7 @@ export default function EditBridge() {
       [data-cms], [data-cms-img], [data-cms-link]{ border-radius:7px; }
       /* Editable headings use text-wrap:balance, which re-wraps the moment the element is a focused
          contenteditable and would jump the section. A stable wrap keeps idle and focused layouts identical. */
-      [data-cms]{ text-wrap: normal !important; transition:background-color .12s ease; }
+      [data-cms]{ text-wrap: wrap !important; transition:background-color .12s ease; }
       html[data-cms-mode="edit"] [data-cms]{ cursor:text; }
       [data-cms-img], [data-cms-link]{ cursor:pointer; }
       /* hover: a quiet outline over the element, never over its own background and never in the way of a click */
@@ -198,6 +198,7 @@ export default function EditBridge() {
       }
       [data-cms-img]:hover::after{ top:2px!important; right:2px!important; bottom:2px!important; left:2px!important; z-index:2147483000; }
       /* selection: one fixed ring, 2px teal ink inside 2px white (3:1 on light and on a dark hero) */
+      .cms-sel:hover::after{ display:none !important; }
       #c3-sel-ring{
         position:fixed; pointer-events:none; z-index:2147483400; display:none; box-sizing:border-box;
         border-radius:9px; box-shadow: 0 0 0 2px ${INK}, 0 0 0 4px #fff;
@@ -290,6 +291,9 @@ export default function EditBridge() {
       const key = `${r.left}|${r.top}|${r.width}|${r.height}|${pad}`;
       if (key === ringLast && ring.style.display === "block") return;
       ringLast = key;
+      // follow the element's own corner radius so a rounded photo is not ringed by a square-cornered box
+      const rad = parseFloat(getComputedStyle(el).borderTopLeftRadius) || 0;
+      ring.style.borderRadius = `${Math.max(pad < 0 ? 4 : 7, rad + pad)}px`;
       ring.style.left = `${r.left - pad}px`; ring.style.top = `${r.top - pad}px`;
       ring.style.width = `${r.width + pad * 2}px`; ring.style.height = `${r.height + pad * 2}px`;
       ring.style.display = "block";
