@@ -5,7 +5,7 @@ import { useState, useEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X, ChevronDown, Search } from "lucide-react";
-import { navItems, navGroups, ctaItem } from "@/data/navigation";
+import { textNavItems, searchItem, navGroups, ctaItem } from "@/data/navigation";
 import type { NavItem as StudioNavItem } from "@/lib/cms";
 import Logo from "@/components/brand/Logo";
 import type { CMSOverrides } from "@/lib/cms";
@@ -50,7 +50,7 @@ export default function Header({ globals = {}, menu = null, announcement = null 
   // defaults. The code default carries `children` (About → Our Story / What We Believe,
   // Locations → Hays / Colby) so those pages are reachable via dropdowns — never
   // orphaned (G5 drift-guard).
-  const navList: NavEntry[] = menu && menu.length ? menu : navItems;
+  const navList: NavEntry[] = menu && menu.length ? menu : textNavItems;
   const fromStudio = !!(menu && menu.length);
   // /give was orphaned: Header exported ctaItem (Give) but never rendered it. Surface it
   // as a secondary CTA so it's reachable from the bar (G5).
@@ -316,7 +316,7 @@ export default function Header({ globals = {}, menu = null, announcement = null 
           {/* Desktop right: secondary Give link + primary Plan-a-Visit CTA. Shown from md
               up (alongside both the grouped and full bars). */}
           <div className="hidden md:flex items-center gap-3 lg:gap-4">
-            <Link href="/search/" prefetch={false} aria-label="Search the site" className="inline-flex items-center justify-center w-11 h-11 -mr-1" style={{ color: base }}>
+            <Link href={searchItem.href} prefetch={false} aria-label="Search the site" className="inline-flex items-center justify-center w-11 h-11 -mr-1" style={{ color: base }}>
               <Search size={18} aria-hidden="true" />
             </Link>
             <Link
@@ -470,7 +470,7 @@ export default function Header({ globals = {}, menu = null, announcement = null 
                   <span data-cms-link-label>{tx(t, "nav-cta-label", "Plan a Visit")}</span>
                 </Link>
                 <Link
-                  href="/search/"
+                  href={searchItem.href}
                   prefetch={false}
                   className="btn btn-outline btn-lg w-full text-center"
                   onClick={() => setMobileOpen(false)}

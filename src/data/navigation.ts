@@ -2,6 +2,8 @@ export interface NavItem {
   label: string;
   href: string;
   children?: NavItem[];
+  /** Drawn as an icon control at the right of the bar (and a button in the phone menu), not as a text link. */
+  icon?: "search";
 }
 
 export const navItems: NavItem[] = [
@@ -30,7 +32,14 @@ export const navItems: NavItem[] = [
   { label: "Watch", href: "/watch/" },
   { label: "Counseling", href: "/counseling/" },
   { label: "Connect", href: "/connect/" },
+  // Site search: a real destination in the nav data, drawn as the magnifier at the right of the bar.
+  { label: "Search", href: "/search/", icon: "search" },
 ];
+
+/** The text links of the bar: every entry except icon controls. */
+export const textNavItems: NavItem[] = navItems.filter((n) => !n.icon);
+/** The search control (icon + accessible name + destination). */
+export const searchItem: NavItem = navItems.find((n) => n.icon === "search")!;
 
 export const ctaItem: NavItem = {
   label: "Give",
