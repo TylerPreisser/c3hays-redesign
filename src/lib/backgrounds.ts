@@ -56,10 +56,15 @@ export function buildBgCss(
   bgFill: BgFill = {},
 ): string {
   const rules: string[] = [];
+  // Ids and values come from Studio and land inside a <style>: ids are plain tokens, values may not contain anything
+  // that closes a rule or the element.
+  const idOk = (v: unknown): v is string => typeof v === "string" && /^[\w:.-]{1,80}$/.test(v);
+  const valOk = (v: unknown): v is string =>
+    typeof v === "string" && v.length <= 4000 && !/[<>{}\\;]|\/\*/.test(v.replace(/url\(\s*(["'])[^"'<>{}\\]*\1\s*\)/gi, ""));
   // A section with bgSpan>0 paints ONE continuous background across itself and the
   // next N visible sections (rendered by PageComposer's span wrapper), so those
   // covered sections are skipped here to avoid a repeated (seamed) per-section paint.
-  const vis = sections.filter((s) => s && s.visible !== false);
+  const vis = sections.filter((s) => s && s.visible !== false && idOk(s.id));
   const covered = new Set<string>();
   vis.forEach((s, i) => {
     const span = Math.max(0, Math.floor(Number(s.bgSpan) || 0));
@@ -68,12 +73,12 @@ export function buildBgCss(
     }
   });
   for (const s of vis) {
-    if (s.bg && !covered.has(s.id)) {
+    if (s.bg && valOk(s.bg) && !covered.has(s.id)) {
       rules.push(`[data-section="${s.id}"]>*{background:${s.bg} !important}`);
     }
   }
   for (const [key, val] of Object.entries(bgFill || {})) {
-    if (val) rules.push(`[data-cms-bg="${key}"]{background:${val} !important}`);
+    if (val && idOk(key) && valOk(val)) rules.push(`[data-cms-bg="${key}"]{background:${val} !important}`);
   }
   return rules.join("");
 }

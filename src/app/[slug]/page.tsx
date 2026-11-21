@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { getPageContent, getCMSScreen, getCMSBundle } from "@/lib/cms";
 import { isCmsLive } from "@/lib/cms-live";
+import { sanitizeInlineHtml } from "@/lib/inline-html";
 
 /**
  * Website Editor v4 — R5: generic renderer for CMS-authored pages (a Screen).
@@ -70,9 +71,9 @@ export default async function GenericPage({
       <section data-section={slug} style={{ padding: "clamp(4rem, 10vw, 8rem) 1.25rem" }}>
         <div style={{ maxWidth: "48rem", margin: "0 auto" }}>
           <h1 data-cms="t:page-title" style={{ fontSize: "clamp(2rem, 6vw, 3.5rem)", fontWeight: 800, lineHeight: 1.05, letterSpacing: "-0.02em" }}
-            dangerouslySetInnerHTML={{ __html: title }} />
+            dangerouslySetInnerHTML={{ __html: sanitizeInlineHtml(title) }} />
           <div data-cms="t:page-body" style={{ marginTop: "1.5rem", fontSize: "1.125rem", lineHeight: 1.7, color: "#3a3b3b" }}
-            dangerouslySetInnerHTML={{ __html: body || "Write something about this page." }} />
+            dangerouslySetInnerHTML={{ __html: body ? sanitizeInlineHtml(body) : "Write something about this page." }} />
         </div>
       </section>
     </main>

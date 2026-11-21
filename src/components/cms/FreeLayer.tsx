@@ -1,4 +1,5 @@
 import type { FreeEl } from "@/lib/cms";
+import { sanitizeInlineHtml } from "@/lib/inline-html";
 
 /**
  * FreeLayer — the render surface for DRAG-ANYWHERE freeform elements.
@@ -58,7 +59,7 @@ export default function FreeLayer({ freeEls }: { freeEls?: FreeEl[] }) {
                 whiteSpace: "nowrap",
               }}
             >
-              <span data-cms-link-label dangerouslySetInnerHTML={{ __html: el.text || "Button" }} />
+              <span data-cms-link-label dangerouslySetInnerHTML={{ __html: el.text ? sanitizeInlineHtml(el.text) : "Button" }} />
             </a>
           );
         }
@@ -76,7 +77,7 @@ export default function FreeLayer({ freeEls }: { freeEls?: FreeEl[] }) {
               lineHeight: 1.3,
               color: "var(--color-ink, #1b1c1c)",
             }}
-            dangerouslySetInnerHTML={{ __html: el.text || "Add your text" }}
+            dangerouslySetInnerHTML={{ __html: el.text ? sanitizeInlineHtml(el.text) : "Add your text" }}
           />
         );
       })}

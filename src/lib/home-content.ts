@@ -7,6 +7,8 @@
  * the site looks identical to the hand-built original.
  */
 import type { StudioHome, FreeEl, CMSOverrides } from "@/lib/cms";
+import { sanitizeInlineHtml } from "@/lib/inline-html";
+import { txTimes } from "@/lib/service-times-core";
 
 const TEAL = "#1cc3af";
 
@@ -56,7 +58,13 @@ export const SECTIONS_DEFAULT: SectionMeta[] = [
 
 /** Read a generic per-element text override (HTML) by its data-cms id, else fallback. */
 export function tx(text: Record<string, string> | undefined, key: string, fallback: string): string {
-  return text && typeof text[key] === "string" && text[key].trim() !== "" ? text[key] : fallback;
+  return text && typeof text[key] === "string" && text[key].trim() !== "" ? sanitizeInlineHtml(text[key]) : fallback;
+}
+
+/** `txTimes` (a stale clock-time override falls back to the data-built text) with what Studio sent read through the allow-list. */
+export function txTimesSafe(text: Record<string, string> | undefined, key: string, fallback: string): string {
+  const v = txTimes(text, key, fallback);
+  return v === fallback ? fallback : sanitizeInlineHtml(v);
 }
 
 /**
@@ -119,6 +127,8 @@ export const HOME_DEFAULTS: HomeContent = {
 };
 
 const str = (v: unknown, fallback: string): string => (typeof v === "string" && v.trim() !== "" ? v : fallback);
+/** Like `str`, for text that is set as HTML: what Studio sent goes through the allow-list, the built-in fallback does not need it. */
+const htm = (v: unknown, fallback: string): string => (typeof v === "string" && v.trim() !== "" ? sanitizeInlineHtml(v) : fallback);
 
 /**
  * A pillar's key in a canvas path. Studio gives each stored pillar an `id`; a record without one (old content) takes
@@ -140,30 +150,30 @@ export function fromStudioHome(raw: StudioHome | null | undefined): HomeContent 
   const pillarsRaw = raw.meetGrowServe?.pillars;
   return {
     hero: {
-      heading: str(raw.hero?.heading, HERO_DEFAULTS.heading),
+      heading: htm(raw.hero?.heading, HERO_DEFAULTS.heading),
       bgImage: str(raw.hero?.bgImage, HERO_DEFAULTS.bgImage),
-      ctaLabel: str(raw.hero?.ctaLabel, HERO_DEFAULTS.ctaLabel),
+      ctaLabel: htm(raw.hero?.ctaLabel, HERO_DEFAULTS.ctaLabel),
       ctaHref: str(raw.hero?.ctaHref, HERO_DEFAULTS.ctaHref),
       isLive: typeof raw.hero?.isLive === "boolean" ? raw.hero.isLive : HERO_DEFAULTS.isLive,
     },
-    mission: { html: str(raw.mission?.html, MISSION_DEFAULTS.html) },
+    mission: { html: htm(raw.mission?.html, MISSION_DEFAULTS.html) },
     meetGrowServe: {
-      heading: str(raw.meetGrowServe?.heading, MEET_GROW_SERVE_DEFAULTS.heading),
+      heading: htm(raw.meetGrowServe?.heading, MEET_GROW_SERVE_DEFAULTS.heading),
       pillars: Array.isArray(pillarsRaw) && pillarsRaw.length
         ? pillarsRaw.map((p, i) => ({
             id: pillarId(p?.id, i, pillarsRaw.map((q) => q?.id)),
-            word: str(p?.word, MEET_GROW_SERVE_DEFAULTS.pillars[i]?.word ?? `tile-${i}`),
-            headline: str(p?.headline, MEET_GROW_SERVE_DEFAULTS.pillars[i]?.headline ?? ""),
-            body: str(p?.body, MEET_GROW_SERVE_DEFAULTS.pillars[i]?.body ?? ""),
+            word: htm(p?.word, MEET_GROW_SERVE_DEFAULTS.pillars[i]?.word ?? `tile-${i}`),
+            headline: htm(p?.headline, MEET_GROW_SERVE_DEFAULTS.pillars[i]?.headline ?? ""),
+            body: htm(p?.body, MEET_GROW_SERVE_DEFAULTS.pillars[i]?.body ?? ""),
             image: str(p?.image, MEET_GROW_SERVE_DEFAULTS.pillars[i]?.image ?? "/images/congregation.webp"),
             href: str(p?.href, MEET_GROW_SERVE_DEFAULTS.pillars[i]?.href ?? "/"),
           }))
         : MEET_GROW_SERVE_DEFAULTS.pillars,
     },
     nt26: {
-      heading: str(raw.nt26?.heading, NT26_DEFAULTS.heading),
-      body: str(raw.nt26?.body, NT26_DEFAULTS.body),
-      ctaLabel: str(raw.nt26?.ctaLabel, NT26_DEFAULTS.ctaLabel),
+      heading: htm(raw.nt26?.heading, NT26_DEFAULTS.heading),
+      body: htm(raw.nt26?.body, NT26_DEFAULTS.body),
+      ctaLabel: htm(raw.nt26?.ctaLabel, NT26_DEFAULTS.ctaLabel),
       ctaHref: str(raw.nt26?.ctaHref, NT26_DEFAULTS.ctaHref),
       image: str(raw.nt26?.image, NT26_DEFAULTS.image),
     },
@@ -174,7 +184,7 @@ export function fromStudioHome(raw: StudioHome | null | undefined): HomeContent 
       cards: Array.isArray(raw.stayConnected?.cards)
         ? raw.stayConnected!.cards!
             .filter((c) => c && typeof c.id === "string" && typeof c.title === "string" && typeof c.body === "string" && typeof c.icon === "string" && typeof c.href === "string")
-            .map((c) => ({ id: c.id!, title: c.title!, body: c.body!, icon: c.icon!, href: c.href!, cta: typeof c.cta === "string" ? c.cta : undefined }))
+            .map((c) => ({ id: c.id!, title: sanitizeInlineHtml(c.title!), body: sanitizeInlineHtml(c.body!), icon: c.icon!, href: c.href!, cta: typeof c.cta === "string" ? c.cta : undefined }))
         : undefined,
     },
     text: (raw.text && typeof raw.text === "object" ? raw.text : {}) as Record<string, string>,

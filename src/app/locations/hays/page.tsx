@@ -5,10 +5,10 @@ import { MapPin, Clock, Navigation, Phone, Mail } from "lucide-react";
 import { site } from "@/data/site";
 import { assetPath } from "@/lib/asset-path";
 import { getCMSPage } from "@/lib/cms";
-import { tx, imgCss } from "@/lib/home-content";
+import { tx, imgCss, txTimesSafe } from "@/lib/home-content";
 import StaffGrid from "@/components/about/StaffGrid";
 import { getServiceTimes } from "@/lib/service-times";
-import { campus, campusLine, dayLine, kidsTimes, spokenLine, txTimes } from "@/lib/service-times-core";
+import { campus, campusLine, dayLine, kidsTimes, spokenLine } from "@/lib/service-times-core";
 
 export async function generateMetadata(): Promise<Metadata> {
   const hays = campus(await getServiceTimes(), "hays");
@@ -115,7 +115,7 @@ export default async function HaysCampusPage() {
                 data-cms="t:hays-details-body-1"
                 style={{ color: "rgba(27,28,28,0.65)" }}
                 dangerouslySetInnerHTML={{
-                  __html: txTimes(
+                  __html: txTimesSafe(
                     t,
                     "hays-details-body-1",
                     `Join us for worship in Hays, ${spokenLine(hays)}. You are welcome here, just as you are.`
@@ -128,7 +128,7 @@ export default async function HaysCampusPage() {
                 data-cms="t:hays-details-body-2"
                 style={{ color: "rgba(27,28,28,0.55)" }}
                 dangerouslySetInnerHTML={{
-                  __html: txTimes(
+                  __html: txTimesSafe(
                     t,
                     "hays-details-body-2",
                     `C3Kids is available for children ages 3 through 5th grade${kids ? ` during our ${kids} Sunday services` : ""}. CrossCurrent student ministry meets on Wednesday nights.`

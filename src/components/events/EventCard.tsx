@@ -1,4 +1,5 @@
 import type { CSSProperties, ElementType, ReactNode } from "react";
+import { sanitizeInlineHtml } from "@/lib/inline-html";
 import Image from "next/image";
 import { assetPath } from "@/lib/asset-path";
 import { Tx, EditableLink } from "@/components/cms/Editable";
@@ -142,7 +143,7 @@ function Field({
         data-cms={cmsPath}
         className={className}
         style={style}
-        dangerouslySetInnerHTML={{ __html: String(value) }}
+        dangerouslySetInnerHTML={{ __html: sanitizeInlineHtml(String(value)) }}
       />
     );
   }

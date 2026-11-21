@@ -36,13 +36,27 @@ export function canonTime(raw: unknown): string | null {
   return `${h}:${min} ${m[3].toUpperCase()}M`;
 }
 
+const WEEKDAYS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+/** A weekday name in any case, canonical spelling, or null. */
+export function canonDay(raw: unknown): string | null {
+  if (typeof raw !== "string") return null;
+  const v = raw.trim().toLowerCase();
+  return WEEKDAYS.find((d) => d.toLowerCase() === v) ?? null;
+}
+/** A room is a short plain label: letters, digits, spaces and . , ' - ( ) / #. Anything else is dropped (the time stays). */
+export function plainRoom(raw: unknown): string | null {
+  if (typeof raw !== "string") return null;
+  const v = raw.trim();
+  return v && v.length <= 40 && /^[\p{L}\p{N} .,'’()\-/#]+$/u.test(v) ? v : null;
+}
+
 function normalizeSlots(svc: Record<string, unknown>): Slot[] | null {
   const out: Slot[] = [];
   if (Array.isArray(svc.slots) && svc.slots.length > 0) {
     for (const s of svc.slots as Array<Record<string, unknown>>) {
       const time = canonTime(s?.time);
       if (!time) return null;
-      out.push({ time, room: typeof s.room === "string" && s.room.trim() ? s.room.trim() : null, kids: s.kids === true });
+      out.push({ time, room: plainRoom(s.room), kids: s.kids === true });
     }
     return out;
   }
@@ -62,15 +76,16 @@ export function normalizeCampus(rec: unknown): CampusTimes | null {
   if (!rec || typeof rec !== "object") return null;
   const r = rec as Record<string, unknown>;
   const slug = typeof r.slug === "string" ? r.slug : typeof r.id === "string" ? r.id : "";
-  if (!slug || !Array.isArray(r.services) || r.services.length === 0) return null;
+  if (!/^[a-z0-9-]+$/i.test(slug) || !Array.isArray(r.services) || r.services.length === 0) return null;
   const services: DayServices[] = [];
   for (const s of r.services as Array<Record<string, unknown>>) {
-    if (!s || typeof s.day !== "string" || !s.day.trim()) return null;
+    const day = canonDay(s?.day);
+    if (!day) return null;
     const slots = normalizeSlots(s);
     if (!slots) return null;
-    services.push({ day: s.day.trim(), slots });
+    services.push({ day, slots });
   }
-  const name = typeof r.name === "string" && r.name.trim() ? r.name.trim() : slug[0].toUpperCase() + slug.slice(1);
+  const name = plainRoom(r.name) ?? slug[0].toUpperCase() + slug.slice(1);
   return { slug, name, services };
 }
 
