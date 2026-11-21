@@ -40,7 +40,8 @@ export default async function MessagePage({ params }: { params: Promise<{ id: st
         </div>
       </section>
       <section style={{ backgroundColor: "#1b1c1c", paddingBottom: "clamp(3rem, 8vw, 6rem)" }}>
-        <div className="container-c3" style={{ maxWidth: "64rem" }}>
+        <div className="container-c3">
+          <div style={{ maxWidth: "64rem" }}>
           {s.youtube_video_id ? (
             <div style={{ position: "relative", aspectRatio: "16 / 9", borderRadius: "var(--radius-md)", overflow: "hidden", background: "#000" }}>
               <iframe
@@ -65,6 +66,7 @@ export default async function MessagePage({ params }: { params: Promise<{ id: st
             </p>
           )}
           {s.description && <p className="body-lg" style={{ color: "rgba(255,255,255,0.85)", marginTop: "1.5rem", maxWidth: "46rem", whiteSpace: "pre-line" }}>{s.description}</p>}
+          </div>
         </div>
       </section>
     </>

@@ -132,7 +132,7 @@ export default function Header({ globals = {}, menu = null, announcement = null 
   // #6: pages with a LIGHT hero (e.g. /visit) make the transparent nav's WHITE logo +
   // links invisible against the pale background. Force the SOLID treatment (opaque bar +
   // DARK logo/links) there at every scroll position so the nav is legible for contrast.
-  const lightHeroPage = pathname === "/visit" || pathname === "/visit/";
+  const lightHeroPage = pathname === "/visit" || pathname === "/visit/" || (pathname ?? "").startsWith("/search");
   const isScrolled = nav.effect === "solid" ? true : nav.effect === "transparent" ? false : (scrolled || lightHeroPage);
   const navColor = nav.color;
   const base = navColor || (isScrolled ? "rgba(27,28,28,0.7)" : "rgba(255,255,255,0.82)");
@@ -274,7 +274,7 @@ export default function Header({ globals = {}, menu = null, announcement = null 
           ...(nav.bg && isScrolled ? { backgroundColor: nav.bg } : {}),
         }}
       >
-        {announcement && (
+        {announcement && !mobileOpen && (
           <div role="region" aria-label="Announcement" data-announcement style={{ background: "#0f3f3a", color: "#fff" }}>
             <p className="container-c3 body-sm" style={{ margin: 0, padding: "0.45rem 0", display: "flex", flexWrap: "wrap", gap: "0.25rem 0.75rem", alignItems: "center", justifyContent: "center", textAlign: "center" }}>
               <strong>{announcement.title}</strong>

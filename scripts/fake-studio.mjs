@@ -41,8 +41,8 @@ const homeDraft = {
 };
 
 const sermons = [
-  { id: "srm_1", title: "Sample Message One", speaker: "Sample Speaker", date: "2026-11-15", description: "A sample message for local checks.", youtube_video_id: "dQw4w9WgXcQ", thumbnail_url: null, scripture_references: ["John 1:1-5"], duration: 1800, created_at: T, updated_at: T },
-  { id: "srm_2", title: "Sample Message Two", speaker: "Sample Speaker", date: "2026-11-08", description: null, youtube_video_id: "dQw4w9WgXcQ", thumbnail_url: null, scripture_references: [], duration: null, created_at: T, updated_at: T },
+  { id: "srm_1", title: "Sample Message One", speaker: "Sample Speaker", date: "2026-11-15", description: "A sample message for local checks.", youtube_video_id: "M7lc1UVf-VE", thumbnail_url: null, scripture_references: ["John 1:1-5"], duration: 1800, created_at: T, updated_at: T },
+  { id: "srm_2", title: "Sample Message Two", speaker: "Sample Speaker", date: "2026-11-08", description: null, youtube_video_id: "M7lc1UVf-VE", thumbnail_url: null, scripture_references: [], duration: null, created_at: T, updated_at: T },
 ];
 const locations = [
   { id: "hays", name: "Hays", services: [{ day: "Sunday", times: ["8:00 AM", "9:00 AM", "10:45 AM"] }] },
@@ -78,6 +78,7 @@ const server = http.createServer((req, res) => {
   if (p === "/api/content/home") return send(homePub);
   if (p === "/api/content/globals") return send({ text: { "footer-tagline": "Published footer words" } });
   if (p === "/api/content/navigation") return send(MENU);
+  if (p === "/api/content/site") return send({ giving: { hays: "https://example.org/give/hays-old" }, give_config: { campuses: { hays: { give_url: "https://example.org/give/hays" }, colby: { give_url: "https://example.org/give/colby" } } } });
   if (p === "/api/content/sermons") return send(sermons);
   if (p === "/api/content/locations") return send(locations);
   if (p === "/api/content/announcements") return send(announcements.filter((a) => a.active));
