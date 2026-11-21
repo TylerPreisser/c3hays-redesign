@@ -23,10 +23,12 @@ const nextConfig: NextConfig = {
     qualities: [75, 90],
   },
   devIndicators: false,
+  // Inlined at build so /robots.txt (staging only) knows the build is a no-index one.
+  env: { SITE_NOINDEX: process.env.SITE_NOINDEX === "1" ? "1" : "" },
   // Security headers (CSP with Studio's origin in frame-ancestors, Referrer-Policy, HSTS, nosniff). Applied by the
   // CMS_LIVE server runtime; a static export cannot send headers (the live Worker is the deployed shape).
   async headers() {
-    return [{ source: "/:path*", headers: securityHeaders({ studio: studioOrigin(), dev: process.env.NODE_ENV !== "production" }) }];
+    return [{ source: "/:path*", headers: securityHeaders({ studio: studioOrigin(), dev: process.env.NODE_ENV !== "production", noindex: process.env.SITE_NOINDEX === "1", build: process.env.SITE_BUILD_ID }) }];
   },
   // /beliefs merged into /about (item #2). Redirect old links + the section-preview
   // so nothing 404s. Honored in the CMS_LIVE server runtime (the deployed site); the

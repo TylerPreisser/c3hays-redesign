@@ -14,7 +14,7 @@ const wrangler = JSON.parse(readFileSync(join(__dirname, "../wrangler.jsonc"), "
 describe("security headers", () => {
   it("frames only Studio's origin of the same environment, and still allows the bridge's inline <style>", () => {
     const csp = contentSecurityPolicy({ studio: STUDIO_ORIGINS.staging });
-    expect(csp).toMatch(/frame-ancestors https:\/\/c3-studio-staging\.tylerpreisser\.workers\.dev(;|$)/);
+    expect(csp).toMatch(/frame-ancestors https:\/\/c3-studio-staging\.preissersolutions\.com(;|$)/);
     expect(csp).not.toContain(STUDIO_ORIGINS.production);
     expect(csp).toMatch(/style-src [^;]*'unsafe-inline'/);
     expect(csp).toContain("https://challenges.cloudflare.com");
@@ -24,6 +24,14 @@ describe("security headers", () => {
     const h = Object.fromEntries(securityHeaders({ studio: STUDIO_ORIGINS.production }).map((x) => [x.key, x.value]));
     expect(h["Referrer-Policy"]).toBe("strict-origin-when-cross-origin");
     expect(h["X-Content-Type-Options"]).toBe("nosniff");
+  });
+  it("no-index and build headers are staging-only: absent unless asked for", () => {
+    const keys = (o: Parameters<typeof securityHeaders>[0]) => securityHeaders(o).map((x) => x.key);
+    expect(keys({ studio: STUDIO_ORIGINS.production })).not.toContain("X-Robots-Tag");
+    expect(keys({ studio: STUDIO_ORIGINS.production })).not.toContain("X-C3-Build");
+    const h = Object.fromEntries(securityHeaders({ studio: STUDIO_ORIGINS.staging, noindex: true, build: "abc-1" }).map((x) => [x.key, x.value]));
+    expect(h["X-Robots-Tag"]).toBe("noindex, nofollow");
+    expect(h["X-C3-Build"]).toBe("abc-1");
   });
   it("STUDIO_ORIGIN picks the environment and a junk value fails the build", () => {
     expect(studioOrigin({ STUDIO_ORIGIN: `${STUDIO_ORIGINS.staging}/` })).toBe(STUDIO_ORIGINS.staging);
