@@ -7,7 +7,8 @@ paths: ["src/lib/cms*.ts", "src/components/cms/**", "src/app/**/page.tsx", "src/
 - `src/lib/cms.ts`'s `cmsFetch` must stay fail-soft: short-circuit to `null` when
   `NEXT_PUBLIC_CMS_URL` is unset (keeps the static-export build safe), and use
   `cache: "no-store"` with a bounded timeout (2.5s) for the live path. Do not add a hard failure
-  or a longer default timeout without checking both deploy targets in `DEPLOY_READY.md`.
+  or a longer default timeout without checking both build modes (the static export, and `CMS_LIVE=1`
+  server rendering on the Worker; commands in `CLAUDE.md`).
 - Page components try CMS content first and fall back to hand-built sections when
   `blocks.length` is empty (`src/app/page.tsx` pattern) — preserve this shape in any new CMS-backed
   route; never make the CMS the only content source for a page.
