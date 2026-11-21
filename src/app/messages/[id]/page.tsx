@@ -30,7 +30,7 @@ export default async function MessagePage({ params }: { params: Promise<{ id: st
   const meta = [when, s.speaker].filter(Boolean).join(" · ");
   return (
     <>
-      <section style={{ backgroundColor: "#1b1c1c", color: "#fff", paddingTop: "clamp(7rem, 14vw, 10rem)", paddingBottom: "clamp(2rem, 5vw, 3.5rem)" }}>
+      <section style={{ backgroundColor: "#1b1c1c", color: "#fff", paddingTop: "clamp(10.5rem, 16vw, 12rem)", paddingBottom: "clamp(2rem, 5vw, 3.5rem)" }}>
         <div className="container-c3">
           <Link href="/messages/" className="arrow-link body-sm" style={{ color: "var(--color-teal)", fontWeight: 600 }}>
             <span aria-hidden="true">←</span> All messages

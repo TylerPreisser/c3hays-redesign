@@ -89,7 +89,7 @@ function FLink({ t, id, label, href, fixed, tone = "muted" }: { t: TextBag; id: 
 
 function FooterHeading({ id, t, children }: { id: string; t: TextBag; children: string }) {
   return (
-    <p className="overline mb-5" data-cms={`g:${id}`} style={{ color: "rgba(255,255,255,0.42)" }} dangerouslySetInnerHTML={{ __html: tx(t, id, children) }} />
+    <p className="overline mb-5" data-cms={`g:${id}`} style={{ color: "rgba(255,255,255,0.62)" }} dangerouslySetInnerHTML={{ __html: tx(t, id, children) }} />
   );
 }
 
@@ -120,7 +120,7 @@ function GradientBleed() {
 function BottomBar({ t }: { t: TextBag }) {
   return (
     <div style={{ borderTop: "1px solid rgba(255,255,255,0.10)", paddingTop: "var(--s-8, 32px)" }}>
-      <div className="container-c3 pb-8 text-xs flex flex-col items-center gap-2 md:flex-row md:items-center md:justify-between md:gap-4" style={{ color: "rgba(255,255,255,0.40)" }}>
+      <div className="container-c3 pb-8 text-xs flex flex-col items-center gap-2 md:flex-row md:items-center md:justify-between md:gap-4" style={{ color: "rgba(255,255,255,0.62)" }}>
         <p data-cms="g:footer-copyright" dangerouslySetInnerHTML={{ __html: tx(t, "footer-copyright", `© ${YEAR} Celebration Community Church · All Rights Reserved`) }} />
         <div className="flex items-center gap-5">
           {LEGAL_LINKS.map((l) => <FLink key={l.id} t={t} {...l} />)}

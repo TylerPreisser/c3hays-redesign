@@ -35,7 +35,7 @@ export default function SearchClient({ index }: { index: SearchEntry[] }) {
           autoComplete="off"
           style={{ flex: "1 1 16rem", minHeight: 48, padding: "0 1.1rem", borderRadius: 999, border: "1px solid rgba(27,28,28,0.35)", fontSize: "1rem", background: "#fff", color: "#1b1c1c" }}
         />
-        <button type="submit" className="btn btn-primary" style={{ minHeight: 48 }}>Search</button>
+        <button type="submit" className="btn btn-primary" style={{ minHeight: 48, color: "#0b2f2a" }}>Search</button>
       </form>
       <div role="status" aria-live="polite" style={{ marginTop: "1.5rem" }}>
         {submitted && (
