@@ -61,7 +61,7 @@ _Generated during the autonomous polish + reskin session. Source of truth for wh
 ```bash
 cd "/Users/tylerpreisser/Projects/Coding Projects/c3hays-redesign"
 npm install                 # deps (already installed)
-npm run dev                 # live dev at http://localhost:3000 (Turbopack)
+npm run dev                 # live dev at http://localhost:4400 (Turbopack; the port Studio's editor frames)
 npm run build               # static export → ./out
 node scripts/serve-out.mjs  # serve production ./out at http://localhost:4321 (stable; used for audits)
 node scripts/shoot.mjs <label>   # Playwright audit: screenshots + console/overflow report → screenshots/<label>/

@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+import { securityHeaders, studioOrigin } from "./src/lib/security-headers";
 
 /**
  * GitHub Pages serves project sites at /<repo-name>/.
@@ -22,6 +23,11 @@ const nextConfig: NextConfig = {
     qualities: [75, 90],
   },
   devIndicators: false,
+  // Security headers (CSP with Studio's origin in frame-ancestors, Referrer-Policy, HSTS, nosniff). Applied by the
+  // CMS_LIVE server runtime; a static export cannot send headers (the live Worker is the deployed shape).
+  async headers() {
+    return [{ source: "/:path*", headers: securityHeaders({ studio: studioOrigin(), dev: process.env.NODE_ENV !== "production" }) }];
+  },
   // /beliefs merged into /about (item #2). Redirect old links + the section-preview
   // so nothing 404s. Honored in the CMS_LIVE server runtime (the deployed site); the
   // static-export CI build ignores redirects with a warning (that pipeline is separate).

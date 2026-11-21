@@ -25,7 +25,12 @@
     // empty on the Worker. Without this the /section-preview live-thumbnail route gates
     // its whole render off a false flag and renders blank. (Same gotcha as DEMO_MODE.)
     "CMS_LIVE": "1",
-    "NODE_ENV": "production"
+    "NODE_ENV": "production",
+    // Turnstile SITE key (public by design; the secret lives in Studio). Empty: the signup forms show no widget and
+    // say signup is off. Set it here once the church's Turnstile widget exists (plan T2).
+    "TURNSTILE_SITE_KEY": ""
+    // SITE_FORWARD_SECRET is a Worker SECRET (never a var): `secrets.py push-worker SITE_FORWARD_SECRET --worker c3hays-live`
+    // (and `--worker c3hays-live-staging`). The signup route refuses to forward without it.
   },
   // Finding 2: SERVICE BINDING to the c3-studio editor Worker (same account). The SSR
   // fetches c3-studio's content/draft API per request; a Worker→Worker subrequest to
@@ -36,7 +41,18 @@
   // NOTE: `service` MUST match c3-studio's wrangler `name`; the target must be deployed.
   "services": [
     { "binding": "CMS", "service": "c3-studio" }
-  ]
+  ],
+  // STAGING: `wrangler deploy --env staging`, built with STUDIO_ORIGIN and NEXT_PUBLIC_CMS_URL set to Studio staging
+  // (the CSP's frame-ancestors and the CMS base URL are fixed at build). Its CMS binding points at the Worker
+  // `c3-studio-staging`, so staging never reads or writes production content. `vars` and `services` are not
+  // inherited by an environment, so both are repeated. The preview address stays this file's top level (production).
+  "env": {
+    "staging": {
+      "name": "c3hays-live-staging",
+      "vars": { "CMS_LIVE": "1", "NODE_ENV": "production", "TURNSTILE_SITE_KEY": "" },
+      "services": [{ "binding": "CMS", "service": "c3-studio-staging" }]
+    }
+  }
   // Phase 2 (separate GO): add a `routes` custom_domain entry + DNS to point the
   // public church domain here. Left out on purpose so Phase 1 stays *.workers.dev.
 }
