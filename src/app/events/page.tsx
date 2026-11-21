@@ -11,6 +11,9 @@ import SectionHeader from "@/components/ui/SectionHeader";
 import PageComposer from "@/components/cms/PageComposer";
 import LiveCalendar from "@/components/events/LiveCalendar";
 import UpcomingEventsLive from "@/components/events/UpcomingEventsLive";
+import StudioEventsList from "@/components/events/StudioEventsList";
+import { EVENTS_FROM_STUDIO } from "@/lib/espace";
+import { getStudioEvents } from "@/lib/studio-events";
 import UpcomingEventsAuthored from "@/components/events/UpcomingEventsAuthored";
 import { parseEventCards } from "@/components/events/events-content";
 
@@ -61,6 +64,8 @@ export default async function EventsPage({
   // Authored cards (round-2) OVERRIDE the live eSpace feed when present; absent ⇒ the
   // live island keeps auto-populating (live-by-default). See events-content.ts.
   const authoredCards = parseEventCards(ov);
+  // Flag OFF (the default): eSpace stays the source. ON: Studio's events, and eSpace again if Studio does not answer.
+  const studioEvents = EVENTS_FROM_STUDIO ? await getStudioEvents() : null;
 
   const render = (id: string, variant?: string): React.ReactNode => {
     switch (id) {
@@ -131,6 +136,8 @@ export default async function EventsPage({
             />
             {authoredCards.length > 0 ? (
               <UpcomingEventsAuthored cards={authoredCards} text={t} media={media} />
+            ) : studioEvents ? (
+              <StudioEventsList events={studioEvents} />
             ) : (
               <UpcomingEventsLive text={t} media={media} />
             )}

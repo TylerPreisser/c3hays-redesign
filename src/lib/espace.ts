@@ -17,6 +17,12 @@
  *    the browser; works in both static-export and CMS_LIVE server modes.
  */
 
+/**
+ * Events from Studio on the site, behind a flag that is OFF. Until the church decides (plan Q16) eSpace stays the
+ * calendar; flipping this to "1" at build time only swaps the upcoming-events list for Studio's, never the calendar.
+ */
+export const EVENTS_FROM_STUDIO = process.env.NEXT_PUBLIC_EVENTS_FROM_STUDIO === "1";
+
 /** GetFullCalendarEvents base — the JSON feed we map into <CalEvent>s. */
 export const ESPACE_ENDPOINT =
   "https://app.espace.cool/Public/GetFullCalendarEvents";
