@@ -11,7 +11,7 @@
  */
 export const STUDIO_ORIGINS = {
   production: "https://c3-studio.tylerpreisser.workers.dev",
-  staging: "https://c3-studio-staging.tylerpreisser.workers.dev",
+  staging: "https://c3-studio-staging.preissersolutions.com",
 } as const;
 
 export function studioOrigin(env: Record<string, string | undefined> = process.env): string {
@@ -43,7 +43,7 @@ export function contentSecurityPolicy(opts: { studio: string; dev?: boolean }): 
   return Object.entries(directives).map(([k, v]) => `${k} ${v.join(" ")}`).join("; ");
 }
 
-export function securityHeaders(opts: { studio: string; dev?: boolean }): { key: string; value: string }[] {
+export function securityHeaders(opts: { studio: string; dev?: boolean; noindex?: boolean; build?: string }): { key: string; value: string }[] {
   return [
     { key: "Content-Security-Policy", value: contentSecurityPolicy(opts) },
     // A ?preview= token must never leave in a Referer.
@@ -51,5 +51,9 @@ export function securityHeaders(opts: { studio: string; dev?: boolean }): { key:
     { key: "X-Content-Type-Options", value: "nosniff" },
     { key: "Strict-Transport-Security", value: "max-age=63072000; includeSubDomains" },
     { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=(), payment=()" },
+    // Staging only (SITE_NOINDEX=1 at build): search engines stay out. Production never sets it.
+    ...(opts.noindex ? [{ key: "X-Robots-Tag", value: "noindex, nofollow" }] : []),
+    // Staging only: names the build the live address serves, so a deploy can be verified (SITE_BUILD_ID at build).
+    ...(opts.build ? [{ key: "X-C3-Build", value: opts.build }] : []),
   ];
 }
