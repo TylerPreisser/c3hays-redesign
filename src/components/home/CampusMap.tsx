@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import { tx, type BtnStyle } from "@/lib/home-content";
+import { useServiceTimes } from "@/providers/ServiceTimesProvider";
+import { campus, dayLine } from "@/lib/service-times-core";
 
 /**
  * CampusMap — an addable "interactive campus map" navigation section.
@@ -74,7 +76,7 @@ const CAMPUSES: Campus[] = [
     top: "38%",
     rows: [
       { field: "address", icon: "pin", label: "Address", value: "5790 230th Ave, Hays, KS" },
-      { field: "times", icon: "clock", label: "Service Times", value: "Saturdays 5:00 PM &middot; Sundays 8:00, 9:30 &amp; 11:00 AM" },
+      { field: "times", icon: "clock", label: "Service Times", value: "" /* rendered from Studio data */ },
       { field: "parking", icon: "car", label: "Parking", value: "Add details" },
     ],
   },
@@ -87,13 +89,14 @@ const CAMPUSES: Campus[] = [
     top: "68%",
     rows: [
       { field: "address", icon: "pin", label: "Address", value: "1923 S Range, Colby, KS" },
-      { field: "times", icon: "clock", label: "Service Times", value: "Sundays 10:00 AM" },
+      { field: "times", icon: "clock", label: "Service Times", value: "" /* rendered from Studio data */ },
       { field: "parking", icon: "car", label: "Parking", value: "Add details" },
     ],
   },
 ];
 
 export default function CampusMap({ text, className }: CampusMapProps) {
+  const serviceTimes = useServiceTimes();
   const [selected, setSelected] = useState<"hays" | "colby">("hays");
   const active = CAMPUSES.find((c) => c.id === selected) ?? CAMPUSES[0];
 
@@ -257,10 +260,18 @@ export default function CampusMap({ text, className }: CampusMapProps) {
                     data-cms={`t:campusmap-${active.id}-${row.field}-label`}
                     dangerouslySetInnerHTML={{ __html: tx(text, `campusmap-${active.id}-${row.field}-label`, row.label) }}
                   />
-                  <span
-                    data-cms={`t:campusmap-${active.id}-${row.field}-value`}
-                    dangerouslySetInnerHTML={{ __html: tx(text, `campusmap-${active.id}-${row.field}-value`, row.value) }}
-                  />
+                  {row.field === "times" ? (
+                    <span data-service-times={active.id}>
+                      {campus(serviceTimes, active.id).services.map((sv, i) => (
+                        <span key={i} style={{ display: "block" }}>{dayLine(sv)}</span>
+                      ))}
+                    </span>
+                  ) : (
+                    <span
+                      data-cms={`t:campusmap-${active.id}-${row.field}-value`}
+                      dangerouslySetInnerHTML={{ __html: tx(text, `campusmap-${active.id}-${row.field}-value`, row.value) }}
+                    />
+                  )}
                 </div>
               </div>
             ))}

@@ -11,6 +11,10 @@ import SmoothScrollProvider from "@/providers/SmoothScrollProvider";
 import { site } from "@/data/site";
 import { assetPath } from "@/lib/asset-path";
 import { getCMSGlobals } from "@/lib/cms";
+import { getServiceTimes } from "@/lib/service-times";
+import { ServiceTimesProvider } from "@/providers/ServiceTimesProvider";
+import { SignupConfigProvider } from "@/providers/SignupConfigProvider";
+import { getTurnstileSiteKey } from "@/lib/signup-config";
 import { buildBgCss } from "@/lib/backgrounds";
 import { buildGoogleFontsHref } from "@/lib/fonts";
 
@@ -91,6 +95,7 @@ export default async function RootLayout({
 }>) {
   // Fetch shared (footer/header/nav) overrides once and feed both bars.
   const globals = (await getCMSGlobals()) || {};
+  const serviceTimes = await getServiceTimes();
   return (
     <html lang="en" suppressHydrationWarning className={hankenGrotesk.variable}>
       <head>
@@ -121,11 +126,15 @@ export default async function RootLayout({
         {/* v6 R6 (6b): entrance-reveal player for global elements (footer/header).
             Home-page element reveals feed content.anim into a RevealPlayer in page.tsx. */}
         <RevealPlayer anim={globals.anim} />
-        <SmoothScrollProvider>
-          <Header globals={globals} />
-          <main>{children}</main>
-          <Footer globals={globals} />
-        </SmoothScrollProvider>
+        <ServiceTimesProvider value={serviceTimes}>
+          <SignupConfigProvider turnstileSiteKey={getTurnstileSiteKey()}>
+            <SmoothScrollProvider>
+              <Header globals={globals} />
+              <main>{children}</main>
+              <Footer globals={globals} />
+            </SmoothScrollProvider>
+          </SignupConfigProvider>
+        </ServiceTimesProvider>
       </body>
     </html>
   );

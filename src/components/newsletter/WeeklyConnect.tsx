@@ -1,5 +1,6 @@
 import type { CSSProperties } from "react";
-import { Clock, MapPin, ArrowUpRight } from "lucide-react";
+import { MapPin, ArrowUpRight } from "lucide-react";
+import ServiceTimesText from "@/components/ServiceTimesText";
 import { locations } from "@/data/locations";
 import { site } from "@/data/site";
 import { Tx } from "@/components/cms/Editable";
@@ -228,19 +229,7 @@ export default function WeeklyConnect({ t }: { t: Record<string, string> }) {
                   style={{ color: "var(--color-ink-warm)" }}
                 />
               </div>
-              {loc.services.map((s, i) => (
-                <div key={s.day} className="flex items-center gap-2">
-                  <Clock size={14} style={{ color: "var(--color-stone)" }} className="shrink-0" aria-hidden="true" />
-                  <Tx
-                    as="span"
-                    text={t}
-                    k={`weekly-times-${loc.id}-service-${i}`}
-                    fallback={`${s.day}: ${s.times.join(" · ")}`}
-                    className="body-base"
-                    style={{ color: "var(--color-stone)" }}
-                  />
-                </div>
-              ))}
+              <ServiceTimesText campus={loc.id} as="rows" rowClassName="flex items-center gap-2" iconColor="var(--color-stone)" textColor="var(--color-stone)" />
             </div>
           ))}
         </div>

@@ -1,0 +1,6 @@
+[
+  { "id": "iss-older", "title": "Sample older issue", "date": "2026-07-24", "html": "<p>Older sample body.</p>" },
+  { "id": "iss-newest", "title": "Sample newest issue", "sent_at": "2026-07-31T14:00:00Z", "topics": ["sample"],
+    "html": "<h2 onclick=\"x()\">Heading</h2><p style=\"color:red\">Body with <a href=\"https://example.org/page?e=abc\">a link</a>, <a href=\"https://c3.list-manage.com/track/click?u=1&e=recipient\">a tracked link</a>, <a href=\"javascript:alert(1)\">bad</a> and <script>alert(1)</script><img src=\"http://insecure.example/x.png\"> text.</p><p>1 < 2 and <b>bold</b></p>" },
+  { "id": "iss-no-html", "title": "No body", "date": "2026-08-07" }
+]

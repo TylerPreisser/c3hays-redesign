@@ -3,6 +3,7 @@ import { MapPin } from "lucide-react";
 import { site } from "@/data/site";
 import Logo from "@/components/brand/Logo";
 import NewsletterForm from "./NewsletterForm";
+import ServiceTimesText from "@/components/ServiceTimesText";
 import type { CMSOverrides } from "@/lib/cms";
 import { tx } from "@/lib/home-content";
 
@@ -59,8 +60,8 @@ const LEGAL_LINKS = [
   { id: "footer-legal-2", label: "Accessibility", href: "/accessibility/" },
 ];
 const CAMPUSES = [
-  { id: "hays", name: "Hays", addr: [`${site.address.street}`, `${site.address.city}, ${site.address.state} ${site.address.zip}`], times: "Sat 5 PM · Sun 8, 9:30, 11 AM" },
-  { id: "colby", name: "Colby", addr: ["1923 S Range", "Colby, KS 67701"], times: "Sun 10:00 AM" },
+  { id: "hays", name: "Hays", addr: [`${site.address.street}`, `${site.address.city}, ${site.address.state} ${site.address.zip}`] },
+  { id: "colby", name: "Colby", addr: ["1923 S Range", "Colby, KS 67701"] },
 ];
 
 type TextBag = Record<string, string>;
@@ -187,7 +188,7 @@ function FooterEditorial({ t, m, preCta = false }: { t: TextBag; m: MediaBag; pr
                   <div>
                     <p className="body-sm font-bold mb-1" data-cms={`g:footer-campus-${c.id}-name`} style={{ color: "rgba(255,255,255,0.92)" }} dangerouslySetInnerHTML={{ __html: tx(t, `footer-campus-${c.id}-name`, c.name) }} />
                     <address className="not-italic body-sm leading-snug mb-1.5" data-cms={`g:footer-campus-${c.id}-addr`} style={{ color: "rgba(255,255,255,0.48)" }} dangerouslySetInnerHTML={{ __html: tx(t, `footer-campus-${c.id}-addr`, `${c.addr[0]}<br/>${c.addr[1]}`) }} />
-                    <p className="text-xs" data-cms={`g:footer-campus-${c.id}-times`} style={{ color: "rgba(255,255,255,0.55)" }} dangerouslySetInnerHTML={{ __html: tx(t, `footer-campus-${c.id}-times`, c.times) }} />
+                    <p className="text-xs" style={{ color: "rgba(255,255,255,0.55)" }}><ServiceTimesText campus={c.id} /></p>
                   </div>
                 </div>
               ))}

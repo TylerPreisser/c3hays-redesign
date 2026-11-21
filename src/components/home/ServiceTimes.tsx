@@ -2,6 +2,8 @@
 
 import { tx, type BtnStyle } from "@/lib/home-content";
 import { btnCss } from "./Hero";
+import { useServiceTimes } from "@/providers/ServiceTimesProvider";
+import { campus, campusLine, dayLine, type CampusTimes } from "@/lib/service-times-core";
 
 /**
  * ServiceTimes — an addable, on-brand "when we gather" section. Generic + fully
@@ -23,11 +25,14 @@ export default function ServiceTimes({
   variant?: string;
 }) {
   const v = variant || "cards";
+  const times = useServiceTimes();
+  const hays = campus(times, "hays");
+  const colby = campus(times, "colby");
 
   // v7 R3: a world-class campus card — restrained color (teal as a top accent + a soft
   // icon badge, not a loud all-teal heading), a crisp white campus name, a hairline rule,
   // and generously-set times. The single editable regions (city / times) are unchanged.
-  const Campus = ({ k, city, days }: { k: string; city: string; days: string }) => (
+  const Campus = ({ k, city, c }: { k: string; city: string; c: CampusTimes }) => (
     <div
       style={{
         flex: "1 1 320px",
@@ -53,10 +58,13 @@ export default function ServiceTimes({
       </div>
       <div aria-hidden style={{ height: 1, background: "rgba(255,255,255,0.08)", marginBottom: "1.1rem" }} />
       <p
-        data-cms={`t:svc-${k}-times`}
+        data-service-times={c.slug}
         style={{ color: "rgba(255,255,255,0.82)", margin: 0, fontSize: "1.075rem", lineHeight: 2, letterSpacing: "0.005em" }}
-        dangerouslySetInnerHTML={{ __html: tx(text, `svc-${k}-times`, days) }}
-      />
+      >
+        {c.services.map((sv, i) => (
+          <span key={i} style={{ display: "block" }}>{dayLine(sv)}</span>
+        ))}
+      </p>
     </div>
   );
 
@@ -68,8 +76,9 @@ export default function ServiceTimes({
             dangerouslySetInnerHTML={{ __html: tx(text, "svc-eyebrow", "Plan to join us") }} />
           <h2 data-cms="t:svc-heading" className="display-2 text-white" style={{ margin: 0 }}
             dangerouslySetInnerHTML={{ __html: tx(text, "svc-heading", "Service Times") }} />
-          <p data-cms="t:svc-band-times" className="body-lg" style={{ color: "rgba(255,255,255,0.75)", maxWidth: 620, margin: 0 }}
-            dangerouslySetInnerHTML={{ __html: tx(text, "svc-band-times", "Hays, Saturday 5:00pm &amp; Sunday 8:00, 9:30 &amp; 11:00am &nbsp;&bull;&nbsp; Colby, Sunday 10:00am") }} />
+          <p data-service-times="band" className="body-lg" style={{ color: "rgba(255,255,255,0.75)", maxWidth: 620, margin: 0 }}>
+            {hays.name}, {campusLine(hays)} &nbsp;&bull;&nbsp; {colby.name}, {campusLine(colby)}
+          </p>
           <a href={text?.["svc.cta-href"] || "/visit/"} data-cms-link="svc.cta" className="btn"
             style={btnCss(btnStyle) || { background: "#1cc3af", color: "#042e29", borderRadius: 999, fontWeight: 700, padding: "0.9rem 1.9rem", marginTop: "0.5rem" }}>
             <span data-cms-link-label>{text?.["svc.cta-label"] || "Plan Your Visit"}</span>
@@ -89,8 +98,8 @@ export default function ServiceTimes({
             dangerouslySetInnerHTML={{ __html: tx(text, "svc-heading", "Service Times") }} />
         </div>
         <div style={{ display: "flex", flexWrap: "wrap", gap: "clamp(1rem,3vw,1.75rem)", justifyContent: "center" }}>
-          <Campus k="a" city="Hays Campus" days="Saturday, 5:00pm<br/>Sunday, 8:00, 9:30 &amp; 11:00am" />
-          <Campus k="b" city="Colby Campus" days="Sunday, 10:00am" />
+          <Campus k="a" city="Hays Campus" c={hays} />
+          <Campus k="b" city="Colby Campus" c={colby} />
         </div>
         <div style={{ textAlign: "center", marginTop: "clamp(2rem,4vw,3rem)" }}>
           <a href={text?.["svc.cta-href"] || "/visit/"} data-cms-link="svc.cta" className="btn"

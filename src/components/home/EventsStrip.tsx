@@ -24,8 +24,8 @@ export default function EventsStrip({
   const v = variant || "cards";
   const events = [
     { k: "a", month: "JUL", day: "20", title: "Baptism Sunday", detail: "Both services &bull; Take your next step" },
-    { k: "b", month: "JUL", day: "26", title: "Youth Summer Night", detail: "Fri 7:00pm &bull; Grades 6&ndash;12" },
-    { k: "c", month: "AUG", day: "03", title: "Newcomers Lunch", detail: "After 11:00am &bull; Meet the team" },
+    { k: "b", month: "JUL", day: "26", title: "Youth Summer Night", detail: "Friday night &bull; Grades 6&ndash;12" },
+    { k: "c", month: "AUG", day: "03", title: "Newcomers Lunch", detail: "After the last service &bull; Meet the team" },
   ];
 
   const Head = (

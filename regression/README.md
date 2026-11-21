@@ -13,4 +13,4 @@ hold is the one allowed edit, recorded with sha256 before and after.
 ## Cases
 | Case | Input (captured) | Oracle | What must hold |
 |---|---|---|---|
-(none yet: the first real failure becomes case 1)
+| service-times | celebratejesus.org, fetched 2026-11-21 (sha256 in `service-times/PROVENANCE.md`) | the church's own published times | no clock-time literal outside the snapshot; Studio records and the snapshot both render the church's line |

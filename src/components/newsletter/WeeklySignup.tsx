@@ -3,6 +3,9 @@
 import { useState, type CSSProperties } from "react";
 import { Check } from "lucide-react";
 import { tx } from "@/lib/home-content";
+import TurnstileWidget from "./TurnstileWidget";
+import { SIGNUP_DONE, SIGNUP_ERRORS, SIGNUP_NOTE, useSignup } from "./useSignup";
+import { useSignupConfig } from "@/providers/SignupConfigProvider";
 
 /**
  * <WeeklySignup> — the editor-native C3 Weekly newsletter signup (round-3).
@@ -27,9 +30,8 @@ import { tx } from "@/lib/home-content";
  * a handle without being one. If the placeholder needs to be authorable, it needs an
  * attribute-editing path in Studio (cross-repo), not another hidden node here.
  *
- * FUNCTIONAL: client-side email validation + a success state (no external endpoint
- * exists in the static-export build; the submit is structured so a real subscribe
- * POST can be dropped into `onSubmit`). Renders purely from the generic `text`
+ * FUNCTIONAL: posts to the site's own /api/newsletter/subscribe route with a Turnstile token; the form says plainly
+ * that it only records the address for the church (it does not subscribe to C3 News yet). Renders purely from the generic `text`
  * override map, so it is ALSO addable via the section library (engine renderExample).
  */
 export interface WeeklySignupProps {
@@ -45,24 +47,19 @@ export interface WeeklySignupProps {
   style?: CSSProperties;
 }
 
-const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
 export default function WeeklySignup({ text = {}, bgKey = "weekly-signup-card", tone = "onDark", className, style }: WeeklySignupProps) {
+  const { turnstileSiteKey } = useSignupConfig();
+  const { status, setStatus, submit, resetKey } = useSignup();
   const [email, setEmail] = useState("");
-  const [status, setStatus] = useState<"idle" | "error" | "done">("idle");
+  const [token, setToken] = useState<string | null>(null);
+  const [trap, setTrap] = useState("");
 
   const placeholder = tx(text, "weekly-signup-placeholder", "your@email.com");
   const ctaLabel = text["weekly-signup-cta-label"] || "Sign Up";
 
   const onSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!EMAIL_RE.test(email.trim())) {
-      setStatus("error");
-      return;
-    }
-    // No public subscribe endpoint in the static-export build — record success
-    // client-side. Drop a real `await fetch(SUBSCRIBE_URL, …)` here when it lands.
-    setStatus("done");
+    void submit(email, token, trap);
   };
 
   const onLight = tone === "onLight";
@@ -85,7 +82,7 @@ export default function WeeklySignup({ text = {}, bgKey = "weekly-signup-card", 
     <div className={className} data-cms-bg={bgKey} style={surface} aria-label="Subscribe to The C3 Weekly">
       {status === "done" ? (
         <p className="body-base inline-flex items-center gap-2" style={{ color: doneColor, fontWeight: 600, textShadow: labelShadow }} role="status">
-          <Check size={18} /> You&rsquo;re on the list, watch your inbox.
+          <Check size={18} /> {SIGNUP_DONE}
         </p>
       ) : (
         <form className="flex flex-col gap-2.5 w-full min-w-0" onSubmit={onSubmit} noValidate>
@@ -101,21 +98,27 @@ export default function WeeklySignup({ text = {}, bgKey = "weekly-signup-card", 
               autoComplete="email"
               placeholder={placeholder}
               value={email}
-              onChange={(e) => { setEmail(e.target.value); if (status === "error") setStatus("idle"); }}
+              onChange={(e) => { setEmail(e.target.value); if (status !== "idle" && status !== "sending") setStatus("idle"); }}
               className="newsletter-input w-full min-w-0"
               aria-label="Email address"
-              aria-invalid={status === "error"}
+              aria-invalid={status === "invalid"}
             />
             {/* Editable button: data-cms-link + required data-cms-link-label span. */}
-            <button type="submit" data-cms-link="weekly-signup-cta" className="btn btn-primary">
+            <button type="submit" data-cms-link="weekly-signup-cta" className="btn btn-primary" disabled={status === "sending" || !turnstileSiteKey}>
               <span data-cms-link-label>{ctaLabel}</span>
             </button>
           </div>
-          {status === "error" && (
+          {/* Honeypot: off screen and out of the tab order; a person never fills it. */}
+          <input type="text" name="company" tabIndex={-1} autoComplete="off" aria-hidden="true" value={trap} onChange={(e) => setTrap(e.target.value)} style={{ position: "absolute", left: "-9999px", width: 1, height: 1, opacity: 0 }} />
+          {turnstileSiteKey && <TurnstileWidget siteKey={turnstileSiteKey} onToken={setToken} resetKey={resetKey} theme={onLight ? "light" : "dark"} />}
+          {SIGNUP_ERRORS[status] && (
             <span className="body-sm" style={{ color: errColor, textShadow: labelShadow }} role="alert">
-              Please enter a valid email address.
+              {SIGNUP_ERRORS[status]}
             </span>
           )}
+          <span className="body-sm" style={{ color: onLight ? "var(--color-stone)" : "rgba(255,255,255,0.78)", textShadow: labelShadow }}>
+            {turnstileSiteKey ? SIGNUP_NOTE : "Signup is not switched on yet."}
+          </span>
         </form>
       )}
     </div>

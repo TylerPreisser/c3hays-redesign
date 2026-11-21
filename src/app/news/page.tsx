@@ -10,7 +10,7 @@ import PageComposer from "@/components/cms/PageComposer";
 import Section from "@/components/ui/Section";
 import IssueBrowser from "@/components/newsletter/IssueBrowser";
 import WeeklySignup from "@/components/newsletter/WeeklySignup";
-import { newsletterIssues } from "@/data/news";
+import { getNewsIssues } from "@/lib/news-issues";
 
 export const metadata: Metadata = {
   title: "The C3 Weekly",
@@ -27,7 +27,7 @@ export const metadata: Metadata = {
  * (<IssueBrowser>). It is fully editor-native and graceful when empty — the search +
  * week filter controls are always present (never a "coming soon" placeholder); when no
  * real issues exist yet the results area shows an honest "first issue is on its way"
- * note. NO fabricated newsletter bodies — real issues fill @/data/news when they exist.
+ * note. NO fabricated newsletter bodies — issues come from C3 Studio (`newsletter_issues`, see @/lib/news-issues).
  *
  * Composed via <PageComposer> from two sections (ids match c3-backend page-sections):
  *   • weekly-hero → image band: LEFT-aligned header over the photo + a RIGHT-side
@@ -61,6 +61,7 @@ export default async function NewsPage({
   const media = ov.media || {};
   const shim = exampleContentShim(ov);
   const sections = parseSections(ov.sections, PAGE_DEFAULT_SECTIONS);
+  const newsletterIssues = await getNewsIssues();
 
   const render = (id: string, variant?: string): React.ReactNode => {
     switch (id) {

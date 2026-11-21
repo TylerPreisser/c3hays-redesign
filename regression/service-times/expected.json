@@ -1,0 +1,14 @@
+{
+  "oracleLine": "Saturday 5:00 PM; Sunday 8:00 AM (C3 Gym), 9:00 AM (with C3Kids), 10:45 AM (with C3Kids); Colby Sunday 10:00 AM",
+  "campuses": [
+    { "slug": "hays", "services": [
+      { "day": "Saturday", "slots": [ { "time": "5:00 PM", "room": null, "kids": false } ] },
+      { "day": "Sunday", "slots": [
+        { "time": "8:00 AM", "room": "C3 Gym", "kids": false },
+        { "time": "9:00 AM", "room": null, "kids": true },
+        { "time": "10:45 AM", "room": null, "kids": true } ] } ] },
+    { "slug": "colby", "services": [
+      { "day": "Sunday", "slots": [ { "time": "10:00 AM", "room": null, "kids": false } ] } ] }
+  ],
+  "forbidden": ["9:30", "11:00"]
+}

@@ -8,6 +8,7 @@ while read -r kind entry; do
   case "$kind" in \#*) continue ;; esac
   # dispatch per kind, e.g.:  vitest) npx vitest run "$entry" || rc=1 ;;
   case "$kind" in
+    vitest) npx vitest run "$entry" || rc=1 ;;
     *) echo "regression: unknown kind '$kind' for '$entry'"; rc=1 ;;
   esac
 done < regression/bed.txt

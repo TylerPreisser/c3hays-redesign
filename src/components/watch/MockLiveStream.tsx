@@ -17,11 +17,13 @@ import { useState } from "react";
 import { Play, Radio } from "lucide-react";
 import { assetPath } from "@/lib/asset-path";
 import { Tx } from "@/components/cms/Editable";
+import { useServiceTimes } from "@/providers/ServiceTimesProvider";
+import { campus, firstService } from "@/lib/service-times-core";
 
 export default function MockLiveStream({
   poster,
   isLive = false,
-  nextService = "Saturday · 5:00 PM",
+  nextService,
   text,
 }: {
   poster: string;
@@ -31,6 +33,7 @@ export default function MockLiveStream({
   text?: Record<string, string>;
 }) {
   const [playing, setPlaying] = useState(false);
+  const next = nextService ?? firstService(campus(useServiceTimes(), "hays"));
 
   return (
     <div
@@ -141,7 +144,7 @@ export default function MockLiveStream({
                 k="watch-stream-msg-offline"
                 fallback="We&rsquo;re not streaming right now. Next service:"
               />{" "}
-              {nextService}.
+              {next}.
             </>
           )}
         </p>

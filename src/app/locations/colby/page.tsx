@@ -6,15 +6,21 @@ import { assetPath } from "@/lib/asset-path";
 import { getCMSPage } from "@/lib/cms";
 import { tx, imgCss } from "@/lib/home-content";
 import StaffGrid from "@/components/about/StaffGrid";
+import { getServiceTimes } from "@/lib/service-times";
+import { campus, dayLine, campusLine, spokenLine, txTimes } from "@/lib/service-times-core";
 
-export const metadata: Metadata = {
-  title: "Colby Campus",
-  description:
-    "Celebration Community Church, Colby, Kansas. Sunday 10 AM at 1923 S Range.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const colby = campus(await getServiceTimes(), "colby");
+  return {
+    title: "Colby Campus",
+    description: `Celebration Community Church, Colby, Kansas. ${campusLine(colby)} at 1923 S Range.`,
+  };
+}
 
 export default async function ColbyCampusPage() {
   const ov = (await getCMSPage("/locations/colby")) || {};
+  const colby = campus(await getServiceTimes(), "colby");
+  const spoken = spokenLine(colby);
   const t = ov.text || {};
   const media = ov.media || {};
 
@@ -88,10 +94,10 @@ export default async function ColbyCampusPage() {
             }}
             data-cms="t:colby-hero-tagline"
             dangerouslySetInnerHTML={{
-              __html: tx(
+              __html: txTimes(
                 t,
                 "colby-hero-tagline",
-                "Sundays at 10am. Welcome home."
+                `${spoken}. Welcome home.`
               ),
             }}
           />
@@ -133,10 +139,10 @@ export default async function ColbyCampusPage() {
                 style={{ color: "rgba(27,28,28,0.65)" }}
                 data-cms="t:colby-details-body-1"
                 dangerouslySetInnerHTML={{
-                  __html: tx(
+                  __html: txTimes(
                     t,
                     "colby-details-body-1",
-                    "Join us in Colby, Sundays at 10am. You are welcome here, just as you are."
+                    `Join us in Colby, ${spoken}. You are welcome here, just as you are.`
                   ),
                 }}
               />
@@ -198,12 +204,7 @@ export default async function ColbyCampusPage() {
                         __html: tx(t, "colby-service-day", "Sunday"),
                       }}
                     />
-                    <p
-                      data-cms="t:colby-service-time"
-                      dangerouslySetInnerHTML={{
-                        __html: tx(t, "colby-service-time", "10:00 AM"),
-                      }}
-                    />
+                    <p data-service-times="colby">{colby.services.map((sv) => dayLine(sv).slice(sv.day.length + 1)).join("; ")}</p>
                   </div>
                 </div>
               </div>
@@ -304,10 +305,10 @@ export default async function ColbyCampusPage() {
             style={{ color: "rgba(27,28,28,0.60)" }}
             data-cms="t:colby-cta-body"
             dangerouslySetInnerHTML={{
-              __html: tx(
+              __html: txTimes(
                 t,
                 "colby-cta-body",
-                "Come as you are, join us Sunday at 10am and experience C3 Colby for yourself."
+                `Come as you are, join us ${spoken.replace(/s at /, " at ")} and experience C3 Colby for yourself.`
               ),
             }}
           />

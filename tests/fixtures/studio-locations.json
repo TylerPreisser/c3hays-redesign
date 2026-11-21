@@ -1,0 +1,12 @@
+{
+  "locations": [
+    { "id": "loc-hays", "slug": "hays", "name": "Hays", "services": [
+      { "day": "Saturday", "times": ["5:00 PM"], "slots": [ { "time": "5:00 PM", "room": null, "kids": false } ] },
+      { "day": "Sunday", "times": ["8:00 AM", "9:00 AM", "10:45 AM"], "slots": [
+        { "time": "8:00 AM", "room": "C3 Gym", "kids": false },
+        { "time": "9:00 AM", "room": null, "kids": true },
+        { "time": "10:45 AM", "room": null, "kids": true } ] } ] },
+    { "id": "loc-colby", "slug": "colby", "name": "Colby", "services": [
+      { "day": "Sunday", "times": ["10:00 AM"], "slots": [ { "time": "10:00 AM", "room": null, "kids": false } ] } ] }
+  ]
+}

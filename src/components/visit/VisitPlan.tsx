@@ -1,6 +1,8 @@
 import type { CSSProperties } from "react";
 import { HeartHandshake, Shirt, Baby } from "lucide-react";
 import { Tx } from "@/components/cms/Editable";
+import ServiceTimesText from "@/components/ServiceTimesText";
+import { withoutStaleTimes } from "@/lib/service-times-core";
 import Section from "@/components/ui/Section";
 import SectionHeader from "@/components/ui/SectionHeader";
 
@@ -33,11 +35,13 @@ const expectBlocks = [
     id: "kids",
     Icon: Baby,
     title: "Bring The Kids",
-    body: "C3Kids is available for children ages 3 through the 5th grade. The care and growth of every child is our highest priority and our passion is to create exciting, Bible-driven, interactive environments especially designed for your kids! C3Kids is available during our 9:30am service on Sunday so you can enjoy a great service knowing your child is being loved and nurtured.",
+    body: "C3Kids is available for children ages 3 through the 5th grade. The care and growth of every child is our highest priority and our passion is to create exciting, Bible-driven, interactive environments especially designed for your kids!",
   },
 ];
 
-export default function VisitPlan({ t }: { t: Record<string, string> }) {
+export default function VisitPlan({ t: tIn }: { t: Record<string, string> }) {
+  // A published override of the kids text that spells out a clock time predates times being Studio data: drop it.
+  const t = withoutStaleTimes(tIn, ["visit-block-kids-body"]);
   const iconChip: CSSProperties = {
     display: "inline-flex",
     alignItems: "center",
@@ -88,7 +92,8 @@ export default function VisitPlan({ t }: { t: Record<string, string> }) {
       {/* Native accordion — each expectation is an independently recolorable row
           (its own data-cms-bg). Zero-JS via <details>/<summary>, static-export safe. */}
       <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
-        {expectBlocks.map(({ id, Icon, title, body }) => (
+        {expectBlocks.map(({ id, Icon, title, body }) => {
+          return (
           <details
             key={id}
             data-cms-bg={`visit-block-${id}-bg`}
@@ -134,8 +139,14 @@ export default function VisitPlan({ t }: { t: Record<string, string> }) {
               className="body-base"
               style={{ color: "rgba(255,255,255,0.72)", marginTop: "0.9rem", lineHeight: 1.7 }}
             />
+            {id === "kids" && (
+              <p className="body-base" style={{ color: "rgba(255,255,255,0.72)", marginTop: "0.6rem", lineHeight: 1.7 }}>
+                C3Kids is available during our <ServiceTimesText campus="hays" as="kids" /> Sunday services so you can enjoy a great service knowing your child is being loved and nurtured.
+              </p>
+            )}
           </details>
-        ))}
+          );
+        })}
       </div>
     </Section>
   );

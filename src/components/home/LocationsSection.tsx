@@ -5,6 +5,8 @@ import Image from "next/image";
 import { useEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { useServiceTimes } from "@/providers/ServiceTimesProvider";
+import { campus, campusLine, txTimes } from "@/lib/service-times-core";
 import { locations } from "@/data/locations";
 import { assetPath } from "@/lib/asset-path";
 import { tx, type BtnStyle } from "@/lib/home-content";
@@ -25,6 +27,7 @@ const BLANK_PX =
    a stylized northwest-Kansas map with Hays + Colby markers beside a teal
    "find your campus" card, then two rounded campus cards. */
 export default function LocationsSection({ text = {}, btn = {} }: { text?: Record<string, string>; btn?: Record<string, BtnStyle> }) {
+  const serviceTimes = useServiceTimes();
   const sectionRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
@@ -145,7 +148,7 @@ export default function LocationsSection({ text = {}, btn = {} }: { text?: Recor
                   card-bg Recolor and its text/buttons stay interactive. Same visual. */}
               <div className="absolute inset-x-0 bottom-0 flex flex-col justify-end" style={{ padding: "2.5rem" }}>
                 <h3 className="heading-1 text-white" data-cms={`t:campus-${loc.id}-name`} style={{ marginBottom: "0.4rem" }} dangerouslySetInnerHTML={{ __html: tx(text, `campus-${loc.id}-name`, loc.name) }} />
-                <p className="text-sm" data-cms={`t:campus-${loc.id}-info`} style={{ color: "rgba(255,255,255,0.7)", marginBottom: "1.75rem" }} dangerouslySetInnerHTML={{ __html: tx(text, `campus-${loc.id}-info`, `${loc.street}, ${loc.city}, ${loc.state} · ${loc.services[0]?.day} ${loc.services[0]?.times.join(", ")}`) }} />
+                <p className="text-sm" data-cms={`t:campus-${loc.id}-info`} style={{ color: "rgba(255,255,255,0.7)", marginBottom: "1.75rem" }} dangerouslySetInnerHTML={{ __html: txTimes(text, `campus-${loc.id}-info`, `${loc.street}, ${loc.city}, ${loc.state} · ${campusLine(campus(serviceTimes, loc.id))}`) }} />
                 <div className="flex flex-wrap gap-3">
                   <Link href={text[`campusbtn-${loc.id}-info-href`] || `/locations/${loc.slug}/`} data-cms-link={`campusbtn-${loc.id}-info`} className="btn btn-primary btn-sm" style={btnCss(btn[`campusbtn-${loc.id}-info`])}>
                     <span data-cms-link-label>{text[`campusbtn-${loc.id}-info-label`] || "Campus Info"}</span>

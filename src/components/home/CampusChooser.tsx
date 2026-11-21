@@ -7,6 +7,8 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { ChevronDown, MapPin } from "lucide-react";
+import { useServiceTimes } from "@/providers/ServiceTimesProvider";
+import { campus, firstService } from "@/lib/service-times-core";
 import { locations } from "@/data/locations";
 import { btnCss } from "./btn-css";
 import type { BtnStyle } from "@/lib/home-content";
@@ -24,6 +26,7 @@ export default function CampusChooser({
   text?: Record<string, string>;
   btn?: Record<string, BtnStyle>;
 }) {
+  const serviceTimes = useServiceTimes();
   const [open, setOpen] = useState(false);
   const [editMode, setEditMode] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -120,7 +123,7 @@ export default function CampusChooser({
                 </span>
                 <span className="block text-sm truncate" style={{ color: "rgba(27,28,28,0.55)" }}>
                   {loc.city}, {loc.state} ·{" "}
-                  {loc.services[0]?.day} {loc.services[0]?.times[0]}
+                  {firstService(campus(serviceTimes, loc.id))}
                 </span>
               </span>
               <ChevronDown size={16} className="ml-auto -rotate-90 shrink-0" style={{ color: "rgba(27,28,28,0.35)" }} />

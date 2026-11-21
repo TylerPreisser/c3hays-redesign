@@ -1,5 +1,6 @@
 import type { CSSProperties } from "react";
-import { Clock, MapPin, Smartphone } from "lucide-react";
+import { MapPin, Smartphone } from "lucide-react";
+import ServiceTimesText from "@/components/ServiceTimesText";
 import { locations } from "@/data/locations";
 import { site } from "@/data/site";
 import { Tx } from "@/components/cms/Editable";
@@ -167,22 +168,9 @@ export default function JoinPanel({ t }: { t: Record<string, string> }) {
                 style={{ color: "var(--color-mute)", lineHeight: 1.7 }}
               />
             </div>
-            {/* #4: the service TIMES + text are editor-native — each row is its own
-                <Tx> region (data-cms), so staff edit the day/times in place. */}
+            {/* Service times are Studio location data (edited in the location form), not page text. */}
             <div className="flex flex-col gap-3">
-              {loc.services.map((s, i) => (
-                <div key={s.day} className="flex items-center gap-2.5">
-                  <Clock size={14} style={{ color: "var(--color-mute)" }} className="shrink-0" />
-                  <Tx
-                    text={t}
-                    k={`visit-campus-${loc.id}-service-${i}`}
-                    fallback={`${s.day}: ${s.times.join(" · ")}`}
-                    as="span"
-                    className="body-base"
-                    style={{ color: "var(--color-ink)" }}
-                  />
-                </div>
-              ))}
+              <ServiceTimesText campus={loc.id} as="rows" rowClassName="flex items-center gap-2.5" iconColor="var(--color-mute)" textColor="var(--color-ink)" />
             </div>
             {/* Spacer flexes so Directions pins to the bottom → equal-height cards align. */}
             <div style={{ flex: 1, minHeight: "var(--space-cta)" }} />

@@ -25,20 +25,18 @@ export const news: NewsItem[] = [];
 export const newsCategories = ["All", "Announcement", "Event", "Message", "Outreach", "Students"] as const;
 
 /* ─────────────────────────────────────────────────────────────────────────
-   The C3 Weekly — newsletter issues.
-   ─────────────────────────────────────────────────────────────────────────
-   Intentionally EMPTY: the real church runs no such newsletter archive, so we do
-   not invent editions. <IssueBrowser> renders an honest "first issue is on its way"
-   state for an empty array. Fill this array with REAL issues when they exist. */
+   The C3 Weekly — newsletter issues. They live in C3 Studio (`newsletter_issues`) and
+   are read by src/lib/news-issues.ts; nothing is hard-coded here. No fabricated issues.
+   ───────────────────────────────────────────────────────────────────────── */
 export interface IssueSection {
-  heading: string;
-  /** May contain inline HTML (<em>, <strong>, links) — authored content only. */
+  heading?: string;
+  /** Sanitised HTML only (src/lib/news-issues.ts re-sanitises on read). */
   body: string;
 }
 export interface NewsletterIssue {
   id: string;
-  /** Sequential edition number shown as "Issue No. NN". */
-  number: number;
+  /** Edition number shown as "Issue No. NN"; absent when Studio has none (a sent campaign carries no number). */
+  number?: number;
   title: string;
   date: string; // ISO yyyy-mm-dd — the send date (defines the "week")
   excerpt: string;
@@ -49,6 +47,3 @@ export interface NewsletterIssue {
   /** Body of the issue, rendered by <IssueReader>. */
   sections: IssueSection[];
 }
-
-// Empty until a real newsletter exists — no fabricated issues.
-export const newsletterIssues: NewsletterIssue[] = [];

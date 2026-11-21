@@ -17,7 +17,8 @@ import {
 import { tx, imgCss } from "@/lib/home-content";
 import { assetPath } from "@/lib/asset-path";
 import { site } from "@/data/site";
-import { locations } from "@/data/locations";
+import { useServiceTimes } from "@/providers/ServiceTimesProvider";
+import { campus, compactLine } from "@/lib/service-times-core";
 import { Tx } from "@/components/cms/Editable";
 import Section from "@/components/ui/Section";
 import Stack from "@/components/ui/Stack";
@@ -104,10 +105,7 @@ export function ConnectHero({ text, media = {}, img = {} }: ConnectHeroProps) {
   const mapsDir = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(
     addressLine
   )}`;
-  const hays = locations.find((l) => l.id === "hays");
-  const serviceLine = hays
-    ? hays.services.map((s) => `${s.day} ${s.times.join(", ")}`).join(" · ")
-    : "Sat 5PM · Sun 8, 9:30 & 11AM";
+  const serviceLine = compactLine(campus(useServiceTimes(), "hays"));
 
   /* Monochrome, self-contained faux static-map thumbnail (no API key). */
   const mapSvg =

@@ -7,15 +7,21 @@ import { assetPath } from "@/lib/asset-path";
 import { getCMSPage } from "@/lib/cms";
 import { tx, imgCss } from "@/lib/home-content";
 import StaffGrid from "@/components/about/StaffGrid";
+import { getServiceTimes } from "@/lib/service-times";
+import { campus, campusLine, dayLine, kidsTimes, spokenLine, txTimes } from "@/lib/service-times-core";
 
-export const metadata: Metadata = {
-  title: "Hays Campus",
-  description:
-    "Celebration Community Church, Hays, Kansas. Saturday 5 PM and Sunday 8, 9:30, and 11 AM at 5790 230th Ave.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const hays = campus(await getServiceTimes(), "hays");
+  return {
+    title: "Hays Campus",
+    description: `Celebration Community Church, Hays, Kansas. ${campusLine(hays)} at 5790 230th Ave.`,
+  };
+}
 
 export default async function HaysCampusPage() {
   const ov = (await getCMSPage("/locations/hays")) || {};
+  const hays = campus(await getServiceTimes(), "hays");
+  const kids = kidsTimes(hays);
   const t = ov.text || {};
   const media = ov.media || {};
 
@@ -109,10 +115,10 @@ export default async function HaysCampusPage() {
                 data-cms="t:hays-details-body-1"
                 style={{ color: "rgba(27,28,28,0.65)" }}
                 dangerouslySetInnerHTML={{
-                  __html: tx(
+                  __html: txTimes(
                     t,
                     "hays-details-body-1",
-                    "Join us for worship in Hays, Saturdays at 5pm and Sundays at 8, 9:30, and 11am. You are welcome here, just as you are."
+                    `Join us for worship in Hays, ${spokenLine(hays)}. You are welcome here, just as you are.`
                   ),
                 }}
               />
@@ -122,10 +128,10 @@ export default async function HaysCampusPage() {
                 data-cms="t:hays-details-body-2"
                 style={{ color: "rgba(27,28,28,0.55)" }}
                 dangerouslySetInnerHTML={{
-                  __html: tx(
+                  __html: txTimes(
                     t,
                     "hays-details-body-2",
-                    "C3Kids is available for children ages 3 through 5th grade during our 9:30am Sunday service. CrossCurrent student ministry meets on Wednesday nights."
+                    `C3Kids is available for children ages 3 through 5th grade${kids ? ` during our ${kids} Sunday services` : ""}. CrossCurrent student ministry meets on Wednesday nights.`
                   ),
                 }}
               />
@@ -156,37 +162,16 @@ export default async function HaysCampusPage() {
                   style={{ fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.16em", color: "#1b1c1c" }}
                   dangerouslySetInnerHTML={{ __html: tx(t, "hays-sidebar-times-heading", "Service Times") }}
                 />
-                <div className="flex flex-col gap-4">
-                  <div className="flex items-start gap-3">
-                    <Clock size={14} style={{ color: "#1cc3af", marginTop: 3 }} className="shrink-0" />
-                    <div className="text-sm" style={{ color: "rgba(27,28,28,0.70)" }}>
-                      <p
-                        className="font-semibold mb-0.5"
-                        data-cms="t:hays-times-sat-label"
-                        style={{ color: "#1b1c1c" }}
-                        dangerouslySetInnerHTML={{ __html: tx(t, "hays-times-sat-label", "Saturday") }}
-                      />
-                      <p
-                        data-cms="t:hays-times-sat-time"
-                        dangerouslySetInnerHTML={{ __html: tx(t, "hays-times-sat-time", "5:00 PM") }}
-                      />
+                <div className="flex flex-col gap-4" data-service-times="hays">
+                  {hays.services.map((sv) => (
+                    <div key={sv.day} className="flex items-start gap-3">
+                      <Clock size={14} style={{ color: "#1cc3af", marginTop: 3 }} className="shrink-0" />
+                      <div className="text-sm" style={{ color: "rgba(27,28,28,0.70)" }}>
+                        <p className="font-semibold mb-0.5" style={{ color: "#1b1c1c" }}>{sv.day}</p>
+                        <p>{dayLine(sv).slice(sv.day.length + 1)}</p>
+                      </div>
                     </div>
-                  </div>
-                  <div className="flex items-start gap-3">
-                    <Clock size={14} style={{ color: "#1cc3af", marginTop: 3 }} className="shrink-0" />
-                    <div className="text-sm" style={{ color: "rgba(27,28,28,0.70)" }}>
-                      <p
-                        className="font-semibold mb-0.5"
-                        data-cms="t:hays-times-sun-label"
-                        style={{ color: "#1b1c1c" }}
-                        dangerouslySetInnerHTML={{ __html: tx(t, "hays-times-sun-label", "Sunday") }}
-                      />
-                      <p
-                        data-cms="t:hays-times-sun-times"
-                        dangerouslySetInnerHTML={{ __html: tx(t, "hays-times-sun-times", "8:00 AM · 9:30 AM · 11:00 AM") }}
-                      />
-                    </div>
-                  </div>
+                  ))}
                 </div>
               </div>
 

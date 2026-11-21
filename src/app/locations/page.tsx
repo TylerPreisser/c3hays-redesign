@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import { Navigation } from "lucide-react";
+import { getServiceTimes } from "@/lib/service-times";
+import { campus, dayLine } from "@/lib/service-times-core";
 import { locations } from "@/data/locations";
 import { assetPath } from "@/lib/asset-path";
 import { getPageContent } from "@/lib/cms";
@@ -49,6 +51,7 @@ export default async function LocationsPage({
   const sp = cmsLive && searchParams ? await searchParams : {};
   const preview = typeof sp.preview === "string" ? sp.preview : undefined;
   const ov = (await getPageContent("/locations", preview)) || {};
+  const serviceTimes = await getServiceTimes();
   const t = ov.text || {};
   const media = ov.media || {};
   const shim = exampleContentShim(ov);
@@ -200,20 +203,11 @@ export default async function LocationsPage({
                         />
 
                         {/* Service times */}
-                        <div
-                          className="body-sm"
-                          data-cms={`t:locations-campus-${loc.id}-times`}
-                          style={{ color: "rgba(255,255,255,0.55)", lineHeight: 1.7 }}
-                          dangerouslySetInnerHTML={{
-                            __html: tx(
-                              t,
-                              `locations-campus-${loc.id}-times`,
-                              loc.services
-                                .map((s) => `${s.day}: ${s.times.join(" &middot; ")}`)
-                                .join("<br/>")
-                            ),
-                          }}
-                        />
+                        <div className="body-sm" data-service-times={loc.id} style={{ color: "rgba(255,255,255,0.55)", lineHeight: 1.7 }}>
+                          {campus(serviceTimes, loc.id).services.map((sv) => (
+                            <div key={sv.day}>{dayLine(sv)}</div>
+                          ))}
+                        </div>
                       </Stack>
 
                       {/* Directions button (Directions-only — no campus-details filler) */}

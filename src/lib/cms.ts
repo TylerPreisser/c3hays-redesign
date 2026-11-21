@@ -48,6 +48,15 @@ function cmsFetcher(): FetchLike {
   return (input, init) => fetch(input, init);
 }
 
+/**
+ * A write to Studio from a server route of this site (the signup). Goes over the `CMS` service binding on the
+ * Worker, the public URL elsewhere. Throws when no Studio is configured, so a caller can refuse instead of dropping.
+ */
+export function cmsForward(path: string, init: RequestInit): Promise<Response> {
+  if (!CMS_BASE) throw new Error("Studio is not configured");
+  return cmsFetcher()(`${CMS_BASE}${path}`, init);
+}
+
 export interface CMSBlock {
   id: string;
   screen_id: string;
@@ -89,6 +98,8 @@ export async function getCMSScreen(slug: string): Promise<{ screen: { title: str
 export const getCMSSermons = () => cmsFetch<unknown[]>("/api/content/sermons");
 export const getCMSEvents = () => cmsFetch<unknown[]>("/api/content/events");
 export const getCMSLocations = () => cmsFetch<unknown[]>("/api/content/locations");
+/** Studio `newsletter_issues` (published). Each item carries its sanitised HTML in `html`. */
+export const getCMSNewsletterIssues = () => cmsFetch<unknown[]>("/api/content/newsletter_issues");
 
 /** Structured, section-based Home content from C3 Studio (or null if CMS off). */
 export const getCMSHome = () => cmsFetch<StudioHome>("/api/content/home");

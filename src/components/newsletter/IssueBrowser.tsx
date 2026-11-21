@@ -190,7 +190,7 @@ export default function IssueBrowser({ issues }: IssueBrowserProps) {
                 border: "1px solid rgba(27,28,28,0.08)",
                 boxShadow: "var(--shadow-rest)",
               }}
-              aria-label={`Read Issue No. ${issue.number}: ${issue.title}`}
+              aria-label={`Read ${issue.number != null ? `Issue No. ${issue.number}: ` : ""}${issue.title}`}
             >
               {issue.image && (
                 <div className="relative overflow-hidden" style={{ aspectRatio: "16 / 9" }}>
@@ -218,7 +218,7 @@ export default function IssueBrowser({ issues }: IssueBrowserProps) {
                       backdropFilter: "blur(4px)",
                     }}
                   >
-                    Issue No. {issue.number}
+                    {issue.number != null ? `Issue No. ${issue.number}` : "C3 News"}
                   </span>
                 </div>
               )}

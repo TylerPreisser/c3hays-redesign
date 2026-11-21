@@ -142,9 +142,11 @@ export default function IssueReader({ issue, onClose }: IssueReaderProps) {
             className="flex items-center flex-wrap gap-x-4 gap-y-1"
             style={{ color: "var(--color-mute)", fontSize: "0.82rem", fontWeight: 600, marginBottom: "0.9rem" }}
           >
-            <span style={{ color: "var(--color-teal-deep)", letterSpacing: "0.06em", textTransform: "uppercase" }}>
-              Issue No. {issue.number}
-            </span>
+            {issue.number != null && (
+              <span style={{ color: "var(--color-teal-deep)", letterSpacing: "0.06em", textTransform: "uppercase" }}>
+                Issue No. {issue.number}
+              </span>
+            )}
             <span>{formatDate(issue.date)}</span>
             <span className="inline-flex items-center gap-1.5">
               <Clock size={14} /> {issue.readMinutes} min read
@@ -180,14 +182,16 @@ export default function IssueReader({ issue, onClose }: IssueReaderProps) {
           <div className="flex flex-col" style={{ gap: "var(--space-block)" }}>
             {issue.sections.map((s, i) => (
               <div key={i}>
-                <h3
-                  className="heading-3"
-                  style={{ color: "var(--color-ink)", fontSize: "1.15rem", marginBottom: "0.6rem" }}
-                >
-                  {s.heading}
-                </h3>
-                <p
-                  className="body-base"
+                {s.heading && (
+                  <h3
+                    className="heading-3"
+                    style={{ color: "var(--color-ink)", fontSize: "1.15rem", marginBottom: "0.6rem" }}
+                  >
+                    {s.heading}
+                  </h3>
+                )}
+                <div
+                  className="body-base issue-body"
                   style={{ color: "var(--color-mute)", lineHeight: 1.7 }}
                   dangerouslySetInnerHTML={{ __html: s.body }}
                 />
