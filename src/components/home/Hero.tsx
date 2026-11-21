@@ -61,6 +61,10 @@ export default function Hero({ content = HERO_DEFAULTS, btnStyle, text = {}, btn
             image) so the centered white headline reads at AA. Standalone hero / split /
             minimal keep their OWN full-bleed hero.bg photo (the only hero.bg element then). */}
         <div className="absolute inset-0" style={{ zIndex: continuous ? 1 : 0 }}>
+          {/* Continuous mode: the photo is PageComposer's shared layer, which sits under the sections and can never be
+              the click target. This empty layer carries the same edit marker over the hero, so the photo is selectable
+              in the editor's canvas; it paints nothing. */}
+          {continuous && <div aria-hidden="true" data-cms-img="hero.bg" className="absolute inset-0" />}
           {!continuous && (
             <Image
               src={assetPath(content.bgImage)}

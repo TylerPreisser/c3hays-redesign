@@ -51,14 +51,16 @@ export default async function ColbyCampusPage() {
         {/* Dark scrim — bottom-weighted for headline legibility */}
         <div
           className="absolute inset-0"
+          aria-hidden="true"
           style={{
             background:
               "linear-gradient(to top, rgba(10,10,10,0.90) 0%, rgba(10,10,10,0.45) 55%, rgba(10,10,10,0.25) 100%)",
+            pointerEvents: "none",
           }}
         />
 
         {/* Hero content */}
-        <div className="relative z-10 container-c3 pb-16 pt-44">
+        <div className="relative z-10 container-c3 hero-passthru pb-16 pt-44">
           <Link
             href="/locations/"
             className="back-link inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-widest mb-6"

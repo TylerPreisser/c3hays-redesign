@@ -923,3 +923,8 @@ img[data-cms-img]:not([data-cms-img^="g:logo"]),
 }
 .skip-link:focus { top: 0.75rem; outline: 3px solid #0f766e; outline-offset: 2px; }
 main:focus { outline: none; }
+
+/* A hero's content column lets clicks fall through to the photo behind it (so the editor can select the photo);
+   what is inside it takes clicks as usual. */
+.hero-passthru { pointer-events: none; }
+.hero-passthru > * { pointer-events: auto; }

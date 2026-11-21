@@ -63,7 +63,7 @@ export default async function HaysCampusPage() {
         </div>
 
         {/* Content */}
-        <div className="relative z-10 container-c3 pb-16 pt-44">
+        <div className="relative z-10 container-c3 hero-passthru pb-16 pt-44">
           <Link
             href="/locations/"
             className="inline-flex items-center gap-1.5 mb-5 text-white/70 hover:text-white transition-colors duration-150"

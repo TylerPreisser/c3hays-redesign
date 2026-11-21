@@ -91,8 +91,8 @@ export default async function NewsPage({
               style={{ background: "linear-gradient(90deg, rgba(10,12,14,0.78) 0%, rgba(10,12,14,0.55) 42%, rgba(10,12,14,0.25) 100%)", pointerEvents: "none" }}
             />
 
-            <div className="container-c3 relative" style={{ paddingTop: "var(--section-y)", paddingBottom: "var(--section-y)", width: "100%" }}>
-              <div className="grid grid-cols-1 lg:grid-cols-[1.1fr_minmax(20rem,26rem)] gap-10 lg:gap-16 items-center">
+            <div className="container-c3 relative hero-passthru" style={{ paddingTop: "var(--section-y)", paddingBottom: "var(--section-y)", width: "100%" }}>
+              <div className="grid grid-cols-1 lg:grid-cols-[1.1fr_minmax(20rem,26rem)] gap-10 lg:gap-16 items-center hero-passthru">
                 {/* LEFT — header, left-aligned over the image. White text over the scrim. */}
                 <div data-cms-bg="weekly-hero-copy" style={{ maxWidth: "40rem" }}>
                   <Tx
