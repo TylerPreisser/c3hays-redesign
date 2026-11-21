@@ -280,7 +280,7 @@ export default function Header({ globals = {}, menu = null, announcement = null 
               <strong>{announcement.title}</strong>
               {announcement.body && <span style={{ color: "rgba(255,255,255,0.86)" }}>{announcement.body}</span>}
               {announcement.linkUrl && (
-                <a href={announcement.linkUrl} style={{ color: "#7ff0e0", fontWeight: 600, textDecoration: "underline", textUnderlineOffset: 3 }}>
+                <a href={announcement.linkUrl} style={{ color: "#7ff0e0", fontWeight: 600, textDecoration: "underline", textUnderlineOffset: 3, display: "inline-block", padding: "0.3rem 0.25rem" }}>
                   {announcement.linkLabel || "Learn more"}
                 </a>
               )}
