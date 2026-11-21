@@ -1,0 +1,1 @@
+# one "<kind> <entry>" per line; run.sh replays each. No cases yet.
