@@ -45,6 +45,8 @@ cmd_build() {
   CMS_LIVE=1 SITE_NOINDEX=1 SITE_BUILD_ID="$BUILD_ID" STUDIO_ORIGIN="$STUDIO" NEXT_PUBLIC_STUDIO_ORIGIN="$STUDIO" NEXT_PUBLIC_CMS_URL="$STUDIO" \
     npm run cf:build > "$BASE/build.log" 2>&1 || { tail -60 "$BASE/build.log"; exit 1; }
   [ -f .open-next/worker.js ] || die "build left no .open-next/worker.js"
+  # Static files (/_next/static, images) are answered by the assets binding, not by Next: give them the no-index header too.
+  printf '/*\n  X-Robots-Tag: noindex, nofollow\n' > .open-next/assets/_headers
   BUILT="$(git rev-parse HEAD)"
   case "$BUILD_ID" in "$BUILT"-*) ;; *) die "built tree is $BUILT, build id says $BUILD_ID" ;; esac
   [ "$BUILT" = "$SHA" ] || die "built tree is $BUILT, requested $SHA"
@@ -91,6 +93,9 @@ cmd_verify() {
   done
   [ "$(header_of x-robots-tag "$T/h.head")" = "noindex, nofollow" ] || die "X-Robots-Tag missing on /"
   echo "ok: X-Robots-Tag noindex, nofollow"
+  p="$(curl -sS --max-time 30 "$URL/" | grep -o '/_next/static/[^"]*\.js' | head -1)"; [ -n "$p" ] || die "no static asset found on /"
+  [ "$(curl -sSI --max-time 30 "$URL$p" | grep -i '^x-robots-tag:' | tr -d '\r' | sed 's/^[^:]*: *//')" = "noindex, nofollow" ] || die "X-Robots-Tag missing on the static asset $p"
+  echo "ok: X-Robots-Tag on the static asset $p"
   curl -sS --max-time 30 "$URL/robots.txt" | grep -q '^Disallow: /$' || die "robots.txt is not disallow-all"
   echo "ok: robots.txt disallow-all"
   csp="$(header_of content-security-policy "$T/h.head")"
