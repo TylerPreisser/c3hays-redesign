@@ -883,8 +883,9 @@ export default function EditBridge() {
           if (d.path === "") { clearSelection(false); return; }
           const hit = findByPath(d.path);
           if (!hit || mode === "visitor") return;
-          select(hit.el, hit.kind, hit.kind === "text" ? textExtra(hit.el) : {}, { echo: true });
+          // bring it into view first, so the box we answer with is where the person will see it
           try { hit.el.scrollIntoView({ block: "nearest" }); } catch { /* old engine */ }
+          select(hit.el, hit.kind, hit.kind === "text" ? textExtra(hit.el) : {}, { echo: true });
           if (hit.kind === "text" && effMode() === "edit" && editable.has(hit.el)) {
             hit.el.focus({ preventScroll: true });
             setCaretAt(hit.el, textLen(hit.el));
