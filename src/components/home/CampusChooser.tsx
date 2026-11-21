@@ -8,7 +8,7 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { ChevronDown, MapPin } from "lucide-react";
 import { locations } from "@/data/locations";
-import { btnCss } from "./Hero";
+import { btnCss } from "./btn-css";
 import type { BtnStyle } from "@/lib/home-content";
 
 export default function CampusChooser({

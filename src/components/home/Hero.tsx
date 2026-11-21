@@ -5,19 +5,10 @@ import Image from "next/image";
 import { motion } from "framer-motion";
 import { assetPath } from "@/lib/asset-path";
 import CampusChooser from "./CampusChooser";
+import { btnCss } from "./btn-css";
 import { HERO_DEFAULTS, tx, type HeroContent, type BtnStyle } from "@/lib/home-content";
 
-/** Build inline button CSS from an editable button style (overrides the class). */
-export function btnCss(b?: BtnStyle): React.CSSProperties | undefined {
-  if (!b) return undefined;
-  return {
-    background: b.variant === "outline" ? "transparent" : b.bg,
-    color: b.variant === "outline" ? b.bg : b.color,
-    border: b.variant === "outline" ? `2px solid ${b.bg}` : "none",
-    borderRadius: b.radius,
-    fontFamily: b.font || undefined,
-  };
-}
+export { btnCss };
 
 /* Word-stagger easing — snappy pop-in */
 const WORD_EASE = [0.16, 1, 0.3, 1] as const;
