@@ -23,3 +23,13 @@ CLAUDE.local.md
 # graphify — local-only knowledge graph (rebuild with `graphify update .`, ~12s)
 graphify-out/
 .claude/settings.json.graphify-bak
+
+# env files (the example is tracked), keys
+.env
+.env.*
+!.env.example
+*.pem
+.dev.vars
+.vite/
+coverage/
+dist/

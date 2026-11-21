@@ -1,4 +1,25 @@
-@AGENTS.md
+# c3hays-redesign
+
+Public website for Celebration Community Church (Hays). Next.js 16 + React 19 + Tailwind 4, Node 22, TypeScript.
+Production is the Cloudflare Worker `c3hays-live` (OpenNext), reading live content from the C3 Studio editor.
+
+## Commands
+- Dev: `npm run dev`. Typecheck: `npx tsc --noEmit`. Lint: `npm run lint`. Tests: `npm test` (vitest, `tests/`).
+- Build (production SSR shape): `CMS_LIVE=1 npm run build`. Worker bundle: `npm run cf:build`.
+- Boot + smoke: after the build, `CMS_LIVE=1 npx next start -p 3999`, then `curl -s -o /dev/null -w '%{http_code}' localhost:3999/` returns 200.
+- Gate: `scripts/ci-steps.sh` (run by the global pre-push hook). Deploy: `scripts/deploy-from-clean-checkout.sh <sha>`
+  (a sha on `main` with a green `ci-local` status; `deploy.yml` is the manual fallback). Never deploy without sign-off.
+
+## Agent instructions
+<!-- BEGIN:nextjs-agent-rules -->
+# This is NOT the Next.js you know
+
+This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` before writing any code. Heed deprecation notices.
+<!-- END:nextjs-agent-rules -->
+
+<!-- agent-kit -->
+Agent instructions for this repo live in `CLAUDE.md` (read it in full); settled decisions in `DECISIONS/` (or the nearest parent's). Conformance to an Accepted ADR is never a defect.
+A reviewer may block only with cited code; objections to a settled decision go in a non-blocking "Decision Concerns" section citing the ADR. Never run a live deploy without explicit human say-so.
 
 ## Settled decisions — see DECISIONS/
 
