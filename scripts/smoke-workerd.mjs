@@ -7,7 +7,7 @@
 // only bundle the code; nothing had ever executed it. This does, locally, before any staging rollout:
 //
 //   `wrangler dev --env <env> --local` boots the Worker in workerd; `/`, `/news` and `/locations/hays` must answer 200
-//   with real HTML, and workerd must log no uncaught error. No remote call is made, state lives in a temp dir.
+//   with real HTML, an unknown path must answer 404 (the site's own page, not a 500), and workerd must log no uncaught error. No remote call is made, state lives in a temp dir.
 //
 // Usage: CMS_LIVE=1 npm run cf:build, then  node scripts/smoke-workerd.mjs [--env staging] [--port 4642] [--dir <built tree>]
 // Exit 0 = every check passed. Exit 1 = a check failed (each failure is printed).
@@ -27,6 +27,7 @@ const PORT = Number(opt("port", "4642"));
 const REPO = resolve(opt("dir", fileURLToPath(new URL("..", import.meta.url))));
 const WRANGLER = join(REPO, "node_modules", ".bin", "wrangler");
 const MUST_200 = ["/", "/news", "/locations/hays"];
+const MUST_404 = ["/nope-xyz", "/nope/xyz"];
 const BOOT_MS = 180_000;
 
 const failures = [];
@@ -87,6 +88,12 @@ try {
     const body = await res.text();
     if (res.status === 200 && /<html/i.test(body) && /<h1|<main/i.test(body)) ok(`${path} -> 200 (${body.length} bytes of HTML)`);
     else fail(`${path} -> ${res.status}: ${firstLine(body)}`);
+  }
+  for (const path of MUST_404) {
+    const res = await fetch(`http://127.0.0.1:${PORT}${path}`, { redirect: "follow" });
+    const body = await res.text();
+    if (res.status === 404 && /<html/i.test(body)) ok(`${path} -> 404 (the site's not-found page)`);
+    else fail(`${path} -> ${res.status} (expected 404): ${firstLine(body)}`);
   }
   await new Promise((r) => setTimeout(r, 500));
   const errs = log.join("").split("\n").filter((l) => /\[wrangler:error\]|Uncaught|Unexpected loadManifest/.test(l));

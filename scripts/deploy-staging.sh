@@ -6,7 +6,7 @@
 #                      origins, `wrangler deploy --dry-run --env staging`, then scripts/smoke-workerd.mjs (the built Worker
 #                      under workerd). Writes BUILD_ID = <sha>-<UTC> beside the worktree; the sha is re-read from the built tree.
 #   rollout <worktree> remote write. Prints the rollback command first, then `wrangler deploy --env staging`.
-#   verify <BUILD_ID>  fetches the live address: 200 on / /news /locations/hays /search, x-c3-build = BUILD_ID,
+#   verify <BUILD_ID>  fetches the live address: 200 on / /news /locations/hays /search, 404 on an unknown path, x-c3-build = BUILD_ID,
 #                      X-Robots-Tag noindex, robots.txt disallow-all, frame-ancestors = Studio staging only.
 # From this PC (ALLOW_DEPLOY=1 on rollout is the owner's say-so for STAGING ONLY):
 #   export CLOUDFLARE_ACCOUNT_ID=af76b8aeaa433c3fd3c17ce77375062f
@@ -90,6 +90,9 @@ cmd_verify() {
   echo "ok: / -> 200, x-c3-build $ID"
   for p in /news /locations/hays /search; do
     code="$(curl -sS -L --max-time 30 -o /dev/null -w '%{http_code}' "$URL$p")"; [ "$code" = 200 ] || die "$p -> $code"; echo "ok: $p -> 200"
+  done
+  for p in /nope-xyz /nope/xyz; do
+    code="$(curl -sS -L --max-time 30 -o /dev/null -w '%{http_code}' "$URL$p")"; [ "$code" = 404 ] || die "unknown path $p -> $code (expected 404)"; echo "ok: $p -> 404"
   done
   [ "$(header_of x-robots-tag "$T/h.head")" = "noindex, nofollow" ] || die "X-Robots-Tag missing on /"
   echo "ok: X-Robots-Tag noindex, nofollow"

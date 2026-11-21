@@ -34,6 +34,11 @@ export const STATIC_ROUTES = new Set([
   "events", "newsletter", "section-preview", "search",
 ]);
 
+// The root layout reads the request (the editor's preview token) to draw the draft mark, the menu and the header, so a
+// page that renders through it must be dynamic. Without this an unknown slug is rendered as a static page and the layout's
+// request read aborts it (DYNAMIC_SERVER_USAGE), which answered 500 instead of the 404 page.
+export const dynamic = "force-dynamic";
+
 export async function generateStaticParams(): Promise<{ slug: string }[]> {
   const bundle = await getCMSBundle().catch(() => null);
   return (bundle?.screens || [])
