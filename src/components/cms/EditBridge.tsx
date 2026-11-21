@@ -1,942 +1,968 @@
 "use client";
 
 import { useEffect } from "react";
-import { buildBgCss } from "@/lib/backgrounds";
-import { FONT_PICKER } from "@/lib/fonts";
 
 /**
- * EditBridge — turns the live site into an ON-PAGE editor when embedded in C3
- * Studio (`?cmsEdit=1` + inside an iframe). Click any tagged element to place a
- * caret and type in place; select text to format (bold/italic/color/size/font).
- * Changes are sent to the editor via postMessage (NO page reload). On the public
- * site this does nothing.
+ * EditBridge — turns the live site into an in-place editor when it is framed by C3 Studio
+ * (`?cmsEdit=1`, inside an iframe, and a Studio origin configured). Click the real page and
+ * type; select words for B, I and Link; the change goes to Studio as one message about one field.
+ * On the public site (no `cmsEdit`, not framed) this does nothing.
  *
- * Messages to parent (source:"c3site"):
- *   {type:"cms:ready"}
- *   {type:"cms:edit", path, html}     // a region's content changed
- *   {type:"cms:focus", path}          // a region was focused (caret placed)
- *   {type:"cms:focus", path, hrefPath, href} // ITEM 5: focused text sits inside a
- *                                     // data-cms-href anchor → carries a link the
- *                                     // editor can expose as a link field (additive;
- *                                     // plain text still posts the {path}-only shape)
- *   {type:"cms:log", ev, ...}         // debug events for the live runner
- * From parent (source:"c3editor"):
- *   {type:"cms:setHtml", path, html}     // set a region's content (external update)
- *   {type:"cms:setImg", path, src}       // U10: live-swap a tagged image (preview only)
- *   {type:"cms:setStyle", path, background}            // U10: live-paint a tagged tile bg (preview only)
- *   {type:"cms:setStyle", path, background, scope:"section"} // v8 P6: live-paint a SECTION bg
+ * THE CONTRACT (workplan §6 "Canvas messages"). Every message is `{v: 2, source, type, ...}`.
+ * The bridge POSTS ONLY to Studio's origin and ACCEPTS ONLY a message that
+ *   (1) comes from Studio's origin, (2) comes from `window.parent`, (3) has `v === 2`,
+ *   (4) has `source === "c3editor"`. Anything else is ignored without a trace.
+ * Studio's origin is origin(NEXT_PUBLIC_STUDIO_ORIGIN || NEXT_PUBLIC_CMS_URL), both inlined at BUILD
+ * time (README "Local development"). With neither set the bridge stays off: it never posts to "*".
+ *
+ * site -> editor (source "c3site"):
+ *   cms:ready   {draftServed, asOf, mode, reason: "load" | "mode"}
+ *               draftServed = the root's data-cms-draft mark is "served" (P2-W). Anything else is false.
+ *               mode = the mode IN FORCE: a page that is not the draft is held in "view" whatever was asked.
+ *   cms:select  {path, kind: "text"|"image"|"link"|"section"|"none", box: {x,y,width,height}|null,
+ *                label?, href? (link), hrefPath?, href? (text inside a data-cms-href), echo?: true}
+ *               `echo` marks the answer to editor:select, so Studio does not select twice.
+ *   cms:edit    {path, value}             value = allow-listed HTML (b, strong, i, em, br, a[href])
+ *   cms:section {op: "move"|"deselect", id, index}   index = position among the page's [data-section]
+ * editor -> site (source "c3editor"):
+ *   editor:mode   {mode: "edit"|"view"|"visitor", caps?: {path: maxChars}, pages?: [{title, href}]}
+ *   editor:apply  {path, value}   text: HTML string; image: URL string; link: {label?, href?}
+ *   editor:select {path}          a field's data-cms key, or a section id; "" clears
+ *
+ * Paths are the site's own `data-cms*` keys. A list item is addressed by its id inside the key
+ * (e.g. `meetGrowServe.pillars.<id>.headline`), never by its position; the bridge never derives an index
+ * from the DOM for a field, and finds fields by comparing attribute values, never by building selectors.
  */
+
+const V = 2;
+export type BridgeMode = "edit" | "view" | "visitor";
+const MODES: BridgeMode[] = ["edit", "view", "visitor"];
+
+const INK = "#0F6F64"; // teal ink: 6.04:1 on white (console tokens)
+
+/* ── safe values ─────────────────────────────────────────────────────────────── */
+
+/** https, http, mailto, tel or a site path. Anything else (javascript:, data:, //host) is refused. */
+export function safeHref(raw: unknown): string | null {
+  if (typeof raw !== "string") return null;
+  const v = raw.trim();
+  if (!v || v.length > 2000) return null;
+  const probe = v.replace(/[\u0000- \u007f]/g, "");
+  if (/^[a-z][a-z0-9+.-]*:/i.test(probe)) return /^(https?:|mailto:|tel:)/i.test(probe) ? v : null;
+  if (probe.startsWith("//")) return null;
+  if (probe.startsWith("/") || probe.startsWith("#")) return v;
+  return null;
+}
+
+function safeImgSrc(raw: unknown): string | null {
+  if (typeof raw !== "string") return null;
+  const v = raw.trim();
+  if (!v || v.length > 4000) return null;
+  const probe = v.replace(/[\u0000- \u007f]/g, "");
+  if (/^data:image\/(png|jpe?g|gif|webp|avif);/i.test(probe)) return v;
+  return safeHref(v) && !/^(mailto:|tel:|#)/i.test(probe) ? v : null;
+}
+
+const esc = (s: string) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+const escAttr = (s: string) => esc(s).replace(/"/g, "&quot;");
+const DROP = new Set(["script", "style", "iframe", "object", "embed", "template", "noscript", "svg", "math", "title"]);
+
+/** Reduce HTML to the editor's allow-list: b, strong, i, em, br, and a whose href is safe. */
+export function sanitizeHtml(html: string): string {
+  const doc = new DOMParser().parseFromString(`<body>${html}</body>`, "text/html");
+  const out: string[] = [];
+  const walk = (n: Node) => {
+    if (n.nodeType === 3) { out.push(esc(n.nodeValue || "")); return; }
+    if (n.nodeType !== 1) return;
+    const el = n as Element;
+    const tag = el.tagName.toLowerCase();
+    if (DROP.has(tag)) return;
+    if (tag === "br") { out.push("<br>"); return; }
+    if (tag === "b" || tag === "strong" || tag === "i" || tag === "em") {
+      out.push(`<${tag}>`); el.childNodes.forEach(walk); out.push(`</${tag}>`); return;
+    }
+    if (tag === "a") {
+      const href = safeHref(el.getAttribute("href"));
+      if (href) { out.push(`<a href="${escAttr(href)}">`); el.childNodes.forEach(walk); out.push("</a>"); return; }
+    }
+    el.childNodes.forEach(walk);
+  };
+  doc.body.childNodes.forEach(walk);
+  return out.join("").replace(/(<br>)+$/, "");
+}
+
+/** Does `path` match a cap key? `*` stands for one dotted segment (a list item's id). */
+export function capFor(caps: Record<string, number>, path: string): number {
+  if (Object.prototype.hasOwnProperty.call(caps, path)) return caps[path];
+  for (const k of Object.keys(caps)) {
+    if (!k.includes("*")) continue;
+    const re = new RegExp("^" + k.split("*").map((p) => p.replace(/[.+?^${}()|[\]\\]/g, "\\$&")).join("[^.]+") + "$");
+    if (re.test(path)) return caps[k];
+  }
+  return 0;
+}
+
+/* ── the component ───────────────────────────────────────────────────────────── */
+
 export default function EditBridge() {
   useEffect(() => {
+    // Studio's origin: inlined at build. Both reads must stay literal `process.env.NEXT_PUBLIC_*`.
+    let STUDIO = "";
+    try {
+      const raw = process.env.NEXT_PUBLIC_STUDIO_ORIGIN || process.env.NEXT_PUBLIC_CMS_URL || "";
+      STUDIO = raw ? new URL(raw).origin : "";
+    } catch { STUDIO = ""; }
+
     let on = false;
     try {
       const q = new URLSearchParams(window.location.search);
-      on = q.get("cmsEdit") === "1" && window.parent !== window;
+      on = !!STUDIO && q.get("cmsEdit") === "1" && window.parent !== window;
+      // The browser tells us who framed us (Chromium, WebKit). If it says someone else, stay off.
+      const anc = (window.location as Location & { ancestorOrigins?: DOMStringList }).ancestorOrigins;
+      if (on && anc && anc.length && anc[0] !== STUDIO) on = false;
     } catch { on = false; }
     if (!on) return;
 
-    const post = (m: Record<string, unknown>) => window.parent.postMessage({ source: "c3site", ...m }, "*");
-    const log = (ev: string, data: Record<string, unknown> = {}) => post({ type: "cms:log", ev, ...data });
+    const root = document.documentElement;
+    const post = (m: Record<string, unknown>) => {
+      try { window.parent.postMessage({ v: V, source: "c3site", ...m }, STUDIO); } catch { /* parent gone */ }
+    };
 
-    document.documentElement.setAttribute("data-cms-edit", "1");
+    /* ── state ── */
+    let mode: BridgeMode = "view";
+    let caps: Record<string, number> = {};
+    let pages: { title: string; href: string }[] = [];
+    let sel: { attr: string; value: string; kind: string } | null = null;
+    let secSelId = "";
+    let activeEl: HTMLElement | null = null;
+    let composing = false;
+    let timer: ReturnType<typeof setTimeout> | null = null;
+    const dirty = new Set<HTMLElement>();
+    const lastSent = new Map<string, string>();
+    const editable = new Set<HTMLElement>();
+    const tabAdded = new WeakSet<HTMLElement>();
 
-    const style = document.createElement("style");
-    style.textContent = `
-      /* v6 R9: an obviously-EDITOR affordance — an animated dashed "marching-ants"
-         outline that circles the hovered/selected element (never a plain website
-         hover). cmsEdit-only (this whole stylesheet is injected only in edit mode);
-         prefers-reduced-motion falls back to a static dashed outline. The outline is
-         a pointer-events:none ::after overlay, so it never covers the element's own
-         background or blocks clicks. */
-      /* v8 iter-2 D17: NO blanket position:relative here. That rule (injected AFTER
-         Tailwind, equal specificity → later wins) turned full-bleed hero wrappers
-         (<div class="absolute inset-0" data-cms-img="…">) into position:relative, so
-         inset-0 stopped stretching them → wrapper 0×0 → <Image fill> 0×0 → hero blank
-         in the editor. Anchoring is now done in JS, only for elements whose COMPUTED
-         position is static (see ensureAnchored). */
-      [data-cms], [data-cms-img], [data-cms-link], [data-cms-icon], [data-cms-bg]{ border-radius:7px; }
-      /* BUG #1 (mission layout jump): editable headings use text-wrap:balance, which the
-         browser RE-COMPUTES the moment the element becomes a focused contenteditable —
-         re-wrapping e.g. the mission statement 3→4 lines and JUMPING the section height
-         (473→553px) on hover/select/focus. Forcing a stable, non-balanced wrap in EDIT
-         MODE ONLY (this sheet is injected only when cmsEdit=1) makes the idle and focused
-         layouts identical, so the section height is STABLE while editing. The published
-         site (no cmsEdit) keeps text-wrap:balance untouched. */
-      [data-cms]{ text-wrap: normal !important; }
-      [data-cms]{ cursor:text; transition:background-color .12s ease; }
-      [data-cms]:hover{ background-color: rgba(28,195,175,.05); }
-      [data-cms-img], [data-cms-link], [data-cms-icon], [data-cms-bg]{ cursor:pointer; }
-      /* the marching border — shown on HOVER only. The SELECTED element's outline is a
-         separate position:fixed overlay ring (#c3-sel-ring), measured from the element's
-         live getBoundingClientRect so it is pixel-accurate regardless of the element's
-         positioning context and never clipped by an ancestor's overflow:hidden (ITEM 2). */
-      [data-cms]:hover::after, [data-cms-img]:hover::after, [data-cms-link]:hover::after, [data-cms-icon]:hover::after, [data-cms-bg]:hover::after{
+    const draftServed = () => {
+      const m = root.getAttribute("data-cms-draft") ?? document.querySelector("[data-cms-draft]")?.getAttribute("data-cms-draft");
+      return m === "served";
+    };
+    const effMode = (): BridgeMode => (mode === "edit" && !draftServed() ? "view" : mode);
+    const asOfMark = () => root.getAttribute("data-cms-asof") || new Date().toISOString();
+    const postReady = (reason: "load" | "mode") => post({ type: "cms:ready", draftServed: draftServed(), asOf: asOfMark(), mode: effMode(), reason });
+
+    /* every element carrying a given attribute value; compared, never put into a selector */
+    const byAttr = (attr: string, value: string) =>
+      Array.from(document.querySelectorAll<HTMLElement>(`[${attr}]`)).filter((el) => el.getAttribute(attr) === value);
+    const fields = () => Array.from(document.querySelectorAll<HTMLElement>("[data-cms]"));
+    const pathOf = (el: HTMLElement) => el.getAttribute("data-cms") || "";
+    const inChrome = (t: EventTarget | null) => !!(t as HTMLElement | null)?.closest?.("#c3-toolbar,#c3-link-card,#c3-cap");
+    const fieldOf = (t: EventTarget | null) => ((t as HTMLElement | null)?.closest?.("[data-cms]") as HTMLElement | null) || null;
+
+    /* ── chrome: stylesheet, ring, counter, bar, link card ── */
+    let style: HTMLStyleElement | null = null;
+    let ring: HTMLDivElement | null = null;
+    let cap: HTMLDivElement | null = null;
+    let bar: HTMLDivElement | null = null;
+    let card: HTMLDivElement | null = null;
+    let cardInput: HTMLInputElement | null = null;
+    let cardList: HTMLDivElement | null = null;
+    let cardRemove: HTMLButtonElement | null = null;
+    let savedRange: Range | null = null;
+    let ringRaf = 0;
+
+    const CSS_TEXT = `
+      /* In-place editor chrome. Injected only while the site is framed by Studio. */
+      [data-cms], [data-cms-img], [data-cms-link]{ border-radius:7px; }
+      /* Editable headings use text-wrap:balance, which re-wraps the moment the element is a focused
+         contenteditable and would jump the section. A stable wrap keeps idle and focused layouts identical. */
+      [data-cms]{ text-wrap: normal !important; transition:background-color .12s ease; }
+      html[data-cms-mode="edit"] [data-cms]{ cursor:text; }
+      [data-cms-img], [data-cms-link]{ cursor:pointer; }
+      /* hover: a quiet outline over the element, never over its own background and never in the way of a click */
+      [data-cms]:hover::after, [data-cms-img]:hover::after, [data-cms-link]:hover::after{
         content:""; position:absolute;
-        /* v8 D3: PIN the geometry with !important. Some tagged elements own their own
-           author ::after (e.g. globals.css .nav-link-underline::after sets width:0;
-           height:2px;bottom:-2px). That author rule leaks its width/height/inset into
-           this overlay and collapses the marching-ants ring to a 0x2px sliver — the
-           "navbar ring still wrong" bug. Forcing all four insets AND width/height with
-           !important beats any co-resident author ::after regardless of specificity or
-           order, so the ring always renders as a full rectangle around EVERY data-cms.  */
+        /* pinned with !important: an author ::after (e.g. .nav-link-underline) must not collapse it to a sliver */
         top:-3px!important; right:-3px!important; bottom:-3px!important; left:-3px!important;
         width:auto!important; height:auto!important;
-        /* v8 P4: RESET the background-color. The nav links carry
-           .nav-link-underline whose ::after sets background-color:var(--color-teal)
-           (globals.css). Because D3 above pins this overlay to full size
-           (inset:-3px + width/height:auto !important), that leaked solid teal fills
-           the whole box and paints an unreadable SOLID GREEN BOX over the label. The
-           ants are drawn via background-IMAGE, so forcing background-COLOR transparent
-           keeps the marching-ants ring while letting the text ("ABOUT" etc.) show. */
         background-color: transparent !important;
         border-radius:9px; pointer-events:none; z-index:2147482000;
-        --ant: rgba(28,195,175,.85);
+        --ant: rgba(15,111,100,.55);
         background-image:
-          repeating-linear-gradient(90deg, var(--ant) 0 7px, transparent 7px 14px),
-          repeating-linear-gradient(90deg, var(--ant) 0 7px, transparent 7px 14px),
-          repeating-linear-gradient(0deg,  var(--ant) 0 7px, transparent 7px 14px),
-          repeating-linear-gradient(0deg,  var(--ant) 0 7px, transparent 7px 14px);
-        background-size: 100% 2px, 100% 2px, 2px 100%, 2px 100%;
+          repeating-linear-gradient(90deg, var(--ant) 0 6px, transparent 6px 10px),
+          repeating-linear-gradient(90deg, var(--ant) 0 6px, transparent 6px 10px),
+          repeating-linear-gradient(0deg,  var(--ant) 0 6px, transparent 6px 10px),
+          repeating-linear-gradient(0deg,  var(--ant) 0 6px, transparent 6px 10px);
+        background-size: 100% 1.5px, 100% 1.5px, 1.5px 100%, 1.5px 100%;
         background-position: 0 0, 0 100%, 0 0, 100% 0;
         background-repeat: no-repeat;
-        animation: c3ants .5s linear infinite;
       }
-      @keyframes c3ants{ to{ background-position: 14px 0, -14px 100%, 0 -14px, 100% 14px; } }
-      /* ITEM 2: the SELECTED-element outline — a single fixed overlay ring, positioned in
-         JS from the target's getBoundingClientRect (pixel-accurate, overflow-proof). Deeper
-         teal + thicker ants than hover so selection reads as distinct. */
+      [data-cms-img]:hover::after{ top:2px!important; right:2px!important; bottom:2px!important; left:2px!important; z-index:2147483000; }
+      /* selection: one fixed ring, 2px teal ink inside 2px white (3:1 on light and on a dark hero) */
       #c3-sel-ring{
-        position:fixed; pointer-events:none; z-index:2147483400; display:none;
-        border-radius:9px; box-sizing:border-box;
-        --ant:#179c8c;
-        background-image:
-          repeating-linear-gradient(90deg, var(--ant) 0 7px, transparent 7px 14px),
-          repeating-linear-gradient(90deg, var(--ant) 0 7px, transparent 7px 14px),
-          repeating-linear-gradient(0deg,  var(--ant) 0 7px, transparent 7px 14px),
-          repeating-linear-gradient(0deg,  var(--ant) 0 7px, transparent 7px 14px);
-        background-size: 100% 3px, 100% 3px, 3px 100%, 3px 100%;
-        background-position: 0 0, 0 100%, 0 0, 100% 0;
-        background-repeat: no-repeat;
-        animation: c3ants .38s linear infinite;
+        position:fixed; pointer-events:none; z-index:2147483400; display:none; box-sizing:border-box;
+        border-radius:9px; box-shadow: 0 0 0 2px ${INK}, 0 0 0 4px #fff;
+        opacity:1; transition: opacity .12s ease-out;
       }
-      @media (prefers-reduced-motion: reduce){ #c3-sel-ring{ animation:none; } }
-      /* ITEM 3: UNIVERSAL selection outline for IMAGES. A full-bleed image wrapper
-         (<div class="absolute inset-0" data-cms-img>) fills its section EXACTLY, and the
-         shared ring above pins to inset:-3px — i.e. 3px OUTSIDE the wrapper on every side.
-         Hero/photo sections commonly set overflow:hidden, which then clips that entire
-         outer ring → the image read as selected (.cms-sel added, "Change image" chip up)
-         but showed NO marching ants. Text/tile/link/icon/section rings are never clipped
-         because those elements sit INSIDE larger containers, so this override is scoped to
-         images only: draw the ring a few px INSIDE the element (never clipped by an
-         ancestor's overflow:hidden) and lift it above any scrim / next-image layer. The
-         --ant color + thicker background-size from the .cms-sel rule above still apply. */
-      [data-cms-img]:hover::after{
-        top:2px!important; right:2px!important; bottom:2px!important; left:2px!important;
-        z-index:2147483000;
-      }
-      /* keystone A/C: SECTION selection outline. Every page composed by PageComposer
-         wraps each section in <div data-section=id>. Clicking a section's own chrome
-         (canvas, symptom A) OR its rail card (symptom C) stamps .cms-sel-sec on that
-         wrapper → the SAME marching-ants, sized for a full section. Positioned only
-         when selected so the plain wrapper never changes layout in normal flow. */
-      [data-section].cms-sel-sec{ position: relative; }
-      [data-section].cms-sel-sec::after{
-        content:""; position:absolute; top:2px!important; right:2px!important; bottom:2px!important; left:2px!important;
-        width:auto!important; height:auto!important; background-color:transparent!important;
-        border-radius:12px; pointer-events:none; z-index:2147481000;
-        --ant:#0ea5a0;
-        background-image:
-          repeating-linear-gradient(90deg, var(--ant) 0 9px, transparent 9px 18px),
-          repeating-linear-gradient(90deg, var(--ant) 0 9px, transparent 9px 18px),
-          repeating-linear-gradient(0deg,  var(--ant) 0 9px, transparent 9px 18px),
-          repeating-linear-gradient(0deg,  var(--ant) 0 9px, transparent 9px 18px);
-        background-size: 100% 3px, 100% 3px, 3px 100%, 3px 100%;
-        background-position: 0 0, 0 100%, 0 0, 100% 0;
-        background-repeat: no-repeat;
-        animation: c3ants .5s linear infinite;
-      }
-      @media (prefers-reduced-motion: reduce){ [data-section].cms-sel-sec::after{ animation:none; } }
-      @media (prefers-reduced-motion: reduce){
-        [data-cms]:hover::after, [data-cms-img]:hover::after, [data-cms-link]:hover::after, [data-cms-icon]:hover::after, [data-cms-bg]:hover::after{ animation:none; }
-      }
-      /* v7 R6: selection = the marching-ants ONLY. Kill the solid green box — the
-         c3hays brand :focus-visible ring (globals.css: outline 2px solid teal) that
-         paints a filled rounded box while a contenteditable/link is focused. Scoped
-         to edit mode (this whole sheet is injected only when cmsEdit=1), so the
-         public-site focus ring stays intact for accessibility. */
-      [data-cms]:focus, [data-cms]:focus-visible,
-      [data-cms].cms-sel, [data-cms-img].cms-sel, [data-cms-link].cms-sel, [data-cms-icon].cms-sel, [data-cms-bg].cms-sel,
-      [data-cms].cms-sel:focus-visible, [data-cms-link].cms-sel:focus-visible, [data-cms-img].cms-sel:focus-visible, [data-cms-icon].cms-sel:focus-visible, [data-cms-bg].cms-sel:focus-visible{
-        outline: none !important;
-      }
-      /* v7 R5: the on-canvas "Edit section" oval (#c3-sec-handle) is REMOVED — section
-         editing is triggered from the right-rail SectionDock card, not a floating pill. */
-      /* v4 R2: the floating "recolor this tile" handle. A packed tile has almost no
-         bare background to click, so the v3 click-empty-pixels path was undiscoverable
-         (a click landed a text caret). This EXPLICIT chip appears on hover over any
-         recolorable element ([data-cms-bg]) and opens the background picker. */
-      #c3-bg-handle{ position:fixed; z-index:2147483646; display:none; align-items:center; gap:6px;
-        background:#7c3aed; color:#fff; font:700 12px/1 -apple-system,system-ui,sans-serif;
-        padding:6px 11px; border-radius:999px; border:none; cursor:pointer; box-shadow:0 6px 18px rgba(0,0,0,.28); }
-      #c3-bg-handle:hover{ background:#6d28d9; }
-      /* v7 R12: the DISCOVERABLE per-image "Change image" chip (top-LEFT of the hovered
-         image — the old section oval that lived there is gone). Makes swapping a photo
-         obvious for Kale, instead of relying on knowing you can click the image. */
-      #c3-img-handle{ position:fixed; z-index:2147483646; display:none; align-items:center; gap:6px;
-        background:#1cc3af; color:#042e29; font:700 12px/1 -apple-system,system-ui,sans-serif;
-        padding:6px 11px; border-radius:999px; border:none; cursor:pointer; box-shadow:0 6px 18px rgba(0,0,0,.28); }
-      #c3-img-handle:hover{ background:#15b3a0; }
-      /* #2 events add/remove: the per-card DELETE chip (bottom-right of an authored
-         event card [data-cms-card]) → posts cms:removeCard so the editor drops it. */
-      #c3-card-delete{ position:fixed; z-index:2147483646; display:none; align-items:center; gap:6px;
-        background:#c0392b; color:#fff; font:700 12px/1 -apple-system,system-ui,sans-serif;
-        padding:6px 11px; border-radius:999px; border:none; cursor:pointer; box-shadow:0 6px 18px rgba(0,0,0,.28); }
-      #c3-card-delete:hover{ background:#a93226; }
-      [data-cms-edit-badge]{ position:fixed; z-index:2147483646; background:#1cc3af; color:#042e29; font:700 11px/1 -apple-system,sans-serif;
-        padding:4px 8px; border-radius:999px; pointer-events:none; transform:translateY(-50%); box-shadow:0 4px 12px rgba(0,0,0,.25); }
-      #c3-toolbar{ position:fixed; z-index:2147483647; display:none; gap:2px; align-items:center;
-        background:#1b1c1c; color:#fff; border-radius:10px; padding:5px; box-shadow:0 10px 30px rgba(0,0,0,.35);
-        font-family:-apple-system,system-ui,sans-serif; }
-      #c3-toolbar button, #c3-toolbar select, #c3-toolbar label{ background:transparent; color:#fff; border:none; border-radius:6px;
-        font-size:13px; height:28px; min-width:28px; padding:0 6px; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; }
-      #c3-toolbar button:hover{ background:#333; }
-      #c3-toolbar .sep{ width:1px; height:18px; background:#3a3b3b; margin:0 3px; }
-      #c3-toolbar .sw{ width:18px; height:18px; border-radius:50%; border:2px solid #555; cursor:pointer; padding:0; }
-      #c3-toolbar select{ background:#2a2b2b; }
+      @media (prefers-reduced-motion: reduce){ #c3-sel-ring{ transition:none; } }
+      /* the c3hays brand :focus-visible box would double the ring while a field has focus */
+      [data-cms]:focus, [data-cms]:focus-visible, [data-cms].cms-sel, [data-cms-link].cms-sel, [data-cms-img].cms-sel,
+      [data-cms-link].cms-sel:focus-visible, [data-cms-img].cms-sel:focus-visible{ outline:none !important; }
+      #c3-cap{ position:fixed; z-index:2147483646; display:none; font:600 11px/1 -apple-system,system-ui,sans-serif;
+        background:#fff; color:#1b1c1c; border:1px solid rgba(27,28,28,.14); border-radius:999px; padding:4px 8px;
+        box-shadow:0 2px 8px rgba(0,0,0,.12); pointer-events:none; }
+      #c3-cap[data-state="near"]{ color:#8a5300; border-color:#d98a16; }
+      #c3-cap[data-state="full"]{ color:#b42318; border-color:#b42318; }
+      #c3-toolbar, #c3-link-card{ position:fixed; z-index:2147483647; display:none; align-items:center; gap:2px;
+        background:#fff; color:#1b1c1c; border:1px solid rgba(27,28,28,.14); border-radius:10px; padding:4px;
+        box-shadow:0 8px 28px rgba(0,0,0,.18); font-family:-apple-system,system-ui,sans-serif; }
+      #c3-toolbar button, #c3-link-card button{ background:transparent; color:#1b1c1c; border:none; border-radius:6px;
+        font:600 13px/1 -apple-system,system-ui,sans-serif; height:30px; min-width:30px; padding:0 9px; cursor:pointer; }
+      #c3-toolbar button:hover, #c3-link-card button:hover, #c3-link-card button[data-active="1"]{ background:#eef6f5; }
+      #c3-toolbar button[aria-pressed="true"]{ background:#d9eeeb; color:${INK}; }
+      #c3-link-card{ flex-direction:column; align-items:stretch; gap:4px; width:280px; padding:8px; }
+      #c3-link-card input{ font:400 14px/1.2 -apple-system,system-ui,sans-serif; border:1px solid rgba(27,28,28,.25);
+        border-radius:6px; padding:7px 8px; color:#1b1c1c; background:#fff; }
+      #c3-link-card input:focus{ outline:2px solid ${INK}; outline-offset:1px; }
+      #c3-link-card [data-page]{ text-align:left; height:auto; padding:7px 8px; display:flex; justify-content:space-between; gap:8px; }
+      #c3-link-card [data-page] small{ font-weight:400; color:#6b6c6c; }
     `;
-    document.head.appendChild(style);
 
-    // U10 preview shim (background): paint via an injected, !important STYLESHEET rule
-    // keyed by data-cms-bg (mirrors buildBgCss) — NOT an inline element style. A
-    // document stylesheet is not reset when React re-renders the tagged element, so
-    // the preview survives a client re-render (e.g. a client component re-rendering
-    // and re-applying its own inline background). Preview-only; no persistence.
-    const shimBg: Record<string, string> = {};
-    // v8 polish P6: a SECTION bg edit (scope:"section") paints a `[data-section=id]>*`
-    // rule — routed through buildBgCss's SECTIONS arg, exactly like the published path
-    // (page.tsx buildBgCss(c.sections,…)). Keyed separately from the data-cms-bg tiles.
-    const shimSections: Record<string, string> = {};
-    const shimStyle = document.createElement("style");
-    shimStyle.id = "c3-shim-bg";
-    document.head.appendChild(shimStyle);
-    const rebuildShim = () => {
-      const secs = Object.entries(shimSections).map(([id, bg]) => ({ id, visible: true, bg }));
-      shimStyle.textContent = buildBgCss(secs, shimBg);
-    };
-    const applyShimBg = (path: string, background: string) => {
-      if (background) shimBg[path] = background; else delete shimBg[path];
-      rebuildShim();
-    };
-    const applyShimSection = (id: string, background: string) => {
-      if (background) shimSections[id] = background; else delete shimSections[id];
-      rebuildShim();
+    const mkBtn = (label: string, html: string, fn: () => void) => {
+      const b = document.createElement("button");
+      b.type = "button"; b.innerHTML = html; b.setAttribute("aria-label", label); b.title = label;
+      b.addEventListener("mousedown", (e) => { e.preventDefault(); fn(); });
+      return b;
     };
 
-    // Unit L: preview IMAGE swaps (esp. the per-variant logos g:logo-light/dark).
-    // Store the applied overrides and re-apply them whenever a matching data-cms-img
-    // (re)MOUNTS — a client re-render (e.g. the header swapping the light/dark logo
-    // on scroll) mounts a FRESH <img> with the DEFAULT src, which silently drops the
-    // preview swap. Unlike a background (a durable stylesheet rule), an <img> src is
-    // reset on remount, so we re-apply on mount via a MutationObserver — not only on
-    // cms:ready. Preview-only; never changes what Publish persists.
-    const shimImg: Record<string, string> = {};
-    const applyImgTo = (el: HTMLElement, src: string) => {
-      const img = (el.tagName === "IMG" ? el : el.querySelector("img")) as HTMLImageElement | null;
-      if (img && img.src !== src) { img.removeAttribute("srcset"); img.src = src; }
+    const buildChrome = () => {
+      if (style) return;
+      style = document.createElement("style");
+      style.textContent = CSS_TEXT;
+      document.head.appendChild(style);
+      ring = document.createElement("div"); ring.id = "c3-sel-ring"; ring.setAttribute("aria-hidden", "true");
+      document.body.appendChild(ring);
+      cap = document.createElement("div"); cap.id = "c3-cap"; cap.setAttribute("role", "status"); cap.setAttribute("aria-live", "polite");
+      document.body.appendChild(cap);
+      bar = document.createElement("div"); bar.id = "c3-toolbar"; bar.setAttribute("role", "toolbar"); bar.setAttribute("aria-label", "Format"); bar.contentEditable = "false";
+      bar.appendChild(mkBtn("Bold", "<b>B</b>", () => format("bold")));
+      bar.appendChild(mkBtn("Italic", "<i>I</i>", () => format("italic")));
+      bar.appendChild(mkBtn("Link", "Link", () => openLinkCard()));
+      document.body.appendChild(bar);
+      card = document.createElement("div"); card.id = "c3-link-card"; card.setAttribute("role", "dialog"); card.setAttribute("aria-label", "Link");
+      cardInput = document.createElement("input"); cardInput.type = "text"; cardInput.placeholder = "Search pages or paste an address";
+      cardInput.setAttribute("aria-label", "Link to"); cardInput.autocomplete = "off";
+      cardInput.addEventListener("input", () => renderPages());
+      cardInput.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") { e.preventDefault(); e.stopPropagation(); commitLinkFromInput(); }
+        else if (e.key === "Escape") { e.preventDefault(); e.stopPropagation(); closeLinkCard(true); }
+      });
+      cardList = document.createElement("div");
+      cardRemove = mkBtn("Remove link", "Remove link", () => removeLink());
+      cardRemove.style.display = "none";
+      card.append(cardInput, cardList, cardRemove);
+      document.body.appendChild(card);
+      const loop = () => { positionRing(); ringRaf = requestAnimationFrame(loop); };
+      ringRaf = requestAnimationFrame(loop);
     };
-    const applyShimImg = (path: string, src: string) => {
-      if (src) shimImg[path] = src; else delete shimImg[path];
-      if (src) document.querySelectorAll<HTMLElement>(`[data-cms-img="${path}"]`).forEach((el) => applyImgTo(el, src));
+    const dropChrome = () => {
+      cancelAnimationFrame(ringRaf);
+      style?.remove(); ring?.remove(); cap?.remove(); bar?.remove(); card?.remove();
+      style = ring = cap = bar = card = cardInput = cardList = cardRemove = null;
     };
-    const reapplyShimImgs = () => {
-      for (const [path, src] of Object.entries(shimImg)) {
-        document.querySelectorAll<HTMLElement>(`[data-cms-img="${path}"]`).forEach((el) => applyImgTo(el, src));
+
+    /* ── selection ring ── */
+    const selTargets = () => (sel ? byAttr(sel.attr, sel.value) : []);
+    const ringTarget = () => {
+      const all = selTargets();
+      return all.find((el) => { const r = el.getBoundingClientRect(); return r.width > 0 || r.height > 0; }) || all[0] || null;
+    };
+    let ringLast = "";
+    function positionRing() {
+      if (!ring) return;
+      const el = ringTarget();
+      const hide = () => { if (ring!.style.display !== "none") ring!.style.display = "none"; ringLast = ""; };
+      if (!el || !document.contains(el)) return hide();
+      const r = el.getBoundingClientRect();
+      if (r.width === 0 && r.height === 0) return hide();
+      // text and links: just outside the element; photos and sections: inside, so a full-bleed
+      // element is never clipped by the viewport or an ancestor's overflow.
+      const pad = sel && (sel.kind === "image" || sel.kind === "section") ? -4 : 3;
+      const key = `${r.left}|${r.top}|${r.width}|${r.height}|${pad}`;
+      if (key === ringLast && ring.style.display === "block") return;
+      ringLast = key;
+      ring.style.left = `${r.left - pad}px`; ring.style.top = `${r.top - pad}px`;
+      ring.style.width = `${r.width + pad * 2}px`; ring.style.height = `${r.height + pad * 2}px`;
+      ring.style.display = "block";
+    }
+    const clearMarks = () => {
+      document.querySelectorAll(".cms-sel").forEach((n) => n.classList.remove("cms-sel"));
+      document.querySelectorAll(".cms-sel-sec").forEach((n) => n.classList.remove("cms-sel-sec"));
+    };
+    const stamp = () => {
+      clearMarks();
+      if (!sel) return;
+      selTargets().forEach((el) => el.classList.add(sel!.attr === "data-section" ? "cms-sel-sec" : "cms-sel"));
+    };
+    const boxOf = (el: HTMLElement | null) => {
+      if (!el) return null;
+      const r = el.getBoundingClientRect();
+      return { x: Math.round(r.left), y: Math.round(r.top), width: Math.round(r.width), height: Math.round(r.height) };
+    };
+    const sections = () => Array.from(document.querySelectorAll<HTMLElement>("[data-section]"));
+    const KIND_ATTR: Record<string, string> = { text: "data-cms", image: "data-cms-img", link: "data-cms-link", section: "data-section" };
+
+    /** Select an element: ring it and tell Studio. `extra` rides along (label/href); `echo` marks an editor:select answer. */
+    function select(el: HTMLElement, kind: "text" | "image" | "link" | "section", extra: Record<string, unknown> = {}, opts: { echo?: boolean; quiet?: boolean } = {}) {
+      const attr = KIND_ATTR[kind];
+      const value = el.getAttribute(attr) || "";
+      const same = !!sel && sel.attr === attr && sel.value === value;
+      sel = { attr, value, kind };
+      secSelId = kind === "section" ? value : "";
+      stamp(); positionRing();
+      if (opts.quiet || (same && !opts.echo)) return;
+      post({ type: "cms:select", path: value, kind, box: boxOf(el), ...extra, ...(opts.echo ? { echo: true } : {}) });
+    }
+    function clearSelection(tell: boolean) {
+      const had = !!sel;
+      sel = null; secSelId = ""; stamp(); positionRing();
+      if (tell && had) post({ type: "cms:select", path: "", kind: "none", box: null });
+    }
+    const textExtra = (el: HTMLElement) => {
+      const linkEl = el.closest("[data-cms-href]");
+      return linkEl ? { hrefPath: linkEl.getAttribute("data-cms-href"), href: linkEl.getAttribute("href") || "" } : {};
+    };
+
+    /* ── editability (edit mode on a page that IS the draft) ── */
+    const ensureEditable = () => {
+      const on = effMode() === "edit";
+      if (on) {
+        fields().forEach((el) => {
+          if (el.getAttribute("contenteditable") !== "true") el.setAttribute("contenteditable", "true");
+          el.spellcheck = false;
+          if (!el.hasAttribute("tabindex")) { el.setAttribute("tabindex", "0"); tabAdded.add(el); }
+          editable.add(el);
+        });
+      } else {
+        editable.forEach((el) => { el.removeAttribute("contenteditable"); if (tabAdded.has(el)) { el.removeAttribute("tabindex"); tabAdded.delete(el); } });
+        editable.clear();
       }
     };
 
-    // v7 R6: PERSIST the selection by PATH, not by node. The sticky header (and any
-    // client re-render) mounts FRESH nodes that lack the `.cms-sel` class, so the
-    // marching-ants vanish mid-edit — esp. in the nav bar. We remember the selected
-    // element as a stable attribute-selector and re-stamp `.cms-sel` onto whatever
-    // node currently matches it, on every DOM mutation (same remount hook the image
-    // shim already uses). Empty ⇒ nothing selected. Preview-only; no persistence.
-    let selPath = "";
-    // ITEM 2: the fixed overlay selection ring. Positioned from the SELECTED element's
-    // live getBoundingClientRect — always pixel-accurate, never clipped by an ancestor's
-    // overflow, independent of the element's own positioning context (the old `.cms-sel`
-    // ::after mis-laid-out on static/overflow-hidden elements). Resolved fresh from
-    // selPath every reposition, so it survives client re-mounts automatically.
-    const selRing = document.createElement("div");
-    selRing.id = "c3-sel-ring";
-    selRing.setAttribute("aria-hidden", "true");
-    document.body.appendChild(selRing);
-    const ringTarget = (): HTMLElement | null => (selPath ? document.querySelector<HTMLElement>(selPath) : null);
-    let ringLast = "";
-    const positionRing = () => {
-      const el = ringTarget();
-      if (!el || !document.contains(el)) { if (selRing.style.display !== "none") selRing.style.display = "none"; ringLast = ""; return; }
-      const r = el.getBoundingClientRect();
-      if (r.width === 0 && r.height === 0) { if (selRing.style.display !== "none") selRing.style.display = "none"; return; }
-      const pad = 3;
-      // Only write when the geometry actually changed (the rAF loop calls this every
-      // frame) so we never thrash style during a scroll/drag.
-      const key = `${r.left}|${r.top}|${r.width}|${r.height}`;
-      if (key === ringLast && selRing.style.display === "block") return;
-      ringLast = key;
-      selRing.style.left = `${r.left - pad}px`;
-      selRing.style.top = `${r.top - pad}px`;
-      selRing.style.width = `${r.width + pad * 2}px`;
-      selRing.style.height = `${r.height + pad * 2}px`;
-      selRing.style.display = "block";
-    };
-    // ITEM 2: keep the ring GLUED to the selected element every frame — so it stays
-    // pixel-accurate through contenteditable reflow, entrance animations, sticky-header
-    // shifts, and the drag itself (no stale/offset outline like the old ::after).
-    let ringRaf = 0;
-    const ringLoop = () => { positionRing(); ringRaf = requestAnimationFrame(ringLoop); };
-    ringRaf = requestAnimationFrame(ringLoop);
-    const reapplySel = () => {
-      if (!selPath) { selRing.style.display = "none"; return; }
-      const cur = document.querySelectorAll<HTMLElement>(selPath);
-      if (!cur.length) { return; } // element not (re)mounted yet — leave prior state
-      document.querySelectorAll(".cms-sel").forEach((n) => { if (!(n as HTMLElement).matches(selPath)) n.classList.remove("cms-sel"); });
-      cur.forEach((el) => el.classList.add("cms-sel"));
-      positionRing();
-    };
-
-    // keystone A/C: SECTION selection, persisted by data-section id (survives re-render,
-    // same pattern as selPath). selectSection("") clears. Set from a canvas section-click
-    // (A) and from an inbound cms:selectSection posted when a rail card is clicked (C).
-    const cssEsc = (s: string) => (typeof CSS !== "undefined" && CSS.escape ? CSS.escape(s) : s.replace(/["\\]/g, "\\$&"));
-    let secSelId = "";
-    const clearSecSel = () => document.querySelectorAll(".cms-sel-sec").forEach((n) => n.classList.remove("cms-sel-sec"));
-    const selectSection = (id: string) => {
-      secSelId = id || "";
-      clearSecSel();
-      if (!secSelId) return;
-      document.querySelectorAll<HTMLElement>(`[data-section="${cssEsc(secSelId)}"]`).forEach((el) => el.classList.add("cms-sel-sec"));
-    };
-    const reapplySecSel = () => {
-      if (!secSelId) return;
-      const sel = `[data-section="${cssEsc(secSelId)}"]`;
-      const cur = document.querySelectorAll<HTMLElement>(sel);
-      if (!cur.length) return; // section not (re)mounted yet
-      document.querySelectorAll(".cms-sel-sec").forEach((n) => { if (!(n as HTMLElement).matches(sel)) n.classList.remove("cms-sel-sec"); });
-      cur.forEach((el) => el.classList.add("cms-sel-sec"));
-    };
-
-    // v8 iter-2 D17: anchor the marching-ants ::after by making ONLY static elements
-    // position:relative. Elements already positioned (absolute/fixed/sticky/relative —
-    // e.g. a full-bleed `absolute inset-0` hero wrapper, or a next/image `fill`) KEEP
-    // their own position so `inset` still stretches them (no 0×0 collapse). Idempotent
-    // per node via a WeakSet, so getComputedStyle runs at most once per element and
-    // freshly-mounted nodes (client re-renders) get anchored on the next mutation.
-    const CMS_SELECTOR = "[data-cms],[data-cms-img],[data-cms-link],[data-cms-icon],[data-cms-bg]";
+    /* keep rings and editability across a client re-render that mounts fresh nodes */
+    const CMS_SELECTOR = "[data-cms],[data-cms-img],[data-cms-link]";
     const anchored = new WeakSet<HTMLElement>();
     const ensureAnchored = () => {
       document.querySelectorAll<HTMLElement>(CMS_SELECTOR).forEach((el) => {
         if (anchored.has(el)) return;
         anchored.add(el);
-        // Anchor unless the element is ALREADY positioned. (Real browsers report
-        // "static" for unpositioned; jsdom reports "" — treat both as needing anchor.)
+        // Anchor the hover ring unless the element is ALREADY positioned (a full-bleed `absolute inset-0`
+        // wrapper must keep its own position or it collapses). jsdom reports "" for unpositioned.
         const pos = getComputedStyle(el).position;
-        if (pos !== "absolute" && pos !== "fixed" && pos !== "sticky" && pos !== "relative") {
-          el.style.position = "relative";
-        }
+        if (pos !== "absolute" && pos !== "fixed" && pos !== "sticky" && pos !== "relative") el.style.position = "relative";
       });
     };
+    const shimImg: Record<string, string> = {};
+    const applyImgTo = (el: HTMLElement, src: string) => {
+      const img = (el.tagName === "IMG" ? el : el.querySelector("img")) as HTMLImageElement | null;
+      if (img && img.getAttribute("src") !== src) { img.removeAttribute("srcset"); img.removeAttribute("sizes"); img.setAttribute("src", src); }
+    };
+    const observer = new MutationObserver(() => {
+      for (const [p, src] of Object.entries(shimImg)) byAttr("data-cms-img", p).forEach((el) => applyImgTo(el, src));
+      if (sel) { stamp(); positionRing(); }
+      ensureAnchored(); ensureEditable();
+    });
 
-    // #2 fix (general): make EVERY [data-cms] editable, including nodes a CLIENT island
-    // mounts AFTER this effect's one-time scan (e.g. /events upcoming cards fetched async,
-    // /news live lists). Before this, the doc-level focusin/click still selected+outlined
-    // them (they "highlighted") but they never got contenteditable, so you couldn't type —
-    // exactly the "clicking highlights but won't let me edit" bug. Idempotent; re-run on
-    // every DOM mutation via the observer below.
-    const ensureEditable = () => {
-      document.querySelectorAll<HTMLElement>("[data-cms]").forEach((el) => {
-        if (el.getAttribute("contenteditable") !== "true") { el.setAttribute("contenteditable", "true"); el.spellcheck = false; }
-      });
+    /* ── sending edits ── */
+    const flushEl = (el: HTMLElement) => {
+      if (!dirty.has(el)) return;
+      dirty.delete(el);
+      const path = pathOf(el);
+      if (!path) return;
+      const value = sanitizeHtml(el.innerHTML);
+      if (lastSent.get(path) === value) return;
+      lastSent.set(path, value);
+      post({ type: "cms:edit", path, value });
+    };
+    const flushAll = () => {
+      if (timer) { clearTimeout(timer); timer = null; }
+      Array.from(dirty).forEach(flushEl);
+    };
+    const markDirty = (el: HTMLElement) => {
+      dirty.add(el);
+      if (composing) return;
+      if (timer) clearTimeout(timer);
+      timer = setTimeout(flushAll, 250);
     };
 
-    const imgObserver = new MutationObserver(() => { if (Object.keys(shimImg).length) reapplyShimImgs(); reapplySel(); reapplySecSel(); ensureAnchored(); ensureEditable(); reapplyOffsets(); });
-    imgObserver.observe(document.body, { childList: true, subtree: true });
-
-    // ── build the floating toolbar ──
-    const bar = document.createElement("div");
-    bar.id = "c3-toolbar";
-    bar.contentEditable = "false";
-    const mkBtn = (html: string, title: string, fn: () => void) => {
-      const b = document.createElement("button"); b.innerHTML = html; b.title = title;
-      b.addEventListener("mousedown", (e) => { e.preventDefault(); fn(); });
-      return b;
+    /* ── caps ── */
+    const textLen = (el: HTMLElement) => (el.textContent || "").length;
+    const selLenIn = (el: HTMLElement) => {
+      const s = window.getSelection();
+      if (!s || !s.rangeCount) return 0;
+      const r = s.getRangeAt(0);
+      return el.contains(r.startContainer) && el.contains(r.endContainer) ? r.toString().length : 0;
     };
-    const exec = (cmd: string, val?: string) => { document.execCommand("styleWithCSS", false, "true"); document.execCommand(cmd, false, val); afterFormat(cmd + (val ? ":" + val : "")); };
-    bar.appendChild(mkBtn("<b>B</b>", "Bold", () => exec("bold")));
-    bar.appendChild(mkBtn("<i>I</i>", "Italic", () => exec("italic")));
-    bar.appendChild(mkBtn("<u>U</u>", "Underline", () => exec("underline")));
-    const sep1 = document.createElement("span"); sep1.className = "sep"; bar.appendChild(sep1);
-    // colors
-    const colors = ["#1b1c1c", "#1cc3af", "#ffffff", "#6b6c6c", "#c0392b", "#d98a16"];
-    colors.forEach((c) => { const s = document.createElement("button"); s.className = "sw"; s.style.background = c; s.title = "Color " + c; s.addEventListener("mousedown", (e) => { e.preventDefault(); exec("foreColor", c); }); bar.appendChild(s); });
-    const custom = document.createElement("input"); custom.type = "color"; custom.title = "Custom color"; custom.style.cssText = "width:24px;height:24px;border:none;background:none;cursor:pointer;padding:0;";
-    custom.addEventListener("input", () => exec("foreColor", custom.value)); bar.appendChild(custom);
-    const sep2 = document.createElement("span"); sep2.className = "sep"; bar.appendChild(sep2);
-    // size
-    const size = document.createElement("select"); size.title = "Text size";
-    [["2", "S"], ["3", "M"], ["5", "L"], ["7", "XL"]].forEach(([v, l]) => { const o = document.createElement("option"); o.value = v; o.textContent = l; size.appendChild(o); });
-    size.value = "3"; size.addEventListener("mousedown", (e) => e.stopPropagation()); size.addEventListener("change", () => exec("fontSize", size.value)); bar.appendChild(size);
-    // font — a VISIBLE picker: each name is rendered in its own font.
-    // v6 R7: DERIVED from the shared FONT_CATALOG (via FONT_PICKER), the same catalog
-    // that generates the layout <link>, so nothing offered here is ever unloaded.
-    const FONTS: [string, string][] = FONT_PICKER;
-    const fontBtn = document.createElement("button");
-    fontBtn.innerHTML = "Font ▾"; fontBtn.title = "Font"; fontBtn.style.minWidth = "60px";
-    const fontMenu = document.createElement("div");
-    fontMenu.id = "c3-fontmenu";
-    fontMenu.style.cssText = "position:fixed; z-index:2147483647; display:none; max-height:320px; overflow-y:auto; overscroll-behavior:contain; background:#1b1c1c; border:1px solid #333; border-radius:10px; padding:6px; box-shadow:0 16px 40px rgba(0,0,0,.45); min-width:200px;";
-    // Keep the wheel inside the menu — never let it scroll the page behind it.
-    fontMenu.addEventListener("wheel", (e) => {
-      const atTop = fontMenu.scrollTop === 0;
-      const atBottom = fontMenu.scrollTop + fontMenu.clientHeight >= fontMenu.scrollHeight - 1;
-      if ((e.deltaY < 0 && atTop) || (e.deltaY > 0 && atBottom)) e.preventDefault();
-      e.stopPropagation();
-    }, { passive: false });
-    FONTS.forEach(([fam, name]) => {
-      const it = document.createElement("div");
-      it.textContent = name; it.style.cssText = `font-family:${fam}; color:#fff; padding:8px 12px; border-radius:7px; cursor:pointer; font-size:17px; white-space:nowrap;`;
-      it.addEventListener("mouseenter", () => (it.style.background = "#333"));
-      it.addEventListener("mouseleave", () => (it.style.background = "transparent"));
-      it.addEventListener("mousedown", (e) => { e.preventDefault(); exec("fontName", fam); fontMenu.style.display = "none"; });
-      fontMenu.appendChild(it);
-    });
-    document.body.appendChild(fontMenu);
-    fontBtn.addEventListener("mousedown", (e) => {
-      e.preventDefault();
-      if (fontMenu.style.display === "block") { fontMenu.style.display = "none"; return; }
-      const r = fontBtn.getBoundingClientRect();
-      fontMenu.style.left = `${Math.min(r.left, window.innerWidth - 220)}px`;
-      fontMenu.style.top = `${r.bottom + 6}px`;
-      fontMenu.style.display = "block";
-    });
-    bar.appendChild(fontBtn);
-    const sep3 = document.createElement("span"); sep3.className = "sep"; bar.appendChild(sep3);
-    bar.appendChild(mkBtn("✕", "Clear formatting", () => exec("removeFormat")));
-    document.body.appendChild(bar);
-
-    // ── v7 R5: the on-canvas "Edit section" oval is GONE ──
-    // Section editing is triggered from the right-rail SectionDock card (which already
-    // sets secSel in HomeEditor). No floating canvas pill — one predictable affordance.
-
-    // ── v4 R2: floating "recolor this tile" chip ──
-    // The discoverable recolor affordance. Hovering ANY recolorable element
-    // ([data-cms-bg] — pillar/ministry tiles, contact cards, footer) reveals this
-    // chip; clicking it posts cms:select{kind:"bg",path} so the editor opens the
-    // background picker. Same stable message contract as the old bare-pixel click,
-    // but a human can actually find and hit it.
-    const bgChip = document.createElement("button");
-    bgChip.id = "c3-bg-handle";
-    bgChip.type = "button";
-    bgChip.setAttribute("data-cms-recolor", "");
-    bgChip.innerHTML = `<span aria-hidden="true">🎨</span> Recolor`;
-    let bgPath = "";
-    bgChip.addEventListener("mousedown", (e) => {
-      e.preventDefault(); e.stopPropagation();
-      if (bgPath) { post({ type: "cms:select", kind: "bg", path: bgPath }); log("select-bg-chip", { path: bgPath }); }
-    });
-    document.body.appendChild(bgChip);
-
-    // ── v7 R12: discoverable "Change image" chip ──
-    // Hovering any image reveals this chip; clicking it opens the image Inspector
-    // (same cms:select{kind:"image"} the image-click posts), so swapping/uploading a
-    // photo is an obvious affordance — not a hidden click-the-image gesture.
-    const imgChip = document.createElement("button");
-    imgChip.id = "c3-img-handle";
-    imgChip.type = "button";
-    imgChip.setAttribute("data-cms-change-image", "");
-    imgChip.innerHTML = `<span aria-hidden="true">🖼</span> Change image`;
-    let imgPath = "";
-    imgChip.addEventListener("mousedown", (e) => {
-      e.preventDefault(); e.stopPropagation();
-      if (imgPath) { post({ type: "cms:select", kind: "image", path: imgPath }); log("select-image-chip", { path: imgPath }); }
-    });
-    document.body.appendChild(imgChip);
-
-    // ── #2 events add/remove: per-card DELETE chip ──
-    // Hovering an authored event card ([data-cms-card="events.cards.<id>"]) reveals a
-    // Delete chip; clicking posts cms:removeCard so the editor drops that card from
-    // PageOverrides.cards and reloads the canvas. (Adding a card is the editor's
-    // "Add event card" section control — the first add flips the grid live→authored.)
-    const cardDelChip = document.createElement("button");
-    cardDelChip.id = "c3-card-delete";
-    cardDelChip.type = "button";
-    cardDelChip.innerHTML = `<span aria-hidden="true">🗑</span> Delete event`;
-    let cardDelPath = "";
-    cardDelChip.addEventListener("mousedown", (e) => {
-      e.preventDefault(); e.stopPropagation();
-      if (cardDelPath) {
-        const id = cardDelPath.split(".").slice(2).join("."); // "events.cards.<id>" → <id>
-        post({ type: "cms:removeCard", list: "events.cards", id });
-        log("remove-card", { path: cardDelPath });
-        cardDelChip.style.display = "none"; cardDelPath = "";
-      }
-    });
-    document.body.appendChild(cardDelChip);
-    const positionCardDel = (el: HTMLElement) => {
+    const updateCounter = (el: HTMLElement | null) => {
+      if (!cap) return;
+      const c = el ? capFor(caps, pathOf(el)) : 0;
+      if (!el || !c || effMode() !== "edit") { cap.style.display = "none"; return; }
+      const n = textLen(el);
+      cap.textContent = `${n} / ${c}`;
+      cap.setAttribute("data-state", n >= c ? "full" : n >= c * 0.9 ? "near" : "ok");
       const r = el.getBoundingClientRect();
-      cardDelChip.style.top = `${Math.max(6, Math.min(window.innerHeight - 44, r.bottom - 44))}px`;
-      cardDelChip.style.left = `${Math.max(6, Math.min(window.innerWidth - 136, r.right - 136))}px`;
-      cardDelChip.style.display = "inline-flex";
+      cap.style.display = "block";
+      cap.style.top = `${Math.min(window.innerHeight - 28, r.bottom + 6)}px`;
+      cap.style.left = `${Math.max(8, Math.min(window.innerWidth - 90, r.right - 70))}px`;
     };
-
-    // ── DRAG-ANYWHERE DELETE: per-freeform-element Delete chip ──
-    // Hovering a freeform element ([data-cms-free] — an "+ Add Text/Button" element)
-    // reveals a Delete chip; clicking posts cms:removeFree so the editor drops it from
-    // freeEls (home model or that page's PageOverrides) and reloads.
-    const freeDelChip = document.createElement("button");
-    freeDelChip.id = "c3-free-delete";
-    freeDelChip.type = "button";
-    freeDelChip.style.cssText =
-      "position:fixed;z-index:2147483646;display:none;align-items:center;gap:5px;background:#e5484d;color:#fff;font:700 11px/1 -apple-system,sans-serif;border:none;border-radius:7px;padding:6px 9px;cursor:pointer;box-shadow:0 4px 14px rgba(0,0,0,.25);";
-    freeDelChip.innerHTML = `<span aria-hidden="true">🗑</span> Delete`;
-    let freeDelId = "";
-    freeDelChip.addEventListener("mousedown", (e) => {
-      e.preventDefault(); e.stopPropagation();
-      if (freeDelId) {
-        post({ type: "cms:removeFree", id: freeDelId });
-        log("remove-free", { id: freeDelId });
-        freeDelChip.style.display = "none"; freeDelId = "";
+    const trimToCap = (el: HTMLElement, c: number) => {
+      let over = textLen(el) - c;
+      if (over <= 0) return;
+      const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
+      const nodes: Text[] = []; let n: Node | null;
+      while ((n = walker.nextNode())) nodes.push(n as Text);
+      for (let i = nodes.length - 1; i >= 0 && over > 0; i--) {
+        const t = nodes[i]; const len = (t.nodeValue || "").length; const cut = Math.min(len, over);
+        t.nodeValue = (t.nodeValue || "").slice(0, len - cut); over -= cut;
       }
-    });
-    document.body.appendChild(freeDelChip);
-    const positionFreeDel = (el: HTMLElement) => {
-      const r = el.getBoundingClientRect();
-      freeDelChip.style.top = `${Math.max(6, r.top - 34)}px`;
-      freeDelChip.style.left = `${Math.max(6, Math.min(window.innerWidth - 96, r.right - 96))}px`;
-      freeDelChip.style.display = "inline-flex";
+      setCaretAt(el, textLen(el));
     };
 
-    let activeEl: HTMLElement | null = null;
-    // Drag-anywhere: set true at the end of a free-element DRAG so the click that
-    // follows mouseup is swallowed (a drag must not also open the link/text inspector).
-    let justDragged = false;
-    const pathOf = (el: HTMLElement | null) => el?.getAttribute("data-cms") || "";
+    /* ── caret helpers ── */
+    const caretOffset = (el: HTMLElement): number => {
+      const s = window.getSelection();
+      if (!s || !s.rangeCount || !el.contains(s.anchorNode)) return -1;
+      const r = document.createRange();
+      r.selectNodeContents(el); r.setEnd(s.anchorNode!, s.anchorOffset);
+      return r.toString().length;
+    };
+    function setCaretAt(el: HTMLElement, offset: number) {
+      const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
+      let pos = 0, n: Node | null, target: Text | null = null, at = 0;
+      while ((n = walker.nextNode())) {
+        const len = (n.nodeValue || "").length;
+        if (offset <= pos + len) { target = n as Text; at = offset - pos; break; }
+        pos += len;
+      }
+      const r = document.createRange();
+      if (target) { r.setStart(target, at); r.collapse(true); } else { r.selectNodeContents(el); r.collapse(false); }
+      const s = window.getSelection(); s?.removeAllRanges(); s?.addRange(r);
+    }
 
-    function positionBar() {
-      const sel = window.getSelection();
+    /* insert plain text at the selection of `el`, as one undoable step where the browser allows */
+    const insertPlain = (el: HTMLElement, text: string) => {
+      if (!text) return;
+      if (typeof document.execCommand === "function") {
+        try { if (document.execCommand("insertText", false, text)) return; } catch { /* fall through */ }
+      }
+      const s = window.getSelection();
+      if (!s || !s.rangeCount || !el.contains(s.anchorNode)) setCaretAt(el, textLen(el));
+      const r = window.getSelection()!.getRangeAt(0);
+      r.deleteContents();
+      const t = document.createTextNode(text);
+      r.insertNode(t); r.setStartAfter(t); r.collapse(true);
+      const s2 = window.getSelection()!; s2.removeAllRanges(); s2.addRange(r);
+      el.dispatchEvent(new Event("input", { bubbles: true }));
+    };
+
+    /* ── format bar (B, I, Link) ── */
+    const selectedFieldRange = (): { el: HTMLElement; range: Range } | null => {
+      const s = window.getSelection();
+      if (!s || !s.rangeCount) return null;
+      const range = s.getRangeAt(0);
+      const a = fieldOf(range.startContainer.nodeType === 1 ? range.startContainer : range.startContainer.parentElement);
+      const b = fieldOf(range.endContainer.nodeType === 1 ? range.endContainer : range.endContainer.parentElement);
+      if (!a || a !== b || !editable.has(a)) return null;
+      return { el: a, range };
+    };
+    function hideBar() { if (bar) bar.style.display = "none"; }
+    function updateBar() {
+      if (!bar) return;
+      const f = selectedFieldRange();
+      if (effMode() !== "edit" || !f || f.range.collapsed) { if (!card || card.style.display !== "flex") hideBar(); return; }
       let rect: DOMRect | null = null;
-      if (sel && sel.rangeCount && !sel.isCollapsed) rect = sel.getRangeAt(0).getBoundingClientRect();
-      else if (activeEl) rect = activeEl.getBoundingClientRect();
-      if (!rect) return;
+      try { rect = f.range.getBoundingClientRect(); } catch { rect = null; }
+      if (!rect || (rect.width === 0 && rect.height === 0)) rect = f.el.getBoundingClientRect();
       bar.style.display = "flex";
-      const bw = bar.offsetWidth || 360;
-      let top = rect.top - bar.offsetHeight - 10;
+      const bw = bar.offsetWidth || 150;
+      let top = rect.top - (bar.offsetHeight || 38) - 10;
       if (top < 8) top = rect.bottom + 10;
       bar.style.top = `${Math.max(8, top)}px`;
-      bar.style.left = `${Math.min(Math.max(8, rect.left + rect.width / 2 - bw / 2), window.innerWidth - bw - 8)}px`;
+      bar.style.left = `${Math.min(Math.max(8, rect.left + rect.width / 2 - bw / 2), Math.max(8, window.innerWidth - bw - 8))}px`;
+      const q = (c: string) => { try { return !!document.queryCommandState?.(c); } catch { return false; } };
+      bar.querySelectorAll("button").forEach((b) => {
+        const l = b.getAttribute("aria-label");
+        if (l === "Bold") b.setAttribute("aria-pressed", String(q("bold")));
+        if (l === "Italic") b.setAttribute("aria-pressed", String(q("italic")));
+      });
     }
-    function hideBar() { bar.style.display = "none"; fontMenu.style.display = "none"; }
-
-    let t: ReturnType<typeof setTimeout> | null = null;
-    function postEdit() {
-      if (!activeEl) return;
-      const path = pathOf(activeEl); const html = activeEl.innerHTML;
-      post({ type: "cms:edit", path, html });
-      log("edit", { path, len: html.length });
+    function format(cmd: "bold" | "italic") {
+      const f = selectedFieldRange();
+      if (!f) return;
+      let done = false;
+      if (typeof document.execCommand === "function") {
+        try { document.execCommand("styleWithCSS", false, "false"); done = document.execCommand(cmd); } catch { done = false; }
+      }
+      if (!done) {
+        const w = document.createElement(cmd === "bold" ? "b" : "i");
+        try { w.appendChild(f.range.extractContents()); f.range.insertNode(w); } catch { return; }
+      }
+      markDirty(f.el); updateBar();
     }
-    function afterFormat(what: string) { log("format", { path: pathOf(activeEl), what }); positionBar(); postEdit(); }
 
-    // make every tagged element editable
-    const els = Array.from(document.querySelectorAll<HTMLElement>("[data-cms]"));
-    els.forEach((el) => { el.setAttribute("contenteditable", "true"); el.spellcheck = false; });
-    ensureAnchored();
-    log("ready", { regions: els.length });
+    /* ── link card ── */
+    const sitePages = () => {
+      if (pages.length) return pages;
+      const seen = new Set<string>(); const out: { title: string; href: string }[] = [];
+      document.querySelectorAll<HTMLAnchorElement>("header a[href], nav a[href]").forEach((a) => {
+        const href = a.getAttribute("href") || ""; const title = (a.textContent || "").trim();
+        if (!href.startsWith("/") || href.startsWith("//") || !title || seen.has(href)) return;
+        seen.add(href); out.push({ title, href });
+      });
+      return out;
+    };
+    const anchorAt = (range: Range, el: HTMLElement): HTMLAnchorElement | null => {
+      const n = range.commonAncestorContainer;
+      const a = (n.nodeType === 1 ? (n as HTMLElement) : n.parentElement)?.closest("a");
+      return a && el.contains(a) ? (a as HTMLAnchorElement) : null;
+    };
+    function renderPages() {
+      if (!cardList || !cardInput) return;
+      const q = cardInput.value.trim().toLowerCase();
+      cardList.textContent = "";
+      const urlish = /^([a-z][a-z0-9+.-]*:|\/|#)/i.test(q);
+      if (urlish) return;
+      sitePages().filter((p) => !q || p.title.toLowerCase().includes(q)).slice(0, 6).forEach((p, i) => {
+        const b = document.createElement("button");
+        b.type = "button"; b.setAttribute("data-page", p.href);
+        if (i === 0 && q) b.setAttribute("data-active", "1");
+        b.innerHTML = `<span></span><small></small>`;
+        (b.firstChild as HTMLElement).textContent = p.title; (b.lastChild as HTMLElement).textContent = p.href;
+        b.addEventListener("mousedown", (e) => { e.preventDefault(); applyLink(p.href); });
+        cardList!.appendChild(b);
+      });
+    }
+    function openLinkCard() {
+      const f = selectedFieldRange();
+      if (!f || !card || !cardInput || effMode() !== "edit") return;
+      const anchor = anchorAt(f.range, f.el);
+      if (f.range.collapsed && !anchor) return;
+      savedRange = f.range.cloneRange();
+      cardInput.value = anchor?.getAttribute("href") || "";
+      if (cardRemove) cardRemove.style.display = anchor ? "" : "none";
+      renderPages();
+      card.style.display = "flex";
+      const r = (() => { try { const rr = f.range.getBoundingClientRect(); return rr.width || rr.height ? rr : f.el.getBoundingClientRect(); } catch { return f.el.getBoundingClientRect(); } })();
+      card.style.top = `${Math.max(8, Math.min(window.innerHeight - 220, r.bottom + 10))}px`;
+      card.style.left = `${Math.max(8, Math.min(window.innerWidth - 296, r.left))}px`;
+      hideBar();
+      cardInput.focus();
+      cardInput.select();
+    }
+    function closeLinkCard(refocus: boolean) {
+      if (!card) return;
+      card.style.display = "none";
+      const f = savedRange ? fieldOf(savedRange.commonAncestorContainer.nodeType === 1 ? savedRange.commonAncestorContainer : savedRange.commonAncestorContainer.parentElement) : null;
+      if (refocus && f) {
+        f.focus({ preventScroll: true });
+        const s = window.getSelection(); s?.removeAllRanges(); if (savedRange) s?.addRange(savedRange);
+      }
+    }
+    function applyLink(raw: string) {
+      const href = safeHref(raw);
+      if (!href || !savedRange) return false;
+      const f = fieldOf(savedRange.commonAncestorContainer.nodeType === 1 ? savedRange.commonAncestorContainer : savedRange.commonAncestorContainer.parentElement);
+      if (!f) return false;
+      const existing = anchorAt(savedRange, f);
+      closeLinkCard(true);
+      if (existing) { existing.setAttribute("href", href); }
+      else {
+        let done = false;
+        if (typeof document.execCommand === "function") {
+          try { done = document.execCommand("createLink", false, href); } catch { done = false; }
+        }
+        if (!done) {
+          const a = document.createElement("a"); a.setAttribute("href", href);
+          const r = savedRange;
+          const frag = r.extractContents();
+          frag.querySelectorAll("a").forEach((x) => x.replaceWith(...Array.from(x.childNodes)));
+          a.appendChild(frag); r.insertNode(a);
+        }
+      }
+      markDirty(f); flushEl(f);
+      return true;
+    }
+    function removeLink() {
+      if (!savedRange) return;
+      const f = fieldOf(savedRange.commonAncestorContainer.nodeType === 1 ? savedRange.commonAncestorContainer : savedRange.commonAncestorContainer.parentElement);
+      if (!f) return;
+      const a = anchorAt(savedRange, f);
+      closeLinkCard(true);
+      if (a) { a.replaceWith(...Array.from(a.childNodes)); markDirty(f); flushEl(f); }
+    }
+    function commitLinkFromInput() {
+      if (!cardInput) return;
+      const v = cardInput.value.trim();
+      const first = cardList?.querySelector<HTMLElement>("[data-page]");
+      if (first && !/^([a-z][a-z0-9+.-]*:|\/|#)/i.test(v)) { applyLink(first.getAttribute("data-page") || ""); return; }
+      applyLink(v);
+    }
+
+    /* ── events on the page ── */
+    const ownerAnchors = (t: HTMLElement) => t.closest("a,button") as HTMLElement | null;
 
     const onFocusIn = (e: FocusEvent) => {
-      const el = (e.target as HTMLElement)?.closest?.("[data-cms]") as HTMLElement | null;
-      if (!el) { return; }
-      activeEl = el; positionBar();
-      // v7 R6: focusing a text region SELECTS it — persistent marching-ants, not a
-      // hover-only outline that vanishes when the mouse moves away.
+      if (inChrome(e.target)) return;
+      const el = fieldOf(e.target);
+      if (!el) return;
+      activeEl = el;
       const p = pathOf(el);
-      clearSel(); clearSecSel(); secSelId = ""; el.classList.add("cms-sel"); selPath = p ? `[data-cms="${p}"]` : "";
-      positionRing();
-      // ITEM 5: a [data-cms] text node inside an element carrying data-cms-href (e.g.
-      // the footer phone/email — an <a href=tel:/mailto:> whose LABEL is the editable
-      // text) posts the link alongside the focus so the editor can render a link field.
-      // Additive: with no data-cms-href we post the unchanged {path}-only shape, so the
-      // text is still directly editable regardless of whether the editor reads hrefPath.
-      const linkEl = el.closest("[data-cms-href]");
-      if (linkEl) {
-        post({ type: "cms:focus", path: p, hrefPath: linkEl.getAttribute("data-cms-href"), href: (linkEl as HTMLAnchorElement).getAttribute("href") || "" });
-      } else {
-        post({ type: "cms:focus", path: p });
-      }
-      log("focus", { path: p });
+      if (!lastSent.has(p)) lastSent.set(p, sanitizeHtml(el.innerHTML));
+      select(el, "text", textExtra(el));
+      updateCounter(el);
+    };
+    const onFocusOut = (e: FocusEvent) => {
+      const el = fieldOf(e.target);
+      if (!el) return;
+      flushEl(el);
+      const to = e.relatedTarget as HTMLElement | null;
+      if (activeEl === el && !(to && inChrome(to))) { activeEl = null; if (cap) cap.style.display = "none"; }
     };
     const onInput = (e: Event) => {
-      const el = (e.target as HTMLElement)?.closest?.("[data-cms]") as HTMLElement | null;
-      if (!el) return; activeEl = el;
-      if (t) clearTimeout(t); t = setTimeout(postEdit, 350);
+      if (inChrome(e.target)) return;
+      const el = fieldOf(e.target);
+      if (!el || effMode() !== "edit") return;
+      activeEl = el;
+      const c = capFor(caps, pathOf(el));
+      if (c && !composing) trimToCap(el, c);
+      markDirty(el);
+      updateCounter(el);
     };
-    const onSelChange = () => { if (activeEl && document.activeElement && activeEl.contains(document.activeElement as Node)) positionBar(); };
-    const clearSel = () => document.querySelectorAll(".cms-sel").forEach((n) => n.classList.remove("cms-sel"));
-    const onClick = (e: MouseEvent) => {
-      // Drag-anywhere: swallow the click that a just-completed free-drag emits, so the
-      // move doesn't also select/open the element's inspector.
-      if (justDragged) { justDragged = false; e.preventDefault(); e.stopPropagation(); return; }
-      const tgt = e.target as HTMLElement;
-      const img = tgt?.closest?.("[data-cms-img]") as HTMLElement | null;
-      const link = tgt?.closest?.("[data-cms-link]") as HTMLElement | null;
-      const icon = tgt?.closest?.("[data-cms-icon]") as HTMLElement | null;
-      const text = tgt?.closest?.("[data-cms]") as HTMLElement | null;
-      if (icon && !text) {
-        e.preventDefault(); e.stopPropagation(); clearSel(); clearSecSel(); secSelId = ""; icon.classList.add("cms-sel");
-        selPath = `[data-cms-icon="${icon.getAttribute("data-cms-icon")}"]`; positionRing();
-        post({ type: "cms:select", kind: "icon", path: icon.getAttribute("data-cms-icon") });
-        log("select-icon", { path: icon.getAttribute("data-cms-icon") });
+    const BLOCKED_INPUT = /^(insertFromDrop|insertFromYank|insertOrderedList|insertUnorderedList|insertHorizontalRule|insertTranspose|formatUnderline|formatStrikeThrough|formatSuperscript|formatSubscript|formatJustify.*|formatIndent|formatOutdent|formatFontName|formatFontSize.*|formatForeColor|formatBackColor|formatSetBlockTextDirection|formatSetInlineTextDirection)$/;
+    const onBeforeInput = (e: Event) => {
+      const el = fieldOf(e.target);
+      if (!el || inChrome(e.target)) return;
+      const ev = e as InputEvent;
+      const t = ev.inputType || "";
+      if (effMode() !== "edit") { e.preventDefault(); return; }
+      if (BLOCKED_INPUT.test(t)) { e.preventDefault(); return; }
+      if (t === "insertParagraph" || t === "insertLineBreak") {
+        e.preventDefault();
+        // a heading, label or button is one line: Enter finishes the line. Body copy takes a soft break.
+        if (el.closest("h1,h2,h3,h4,h5,h6,label,button,a,[data-cms-line]")) { flushEl(el); return; }
+        insertBreak(el);
         return;
       }
-      // OBJECT selection: image → open picker; link → edit label/href
+      const c = capFor(caps, pathOf(el));
+      if (c && !ev.isComposing && (t === "insertText" || t === "insertReplacementText")) {
+        const add = (ev.data || "").length;
+        if (textLen(el) - selLenIn(el) + add > c) e.preventDefault();
+      }
+    };
+    function insertBreak(el: HTMLElement) {
+      if (typeof document.execCommand === "function") {
+        try { if (document.execCommand("insertLineBreak")) return; } catch { /* fall through */ }
+      }
+      const s = window.getSelection(); if (!s || !s.rangeCount) return;
+      const r = s.getRangeAt(0); r.deleteContents();
+      const br = document.createElement("br"); r.insertNode(br); r.setStartAfter(br); r.collapse(true);
+      s.removeAllRanges(); s.addRange(r);
+      el.dispatchEvent(new Event("input", { bubbles: true }));
+    }
+    const onPaste = (e: Event) => {
+      const el = fieldOf(e.target);
+      if (!el || inChrome(e.target)) return;
+      e.preventDefault();
+      if (effMode() !== "edit") return;
+      const cd = (e as ClipboardEvent).clipboardData;
+      let text = (cd?.getData("text/plain") || "").replace(/\s*[\r\n]+\s*/g, " ");
+      const c = capFor(caps, pathOf(el));
+      if (c) text = text.slice(0, Math.max(0, c - (textLen(el) - selLenIn(el))));
+      insertPlain(el, text);
+      if (c) trimToCap(el, c);
+      updateCounter(el);
+    };
+    const onDrop = (e: Event) => { if (fieldOf(e.target) || (e as DragEvent).dataTransfer?.files?.length) e.preventDefault(); };
+    const onCompStart = () => { composing = true; };
+    const onCompEnd = (e: Event) => {
+      composing = false;
+      const el = fieldOf(e.target);
+      if (!el) return;
+      const c = capFor(caps, pathOf(el));
+      if (c) trimToCap(el, c);
+      markDirty(el); updateCounter(el);
+    };
+    const onSelChange = () => {
+      if (activeEl) updateCounter(activeEl);
+      updateBar();
+    };
+
+    const onClick = (e: MouseEvent) => {
+      if (inChrome(e.target)) return;
+      const tgt = e.target as HTMLElement;
+      const em = effMode();
+      const text = tgt?.closest?.("[data-cms]") as HTMLElement | null;
+      if (mode === "visitor") {
+        // see the page as a visitor does, but never leave it: the canvas must keep its token
+        const a = tgt?.closest?.("a") as HTMLAnchorElement | null;
+        const h = a?.getAttribute("href") || "";
+        if (a && h && !h.startsWith("#")) { e.preventDefault(); e.stopPropagation(); }
+        return;
+      }
+      const img = tgt?.closest?.("[data-cms-img]") as HTMLElement | null;
+      const link = tgt?.closest?.("[data-cms-link]") as HTMLElement | null;
       if (img && !text) {
-        e.preventDefault(); e.stopPropagation(); clearSel(); clearSecSel(); secSelId = ""; img.classList.add("cms-sel");
-        selPath = `[data-cms-img="${img.getAttribute("data-cms-img")}"]`; positionRing();
-        post({ type: "cms:select", kind: "image", path: img.getAttribute("data-cms-img") });
-        log("select-image", { path: img.getAttribute("data-cms-img") });
+        e.preventDefault(); e.stopPropagation();
+        select(img, "image");
         return;
       }
       if (link && !text) {
-        e.preventDefault(); e.stopPropagation(); clearSel(); clearSecSel(); secSelId = ""; link.classList.add("cms-sel");
-        selPath = `[data-cms-link="${link.getAttribute("data-cms-link")}"]`; positionRing();
-        const lab = (link.querySelector("[data-cms-link-label]") as HTMLElement)?.innerText ?? link.innerText;
-        // ITEM 3: carry the button's inner HTML so the editor preview can render an
-        // ICON-only button (Facebook/Instagram/YouTube) as its real icon, not "button".
-        post({ type: "cms:select", kind: "link", path: link.getAttribute("data-cms-link"), label: lab, href: (link as HTMLAnchorElement).getAttribute?.("href") || "", html: link.innerHTML });
-        log("select-link", { path: link.getAttribute("data-cms-link") });
-        return;
-      }
-      // v3 R3: BACKGROUND selection — a tile's non-text area. Lowest priority, so
-      // clicking its text/image/button/icon still edits those directly.
-      const bg = tgt?.closest?.("[data-cms-bg]") as HTMLElement | null;
-      if (bg && !text && !img && !link && !icon) {
-        e.preventDefault(); e.stopPropagation(); clearSel(); clearSecSel(); secSelId = ""; bg.classList.add("cms-sel");
-        selPath = `[data-cms-bg="${bg.getAttribute("data-cms-bg")}"]`; positionRing();
-        // ITEM 4: carry the tile's ACTUAL rendered background so the editor's picker
-        // swatch shows the CURRENT color even when no bgFill override is saved yet.
-        post({ type: "cms:select", kind: "bg", path: bg.getAttribute("data-cms-bg"), value: getComputedStyle(bg).backgroundColor });
-        log("select-bg", { path: bg.getAttribute("data-cms-bg") });
-        return;
-      }
-      // keystone A: SECTION selection — a click on a section's own chrome that isn't a
-      // tagged text/image/link/icon/bg target selects the WHOLE section, so its rail
-      // controls (move / bg / style / delete) open and the marching-ants ring the
-      // section. Lowest priority, so editing any tile's content still wins. The rail
-      // card (symptom C) is the always-available path; this makes the canvas work too.
-      const sec = tgt?.closest?.("[data-section]") as HTMLElement | null;
-      if (sec && !text && !img && !link && !icon && !bg) {
         e.preventDefault(); e.stopPropagation();
-        const id = sec.getAttribute("data-section") || "";
-        clearSel(); selPath = ""; positionRing(); // section wins → drop any element ring
-        selectSection(id);
-        post({ type: "cms:select", kind: "section", path: id });
-        log("select-section", { path: id });
+        const lab = (link.querySelector("[data-cms-link-label]") as HTMLElement | null)?.textContent ?? link.textContent ?? "";
+        select(link, "link", { label: lab, href: link.getAttribute("href") || "" });
         return;
       }
-      // plain links/buttons (untagged) — block navigation in edit mode
-      const a = tgt?.closest?.("a,button");
-      if (a && !text) { e.preventDefault(); e.stopPropagation(); log("blocked-nav", { to: (a as HTMLAnchorElement).getAttribute?.("href") || "" }); }
-      if (a && text) e.preventDefault();
+      if (text) {
+        const a = ownerAnchors(tgt);
+        if (a) e.preventDefault(); // a field inside a link edits, it does not navigate
+        if (em !== "edit" || !activeEl) select(text, "text", textExtra(text));
+        return;
+      }
+      const sec = tgt?.closest?.("[data-section]") as HTMLElement | null;
+      if (sec) {
+        e.preventDefault(); e.stopPropagation();
+        select(sec, "section");
+        return;
+      }
+      if (ownerAnchors(tgt)) { e.preventDefault(); e.stopPropagation(); }
     };
     const onDocMouseDown = (e: MouseEvent) => {
+      if (inChrome(e.target)) return;
       const t = e.target as HTMLElement;
-      if (!t?.closest?.("[data-cms]") && !t?.closest?.("#c3-toolbar") && !t?.closest?.("#c3-fontmenu")) hideBar();
-      // BUG #2 (click section/tile BACKGROUND highlights TEXT): the browser places a
-      // text caret AND starts a text selection on mousedown — BEFORE our click handler
-      // (onClick) gets to route the click to background / section selection. So the
-      // nearest editable text got caret-focused + highlighted instead of the background
-      // being selected. FIX: on mousedown, if the target is NOT inside a tagged text
-      // region ([data-cms]) but IS inside a selectable OBJECT (bg tile / image / link /
-      // icon / section wrapper), preventDefault → no caret, no text-selection. The click
-      // handler below still fires and selects that background/section. Clicking ACTUAL
-      // text ([data-cms] present) is untouched, so normal in-place editing still works.
-      if (t?.closest?.("[data-cms]")) return; // real text — let the caret land
-      if (t === bgChip || t === imgChip || t === cardDelChip || t?.closest?.("#c3-toolbar") || t?.closest?.("#c3-fontmenu")) return;
-      const obj = t?.closest?.("[data-cms-bg],[data-cms-img],[data-cms-link],[data-cms-icon],[data-section]");
-      if (obj) { e.preventDefault(); }
+      if (!t?.closest?.("[data-cms]")) hideBar();
+      if (mode === "visitor") return;
+      if (t?.closest?.("[data-cms]")) return; // real text: let the caret land
+      const obj = t?.closest?.("[data-cms-img],[data-cms-link],[data-section]");
+      if (obj) {
+        // no stray caret or text selection from pressing on a photo, button or section...
+        e.preventDefault();
+        // ...but pressing there still ends the edit in the field that had focus, and sends its text
+        if (activeEl) { flushEl(activeEl); activeEl.blur(); }
+      }
     };
 
-    // v4 R2: position the recolor chip at the top-RIGHT of the hovered tile.
-    const positionBgChip = (el: HTMLElement) => {
-      const r = el.getBoundingClientRect();
-      bgChip.style.top = `${Math.max(6, r.top + 8)}px`;
-      bgChip.style.left = `${Math.max(6, Math.min(window.innerWidth - 108, r.right - 108))}px`;
-      bgChip.style.display = "inline-flex";
+    const visible = (el: HTMLElement) => {
+      if (el.closest("[hidden],[aria-hidden='true']")) return false;
+      const cs = getComputedStyle(el);
+      return cs.display !== "none" && cs.visibility !== "hidden";
     };
-    // v7 R12: the change-image chip sits top-LEFT of the image (the removed section oval's spot).
-    const positionImgChip = (el: HTMLElement) => {
-      const r = el.getBoundingClientRect();
-      imgChip.style.top = `${Math.max(6, r.top + 8)}px`;
-      imgChip.style.left = `${Math.max(6, r.left + 8)}px`;
-      imgChip.style.display = "inline-flex";
-    };
-    const onOver = (e: MouseEvent) => {
-      const t = e.target as HTMLElement;
-      // Keep whichever chip the pointer moved onto (so it can be clicked).
-      if (t === bgChip || t === imgChip || t === cardDelChip || t === freeDelChip) return;
-      // #2: show the per-card Delete chip whenever hovering an authored event card
-      // (independent of the img/bg chips below, which keep their own behavior).
-      const cardEl = t?.closest?.("[data-cms-card]") as HTMLElement | null;
-      if (cardEl) { cardDelPath = cardEl.getAttribute("data-cms-card") || ""; positionCardDel(cardEl); }
-      else { cardDelChip.style.display = "none"; cardDelPath = ""; }
-      // Drag-anywhere: show the Delete chip whenever hovering a freeform element.
-      const freeHov = t?.closest?.("[data-cms-free]") as HTMLElement | null;
-      if (freeHov) { freeDelId = freeHov.getAttribute("data-cms-free") || ""; positionFreeDel(freeHov); }
-      else { freeDelChip.style.display = "none"; freeDelId = ""; }
-      // v7 R7 + R12: images are NOT recolorable but ARE swappable. A [data-cms-img] often
-      // sits INSIDE a recolorable [data-cms-bg] wrapper (e.g. a pillar photo), so suppress
-      // the 🎨 recolor chip over images and instead show the discoverable 🖼 Change image chip.
-      const imgEl = t?.closest?.("[data-cms-img]") as HTMLElement | null;
-      if (imgEl) {
-        bgChip.style.display = "none"; bgPath = "";
-        imgPath = imgEl.getAttribute("data-cms-img") || ""; positionImgChip(imgEl);
+    const onKeyDown = (e: KeyboardEvent) => {
+      const em = effMode();
+      const k = e.key;
+      if ((e.metaKey || e.ctrlKey) && !e.altKey && !e.shiftKey && (k === "k" || k === "K")) {
+        if (em === "edit" && selectedFieldRange()) { e.preventDefault(); openLinkCard(); }
         return;
       }
-      imgChip.style.display = "none"; imgPath = "";
-      // v4 R2: a recolorable element (tile / card / footer) → show the recolor chip.
-      const bgEl = t?.closest?.("[data-cms-bg]") as HTMLElement | null;
-      if (bgEl) { bgPath = bgEl.getAttribute("data-cms-bg") || ""; positionBgChip(bgEl); }
-      else { bgChip.style.display = "none"; bgPath = ""; }
-    };
-
-    // ── DRAG-ANYWHERE: free-move [data-cms-free] elements with snap-to-guides ──
-    // A freeform element (FreeLayer) can be grabbed and dragged to any spot on the page.
-    // Threshold-based: a click without movement still edits (text) / selects (button);
-    // moving past 5px enters DRAG mode — the caret is dropped, the element follows the
-    // pointer, and it SNAPS to the page's vertical center (a dashed guide shows) and to
-    // the left edge. On drop we post cms:moveFree{id,xPct,yPx} (x as % of the page width,
-    // y as px) so the editor can persist it into PageOverrides.freeEls. Preview + public
-    // safe: FreeLayer renders the elements; only the editor iframe wires this drag.
-    const gV = document.createElement("div");
-    gV.style.cssText = "position:fixed;z-index:2147483200;top:0;bottom:0;width:0;border-left:2px dashed #7c3aed;display:none;pointer-events:none;";
-    const gH = document.createElement("div");
-    gH.style.cssText = "position:fixed;z-index:2147483200;left:0;right:0;height:0;border-top:2px dashed #7c3aed;display:none;pointer-events:none;";
-    document.body.appendChild(gV); document.body.appendChild(gH);
-    const SNAP = 7;
-    let dEl: HTMLElement | null = null, dId = "", dStartX = 0, dStartY = 0, dLeft0 = 0, dTop0 = 0, dragging = false;
-    let layerRect: DOMRect | null = null;
-    const freeLayer = () => document.querySelector<HTMLElement>("[data-cms-free-layer]");
-    const onFreeMove = (e: MouseEvent) => {
-      if (!dEl || !layerRect) return;
-      const dx = e.clientX - dStartX, dy = e.clientY - dStartY;
-      if (!dragging && Math.abs(dx) < 5 && Math.abs(dy) < 5) return;
-      if (!dragging) {
-        dragging = true; document.body.style.userSelect = "none";
-        try { window.getSelection()?.removeAllRanges(); } catch {}
-        dEl.classList.add("cms-sel"); dEl.style.zIndex = "2147483100"; hideBar();
-      }
-      e.preventDefault(); e.stopPropagation();
-      const w = dEl.offsetWidth, h = dEl.offsetHeight, lw = layerRect.width;
-      let left = dLeft0 + dx, top = dTop0 + dy;
-      left = Math.max(0, Math.min(Math.max(0, lw - w), left));
-      top = Math.max(0, top);
-      // snap element center to the page's vertical center line
-      const center = left + w / 2, mid = lw / 2;
-      gV.style.display = "none"; gH.style.display = "none";
-      if (Math.abs(center - mid) < SNAP) { left = mid - w / 2; gV.style.left = `${layerRect.left + mid}px`; gV.style.display = "block"; }
-      else if (Math.abs(left) < SNAP) { left = 0; gV.style.left = `${layerRect.left}px`; gV.style.display = "block"; }
-      // snap top to a light 8px grid + show a horizontal guide at the element's top
-      top = Math.round(top / 8) * 8;
-      gH.style.top = `${layerRect.top + top}px`; gH.style.display = "block";
-      dEl.style.left = `${left}px`; dEl.style.top = `${top}px`;
-    };
-    const onFreeUp = () => {
-      document.removeEventListener("mousemove", onFreeMove, true);
-      document.removeEventListener("mouseup", onFreeUp, true);
-      gV.style.display = "none"; gH.style.display = "none"; document.body.style.userSelect = "";
-      if (dragging && dEl && layerRect) {
-        const left = parseFloat(dEl.style.left) || 0, top = parseFloat(dEl.style.top) || 0;
-        const xPct = layerRect.width ? (left / layerRect.width) * 100 : 0;
-        justDragged = true; // swallow the trailing click
-        post({ type: "cms:moveFree", id: dId, xPct, yPx: Math.round(top) });
-        log("move-free", { id: dId, xPct: Math.round(xPct), yPx: Math.round(top) });
-      }
-      if (dEl) dEl.style.zIndex = "";
-      dEl = null; dragging = false; layerRect = null;
-    };
-    const onFreeDown = (e: MouseEvent) => {
-      const fe = (e.target as HTMLElement)?.closest?.("[data-cms-free]") as HTMLElement | null;
-      if (!fe) return;
-      const layer = freeLayer(); if (!layer) return;
-      layerRect = layer.getBoundingClientRect();
-      const r = fe.getBoundingClientRect();
-      dEl = fe; dId = fe.getAttribute("data-cms-free") || "";
-      dLeft0 = r.left - layerRect.left; dTop0 = r.top - layerRect.top;
-      dStartX = e.clientX; dStartY = e.clientY; dragging = false;
-      document.addEventListener("mousemove", onFreeMove, true);
-      document.addEventListener("mouseup", onFreeUp, true);
-    };
-    document.addEventListener("mousedown", onFreeDown, true);
-
-    // ── ITEM 1: DRAG-ANYWHERE for ANY in-flow element (button/text/image/icon) ──
-    // Google-Slides / Pic-Collage feel: SELECT an element, then press it and move — it
-    // follows the pointer and is dropped anywhere. We do NOT re-parent it; we persist a
-    // pixel OFFSET keyed by the element's OWN data-cms* attribute selector and apply it
-    // with transform:translate. Round-trips through cms:offset → editor freeOffsets →
-    // <FreeOffsetStyle> on the published/draft page, so the move survives reload + ships
-    // live. In the editor we ALSO apply it inline (from the cms:setOffsets echo the editor
-    // posts on ready) so the preview shows it regardless of the page's SSR wiring.
-    const OFFSET_ATTRS = ["data-cms", "data-cms-link", "data-cms-img", "data-cms-icon"];
-    const offsets: Record<string, { x: number; y: number }> = {};
-    const offsetSelFor = (el: HTMLElement): string => {
-      for (const a of OFFSET_ATTRS) { const v = el.getAttribute(a); if (v !== null) return `[${a}="${v}"]`; }
-      return "";
-    };
-    const applyOffset = (sel: string, o: { x: number; y: number } | undefined) => {
-      document.querySelectorAll<HTMLElement>(sel).forEach((el) => {
-        if (o && (o.x !== 0 || o.y !== 0)) {
-          el.style.transform = `translate(${o.x}px,${o.y}px)`;
-          const pos = getComputedStyle(el).position;
-          if (pos === "static" || pos === "") el.style.position = "relative";
-        } else {
-          el.style.transform = "";
+      if (k === "Escape") {
+        if (card && card.style.display === "flex") { e.preventDefault(); closeLinkCard(true); return; }
+        const cur = activeEl || fieldOf(document.activeElement);
+        if (cur && document.activeElement === cur) {
+          flushAll(); cur.blur(); activeEl = null; hideBar(); if (cap) cap.style.display = "none";
+          window.getSelection()?.removeAllRanges();
+          return;
         }
-      });
-    };
-    const applyAllOffsets = () => { for (const [sel, o] of Object.entries(offsets)) applyOffset(sel, o); };
-    // Re-assert offsets after a client re-render remounts a node (which drops inline
-    // style). Skipped mid-drag so the live transform isn't clobbered by a stale base.
-    const reapplyOffsets = () => { if (!oDragging && Object.keys(offsets).length) applyAllOffsets(); };
-
-    // offset-drag state (parallel to the FreeLayer drag above; transform-based)
-    let oEl: HTMLElement | null = null, oSel = "", oSx = 0, oSy = 0, oBaseX = 0, oBaseY = 0;
-    let oRect0: DOMRect | null = null, oDragging = false;
-    const onOffMove = (e: MouseEvent) => {
-      if (!oEl || !oRect0) return;
-      const dx = e.clientX - oSx, dy = e.clientY - oSy;
-      if (!oDragging && Math.abs(dx) < 5 && Math.abs(dy) < 5) return;
-      if (!oDragging) {
-        oDragging = true; document.body.style.userSelect = "none";
-        try { window.getSelection()?.removeAllRanges(); } catch {}
-        oEl.style.zIndex = "2147483100"; oEl.style.cursor = "grabbing"; hideBar();
+        if (secSelId) {
+          const id = secSelId; const index = sections().findIndex((s) => s.getAttribute("data-section") === id);
+          clearSelection(false);
+          post({ type: "cms:section", op: "deselect", id, index });
+          return;
+        }
+        if (sel) clearSelection(true);
+        return;
       }
-      e.preventDefault(); e.stopPropagation();
-      let nx = oBaseX + dx, ny = oBaseY + dy;
-      const elemCenter = oRect0.left + dx + oRect0.width / 2;
-      const pageCenter = window.innerWidth / 2;
-      gV.style.display = "none"; gH.style.display = "none";
-      // snap the element's center to the page's horizontal center (dashed guide shows)
-      if (Math.abs(elemCenter - pageCenter) < SNAP) {
-        nx = oBaseX + (pageCenter - (oRect0.left + oRect0.width / 2));
-        gV.style.left = `${pageCenter}px`; gV.style.display = "block";
-      } else if (Math.abs(nx) < SNAP) {
-        // snap back to the element's NATURAL horizontal position (offset 0)
-        nx = 0; gV.style.left = `${oRect0.left - oBaseX + oRect0.width / 2}px`; gV.style.display = "block";
+      if (k === "Tab" && em === "edit" && !e.ctrlKey && !e.metaKey && !e.altKey && !inChrome(e.target)) {
+        const cur = fieldOf(document.activeElement);
+        if (!cur) return;
+        const list = fields().filter((f) => editable.has(f) && visible(f));
+        const i = list.indexOf(cur);
+        const next = list[i + (e.shiftKey ? -1 : 1)];
+        if (i < 0 || !next) return; // past the first or last field: let focus leave the page
+        e.preventDefault();
+        flushAll();
+        next.focus({ preventScroll: false });
+        const r = document.createRange(); r.selectNodeContents(next);
+        const s = window.getSelection(); s?.removeAllRanges(); s?.addRange(r);
+        return;
       }
-      // snap back to natural vertical position (offset 0) with a guide
-      if (Math.abs(ny) < SNAP) { ny = 0; gH.style.top = `${oRect0.top - oBaseY}px`; gH.style.display = "block"; }
-      oEl.style.transform = `translate(${nx}px,${ny}px)`;
-      const pos = getComputedStyle(oEl).position; if (pos === "static" || pos === "") oEl.style.position = "relative";
-      positionRing();
-    };
-    const onOffUp = () => {
-      document.removeEventListener("mousemove", onOffMove, true);
-      document.removeEventListener("mouseup", onOffUp, true);
-      gV.style.display = "none"; gH.style.display = "none"; document.body.style.userSelect = "";
-      if (oDragging && oEl && oSel) {
-        // final offset = the applied translate (parse it back out)
-        const m = /translate\(\s*(-?[\d.]+)px\s*,\s*(-?[\d.]+)px/.exec(oEl.style.transform || "");
-        const nx = m ? Math.round(parseFloat(m[1])) : oBaseX;
-        const ny = m ? Math.round(parseFloat(m[2])) : oBaseY;
-        offsets[oSel] = { x: nx, y: ny };
-        justDragged = true; // swallow the trailing click (don't also open the inspector)
-        post({ type: "cms:offset", sel: oSel, x: nx, y: ny });
-        log("offset", { sel: oSel, x: nx, y: ny });
+      if (e.altKey && (k === "ArrowUp" || k === "ArrowDown") && em === "edit" && secSelId && !fieldOf(document.activeElement)) {
+        const all = sections();
+        const i = all.findIndex((s) => s.getAttribute("data-section") === secSelId);
+        const j = i + (k === "ArrowUp" ? -1 : 1);
+        if (i < 0 || j < 0 || j >= all.length) return;
+        e.preventDefault();
+        post({ type: "cms:section", op: "move", id: secSelId, index: j });
       }
-      if (oEl) { oEl.style.zIndex = ""; oEl.style.cursor = ""; }
-      oEl = null; oSel = ""; oDragging = false; oRect0 = null;
-      positionRing();
     };
-    const onOffDown = (e: MouseEvent) => {
-      const t = e.target as HTMLElement;
-      if (t?.closest?.("[data-cms-free]")) return; // FreeLayer elements use their own drag
-      const el = t?.closest?.(CMS_SELECTOR) as HTMLElement | null;
-      if (!el || !selPath) return;
-      // Only a SELECTED element is draggable — press-and-move on the current selection.
-      if (!el.matches(selPath)) return;
-      oEl = el; oSel = offsetSelFor(el); if (!oSel) { oEl = null; return; }
-      const base = offsets[oSel] || { x: 0, y: 0 };
-      oBaseX = base.x; oBaseY = base.y;
-      oRect0 = el.getBoundingClientRect();
-      oSx = e.clientX; oSy = e.clientY; oDragging = false;
-      document.addEventListener("mousemove", onOffMove, true);
-      document.addEventListener("mouseup", onOffUp, true);
-    };
-    document.addEventListener("mousedown", onOffDown, true);
+    const onScroll = () => { positionRing(); updateBar(); if (activeEl) updateCounter(activeEl); };
+    const onResize = () => { positionRing(); updateBar(); };
+    const onHide = () => flushAll();
+    const onVis = () => { if (document.visibilityState === "hidden") flushAll(); };
 
     document.addEventListener("focusin", onFocusIn, true);
+    document.addEventListener("focusout", onFocusOut, true);
     document.addEventListener("input", onInput, true);
+    document.addEventListener("beforeinput", onBeforeInput, true);
+    document.addEventListener("paste", onPaste, true);
+    document.addEventListener("drop", onDrop, true);
+    document.addEventListener("compositionstart", onCompStart, true);
+    document.addEventListener("compositionend", onCompEnd, true);
     document.addEventListener("selectionchange", onSelChange);
     document.addEventListener("click", onClick, true);
     document.addEventListener("mousedown", onDocMouseDown, true);
-    document.addEventListener("mouseover", onOver, true);
-    window.addEventListener("scroll", () => { if (bar.style.display === "flex") positionBar(); positionRing(); bgChip.style.display = "none"; imgChip.style.display = "none"; cardDelChip.style.display = "none"; }, true);
-    window.addEventListener("resize", () => { positionRing(); if (bar.style.display === "flex") positionBar(); }, true);
+    document.addEventListener("keydown", onKeyDown, true);
+    document.addEventListener("visibilitychange", onVis);
+    window.addEventListener("pagehide", onHide);
+    window.addEventListener("scroll", onScroll, true);
+    window.addEventListener("resize", onResize, true);
+
+    /* ── messages from Studio ── */
+    const setMode = (next: BridgeMode) => {
+      const was = effMode();
+      mode = next;
+      const now = effMode();
+      if (was === "edit" && now !== "edit") { flushAll(); if (activeEl) activeEl.blur(); activeEl = null; hideBar(); if (cap) cap.style.display = "none"; }
+      root.setAttribute("data-cms-mode", now);
+      root.toggleAttribute("data-cms-locked", mode === "edit" && now !== "edit");
+      if (next === "visitor") {
+        dropChrome(); clearMarks(); sel = null; secSelId = "";
+        root.removeAttribute("data-cms-edit");
+      } else {
+        buildChrome();
+        root.setAttribute("data-cms-edit", "1");
+        stamp(); positionRing();
+      }
+      ensureEditable();
+    };
+
+    const findByPath = (path: string): { el: HTMLElement; kind: "text" | "image" | "link" | "section" } | null => {
+      for (const kind of ["text", "image", "link", "section"] as const) {
+        const hit = byAttr(KIND_ATTR[kind], path);
+        if (hit.length) return { el: hit.find((el) => { const r = el.getBoundingClientRect(); return r.width > 0; }) || hit[0], kind };
+      }
+      return null;
+    };
 
     const onMsg = (e: MessageEvent) => {
-      const d = e.data; if (!d || d.source !== "c3editor") return;
-      if (d.type === "cms:setHtml" && typeof d.path === "string") {
-        document.querySelectorAll<HTMLElement>(`[data-cms="${d.path}"]`).forEach((el) => { if (el.innerHTML !== d.html) el.innerHTML = d.html; });
-      } else if (d.type === "cms:setImg" && typeof d.path === "string") {
-        // U10 preview shim: live-swap a tagged image (esp. the g:logo-* marks) so a
-        // global image edit shows in the preview without a Publish/reload round-trip.
-        // Unit L: stored + re-applied on remount (see applyShimImg / imgObserver).
-        applyShimImg(d.path, typeof d.src === "string" ? d.src : "");
-      } else if (d.type === "cms:setStyle" && typeof d.path === "string") {
-        // Update the shim stylesheet (survives re-render); "" clears the rule → default.
-        // v8 polish P6: scope:"section" paints a `[data-section=id]>*` rule; else a tile.
-        const bg = typeof d.background === "string" ? d.background : "";
-        if (d.scope === "section") applyShimSection(d.path, bg); else applyShimBg(d.path, bg);
-      } else if (d.type === "cms:selectSection" && typeof d.id === "string") {
-        // keystone C: the editor selected a section (rail card OR echoing a canvas
-        // click) → ring that [data-section] and bring it into view so the user sees
-        // exactly what they're editing.
-        selectSection(d.id);
-        if (d.id) {
-          const el = document.querySelector<HTMLElement>(`[data-section="${cssEsc(d.id)}"]`);
-          if (el && d.scroll !== false) el.scrollIntoView({ behavior: "smooth", block: "center" });
+      if (e.origin !== STUDIO || e.source !== window.parent) return;
+      const d = e.data as Record<string, unknown> | null;
+      if (!d || typeof d !== "object" || d.v !== V || d.source !== "c3editor" || typeof d.type !== "string") return;
+      switch (d.type) {
+        case "editor:mode": {
+          if (typeof d.mode !== "string" || !MODES.includes(d.mode as BridgeMode)) return;
+          if (d.caps && typeof d.caps === "object") {
+            const next: Record<string, number> = {};
+            for (const [k, v] of Object.entries(d.caps as Record<string, unknown>)) if (typeof v === "number" && Number.isFinite(v) && v > 0) next[k.slice(0, 200)] = Math.floor(v);
+            caps = next;
+          }
+          if (Array.isArray(d.pages)) {
+            pages = (d.pages as unknown[]).slice(0, 200).flatMap((p) => {
+              const o = p as { title?: unknown; href?: unknown };
+              const href = safeHref(o?.href);
+              return typeof o?.title === "string" && href ? [{ title: o.title.slice(0, 80), href }] : [];
+            });
+          }
+          setMode(d.mode as BridgeMode);
+          postReady("mode");
+          return;
         }
-      } else if (d.type === "cms:deselectSection") {
-        selectSection("");
-      } else if (d.type === "cms:setOffsets" && d.offsets && typeof d.offsets === "object") {
-        // ITEM 1: the editor echoes the current scope's freeOffsets (on ready + after a
-        // move) so a reloaded/remounted preview re-applies every element's drag offset.
-        for (const k of Object.keys(offsets)) delete offsets[k];
-        for (const [sel, o] of Object.entries(d.offsets as Record<string, { x?: number; y?: number }>)) {
-          if (o && typeof o === "object") offsets[sel] = { x: Number(o.x) || 0, y: Number(o.y) || 0 };
+        case "editor:select": {
+          if (typeof d.path !== "string" || d.path.length > 300) return;
+          if (d.path === "") { clearSelection(false); return; }
+          const hit = findByPath(d.path);
+          if (!hit || mode === "visitor") return;
+          select(hit.el, hit.kind, hit.kind === "text" ? textExtra(hit.el) : {}, { echo: true });
+          try { hit.el.scrollIntoView({ block: "nearest" }); } catch { /* old engine */ }
+          if (hit.kind === "text" && effMode() === "edit" && editable.has(hit.el)) {
+            hit.el.focus({ preventScroll: true });
+            setCaretAt(hit.el, textLen(hit.el));
+          }
+          return;
         }
-        applyAllOffsets(); positionRing();
+        case "editor:apply": {
+          if (typeof d.path !== "string" || d.path.length > 300) return;
+          applyValue(d.path, d.value);
+          return;
+        }
       }
     };
+
+    function applyValue(path: string, value: unknown) {
+      // text: a string of HTML, reduced to the allow-list
+      if (typeof value === "string") {
+        const html = sanitizeHtml(value);
+        const texts = byAttr("data-cms", path);
+        if (texts.length) {
+          lastSent.set(path, html);
+          texts.forEach((el) => {
+            const focused = document.activeElement === el;
+            if (focused && (dirty.has(el) || composing)) return; // the editor's copy is older than the typing in it
+            if (sanitizeHtml(el.innerHTML) === html) return;
+            const at = focused ? caretOffset(el) : -1;
+            el.innerHTML = html;
+            if (focused && at >= 0) setCaretAt(el, Math.min(at, textLen(el)));
+            if (focused) updateCounter(el);
+          });
+          return;
+        }
+        // image: a URL string
+        const imgs = byAttr("data-cms-img", path);
+        const src = safeImgSrc(value);
+        if (imgs.length && src) { shimImg[path] = src; imgs.forEach((el) => applyImgTo(el, src)); }
+        return;
+      }
+      // link: {label?, href?}
+      if (value && typeof value === "object") {
+        const v = value as { label?: unknown; href?: unknown };
+        byAttr("data-cms-link", path).forEach((a) => {
+          const href = safeHref(v.href);
+          if (href) a.setAttribute("href", href);
+          if (typeof v.label === "string") {
+            const lab = a.querySelector("[data-cms-link-label]") as HTMLElement | null;
+            (lab || a).textContent = v.label.slice(0, 200);
+          }
+        });
+      }
+    }
+
     window.addEventListener("message", onMsg);
-    post({ type: "cms:ready" });
+    setMode("view");
+    observer.observe(document.body, { childList: true, subtree: true });
+    ensureAnchored();
+    postReady("load");
 
     return () => {
+      flushAll();
       document.removeEventListener("focusin", onFocusIn, true);
+      document.removeEventListener("focusout", onFocusOut, true);
       document.removeEventListener("input", onInput, true);
+      document.removeEventListener("beforeinput", onBeforeInput, true);
+      document.removeEventListener("paste", onPaste, true);
+      document.removeEventListener("drop", onDrop, true);
+      document.removeEventListener("compositionstart", onCompStart, true);
+      document.removeEventListener("compositionend", onCompEnd, true);
       document.removeEventListener("selectionchange", onSelChange);
       document.removeEventListener("click", onClick, true);
       document.removeEventListener("mousedown", onDocMouseDown, true);
-      document.removeEventListener("mousedown", onFreeDown, true);
-      document.removeEventListener("mousedown", onOffDown, true);
-      document.removeEventListener("mousemove", onOffMove, true);
-      document.removeEventListener("mouseup", onOffUp, true);
-      cancelAnimationFrame(ringRaf);
-      gV.remove(); gH.remove(); selRing.remove();
-      document.removeEventListener("mouseover", onOver, true);
+      document.removeEventListener("keydown", onKeyDown, true);
+      document.removeEventListener("visibilitychange", onVis);
+      window.removeEventListener("pagehide", onHide);
+      window.removeEventListener("scroll", onScroll, true);
+      window.removeEventListener("resize", onResize, true);
       window.removeEventListener("message", onMsg);
-      els.forEach((el) => el.removeAttribute("contenteditable"));
-      imgObserver.disconnect();
-      bar.remove(); fontMenu.remove(); style.remove(); bgChip.remove(); imgChip.remove(); cardDelChip.remove(); shimStyle.remove();
-      document.documentElement.removeAttribute("data-cms-edit");
+      if (timer) clearTimeout(timer);
+      observer.disconnect();
+      mode = "view"; ensureEditable();
+      clearMarks(); dropChrome();
+      root.removeAttribute("data-cms-edit"); root.removeAttribute("data-cms-mode"); root.removeAttribute("data-cms-locked");
     };
   }, []);
 
