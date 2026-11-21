@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 /**
- * In-place typing rules (story C3-P2ES; editor audit E1-08, E1-10, E1-13, E1-15, E1-16, E1-19):
+ * In-place typing rules:
  * view mode is read-only, paste is plain text, a capped field stops at its cap, Cmd+K makes a link,
  * Tab walks the fields in reading order, Esc ends editing.
  */
@@ -17,7 +17,7 @@ const PAGE = `
   <p data-cms="t:card.body">A card.</p>`;
 const $ = (s: string) => document.querySelector(s) as HTMLElement;
 
-describe("view mode is view only (E1-16)", () => {
+describe("view mode is view only", () => {
   it("nothing is contenteditable and typing posts nothing", async () => {
     h = await mountEditor(PAGE, { mode: "view" });
     expect(document.querySelectorAll("[contenteditable]").length).toBe(0);
@@ -39,7 +39,7 @@ describe("view mode is view only (E1-16)", () => {
   });
 });
 
-describe("paste is plain text and a capped field stops at its cap (E1-15)", () => {
+describe("paste is plain text and a capped field stops at its cap", () => {
   it("a paste is inserted as text only, newlines folded to spaces, and the default paste is cancelled", async () => {
     h = await mountEditor(PAGE, { mode: "edit" });
     const el = $('[data-cms="t:card.body"]');
@@ -50,7 +50,7 @@ describe("paste is plain text and a capped field stops at its cap (E1-15)", () =
     expect(el.innerHTML).toBe("Aline one line two");
   });
 
-  it("E1's 5,000-word paste into a capped field leaves it at its cap", async () => {
+  it("a 5,000-word paste into a capped field leaves it at its cap", async () => {
     h = await mountEditor(PAGE, { mode: "edit", caps: { "t:card.body": 120 } });
     const el = $('[data-cms="t:card.body"]');
     el.dispatchEvent(new FocusEvent("focusin", { bubbles: true }));
@@ -89,7 +89,7 @@ describe("paste is plain text and a capped field stops at its cap (E1-15)", () =
   });
 });
 
-describe("Cmd+K link (E1-10)", () => {
+describe("Cmd+K link", () => {
   it("selecting words and pressing Cmd+K opens a page search; choosing a page posts the link edit", async () => {
     h = await mountEditor(PAGE, { mode: "edit", pages: [{ title: "Locations", href: "/locations/" }, { title: "About", href: "/about/" }] });
     const el = $('[data-cms="t:hero.body"]');
@@ -128,7 +128,7 @@ describe("Cmd+K link (E1-10)", () => {
   });
 });
 
-describe("keyboard: Tab and Esc (E1-13, E1-19)", () => {
+describe("keyboard: Tab and Esc", () => {
   it("Tab moves to the next field in reading order and Shift+Tab to the previous", async () => {
     h = await mountEditor(PAGE, { mode: "edit" });
     const [a, b, c] = ["t:hero.headline", "t:hero.body", "t:card.body"].map((p) => $(`[data-cms="${p}"]`));
@@ -164,7 +164,7 @@ describe("keyboard: Tab and Esc (E1-13, E1-19)", () => {
   });
 });
 
-describe("the format bar offers B, I and Link only (E1-10, E1-22)", () => {
+describe("the format bar offers B, I and Link only", () => {
   it("has exactly three buttons: Bold, Italic, Link", async () => {
     h = await mountEditor(PAGE, { mode: "edit" });
     const bar = document.getElementById("c3-toolbar")!;

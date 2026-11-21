@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 /**
- * The edit bridge's v2 canvas contract (workplan §6 "Canvas messages", story C3-P2ES).
+ * The edit bridge's v2 canvas contract.
  *   site -> editor: {v:2, source:"c3site", type: cms:ready | cms:select | cms:edit | cms:section, ...}
  *   editor -> site: {v:2, source:"c3editor", type: editor:mode | editor:apply | editor:select, ...}
  * The bridge posts only to Studio's origin and accepts only from it, from window.parent, with v 2.
@@ -32,7 +32,7 @@ describe("cms:ready", () => {
     expect(h.posts.every((p) => p.targetOrigin === STUDIO)).toBe(true);
   });
 
-  it("reports draftServed:false when the site fell back to the published copy (E1-08)", async () => {
+  it("reports draftServed:false when the site fell back to the published copy", async () => {
     h = await mountEditor(PAGE, { draft: "fallback" });
     expect(h.of("cms:ready")[0].draftServed).toBe(false);
   });
@@ -118,7 +118,7 @@ describe("editor:mode", () => {
     expect(h.of("cms:ready")).toHaveLength(1);
   });
 
-  it("never makes a fallback (published) page editable, whatever the editor asks (E1-08)", async () => {
+  it("never makes a fallback (published) page editable, whatever the editor asks", async () => {
     h = await mountEditor(PAGE, { draft: "fallback" });
     await h.send("editor:mode", { mode: "edit" });
     expect(document.querySelectorAll("[contenteditable]").length).toBe(0);
@@ -181,7 +181,7 @@ describe("cms:edit and editor:apply", () => {
     expect("html" in edits[0]).toBe(false);
   });
 
-  it("text typed in one field is not lost when focus moves to another within the debounce (E1-bug)", async () => {
+  it("text typed in one field is not lost when focus moves to another within the debounce", async () => {
     h = await mountEditor(PAGE, { mode: "edit" });
     const a = document.querySelector('[data-cms="t:hero.headline"]') as HTMLElement;
     const b = document.querySelector('[data-cms="t:hero.body"]') as HTMLElement;

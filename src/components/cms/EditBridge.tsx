@@ -8,7 +8,7 @@ import { useEffect } from "react";
  * type; select words for B, I and Link; the change goes to Studio as one message about one field.
  * On the public site (no `cmsEdit`, not framed) this does nothing.
  *
- * THE CONTRACT (workplan §6 "Canvas messages"). Every message is `{v: 2, source, type, ...}`.
+ * THE CONTRACT (the canvas messages). Every message is `{v: 2, source, type, ...}`.
  * The bridge POSTS ONLY to Studio's origin and ACCEPTS ONLY a message that
  *   (1) comes from Studio's origin, (2) comes from `window.parent`, (3) has `v === 2`,
  *   (4) has `source === "c3editor"`. Anything else is ignored without a trace.
@@ -17,7 +17,7 @@ import { useEffect } from "react";
  *
  * site -> editor (source "c3site"):
  *   cms:ready   {draftServed, asOf, mode, reason: "load" | "mode"}
- *               draftServed = the root's data-cms-draft mark is "served" (P2-W). Anything else is false.
+ *               draftServed = the root's data-cms-draft mark is "served". Anything else is false.
  *               mode = the mode IN FORCE: a page that is not the draft is held in "view" whatever was asked.
  *   cms:select  {path, kind: "text"|"image"|"link"|"section"|"none", box: {x,y,width,height}|null,
  *                label?, href? (link), hrefPath?, href? (text inside a data-cms-href), echo?: true}
