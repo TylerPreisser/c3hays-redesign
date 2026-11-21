@@ -30,6 +30,10 @@ export interface PastMessage {
   tags: string[];
   /** Link target — the real YouTube channel (or a specific watch URL). */
   href: string;
+  /** From Studio: who spoke. */
+  speaker?: string;
+  /** From Studio: the card opens this site's own message page instead of leaving for YouTube. */
+  internal?: boolean;
 }
 
 // Neutral placeholders — the church replaces these with real messages.

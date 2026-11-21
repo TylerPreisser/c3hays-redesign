@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { getPageContent } from "@/lib/cms";
+import { getCampaigns, getGiveLinks } from "@/lib/announcements";
+import GiveCampaigns from "@/components/give/GiveCampaigns";
 import { isCmsLive } from "@/lib/cms-live";
 import { parseSections, exampleContentShim, type SectionMeta } from "@/lib/home-content";
 import { isExampleSection, renderExample } from "@/lib/section-examples";
@@ -46,6 +48,7 @@ export default async function GivePage({
   const preview = typeof sp.preview === "string" ? sp.preview : undefined;
 
   const ov = (await getPageContent("/give", preview)) || {};
+  const [campaigns, giveLinks] = await Promise.all([getCampaigns(), getGiveLinks()]);
   const t = ov.text || {};
   const media = ov.media || {};
   const img = ov.img || {};
@@ -59,7 +62,7 @@ export default async function GivePage({
       case "give-hero":
         return <GiveHero t={t} media={media} img={img} />;
       case "give-ways":
-        return <GiveWays t={t} />;
+        return <GiveWays t={t} links={giveLinks} />;
       default:
         return isExampleSection(id) ? renderExample(id, shim, variant) : null;
     }
@@ -68,13 +71,16 @@ export default async function GivePage({
   // Drag-anywhere: forward free-drag offsets (+ freeform els) so a dragged element on
   // /give persists to the PUBLISHED SSR, exactly like home/PageComposer pages.
   return (
-    <PageComposer
-      sections={sections}
-      bgFill={ov.bgFill}
-      anim={ov.anim}
-      render={render}
-      freeEls={ov.freeEls}
-      freeOffsets={ov.freeOffsets}
-    />
+    <>
+      <PageComposer
+        sections={sections}
+        bgFill={ov.bgFill}
+        anim={ov.anim}
+        render={render}
+        freeEls={ov.freeEls}
+        freeOffsets={ov.freeOffsets}
+      />
+      <GiveCampaigns campaigns={campaigns} />
+    </>
   );
 }

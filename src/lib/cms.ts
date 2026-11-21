@@ -99,6 +99,12 @@ export async function getCMSScreen(slug: string): Promise<{ screen: { title: str
 export const getCMSSermons = () => cmsFetch<unknown[]>("/api/content/sermons");
 export const getCMSEvents = () => cmsFetch<unknown[]>("/api/content/events");
 export const getCMSLocations = () => cmsFetch<unknown[]>("/api/content/locations");
+/** Studio `announcements` (published, web surface). The site applies each one's start and end. */
+export const getCMSAnnouncements = () => cmsFetch<unknown[]>("/api/content/announcements?surface=web");
+/** Studio `site` (carries `give_config` and the legacy `giving` map). */
+export const getCMSSite = () => cmsFetch<Record<string, unknown>>("/api/content/site");
+/** Studio `giving_campaigns`, with the raised figure composed on. */
+export const getCMSGivingCampaigns = () => cmsFetch<unknown[]>("/api/content/giving_campaigns");
 /** Studio `newsletter_issues` (published). Each item carries its sanitised HTML in `html`. */
 export const getCMSNewsletterIssues = () => cmsFetch<unknown[]>("/api/content/newsletter_issues");
 

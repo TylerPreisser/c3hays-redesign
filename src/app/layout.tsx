@@ -12,6 +12,7 @@ import { site } from "@/data/site";
 import { assetPath } from "@/lib/asset-path";
 import { headers } from "next/headers";
 import { getGlobalsContent, getMenu, getDraftMark } from "@/lib/cms";
+import { getAnnouncements } from "@/lib/announcements";
 import { isCmsLive } from "@/lib/cms-live";
 import { getServiceTimes } from "@/lib/service-times";
 import { ServiceTimesProvider } from "@/providers/ServiceTimesProvider";
@@ -106,7 +107,7 @@ export default async function RootLayout({
     preview = h.get("x-c3-preview") || undefined;
     pathname = h.get("x-c3-path") || "/";
   }
-  const [globalsRaw, menu, draft] = await Promise.all([getGlobalsContent(preview), getMenu(preview), getDraftMark(preview, pathname)]);
+  const [globalsRaw, menu, draft, announcements] = await Promise.all([getGlobalsContent(preview), getMenu(preview), getDraftMark(preview, pathname), getAnnouncements()]);
   const globals = globalsRaw || {};
   const serviceTimes = await getServiceTimes();
   return (
@@ -142,7 +143,7 @@ export default async function RootLayout({
         <ServiceTimesProvider value={serviceTimes}>
           <SignupConfigProvider turnstileSiteKey={getTurnstileSiteKey()}>
             <SmoothScrollProvider>
-              <Header globals={globals} menu={menu.items} />
+              <Header globals={globals} menu={menu.items} announcement={announcements[0] ?? null} />
               <main>{children}</main>
               <Footer globals={globals} menu={menu.items} />
             </SmoothScrollProvider>

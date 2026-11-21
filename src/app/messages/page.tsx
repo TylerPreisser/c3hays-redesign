@@ -7,7 +7,7 @@ import { parseSections, tx, imgCss, exampleContentShim, type SectionMeta } from 
 import { isExampleSection, renderExample, SECTION_EXAMPLE_IDS } from "@/lib/section-examples";
 import PageComposer from "@/components/cms/PageComposer";
 import PastMessagesGrid from "@/components/messages/PastMessagesGrid";
-import { pastMessages } from "@/data/messages";
+import { getMessageCards } from "@/lib/sermons";
 import { site } from "@/data/site";
 
 /* Brand mark as an inline SVG (this lucide build ships no brand icons — matches the
@@ -61,6 +61,7 @@ export default async function MessagesPage({
   const sp = cmsLive && searchParams ? await searchParams : {};
   const preview = typeof sp.preview === "string" ? sp.preview : undefined;
   const ov = (await getPageContent("/messages", preview)) || {};
+  const cards = await getMessageCards();
   const t = ov.text || {};
   const media = ov.media || {};
   const shim = exampleContentShim(ov);
@@ -206,7 +207,7 @@ export default async function MessagesPage({
               </div>
 
               {/* Searchable + filterable grid (client component) */}
-              <PastMessagesGrid messages={pastMessages} channelHref={YOUTUBE} />
+              <PastMessagesGrid messages={cards} channelHref={YOUTUBE} />
             </div>
           </section>
         );

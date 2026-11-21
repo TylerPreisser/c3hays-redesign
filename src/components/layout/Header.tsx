@@ -24,7 +24,7 @@ type BarChild = { key: string; label: string; href: string; cmsLink?: string };
 /** One bar entry — a link-parent (has `href`) OR a pure toggle group (no `href`). */
 type BarEntry = { key: string; label: string; href?: string; cmsLink?: string; children: BarChild[] };
 
-export default function Header({ globals = {}, menu = null }: { globals?: CMSOverrides; menu?: StudioNavItem[] | null }) {
+export default function Header({ globals = {}, menu = null, announcement = null }: { globals?: CMSOverrides; menu?: StudioNavItem[] | null; announcement?: { title: string; body: string; linkLabel?: string; linkUrl?: string } | null }) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   // BUG #3 (nav not editable): inside C3 Studio the canvas iframe is ~1180px wide
@@ -263,6 +263,19 @@ export default function Header({ globals = {}, menu = null }: { globals?: CMSOve
           ...(nav.bg && isScrolled ? { backgroundColor: nav.bg } : {}),
         }}
       >
+        {announcement && (
+          <div role="region" aria-label="Announcement" data-announcement style={{ background: "#0f3f3a", color: "#fff" }}>
+            <p className="container-c3 body-sm" style={{ margin: 0, padding: "0.45rem 0", display: "flex", flexWrap: "wrap", gap: "0.25rem 0.75rem", alignItems: "center", justifyContent: "center", textAlign: "center" }}>
+              <strong>{announcement.title}</strong>
+              {announcement.body && <span style={{ color: "rgba(255,255,255,0.86)" }}>{announcement.body}</span>}
+              {announcement.linkUrl && (
+                <a href={announcement.linkUrl} style={{ color: "#7ff0e0", fontWeight: 600, textDecoration: "underline", textUnderlineOffset: 3 }}>
+                  {announcement.linkLabel || "Learn more"}
+                </a>
+              )}
+            </p>
+          </div>
+        )}
         <nav ref={navRef} className="container-c3 flex items-center justify-between h-16 lg:h-[4.5rem]">
 
           {/* Logo — light on transparent dark hero, dark on scrolled white header */}

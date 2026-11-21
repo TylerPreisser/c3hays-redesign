@@ -4,6 +4,7 @@ import { Tx, EditableLink } from "@/components/cms/Editable";
 import GiveOnline from "./GiveOnline";
 
 export interface GiveWaysProps {
+  links?: { hays?: string; colby?: string };
   /** Page text override bag. */
   t: Record<string, string>;
 }
@@ -26,7 +27,7 @@ export interface GiveWaysProps {
  * two campus URLs; no invented fund URLs). `id="give-ways"` is the hero CTA scroll
  * target. Layout lives in a scoped <style> (prefix `gw-`).
  */
-export default function GiveWays({ t }: GiveWaysProps) {
+export default function GiveWays({ t, links }: GiveWaysProps) {
   return (
     <section id="give-ways" data-cms-bg="give-ways-bg" className="gw-ways">
       <style
@@ -82,7 +83,7 @@ export default function GiveWays({ t }: GiveWaysProps) {
         <div className="gw-grid">
           {/* LEFT — dark feature: give online (client island so the Recurring / One-time
               toggle actually rewrites each designation link's Pushpay destination). */}
-          <GiveOnline t={t} />
+          <GiveOnline t={t} links={links} />
 
           {/* RIGHT — the other ways. Each tile owns its OWN data-cms-bg: buildBgCss
               paints `[data-cms-bg=key]{background:… !important}`, which beats the

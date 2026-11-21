@@ -9,6 +9,8 @@ const base = (url: string) => url.replace(/\?r=monthly$/, "");
 export interface GiveOnlineProps {
   /** Page text override bag. */
   t: Record<string, string>;
+  /** Per-campus give pages from Studio. When present they win over an old text override of the same link. */
+  links?: { hays?: string; colby?: string };
 }
 
 /**
@@ -23,9 +25,13 @@ export interface GiveOnlineProps {
  * the per-tile-bg half of the give editor-native contract, and the reason a staffer
  * could not restyle one tile.
  */
-export default function GiveOnline({ t }: GiveOnlineProps) {
-  const haysHref = base(site.giving.hays);
-  const colbyHref = base(site.giving.colby);
+export default function GiveOnline({ t: tIn, links = {} }: GiveOnlineProps) {
+  const haysHref = base(links.hays ?? site.giving.hays);
+  const colbyHref = base(links.colby ?? site.giving.colby);
+  // Studio's give page is the truth: an old saved override of the same button must not send a giver to a stale page.
+  const t = { ...tIn };
+  if (links.hays) delete t["give-ways-hays-give-href"];
+  if (links.colby) delete t["give-ways-colby-give-href"];
 
   return (
     <div className="gw-feature" data-cms-bg="give-way-feature-bg">

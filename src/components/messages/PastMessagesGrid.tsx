@@ -183,8 +183,7 @@ export default function PastMessagesGrid({ messages, channelHref }: PastMessages
             <a
               key={m.id}
               href={m.href}
-              target="_blank"
-              rel="noopener noreferrer"
+              {...(m.internal ? {} : { target: "_blank", rel: "noopener noreferrer" })}
               className="group"
               style={{
                 display: "flex",
@@ -207,7 +206,7 @@ export default function PastMessagesGrid({ messages, channelHref }: PastMessages
                 e.currentTarget.style.borderColor = "rgba(255,255,255,0.10)";
                 e.currentTarget.style.boxShadow = "none";
               }}
-              aria-label={`Watch ${m.title}, ${m.dateLabel} on YouTube`}
+              aria-label={m.internal ? `Watch ${m.title}, ${m.dateLabel}${m.speaker ? `, ${m.speaker}` : ""}` : `Watch ${m.title}, ${m.dateLabel} on YouTube`}
             >
               {/* Thumbnail band with a play affordance */}
               <div
@@ -248,7 +247,7 @@ export default function PastMessagesGrid({ messages, channelHref }: PastMessages
                     backdropFilter: "blur(4px)",
                   }}
                 >
-                  YouTube
+                  {m.internal ? "Message" : "YouTube"}
                 </span>
               </div>
 
@@ -269,6 +268,7 @@ export default function PastMessagesGrid({ messages, channelHref }: PastMessages
                 >
                   {m.title}
                 </h3>
+                {m.speaker && <p className="body-sm" style={{ color: "rgba(255,255,255,0.72)", margin: 0 }}>{m.speaker}</p>}
                 <div style={{ flex: 1 }} />
                 {m.tags.length > 0 && (
                   <div className="flex flex-wrap gap-2" style={{ marginTop: 14 }}>
@@ -293,7 +293,7 @@ export default function PastMessagesGrid({ messages, channelHref }: PastMessages
                   className="arrow-link"
                   style={{ marginTop: 16, color: "var(--color-teal)", fontWeight: 600, fontSize: "0.85rem" }}
                 >
-                  Watch on YouTube
+                  {m.internal ? "Watch" : "Watch on YouTube"}
                   <span className="arrow" aria-hidden="true">→</span>
                 </span>
               </div>
