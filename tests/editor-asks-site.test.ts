@@ -96,8 +96,10 @@ describe("campus pages are named sections", () => {
   });
   it("every section the site draws has a plain name: no code words", async () => {
     const { SECTION_NAMES, sectionName } = await import("@/lib/section-names");
-    for (const [id, name] of Object.entries(SECTION_NAMES)) expect(name, id).toMatch(/^[A-Z][A-Za-z ,.']+$/);
-    expect(name, id).not.toMatch(/[a-z][A-Z]/);
+    for (const [id, name] of Object.entries(SECTION_NAMES)) {
+      expect(name, id).toMatch(/^[A-Z][A-Za-z ,.']+$/);
+      expect(name, id).not.toMatch(/[a-z][A-Z]/);
+    }
     expect(sectionName("watch-ondemand")).toBe("Past services");
     expect(sectionName("someNewThing")).toBe("Some new thing");
   });
