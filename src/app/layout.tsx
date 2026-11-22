@@ -1,3 +1,5 @@
+import { plainText, telHref, mailHref, postalFromTyped } from "@/lib/contact-facts";
+import { tx } from "@/lib/home-content";
 import type { Metadata, Viewport } from "next";
 import { Hanken_Grotesk } from "next/font/google";
 import "./globals.css";
@@ -67,29 +69,35 @@ export const metadata: Metadata = {
   // basePath-aware <link> tags and /favicon.ico is served. No manual icons here.
 };
 
-const jsonLd = {
-  "@context": "https://schema.org",
-  "@type": "Church",
-  name: site.name,
-  alternateName: site.short,
-  description: site.mission,
-  url: "https://celebratejesus.org",
-  telephone: site.phone,
-  email: site.email,
-  address: {
-    "@type": "PostalAddress",
-    streetAddress: site.address.street,
-    addressLocality: site.address.city,
-    addressRegion: site.address.state,
-    postalCode: site.address.zip,
-    addressCountry: "US",
-  },
-  sameAs: [
-    site.social.facebook,
-    site.social.instagram,
-    site.social.youtube,
-  ],
-};
+/** The church's structured data. Phone, email and the Hays address follow what staff typed in the footer, so a visible number never disagrees with it. */
+function jsonLdFor(text: Record<string, string>) {
+  const phone = plainText(tx(text, "footer-phone-label", site.phone));
+  const email = plainText(tx(text, "footer-email-label", site.email));
+  const typedAddr = text["footer-campus-hays-addr"] ? postalFromTyped(tx(text, "footer-campus-hays-addr", "")) : null;
+  return {
+    "@context": "https://schema.org",
+    "@type": "Church",
+    name: site.name,
+    alternateName: site.short,
+    description: site.mission,
+    url: "https://celebratejesus.org",
+    telephone: telHref(phone, site.phone).slice(4),
+    email: mailHref(email, site.email).slice(7),
+    address: {
+      "@type": "PostalAddress",
+      streetAddress: typedAddr?.streetAddress ?? site.address.street,
+      addressLocality: typedAddr?.addressLocality ?? site.address.city,
+      addressRegion: typedAddr?.addressRegion ?? site.address.state,
+      postalCode: typedAddr?.postalCode ?? site.address.zip,
+      addressCountry: "US",
+    },
+    sameAs: [
+      site.social.facebook,
+      site.social.instagram,
+      site.social.youtube,
+    ],
+  };
+}
 
 export default async function RootLayout({
   children,
@@ -122,7 +130,7 @@ export default async function RootLayout({
         <link href={buildGoogleFontsHref()} rel="stylesheet" />
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdFor(globals.text || {})).replace(/</g, "\\u003c") }}
         />
       </head>
       <body>

@@ -12,6 +12,7 @@ import { isExampleSection, renderExample } from "@/lib/section-examples";
 import { tx, imgCss, txTimesSafe } from "@/lib/home-content";
 import StaffGrid from "@/components/about/StaffGrid";
 import { getServiceTimes } from "@/lib/service-times";
+import { telHref, mailHref } from "@/lib/contact-facts";
 import { campus, campusLine, dayLine, kidsTimes, spokenLine, TIMES_TBA } from "@/lib/service-times-core";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -257,7 +258,7 @@ export default async function HaysCampusPage({
                 />
                 <div className="flex flex-col gap-3">
                   <a
-                    href={`tel:${site.phone.replace(/\D/g, "")}`}
+                    href={telHref(tx(t, "hays-contact-phone", site.phone), site.phone)}
                     className="flex items-center gap-2.5 text-sm transition-colors duration-150 hover:text-[#1cc3af]"
                     style={{ color: "rgba(27,28,28,0.65)" }}
                   >
@@ -268,7 +269,7 @@ export default async function HaysCampusPage({
                     />
                   </a>
                   <a
-                    href={`mailto:${site.email}`}
+                    href={mailHref(tx(t, "hays-contact-email", site.email), site.email)}
                     className="flex items-center gap-2.5 text-sm transition-colors duration-150 hover:text-[#1cc3af]"
                     style={{ color: "rgba(27,28,28,0.65)" }}
                   >

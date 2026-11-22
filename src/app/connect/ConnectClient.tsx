@@ -1,5 +1,6 @@
 "use client";
 
+import { telHref, mailHref } from "@/lib/contact-facts";
 import { useState } from "react";
 import Image from "next/image";
 import {
@@ -339,7 +340,7 @@ export function ConnectHero({ text, media = {}, img = {} }: ConnectHeroProps) {
                 <li>
                   <Phone size={16} aria-hidden="true" />
                   <a
-                    href={text["connect-phone-href"] || `tel:${site.phone.replace(/[^0-9+]/g, "")}`}
+                    href={text["connect-phone-href"] || telHref(tx(text, "connect-phone-label", site.phone), site.phone)}
                     data-cms-link="connect-phone"
                   >
                     <span data-cms-link-label>{tx(text, "connect-phone-label", site.phone)}</span>
@@ -348,7 +349,7 @@ export function ConnectHero({ text, media = {}, img = {} }: ConnectHeroProps) {
                 <li>
                   <Mail size={16} aria-hidden="true" />
                   <a
-                    href={text["connect-email-href"] || `mailto:${site.email}`}
+                    href={text["connect-email-href"] || mailHref(tx(text, "connect-email-label", site.email), site.email)}
                     data-cms-link="connect-email"
                   >
                     <span data-cms-link-label>{tx(text, "connect-email-label", site.email)}</span>

@@ -1,3 +1,4 @@
+import { telHref, mailHref } from "@/lib/contact-facts";
 import Link from "next/link";
 import { MapPin } from "lucide-react";
 import { site } from "@/data/site";
@@ -171,10 +172,10 @@ function FooterEditorial({ t, m, links, preCta = false }: { t: TextBag; m: Media
                   navigation while exposing its destination via data-cms-href (read by
                   EditBridge's cms:focus → hrefPath). Clicking selects the text (not the
                   "Edit button" panel); the anchor no longer carries data-cms-link. */}
-              <a href={t["footer-phone-href"] || `tel:${site.phone.replace(/\D/g, "")}`} data-cms-href="g:footer-phone" className="footer-link body-sm" style={{ color: "rgba(255,255,255,0.60)", transition: "color var(--dur-fast) var(--ease-out)" }}>
+              <a href={t["footer-phone-href"] || telHref(tx(t, "footer-phone-label", site.phone), site.phone)} data-cms-href="g:footer-phone" className="footer-link body-sm" style={{ color: "rgba(255,255,255,0.60)", transition: "color var(--dur-fast) var(--ease-out)" }}>
                 <span data-cms="t:footer-phone-label">{tx(t, "footer-phone-label", site.phone)}</span>
               </a>
-              <a href={t["footer-email-href"] || `mailto:${site.email}`} data-cms-href="g:footer-email" className="footer-link body-sm" style={{ color: "rgba(255,255,255,0.60)", transition: "color var(--dur-fast) var(--ease-out)" }}>
+              <a href={t["footer-email-href"] || mailHref(tx(t, "footer-email-label", site.email), site.email)} data-cms-href="g:footer-email" className="footer-link body-sm" style={{ color: "rgba(255,255,255,0.60)", transition: "color var(--dur-fast) var(--ease-out)" }}>
                 <span data-cms="t:footer-email-label">{tx(t, "footer-email-label", site.email)}</span>
               </a>
             </div>
