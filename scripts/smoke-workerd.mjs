@@ -92,6 +92,16 @@ try {
     if (c === "studio" || c === "fallback") ok(`${path} x-c3-content ${c}`);
     else fail(`${path} has no x-c3-content header`);
   }
+  {
+    // the uploaded-media route is the site's own: a name Studio does not have is its plain 404 (not the page 404, not a 500), and it never answers for a bad name
+    for (const path of ["/media/no-such-upload.png", "/media/..%2fx.png", "/media/a%00b.png", "/media/a%5cb.png"]) {
+      const res = await fetch(`http://127.0.0.1:${PORT}${path}`, { redirect: "manual" });
+      const body = await res.text();
+      const ct = res.headers.get("content-type") || "";
+      if (res.status === 404 && /^text\/plain/.test(ct) && !/<html/i.test(body)) ok(`${path} -> 404 from the media route`);
+      else fail(`${path} -> ${res.status} ${ct}: ${firstLine(body)} (expected the media route's plain 404)`);
+    }
+  }
   for (const path of MUST_404) {
     const res = await fetch(`http://127.0.0.1:${PORT}${path}`, { redirect: "follow" });
     const body = await res.text();

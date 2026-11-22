@@ -1,3 +1,4 @@
+import { mediaInCss } from "@/lib/media-path";
 import { getHomeContent } from "@/lib/cms";
 import { isCmsLive } from "@/lib/cms-live";
 import { fromStudioHome } from "@/lib/home-content";
@@ -120,7 +121,7 @@ export default async function LiveSectionPreview({
 
   // Paint the section background exactly like the homepage: a scoped `[data-section]>*`
   // rule via the shared buildBgCss primitive (so a recolored section reads truthfully).
-  const bgCss = buildBgCss(bg ? [{ id, visible: true, bg }] : []);
+  const bgCss = mediaInCss(buildBgCss(bg ? [{ id, visible: true, bg }] : []));
 
   return (
     <>

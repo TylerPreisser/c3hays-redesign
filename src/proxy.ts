@@ -21,6 +21,6 @@ export async function proxy(req: NextRequest) {
 }
 
 export const config = {
-  // Pages only: not assets, not Next internals, not the API routes.
-  matcher: ["/((?!api/|_next/|images/|brand/|.*\\..*).*)"],
+  // Pages only: not assets, not Next internals, not the API routes, not the uploaded-media route.
+  matcher: ["/((?!api/|_next/|images/|brand/|media/|.*\\..*).*)"],
 };

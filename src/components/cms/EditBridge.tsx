@@ -1,5 +1,6 @@
 "use client";
 
+import { mediaSrc } from "@/lib/media-path";
 import { useEffect } from "react";
 
 /**
@@ -967,7 +968,7 @@ export default function EditBridge() {
         }
         // image: a URL string
         const imgs = byAttr("data-cms-img", path);
-        const src = safeImgSrc(value);
+        const src = mediaSrc(safeImgSrc(value)); // the canvas shows an upload through the same /media path a visitor gets
         if (imgs.length && src) { shimImg[path] = src; imgs.forEach((el) => applyImgTo(el, src)); }
         return;
       }

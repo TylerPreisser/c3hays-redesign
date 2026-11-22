@@ -71,6 +71,9 @@ function rawFetcher(): FetchLike {
  * A write to Studio from a server route of this site (the signup). Goes over the `CMS` service binding on the
  * Worker, the public URL elsewhere. Throws when no Studio is configured, so a caller can refuse instead of dropping.
  */
+/** True when a Studio is configured for this build (NEXT_PUBLIC_CMS_URL). */
+export const cmsConfigured = (): boolean => !!CMS_BASE;
+
 export function cmsForward(path: string, init: RequestInit): Promise<Response> {
   if (!CMS_BASE) throw new Error("Studio is not configured");
   return cmsFetcher()(`${CMS_BASE}${path}`, init);

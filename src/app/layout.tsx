@@ -1,3 +1,4 @@
+import { mediaInCss } from "@/lib/media-path";
 import { plainText, telHref, mailHref, postalFromTyped } from "@/lib/contact-facts";
 import { tx } from "@/lib/home-content";
 import type { Metadata, Viewport } from "next";
@@ -137,7 +138,7 @@ export default async function RootLayout({
         {/* v3 (R4): global element backgrounds (footer, etc.) → one scoped stylesheet,
             painted from the shared globals overrides (buildBgCss, !important). */}
         {globals.bgFill && Object.keys(globals.bgFill).length > 0 && (
-          <style dangerouslySetInnerHTML={{ __html: buildBgCss([], globals.bgFill) }} />
+          <style dangerouslySetInnerHTML={{ __html: mediaInCss(buildBgCss([], globals.bgFill)) }} />
         )}
         {/* Drag-anywhere: offsets for GLOBAL elements (footer/header/nav), applied on
             every page as a transform:translate stylesheet (preview + published). */}

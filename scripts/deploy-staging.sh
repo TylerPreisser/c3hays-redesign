@@ -98,6 +98,9 @@ cmd_verify() {
   for p in /nope-xyz /nope/xyz; do
     code="$(curl -sS -L --max-time 30 -o /dev/null -w '%{http_code}' "$URL$p")"; [ "$code" = 404 ] || die "unknown path $p -> $code (expected 404)"; echo "ok: $p -> 404"
   done
+  code="$(curl -sS -L --max-time 30 -o "$T/m.body" -D "$T/m.head" -w '%{http_code}' "$URL/media/no-such-upload.png")"
+  [ "$code" = 404 ] && grep -qi '^content-type: text/plain' "$T/m.head" || die "/media/<missing name> -> $code (expected the media route's plain 404)"
+  echo "ok: /media/<missing name> -> 404 from the media route"
   [ "$(header_of x-robots-tag "$T/h.head")" = "noindex, nofollow" ] || die "X-Robots-Tag missing on /"
   echo "ok: X-Robots-Tag noindex, nofollow"
   p="$(curl -sS --max-time 30 "$URL/" | grep -o '/_next/static/[^"]*\.js' | head -1)"; [ -n "$p" ] || die "no static asset found on /"

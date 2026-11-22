@@ -8,8 +8,13 @@
  * does NOT auto-prefix these — only routes and _next/* artifacts get
  * basePath/assetPrefix treatment.
  */
+import { uploadKey } from "@/lib/media-path";
+
 export const assetPath = (path: string): string => {
   if (!path) return path;
+  // A photo uploaded in Studio is served by this site, never loaded from Studio (src/lib/media-path.ts).
+  const up = uploadKey(path);
+  if (up) return `${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/media/${up}`;
   // Already an absolute URL (http(s)://, protocol-relative, or data:) → leave it.
   if (/^(https?:)?\/\//i.test(path) || path.startsWith("data:")) return path;
   const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";

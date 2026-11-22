@@ -1,3 +1,4 @@
+import { mediaInCss } from "@/lib/media-path";
 import { buildBgCss } from "@/lib/backgrounds";
 import { sectionName } from "@/lib/section-names";
 import RevealPlayer from "@/components/cms/RevealPlayer";
@@ -47,7 +48,7 @@ export default function PageComposer({ sections, bgFill, anim, render, freeEls, 
   // component edits). buildBgCss is the shared primitive mirrored from c3-backend.
   // It SKIPS sections covered by a span leader, so the span layer below is the only
   // paint of that shared image (no per-section repeat = no seam).
-  const bgCss = buildBgCss(sections, bgFill ?? {});
+  const bgCss = mediaInCss(buildBgCss(sections, bgFill ?? {}));
 
   // Build the section wrappers, honoring `bgSpan`: a leader with an image bg + span>0
   // wraps itself and the next `span` visible sections inside ONE positioned group that
@@ -67,7 +68,7 @@ export default function PageComposer({ sections, bgFill, anim, render, freeEls, 
               the combined height → seamless, no glitch line between the sections). */}
           <div
             aria-hidden
-            style={{ position: "absolute", inset: 0, zIndex: 0, background: s.bg, backgroundSize: "cover", backgroundPosition: "center" }}
+            style={{ position: "absolute", inset: 0, zIndex: 0, background: mediaInCss(s.bg ?? ""), backgroundSize: "cover", backgroundPosition: "center" }}
           />
           {members.map((m) => (
             <div key={m.id} data-section={m.id} data-section-name={sectionName(m.id)} style={{ position: "relative", zIndex: 1 }}>
