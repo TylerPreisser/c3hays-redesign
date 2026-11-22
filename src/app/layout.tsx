@@ -1,3 +1,4 @@
+import { EditModeProvider } from "@/providers/EditModeProvider";
 import { mediaInCss } from "@/lib/media-path";
 import { plainText, telHref, mailHref, postalFromTyped } from "@/lib/contact-facts";
 import { tx } from "@/lib/home-content";
@@ -149,6 +150,7 @@ export default async function RootLayout({
         {/* v6 R6 (6b): entrance-reveal player for global elements (footer/header).
             Home-page element reveals feed content.anim into a RevealPlayer in page.tsx. */}
         <RevealPlayer anim={globals.anim} />
+        <EditModeProvider edit={!!preview}>
         <ServiceTimesProvider value={serviceTimes}>
           <SignupConfigProvider turnstileSiteKey={getTurnstileSiteKey()}>
             <SmoothScrollProvider>
@@ -159,6 +161,7 @@ export default async function RootLayout({
             </SmoothScrollProvider>
           </SignupConfigProvider>
         </ServiceTimesProvider>
+        </EditModeProvider>
       </body>
     </html>
   );

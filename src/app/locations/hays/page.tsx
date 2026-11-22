@@ -1,3 +1,4 @@
+import { pickProps } from "@/lib/pick-attr";
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
@@ -37,6 +38,7 @@ export default async function HaysCampusPage({
   // The editor's canvas carries the preview token (draft); a visitor gets the published page. Read only under the live runtime.
   const sp = isCmsLive() && searchParams ? await searchParams : {};
   const preview = typeof sp.preview === "string" ? sp.preview : undefined;
+  const edit = !!preview; // the editor's canvas: the select-only markers are drawn only here
   const ov = (await getPageContent("/locations/hays", preview)) || {};
   const hays = campus(await getServiceTimes(), "hays");
   const kids = kidsTimes(hays);
@@ -129,7 +131,7 @@ export default async function HaysCampusPage({
 
               <p
                 className="body-lg mb-5"
-                data-cms-pick="fact:service_times:hays"
+                {...pickProps(edit, "fact:service_times:hays")}
                 style={{ color: "rgba(27,28,28,0.65)" }}
                 dangerouslySetInnerHTML={{
                   __html: txTimesSafe(
@@ -142,7 +144,7 @@ export default async function HaysCampusPage({
 
               <p
                 className="body-base mb-10"
-                data-cms-pick="fact:service_times:hays"
+                {...pickProps(edit, "fact:service_times:hays")}
                 style={{ color: "rgba(27,28,28,0.55)" }}
                 dangerouslySetInnerHTML={{
                   __html: txTimesSafe(
@@ -179,7 +181,7 @@ export default async function HaysCampusPage({
                   style={{ fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.16em", color: "#1b1c1c" }}
                   dangerouslySetInnerHTML={{ __html: tx(t, "hays-sidebar-times-heading", "Service Times") }}
                 />
-                <div className="flex flex-col gap-4" data-service-times="hays" data-cms-pick="fact:service_times:hays">
+                <div className="flex flex-col gap-4" data-service-times="hays" {...pickProps(edit, "fact:service_times:hays")}>
                   {hays.services.length === 0 && <p className="text-sm" style={{ color: "rgba(27,28,28,0.70)" }}>{TIMES_TBA}</p>}
                   {hays.services.map((sv) => (
                     <div key={sv.day} className="flex items-start gap-3">

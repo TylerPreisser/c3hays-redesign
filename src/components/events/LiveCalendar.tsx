@@ -1,5 +1,7 @@
 "use client";
 
+import { pickProps } from "@/lib/pick-attr";
+import { useEditMode } from "@/providers/EditModeProvider";
 import { useEffect, useMemo, useState } from "react";
 import type { CSSProperties } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
@@ -36,6 +38,7 @@ const MONTH_YEAR = new Intl.DateTimeFormat("en-US", {
 const BORDER = "1px solid rgba(27,28,28,0.08)";
 
 export default function LiveCalendar() {
+  const editMode = useEditMode();
   const [events, setEvents] = useState<CalEvent[] | null>(null);
   const [status, setStatus] = useState<"loading" | "ready" | "error">("loading");
   const [viewDate, setViewDate] = useState(() => {
@@ -142,7 +145,7 @@ export default function LiveCalendar() {
 
   return (
     <div
-      data-cms-pick="fact:events"
+      {...pickProps(editMode, "fact:events")}
       style={{
         borderRadius: "var(--radius-md)",
         background: "#fff",

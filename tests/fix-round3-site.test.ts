@@ -25,10 +25,11 @@ function studio(opts: { locations?: any[]; announcements?: any[] } = {}) {
   }));
   vi.stubEnv("NEXT_PUBLIC_CMS_URL", "https://studio.example.test");
 }
-async function pageHtml(path: "hays" | "colby") {
+async function pageHtml(path: "hays" | "colby", edit = false) {
   vi.resetModules();
+  if (edit) vi.stubEnv("CMS_LIVE", "1"); // the editor's canvas carries ?preview=<token>; a visitor's request carries none
   const mod = await import(path === "hays" ? "@/app/locations/hays/page" : "@/app/locations/colby/page");
-  return renderToStaticMarkup(await (mod.default as (p: object) => Promise<React.ReactElement>)({}));
+  return renderToStaticMarkup(await (mod.default as (p: object) => Promise<React.ReactElement>)(edit ? { searchParams: Promise.resolve({ preview: "tok" }) } : {}));
 }
 async function layoutHtml() {
   vi.resetModules();
@@ -67,22 +68,25 @@ describe("W7 the announcement's date line", () => {
 describe("W8 a text that holds a time is never free-editable", () => {
   it("Hays: the times card and the paragraphs that spell the times are picks that open the times sheet", async () => {
     studio();
-    const html = await pageHtml("hays");
+    expect(await pageHtml("hays")).not.toContain("data-cms-pick"); // a visitor's HTML carries no marker
+    const html = await pageHtml("hays", true);
     expect(html).toContain('data-cms-pick="fact:service_times:hays"');
     for (const k of ["t:hays-details-body-1", "t:hays-details-body-2"]) expect(html).not.toContain(`data-cms="${k}"`);
     expect((html.match(/data-cms-pick="fact:service_times:hays"/g) || []).length).toBeGreaterThanOrEqual(3); // card + two paragraphs
   });
   it("Colby: the same for the card, the hero line, the details paragraph and the closing paragraph; plain prose stays editable", async () => {
     studio();
-    const html = await pageHtml("colby");
+    expect(await pageHtml("colby")).not.toContain("data-cms-pick");
+    const html = await pageHtml("colby", true);
     expect(html).toContain('data-cms-pick="fact:service_times:colby"');
     for (const k of ["t:colby-hero-tagline", "t:colby-details-body-1", "t:colby-cta-body"]) expect(html).not.toContain(`data-cms="${k}"`);
     expect(html).toContain('data-cms="t:colby-details-body-2"'); // "We'd love to see you this Sunday." holds no time
   });
   it("the events list is a pick that opens the events sheet", async () => {
     const { default: List } = await import("@/components/events/StudioEventsList");
-    const html = renderToStaticMarkup(createElement(List, { events: [{ id: "e1", title: "Marriage Night", start: "2026-12-02T18:30:00", allDay: false } as any] }));
-    expect(html).toContain('data-cms-pick="fact:events"');
+    const events = [{ id: "e1", title: "Marriage Night", start: "2026-12-02T18:30:00", allDay: false } as any];
+    expect(renderToStaticMarkup(createElement(List, { events }))).not.toContain("data-cms-pick");
+    expect(renderToStaticMarkup(createElement(List, { events, edit: true }))).toContain('data-cms-pick="fact:events"');
   });
 });
 

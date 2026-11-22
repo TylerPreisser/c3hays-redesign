@@ -1,5 +1,7 @@
 "use client";
 
+import { pickProps } from "@/lib/pick-attr";
+import { useEditMode } from "@/providers/EditModeProvider";
 import { tx, type BtnStyle } from "@/lib/home-content";
 import { btnCss } from "./Hero";
 import { useServiceTimes } from "@/providers/ServiceTimesProvider";
@@ -24,6 +26,7 @@ export default function ServiceTimes({
   btnStyle?: BtnStyle;
   variant?: string;
 }) {
+  const editMode = useEditMode();
   const v = variant || "cards";
   const times = useServiceTimes();
   const hays = campus(times, "hays");
@@ -59,7 +62,7 @@ export default function ServiceTimes({
       <div aria-hidden style={{ height: 1, background: "rgba(255,255,255,0.08)", marginBottom: "1.1rem" }} />
       <p
         data-service-times={c.slug}
-        data-cms-pick={`fact:service_times:${c.slug}`}
+        {...pickProps(editMode, `fact:service_times:${c.slug}`)}
         style={{ color: "rgba(255,255,255,0.82)", margin: 0, fontSize: "1.075rem", lineHeight: 2, letterSpacing: "0.005em" }}
       >
         {c.services.length === 0 && <span style={{ display: "block" }}>{TIMES_TBA}</span>}

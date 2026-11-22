@@ -32,16 +32,21 @@ function studio() {
   }));
   vi.stubEnv("NEXT_PUBLIC_CMS_URL", "https://studio.example.test");
 }
-afterEach(() => { vi.unstubAllGlobals(); vi.unstubAllEnvs(); vi.resetModules(); });
+afterEach(() => { vi.unstubAllGlobals(); vi.unstubAllEnvs(); vi.doUnmock("next/headers"); vi.resetModules(); });
 
 describe("the announcement bar is one line", () => {
-  async function homeHtml(anns: unknown[]) {
+  async function homeHtml(anns: unknown[], edit = false) {
     vi.stubGlobal("fetch", vi.fn(async (url: string) => {
       const p = new URL(url).pathname;
       const body: Record<string, unknown> = { "/api/content/announcements": anns, "/api/content/locations": locations, "/api/content/navigation": [{ id: "m1", label: "Start Here", href: "/visit/" }] };
       return { ok: p in body, json: async () => body[p] ?? {} } as Response;
     }));
     vi.stubEnv("NEXT_PUBLIC_CMS_URL", "https://studio.example.test");
+    if (edit) {
+      // the editor's canvas: the request carries the preview token (src/proxy.ts hands it to the layout as a header)
+      vi.stubEnv("CMS_LIVE", "1");
+      vi.doMock("next/headers", () => ({ headers: async () => new Headers({ "x-c3-preview": "tok", "x-c3-path": "/" }) }));
+    }
     vi.resetModules();
     const Layout = (await import("@/app/layout")).default;
     return renderToStaticMarkup(await Layout({ children: createElement("main", null, "home") }));
@@ -52,8 +57,10 @@ describe("the announcement bar is one line", () => {
     expect(html).not.toContain("Marriage Night"); // priority 1
     expect(html).not.toContain("Last month"); // ended, even with priority 9
     expect((html.match(/data-announcement/g) || []).length).toBe(1);
-    expect(html).toContain('data-cms-pick="announcement:ann_2"');
-    expect(html).toContain('data-cms-pick="nav:menu"');
+    expect(html).not.toContain("data-cms-pick"); // a visitor's page carries no editor markers
+    const edit = await homeHtml(ANNOUNCEMENTS, true);
+    expect(edit).toContain('data-cms-pick="announcement:ann_2"');
+    expect(edit).toContain('data-cms-pick="nav:menu"');
     const raised = await homeHtml(ANNOUNCEMENTS.map((a) => (a.id === "ann_1" ? { ...a, priority: 5 } : a)));
     expect(raised).toContain("Marriage Night");
     expect(raised).not.toContain("App is live");
@@ -86,7 +93,10 @@ describe("service-time lines are facts, not text", () => {
     const { resolveTimes } = await import("@/lib/service-times-core");
     const { SERVICE_TIMES_SNAPSHOT } = await import("@/data/service-times.snapshot");
     const times = resolveTimes(locations, SERVICE_TIMES_SNAPSHOT);
-    const html = renderToStaticMarkup(createElement(ServiceTimesProvider as never, { value: times } as never, createElement(LocationsSection as never, { text: { "campus-hays-info": "Sunday 11:00 PM typed by hand" }, btn: {} } as never)));
+    const { EditModeProvider } = await import("@/providers/EditModeProvider");
+    const section = createElement(ServiceTimesProvider as never, { value: times } as never, createElement(LocationsSection as never, { text: { "campus-hays-info": "Sunday 11:00 PM typed by hand" }, btn: {} } as never));
+    const html = renderToStaticMarkup(createElement(EditModeProvider as never, { edit: true } as never, section));
+    expect(renderToStaticMarkup(section)).not.toContain("data-cms-pick"); // an ordinary visitor's HTML carries no marker
     expect(html).toContain('data-cms-pick="t:campus-hays-info"');
     expect(html).not.toContain('data-cms="t:campus-hays-info"');
     expect(html).not.toContain("typed by hand");

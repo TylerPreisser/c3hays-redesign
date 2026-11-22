@@ -1,3 +1,4 @@
+import { pickProps } from "@/lib/pick-attr";
 import type { StudioEvent } from "@/lib/studio-events";
 
 const fmt = (e: StudioEvent) => {
@@ -10,10 +11,10 @@ const fmt = (e: StudioEvent) => {
 };
 
 /** Studio's upcoming events as a plain list. Only rendered behind EVENTS_FROM_STUDIO. */
-export default function StudioEventsList({ events }: { events: StudioEvent[] }) {
-  if (events.length === 0) return <p data-cms-pick="fact:events" className="body-base" style={{ color: "rgba(255,255,255,0.78)", textAlign: "center" }}>Nothing is scheduled right now. Check back soon.</p>;
+export default function StudioEventsList({ events, edit = false }: { events: StudioEvent[]; edit?: boolean }) {
+  if (events.length === 0) return <p {...pickProps(edit, "fact:events")} className="body-base" style={{ color: "rgba(255,255,255,0.78)", textAlign: "center" }}>Nothing is scheduled right now. Check back soon.</p>;
   return (
-    <ul data-cms-pick="fact:events" style={{ listStyle: "none", padding: 0, margin: "0 auto", maxWidth: "48rem", display: "grid", gap: "1rem" }}>
+    <ul {...pickProps(edit, "fact:events")} style={{ listStyle: "none", padding: 0, margin: "0 auto", maxWidth: "48rem", display: "grid", gap: "1rem" }}>
       {events.map((e) => (
         <li key={e.id} style={{ background: "#252727", borderRadius: "var(--radius-md)", padding: "1.25rem 1.5rem", border: "1px solid rgba(255,255,255,0.10)" }}>
           <p className="body-sm" style={{ color: "#1cc3af", fontWeight: 700, margin: 0 }}>{fmt(e)}</p>

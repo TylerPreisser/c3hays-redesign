@@ -1,3 +1,4 @@
+import { pickProps } from "@/lib/pick-attr";
 import type { Metadata } from "next";
 import Image from "next/image";
 import { Navigation } from "lucide-react";
@@ -50,6 +51,7 @@ export default async function LocationsPage({
   const cmsLive = isCmsLive();
   const sp = cmsLive && searchParams ? await searchParams : {};
   const preview = typeof sp.preview === "string" ? sp.preview : undefined;
+  const edit = !!preview; // the editor's canvas: the select-only markers are drawn only here
   const ov = (await getPageContent("/locations", preview)) || {};
   const serviceTimes = await getServiceTimes();
   const t = ov.text || {};
@@ -203,7 +205,7 @@ export default async function LocationsPage({
                         />
 
                         {/* Service times */}
-                        <div className="body-sm" data-service-times={loc.id} data-cms-pick={`fact:service_times:${loc.id}`} style={{ color: "rgba(255,255,255,0.55)", lineHeight: 1.7 }}>
+                        <div className="body-sm" data-service-times={loc.id} {...pickProps(edit, `fact:service_times:${loc.id}`)} style={{ color: "rgba(255,255,255,0.55)", lineHeight: 1.7 }}>
                           {campus(serviceTimes, loc.id).services.length === 0 && <div>{TIMES_TBA}</div>}
                           {campus(serviceTimes, loc.id).services.map((sv) => (
                             <div key={sv.day}>{dayLine(sv)}</div>

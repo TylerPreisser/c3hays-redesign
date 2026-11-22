@@ -1,5 +1,7 @@
 "use client";
 
+import { pickProps } from "@/lib/pick-attr";
+import { useEditMode } from "@/providers/EditModeProvider";
 import Link from "next/link";
 import Image from "next/image";
 import { useEffect, useRef } from "react";
@@ -27,6 +29,7 @@ const BLANK_PX =
    a stylized northwest-Kansas map with Hays + Colby markers beside a teal
    "find your campus" card, then two rounded campus cards. */
 export default function LocationsSection({ text = {}, btn = {} }: { text?: Record<string, string>; btn?: Record<string, BtnStyle> }) {
+  const editMode = useEditMode();
   const serviceTimes = useServiceTimes();
   const sectionRef = useRef<HTMLElement>(null);
 
@@ -149,7 +152,7 @@ export default function LocationsSection({ text = {}, btn = {} }: { text?: Recor
               <div className="absolute inset-x-0 bottom-0 flex flex-col justify-end" style={{ padding: "2.5rem" }}>
                 <h3 className="heading-1 text-white" data-cms={`t:campus-${loc.id}-name`} style={{ marginBottom: "0.4rem" }} dangerouslySetInnerHTML={{ __html: tx(text, `campus-${loc.id}-name`, loc.name) }} />
                 {/* The street and the service times are facts (the times are the campus record's): never editable text. In edit mode a click selects the times. */}
-                <p className="text-sm" data-cms-pick={`t:campus-${loc.id}-info`} style={{ color: "rgba(255,255,255,0.7)", marginBottom: "1.75rem" }}>{`${loc.street}, ${loc.city}, ${loc.state} · ${campusLine(campus(serviceTimes, loc.id))}`}</p>
+                <p className="text-sm" {...pickProps(editMode, `t:campus-${loc.id}-info`)} style={{ color: "rgba(255,255,255,0.7)", marginBottom: "1.75rem" }}>{`${loc.street}, ${loc.city}, ${loc.state} · ${campusLine(campus(serviceTimes, loc.id))}`}</p>
                 <div className="flex flex-wrap gap-3">
                   <Link href={text[`campusbtn-${loc.id}-info-href`] || `/locations/${loc.slug}/`} data-cms-link={`campusbtn-${loc.id}-info`} className="btn btn-primary btn-sm" style={btnCss(btn[`campusbtn-${loc.id}-info`])}>
                     <span data-cms-link-label>{text[`campusbtn-${loc.id}-info-label`] || "Campus Info"}</span>

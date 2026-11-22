@@ -1,5 +1,7 @@
 "use client";
 
+import { pickProps } from "@/lib/pick-attr";
+import { useEditMode } from "@/providers/EditModeProvider";
 import Link from "next/link";
 import { useState, useEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
@@ -33,6 +35,7 @@ export default function Header({ globals = {}, menu = null, announcements = [] }
   // data-cms-link — i.e. not selectable/editable, and the real editable links were
   // hidden inside closed dropdowns. In edit mode (cmsEdit=1) we force the FULL flat
   // bar instead, where every top-level item IS a data-cms-link → editable again.
+  const pickEdit = useEditMode(); // the editor's canvas (server-decided): the select-only markers are drawn only there
   const [editMode, setEditMode] = useState(false);
   useEffect(() => {
     try { setEditMode(new URLSearchParams(window.location.search).get("cmsEdit") === "1"); } catch { /* noop */ }
@@ -275,7 +278,7 @@ export default function Header({ globals = {}, menu = null, announcements = [] }
         }}
       >
         {!mobileOpen && announcements.map((announcement) => (
-          <div key={announcement.id} role="region" aria-label="Announcement" data-announcement data-cms-pick={`announcement:${announcement.id}`} style={{ background: "#0f3f3a", color: "#fff" }}>
+          <div key={announcement.id} role="region" aria-label="Announcement" data-announcement {...pickProps(pickEdit, `announcement:${announcement.id}`)} style={{ background: "#0f3f3a", color: "#fff" }}>
             <p className="container-c3 body-sm" style={{ margin: 0, padding: "0.45rem 0", display: "flex", flexWrap: "wrap", gap: "0.25rem 0.75rem", alignItems: "center", justifyContent: "center", textAlign: "center" }}>
               {announcement.eyebrow && <span data-announcement-eyebrow style={{ color: "rgba(255,255,255,0.86)" }}>{announcement.eyebrow}</span>}
               <strong>{announcement.title}</strong>
@@ -303,14 +306,14 @@ export default function Header({ globals = {}, menu = null, announcements = [] }
           {/* MEDIUM bar (768–1279px): the 8 destinations folded into 4 dropdown GROUPS
               so the bar never crowds or wraps on tablets / small laptops (G5). HIDDEN in
               edit mode (its group toggles aren't editable — see BUG #3). */}
-          <ul className={`${editMode ? "hidden" : "hidden md:flex xl:hidden"} items-center gap-0.5`} role="list" data-cms-pick="nav:menu">
+          <ul className={`${editMode ? "hidden" : "hidden md:flex xl:hidden"} items-center gap-0.5`} role="list" {...pickProps(pickEdit, "nav:menu")}>
             {groupEntries.map((e) => renderEntry(e, "px-2.5"))}
           </ul>
 
           {/* FULL bar (≥1280px, OR always in edit mode): every primary item inline as an
               editable data-cms-link, About/Locations dropdowns. In edit mode we show it
               from md up (tighter px) so the editor canvas gets the editable bar. */}
-          <ul className={`${editMode ? "hidden md:flex" : "hidden xl:flex"} items-center gap-1`} role="list" data-cms-pick="nav:menu">
+          <ul className={`${editMode ? "hidden md:flex" : "hidden xl:flex"} items-center gap-1`} role="list" {...pickProps(pickEdit, "nav:menu")}>
             {fullEntries.map((e) => renderEntry(e, editMode ? "px-2" : "px-3"))}
           </ul>
 

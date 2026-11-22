@@ -137,7 +137,7 @@ export default async function EventsPage({
             {authoredCards.length > 0 ? (
               <UpcomingEventsAuthored cards={authoredCards} text={t} media={media} />
             ) : studioEvents ? (
-              <StudioEventsList events={studioEvents} />
+              <StudioEventsList events={studioEvents} edit={!!preview} />
             ) : (
               <UpcomingEventsLive text={t} media={media} />
             )}

@@ -1,3 +1,4 @@
+import { pickProps } from "@/lib/pick-attr";
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
@@ -36,6 +37,7 @@ export default async function ColbyCampusPage({
   // The editor's canvas carries the preview token (draft); a visitor gets the published page. Read only under the live runtime.
   const sp = isCmsLive() && searchParams ? await searchParams : {};
   const preview = typeof sp.preview === "string" ? sp.preview : undefined;
+  const edit = !!preview; // the editor's canvas: the select-only markers are drawn only here
   const ov = (await getPageContent("/locations/colby", preview)) || {};
   const colby = campus(await getServiceTimes(), "colby");
   const spoken = spokenLine(colby);
@@ -111,7 +113,7 @@ export default async function ColbyCampusPage({
               color: "rgba(255,255,255,0.72)",
               maxWidth: "36rem",
             }}
-            data-cms-pick="fact:service_times:colby"
+            {...pickProps(edit, "fact:service_times:colby")}
             dangerouslySetInnerHTML={{
               __html: txTimesSafe(
                 t,
@@ -156,7 +158,7 @@ export default async function ColbyCampusPage({
               <p
                 className="body-lg mb-5"
                 style={{ color: "rgba(27,28,28,0.65)" }}
-                data-cms-pick="fact:service_times:colby"
+                {...pickProps(edit, "fact:service_times:colby")}
                 dangerouslySetInnerHTML={{
                   __html: txTimesSafe(
                     t,
@@ -218,12 +220,12 @@ export default async function ColbyCampusPage({
                     <p
                       className="font-semibold mb-0.5"
                       style={{ color: "#1b1c1c" }}
-                      data-cms-pick="fact:service_times:colby"
+                      {...pickProps(edit, "fact:service_times:colby")}
                       dangerouslySetInnerHTML={{
                         __html: tx(t, "colby-service-day", "Sunday"),
                       }}
                     />
-                    <p data-service-times="colby" data-cms-pick="fact:service_times:colby">{colby.services.length === 0 ? TIMES_TBA : colby.services.map((sv) => dayLine(sv).slice(sv.day.length + 1)).join("; ")}</p>
+                    <p data-service-times="colby" {...pickProps(edit, "fact:service_times:colby")}>{colby.services.length === 0 ? TIMES_TBA : colby.services.map((sv) => dayLine(sv).slice(sv.day.length + 1)).join("; ")}</p>
                   </div>
                 </div>
               </div>
@@ -322,7 +324,7 @@ export default async function ColbyCampusPage({
           <p
             className="body-lg mb-10"
             style={{ color: "rgba(27,28,28,0.60)" }}
-            data-cms-pick="fact:service_times:colby"
+            {...pickProps(edit, "fact:service_times:colby")}
             dangerouslySetInnerHTML={{
               __html: txTimesSafe(
                 t,

@@ -94,7 +94,7 @@ try {
   }
   {
     // the uploaded-media route is the site's own: a name Studio does not have is its plain 404 (not the page 404, not a 500), and it never answers for a bad name
-    for (const path of ["/media/no-such-upload.png", "/media/..%2fx.png", "/media/a%00b.png", "/media/a%5cb.png"]) {
+    for (const path of ["/media/site/no-such-upload.png", "/media/site/..%2fx.png", "/media/site/a%00b.png", "/media/site/a%5cb.png", "/media/private/x.png", "/media/x.png"]) {
       const res = await fetch(`http://127.0.0.1:${PORT}${path}`, { redirect: "manual" });
       const body = await res.text();
       const ct = res.headers.get("content-type") || "";

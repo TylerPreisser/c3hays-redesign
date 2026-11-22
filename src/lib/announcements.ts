@@ -11,7 +11,23 @@ export function safeHref(v: unknown): string | undefined {
   return undefined;
 }
 
-const day = (v: unknown): string | null => (typeof v === "string" && /^\d{4}-\d{2}-\d{2}/.test(v) ? v.slice(0, 10) : null);
+/**
+ * The church's calendar day (yyyy-MM-dd, America/Chicago) a stored start or end falls on. An instant (a time with Z or a
+ * UTC offset, as Studio stores them: the end of 12 Dec Central is 2026-12-13T05:59:00.000Z) is converted to Chicago; the
+ * first ten characters of such a string are the UTC date and are NOT the church's day. A value with no zone (a plain date,
+ * or a local date-time) is already the church's own wall-clock day.
+ */
+export function churchDay(v: unknown): string | null {
+  if (typeof v !== "string") return null;
+  const t = v.trim();
+  if (!/^\d{4}-\d{2}-\d{2}/.test(t)) return null;
+  if (/(?:Z|[+-]\d{2}:?\d{2})$/i.test(t) && /T/i.test(t)) {
+    const d = new Date(t);
+    return Number.isNaN(d.getTime()) ? null : churchToday(d);
+  }
+  return t.slice(0, 10);
+}
+const day = churchDay;
 
 /** The date line Studio sends (`eyebrow`, e.g. "Wed 2 Dec") as plain text, or undefined. Never built from the start and end dates. */
 const EYEBROW_MAX = 60;
@@ -23,7 +39,7 @@ export function plainEyebrow(v: unknown): string | undefined {
 
 /**
  * The announcement bar is ONE line. Of the announcements that are on today (active, on the web surface, started and not
- * yet ended; the end day is the last day shown) the site shows the one with the highest `priority` (staff raise it to say
+ * yet ended; the end day is the last day shown, in the church's zone) the site shows the one with the highest `priority` (staff raise it to say
  * "show this one now"); a tie goes to the one that started first, then to the newest published. None on = no bar.
  * `today` is a yyyy-MM-dd day in the church's time zone, passed in so the rule is testable.
  */
