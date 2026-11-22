@@ -88,6 +88,9 @@ try {
     const body = await res.text();
     if (res.status === 200 && /<html/i.test(body) && /<h1|<main/i.test(body)) ok(`${path} -> 200 (${body.length} bytes of HTML)`);
     else fail(`${path} -> ${res.status}: ${firstLine(body)}`);
+    const c = res.headers.get("x-c3-content"); // no Studio is reachable here, so "fallback" is the right answer; the header must exist
+    if (c === "studio" || c === "fallback") ok(`${path} x-c3-content ${c}`);
+    else fail(`${path} has no x-c3-content header`);
   }
   for (const path of MUST_404) {
     const res = await fetch(`http://127.0.0.1:${PORT}${path}`, { redirect: "follow" });

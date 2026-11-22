@@ -88,6 +88,36 @@ async function cmsFetch<T>(path: string): Promise<T | null> {
   }
 }
 
+/**
+ * Can this Worker read Studio at all? "studio" when a published read comes back as JSON; "fallback" when it does not
+ * (a refusal, a sign-in page where JSON was expected, a timeout, no Studio configured), in which case the pages show
+ * their built-in content. Reported as the `x-c3-content` response header and one log line when the state changes; the
+ * visitor never sees an error. Remembered per isolate for `ttlMs` so it costs one small read, not one per request.
+ */
+export type StudioContentState = "studio" | "fallback";
+let probe: { at: number; state: StudioContentState } | null = null;
+export async function studioContentState(ttlMs = 30_000): Promise<StudioContentState> {
+  if (probe && Date.now() - probe.at < ttlMs) return probe.state;
+  let state: StudioContentState = "fallback";
+  let why = "no Studio configured";
+  if (CMS_BASE) {
+    try {
+      const res = await cmsFetcher()(`${CMS_BASE}/api/content/site`, { cache: "no-store", signal: AbortSignal.timeout(2500) });
+      if (!res.ok) why = `Studio answered ${res.status}`;
+      else {
+        const body = await res.json();
+        if (body && typeof body === "object") state = "studio";
+        else why = "Studio answered something that is not content";
+      }
+    } catch {
+      why = "Studio answered something that is not JSON, or did not answer";
+    }
+  }
+  if (state === "fallback" && probe?.state !== "fallback") console.warn(`[c3-content] fallback: ${why}`);
+  probe = { at: Date.now(), state };
+  return state;
+}
+
 /** Whole published bundle (site, nav, collections). */
 export const getCMSBundle = () => cmsFetch<CMSBundle>("/api/content");
 

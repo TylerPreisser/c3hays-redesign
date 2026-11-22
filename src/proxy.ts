@@ -1,4 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server";
+import { studioContentState } from "@/lib/cms";
 
 /**
  * Hands the root layout two things it cannot read itself (a layout receives no search params and no URL):
@@ -7,14 +8,16 @@ import { NextResponse, type NextRequest } from "next/server";
  *
  * Only the live (server) build uses this; the static export has no request to read.
  */
-export function proxy(req: NextRequest) {
+export async function proxy(req: NextRequest) {
   const headers = new Headers(req.headers);
   headers.delete("x-c3-preview"); // never trust a caller-supplied copy
   headers.delete("x-c3-path");
   const token = req.nextUrl.searchParams.get("preview");
   if (token && token.length <= 2048 && /^[A-Za-z0-9._~+/=-]+$/.test(token)) headers.set("x-c3-preview", token);
   headers.set("x-c3-path", req.nextUrl.pathname);
-  return NextResponse.next({ request: { headers } });
+  const res = NextResponse.next({ request: { headers } });
+  res.headers.set("x-c3-content", await studioContentState()); // studio | fallback: says whether Studio was readable
+  return res;
 }
 
 export const config = {
