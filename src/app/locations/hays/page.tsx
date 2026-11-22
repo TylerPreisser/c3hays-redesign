@@ -4,7 +4,11 @@ import Link from "next/link";
 import { MapPin, Clock, Navigation, Phone, Mail } from "lucide-react";
 import { site } from "@/data/site";
 import { assetPath } from "@/lib/asset-path";
-import { getCMSPage } from "@/lib/cms";
+import { getPageContent } from "@/lib/cms";
+import { isCmsLive } from "@/lib/cms-live";
+import PageComposer from "@/components/cms/PageComposer";
+import { parseSections, exampleContentShim, type SectionMeta } from "@/lib/home-content";
+import { isExampleSection, renderExample } from "@/lib/section-examples";
 import { tx, imgCss, txTimesSafe } from "@/lib/home-content";
 import StaffGrid from "@/components/about/StaffGrid";
 import { getServiceTimes } from "@/lib/service-times";
@@ -18,16 +22,28 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-export default async function HaysCampusPage() {
-  const ov = (await getCMSPage("/locations/hays")) || {};
+const PAGE_DEFAULT_SECTIONS: SectionMeta[] = [
+  { id: "hays-hero", visible: true },
+  { id: "hays-details", visible: true },
+  { id: "hays-team", visible: true },
+];
+
+export default async function HaysCampusPage({
+  searchParams,
+}: {
+  searchParams?: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  // The editor's canvas carries the preview token (draft); a visitor gets the published page. Read only under the live runtime.
+  const sp = isCmsLive() && searchParams ? await searchParams : {};
+  const preview = typeof sp.preview === "string" ? sp.preview : undefined;
+  const ov = (await getPageContent("/locations/hays", preview)) || {};
   const hays = campus(await getServiceTimes(), "hays");
   const kids = kidsTimes(hays);
   const t = ov.text || {};
   const media = ov.media || {};
 
-  return (
-    <>
-      {/* ── Hero ─────────────────────────────────────────────────────── */}
+  const parts: Record<string, React.ReactNode> = {
+    "hays-hero": (
       <section
         className="relative flex flex-col justify-end overflow-hidden"
         style={{ minHeight: "clamp(480px, 62vh, 780px)" }}
@@ -87,8 +103,8 @@ export default async function HaysCampusPage() {
           />
         </div>
       </section>
-
-      {/* ── Campus Details ────────────────────────────────────────────── */}
+    ),
+    "hays-details": (
       <section className="section" style={{ backgroundColor: "#ffffff" }}>
         <div className="container-c3">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-10 lg:gap-14">
@@ -267,8 +283,8 @@ export default async function HaysCampusPage() {
           </div>
         </div>
       </section>
-
-      {/* ── Meet the Team ─────────────────────────────────────────────── */}
+    ),
+    "hays-team": (
       <StaffGrid
         groups={["elder", "hays"]}
         keyPrefix="hays-staff"
@@ -276,6 +292,19 @@ export default async function HaysCampusPage() {
         img={ov.img}
         titleText="Meet the Team"
       />
-    </>
+    ),
+  };
+  const sections = parseSections(ov.sections, PAGE_DEFAULT_SECTIONS);
+  const shim = exampleContentShim(ov);
+  // Each block is a named section the editor can select, move and hide (names: src/lib/section-names.ts).
+  return (
+    <PageComposer
+      sections={sections}
+      bgFill={ov.bgFill}
+      anim={ov.anim}
+      render={(id, variant) => parts[id] ?? (isExampleSection(id) ? renderExample(id, shim, variant) : null)}
+      freeEls={ov.freeEls}
+      freeOffsets={ov.freeOffsets}
+    />
   );
 }

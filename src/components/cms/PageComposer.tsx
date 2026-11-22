@@ -1,4 +1,5 @@
 import { buildBgCss } from "@/lib/backgrounds";
+import { sectionName } from "@/lib/section-names";
 import RevealPlayer from "@/components/cms/RevealPlayer";
 import FreeLayer from "@/components/cms/FreeLayer";
 import FreeOffsetStyle from "@/components/cms/FreeOffsetStyle";
@@ -69,7 +70,7 @@ export default function PageComposer({ sections, bgFill, anim, render, freeEls, 
             style={{ position: "absolute", inset: 0, zIndex: 0, background: s.bg, backgroundSize: "cover", backgroundPosition: "center" }}
           />
           {members.map((m) => (
-            <div key={m.id} data-section={m.id} style={{ position: "relative", zIndex: 1 }}>
+            <div key={m.id} data-section={m.id} data-section-name={sectionName(m.id)} style={{ position: "relative", zIndex: 1 }}>
               {render(m.id, m.variant)}
             </div>
           ))}
@@ -78,7 +79,7 @@ export default function PageComposer({ sections, bgFill, anim, render, freeEls, 
       i += members.length - 1; // advance past the grouped members (no double-render)
     } else {
       wrappers.push(
-        <div key={s.id} data-section={s.id}>
+        <div key={s.id} data-section={s.id} data-section-name={sectionName(s.id)}>
           {render(s.id, s.variant)}
         </div>
       );
