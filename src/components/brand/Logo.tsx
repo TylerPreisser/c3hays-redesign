@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { assetPath } from "@/lib/asset-path";
+import { mediaSrc } from "@/lib/media-path";
 
 /**
  * Logo — C3 brand mark using real PNG assets.
@@ -22,7 +23,8 @@ interface LogoProps {
 }
 
 export default function Logo({ variant = "dark", size = 40, className = "", cmsKey, srcOverride }: LogoProps) {
-  const src = srcOverride || (variant === "light" ? assetPath("/brand/logo-light.png") : assetPath("/brand/logo-dark.png"));
+  const override = mediaSrc(srcOverride); // a stored upload path is served from the site's own /media route, never from Studio
+  const src = override || (variant === "light" ? assetPath("/brand/logo-light.png") : assetPath("/brand/logo-dark.png"));
   const img = (
     <Image
       src={src}
@@ -31,7 +33,7 @@ export default function Logo({ variant = "dark", size = 40, className = "", cmsK
       height={size}
       className={className}
       priority
-      unoptimized={!!srcOverride && /^https?:\/\//.test(srcOverride)}
+      unoptimized={!!override && /^https?:\/\//.test(override)}
     />
   );
   // When editable, wrap in a tagged span so EditBridge can select it (the swap

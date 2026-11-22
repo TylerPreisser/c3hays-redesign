@@ -136,6 +136,10 @@ export default function EditBridge() {
     let mode: BridgeMode = "view";
     let caps: Record<string, number> = {};
     let pages: { title: string; href: string }[] = [];
+    /** Phone: words are not edited there, so a press on a section with a photo behind it means the photo. */
+    let photoFirst = false;
+    /** Photo keys the editor will not change (built into the site): drawn as plain, never as buttons. */
+    let fixedImg = new Set<string>();
     let sel: { attr: string; value: string; kind: string } | null = null;
     let secSelId = "";
     let activeEl: HTMLElement | null = null;
@@ -188,6 +192,9 @@ export default function EditBridge() {
       [data-cms]{ text-wrap: wrap !important; transition:background-color .12s ease; }
       html[data-cms-mode="edit"] [data-cms]{ cursor:text; }
       [data-cms-img], [data-cms-link]{ cursor:pointer; }
+      [data-cms-img][data-cms-fixed]{ cursor:default; }
+      [data-cms-img][data-cms-fixed]:hover::after{ display:none!important; }
+      [data-cms-img]:focus-visible{ outline:2px solid #0F6F64!important; outline-offset:-4px; }
       /* hover: a quiet outline over the element, never over its own background and never in the way of a click */
       [data-cms]:hover::after, [data-cms-img]:hover::after, [data-cms-link]:hover::after{
         content:""; position:absolute;
@@ -349,6 +356,7 @@ export default function EditBridge() {
     };
 
     /* ── editability (edit mode on a page that IS the draft) ── */
+    const imgTabbed = new Set<HTMLElement>();
     const ensureEditable = () => {
       const on = effMode() === "edit";
       if (on) {
@@ -359,9 +367,16 @@ export default function EditBridge() {
           editable.add(el);
         });
         picks().forEach((el) => { if (!el.hasAttribute("tabindex")) { el.setAttribute("tabindex", "0"); tabAdded.add(el); } });
+        // a photo is reachable by keyboard: Tab stops on it and Enter or Space opens it, as a press does
+        document.querySelectorAll<HTMLElement>("[data-cms-img]").forEach((el) => {
+          if (!el.hasAttribute("tabindex")) { el.setAttribute("tabindex", "0"); tabAdded.add(el); imgTabbed.add(el); }
+          if (!el.hasAttribute("role")) { el.setAttribute("role", "button"); imgTabbed.add(el); }
+          if (!el.hasAttribute("aria-label")) { el.setAttribute("aria-label", fixedImg.has(el.getAttribute("data-cms-img") || "") ? "Photo built into the website" : "Change photo"); imgTabbed.add(el); }
+          el.toggleAttribute("data-cms-fixed", fixedImg.has(el.getAttribute("data-cms-img") || ""));
+        });
         // Tab walks the editable things in reading order: the site's own links and controls step out of the tab order.
         document.querySelectorAll<HTMLElement>(SITE_CONTROLS).forEach((el) => {
-          if (inChrome(el) || el.hasAttribute("data-cms") || el.hasAttribute("data-cms-pick") || tabWas.has(el)) return;
+          if (inChrome(el) || el.hasAttribute("data-cms") || el.hasAttribute("data-cms-pick") || el.hasAttribute("data-cms-img") || tabWas.has(el)) return;
           tabWas.set(el, el.getAttribute("tabindex"));
           el.setAttribute("tabindex", "-1");
         });
@@ -369,6 +384,8 @@ export default function EditBridge() {
         editable.forEach((el) => { el.removeAttribute("contenteditable"); if (tabAdded.has(el)) { el.removeAttribute("tabindex"); tabAdded.delete(el); } });
         editable.clear();
         picks().forEach((el) => { if (tabAdded.has(el)) { el.removeAttribute("tabindex"); tabAdded.delete(el); } });
+        imgTabbed.forEach((el) => { if (tabAdded.has(el)) { el.removeAttribute("tabindex"); tabAdded.delete(el); } el.removeAttribute("role"); el.removeAttribute("aria-label"); el.removeAttribute("data-cms-fixed"); });
+        imgTabbed.clear();
         tabWas.forEach((was, el) => { if (was === null) el.removeAttribute("tabindex"); else el.setAttribute("tabindex", was); });
         tabWas.clear();
       }
@@ -734,7 +751,7 @@ export default function EditBridge() {
       if (inChrome(e.target)) return;
       const tgt = e.target as HTMLElement;
       const em = effMode();
-      const text = tgt?.closest?.("[data-cms]") as HTMLElement | null;
+      let text = tgt?.closest?.("[data-cms]") as HTMLElement | null;
       if (mode === "visitor") {
         // see the page as a visitor does, but never leave it: the canvas must keep its token
         const a = tgt?.closest?.("a") as HTMLAnchorElement | null;
@@ -756,6 +773,13 @@ export default function EditBridge() {
         for (const el of document.elementsFromPoint(e.clientX, e.clientY)) {
           const hit = (el as HTMLElement).closest?.("[data-cms-img]") as HTMLElement | null;
           if (hit) { img = hit; break; }
+        }
+      }
+      // On a phone the words are not edited, so a press on words over a photo means the photo.
+      if (photoFirst && em === "edit" && text && !link && !tgt?.closest?.("a,button,input,textarea,select,[data-cms-pick]") && typeof document.elementsFromPoint === "function") {
+        for (const el of document.elementsFromPoint(e.clientX, e.clientY)) {
+          const hit = (el as HTMLElement).closest?.("[data-cms-img]") as HTMLElement | null;
+          if (hit) { img = hit; text = null; break; }
         }
       }
       if (img && !text) {
@@ -814,6 +838,8 @@ export default function EditBridge() {
         return;
       }
       if ((k === "Enter" || k === " ") && em === "edit" && !e.metaKey && !e.ctrlKey && !e.altKey) {
+        const ph = (document.activeElement as HTMLElement | null)?.closest?.("[data-cms-img]") as HTMLElement | null;
+        if (ph && !fieldOf(document.activeElement)) { e.preventDefault(); sel = null; select(ph, "image"); return; }
         const pk = pickOf(document.activeElement);
         if (pk && !fieldOf(document.activeElement)) { e.preventDefault(); sel = null; select(pk, "pick"); return; }
       }
@@ -923,6 +949,8 @@ export default function EditBridge() {
             for (const [k, v] of Object.entries(d.caps as Record<string, unknown>)) if (typeof v === "number" && Number.isFinite(v) && v > 0) next[k.slice(0, 200)] = Math.floor(v);
             caps = next;
           }
+          photoFirst = d.photoFirst === true;
+          if (Array.isArray(d.fixed)) fixedImg = new Set((d.fixed as unknown[]).filter((k): k is string => typeof k === "string").slice(0, 100));
           if (Array.isArray(d.pages)) {
             pages = (d.pages as unknown[]).slice(0, 200).flatMap((p) => {
               const o = p as { title?: unknown; href?: unknown };
