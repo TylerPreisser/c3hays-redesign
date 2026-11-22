@@ -7,18 +7,21 @@
 // header string cannot tell that the page's own browser code fetches an origin the policy forbids. This does.
 //
 //   CMS_LIVE=1 NEXT_PUBLIC_CMS_URL=http://127.0.0.1:4673 npm run cf:build     (the same build smoke-workerd.mjs runs)
-//   node scripts/csp-crawl.mjs [--port 4652] [--studio-port 4673] [--dir <built tree>] [--shots <dir>]
+//   PLAYWRIGHT_DIR=<dir> node scripts/csp-crawl.mjs [--artifact] [--port 4652] [--studio-port 4673] [--dir <built tree>] [--shots <dir>]
 //
 // It starts two things and stops both by process group: `wrangler dev --local` on the built Worker (config written to a
 // temp dir: staging's vars, no service binding, so the site reads scripts/fake-studio.mjs over the public-URL path) and
 // the fake Studio. Third parties are stubbed at the network layer (page.route) with empty valid answers, so the check does
 // not depend on the internet; the browser still applies the page's CSP BEFORE the request is routed, so a blocked origin
 // is reported whatever the stub. The church's eSpace calendar answers a fixed payload that includes a registration link.
-// Playwright is found in this repo's node_modules, a sibling c3-backend, or the npx cache; none found is a FAIL.
+// Playwright comes ONLY from the PLAYWRIGHT_DIR environment variable (a directory whose node_modules holds playwright with
+// Chromium installed, e.g. the Studio repo); unset or wrong is one plain FAIL line naming the variable.
+// --artifact: crawl the Worker exactly as built (e.g. by scripts/deploy-staging.sh build, whose Studio is the real staging
+// one): no fake Studio is started and the article page, which needs Studio's sample sermon, is skipped.
 // Exit 0 = clean. Exit 1 = findings (each printed).
 import { spawn } from "node:child_process";
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs";
-import { homedir, tmpdir } from "node:os";
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { createRequire } from "node:module";
 import { fileURLToPath, pathToFileURL } from "node:url";
@@ -29,15 +32,15 @@ const PORT = Number(opt("port", "4652"));
 const STUDIO_PORT = Number(opt("studio-port", "4673"));
 const REPO = resolve(opt("dir", fileURLToPath(new URL("..", import.meta.url))));
 const SHOTS = opt("shots", ""); // a folder: also save stills of /events (1440, 1366, 390)
+const ARTIFACT = args.includes("--artifact");
 const MODE = opt("mode", "espace"); // the events mode the fake Studio serves: espace | studio
 const ORIGIN = `http://127.0.0.1:${PORT}`;
 const BOOT_MS = 180_000;
 
-function findPlaywright() {
-  const cands = [join(REPO, "node_modules/playwright"), join(REPO, "../c3-backend/node_modules/playwright"), join(REPO, "../../../../c3-backend/node_modules/playwright")];
-  const npx = join(homedir(), ".npm/_npx");
-  if (existsSync(npx)) for (const d of readdirSync(npx)) cands.push(join(npx, d, "node_modules/playwright"));
-  // the first copy whose browser is actually installed (several versions can sit in the npx cache)
+function playwrightFromEnv() {
+  const dir = (process.env.PLAYWRIGHT_DIR || "").trim();
+  if (!dir) return undefined;
+  const cands = [join(dir, "node_modules/playwright"), dir];
   for (const c of cands) {
     if (!existsSync(join(c, "package.json"))) continue;
     try { const pw = createRequire(import.meta.url)(c); if (existsSync(pw.chromium.executablePath())) return c; } catch {}
@@ -52,8 +55,8 @@ process.on("exit", () => { stopAll(); rmSync(TMP, { recursive: true, force: true
 for (const s of ["SIGINT", "SIGTERM"]) process.on(s, () => process.exit(130));
 
 if (!existsSync(join(REPO, ".open-next", "worker.js"))) { console.log("FAIL no .open-next/worker.js: build first (see the header of this file)"); process.exit(1); }
-const pwPath = findPlaywright();
-if (!pwPath) { console.log("FAIL Playwright not found (node_modules, ../c3-backend/node_modules or ~/.npm/_npx): this check cannot run, so it fails"); process.exit(1); }
+const pwPath = playwrightFromEnv();
+if (!pwPath) { console.log("FAIL csp-crawl: set PLAYWRIGHT_DIR to a directory whose node_modules/playwright has Chromium installed (it is unset or does not hold a working Playwright)"); process.exit(1); }
 const { chromium } = createRequire(import.meta.url)(pwPath);
 
 // ── the worker: staging's vars, no service binding ──
@@ -104,17 +107,20 @@ async function stub(route) {
   return route.fulfill({ status: 200, contentType: "application/json", headers: cors, body: "{}" });
 }
 
-const PAGES = [
+const ALL_PAGES = [
   ["home", "/"], ["hays campus", "/locations/hays/"], ["colby campus", "/locations/colby/"], ["events", "/events/"], ["news", "/news/"],
   ["article (a message)", "/messages/srm_1/"], ["about", "/about/"], ["give", "/give/"], ["contact (connect)", "/connect/"], ["search", "/search/"],
   ["signup form (visit)", "/visit/"], ["messages", "/messages/"], ["watch", "/watch/"], ["media image", "/media/aB3dEfGhIjKlMnOpQr_-Zz.png"],
   ["edit-mode canvas", "/?preview=crawl-token&cmsEdit=1"], ["not found page", "/nope-xyz/"],
 ];
+const PAGES = ARTIFACT ? ALL_PAGES.filter(([n]) => !n.startsWith("article")) : ALL_PAGES;
 const EXPECT = { "/media/aB3dEfGhIjKlMnOpQr_-Zz.png": 404, "/nope-xyz/": 404 }; // the media route's plain 404 (Studio has no such file) and the site's 404 page
 
 try {
-  const studio = launch(process.execPath, [join(REPO, "scripts/fake-studio.mjs"), String(STUDIO_PORT)], { cwd: REPO, env: { ...process.env, FAKE_EVENTS_MODE: MODE } });
-  await until(async () => { try { return (await fetch(`http://127.0.0.1:${STUDIO_PORT}/api/content/site`)).ok; } catch { return false; } }, "fake Studio", 20_000);
+  if (!ARTIFACT) {
+    launch(process.execPath, [join(REPO, "scripts/fake-studio.mjs"), String(STUDIO_PORT)], { cwd: REPO, env: { ...process.env, FAKE_EVENTS_MODE: MODE } });
+    await until(async () => { try { return (await fetch(`http://127.0.0.1:${STUDIO_PORT}/api/content/site`)).ok; } catch { return false; } }, "fake Studio", 20_000);
+  }
   const w = launch(join(REPO, "node_modules/.bin/wrangler"), ["dev", "-c", join(TMP, "wrangler.jsonc"), "--local", "--port", String(PORT), "--ip", "127.0.0.1", "--persist-to", join(TMP, "state"), "--show-interactive-dev-session=false"], { cwd: REPO, env: { ...process.env, CI: "1", WRANGLER_LOG_PATH: join(TMP, "wl") } });
   await until(() => { if (w.c.exitCode !== null) throw new Error(`wrangler dev exited\n${w.text().slice(-2000)}`); return /Ready on http/.test(w.text()); }, "wrangler dev", BOOT_MS);
 
@@ -185,4 +191,4 @@ const seen = new Map();
 for (const f of findings) { const k = `${f.kind} :: ${f.detail}`; seen.set(k, [...(seen.get(k) ?? []), f.page]); }
 for (const [k, pages] of seen) console.log(`FAIL ${k}\n     on: ${[...new Set(pages)].join(", ")}`);
 if (findings.length) { console.log(`csp-crawl: ${seen.size} distinct finding(s) FAILED`); process.exit(1); }
-console.log(`csp-crawl: clean (${PAGES.length} pages x ${2} viewports)`);
+console.log(`csp-crawl: clean (${PAGES.length} pages x 2 viewports${ARTIFACT ? ", artifact as built" : ""})`);
