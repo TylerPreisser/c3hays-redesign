@@ -748,8 +748,16 @@ export default function EditBridge() {
         select(pk, "pick");
         return;
       }
-      const img = tgt?.closest?.("[data-cms-img]") as HTMLElement | null;
+      let img = tgt?.closest?.("[data-cms-img]") as HTMLElement | null;
       const link = tgt?.closest?.("[data-cms-link]") as HTMLElement | null;
+      // A page-top photo sits UNDER the section's text layer, so a press on the empty part of that layer lands on the layer, not the
+      // photo. When the press is not on words, a link or a button, the photo under the pointer is the one meant.
+      if (!img && !text && !link && !tgt?.closest?.("a,button,input,textarea,select,[data-cms-pick]") && typeof document.elementsFromPoint === "function") {
+        for (const el of document.elementsFromPoint(e.clientX, e.clientY)) {
+          const hit = (el as HTMLElement).closest?.("[data-cms-img]") as HTMLElement | null;
+          if (hit) { img = hit; break; }
+        }
+      }
       if (img && !text) {
         e.preventDefault(); e.stopPropagation();
         select(img, "image");
