@@ -51,7 +51,7 @@
       "name": "c3hays-live-staging",
       // Public (no Access: Studio's editor canvas frames it); X-Robots-Tag + robots.txt keep search engines out.
       "routes": [{ "pattern": "c3hays-staging.preissersolutions.com", "custom_domain": true }],
-      "vars": { "CMS_LIVE": "1", "NODE_ENV": "production", "TURNSTILE_SITE_KEY": "" },
+      "vars": { "CMS_LIVE": "1", "NODE_ENV": "production", "TURNSTILE_SITE_KEY": "0x4AAAAAAGMgeJYPlal9VM_6" },
       "services": [{ "binding": "CMS", "service": "c3-studio-staging" }]
     }
   }

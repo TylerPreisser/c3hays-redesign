@@ -90,6 +90,8 @@ cmd_verify() {
   echo "ok: / -> 200, x-c3-build $ID"
   [ "$(header_of x-c3-content "$T/h.head")" = "studio" ] || die "x-c3-content is '$(header_of x-c3-content "$T/h.head")', not 'studio': the site cannot read Studio and is serving its built-in content"
   echo "ok: x-c3-content studio (the site reads Studio)"
+  grep -q 'turnstileSiteKey\\":\\"[A-Za-z0-9_-][A-Za-z0-9_-]*\\"' "$T/h.body" || die "the signup form carries no Turnstile site key (TURNSTILE_SITE_KEY is empty), so signup shows no widget"
+  echo "ok: the signup form carries a Turnstile site key"
   for p in /news /locations/hays /search; do
     code="$(curl -sS -L --max-time 30 -o /dev/null -w '%{http_code}' "$URL$p")"; [ "$code" = 200 ] || die "$p -> $code"; echo "ok: $p -> 200"
   done
