@@ -34,32 +34,46 @@ function studio() {
 }
 afterEach(() => { vi.unstubAllGlobals(); vi.unstubAllEnvs(); vi.resetModules(); });
 
-describe("announcements on every page, Home included", () => {
-  it("the root layout a visitor gets carries every announcement that is on, the one that started first leading, none that ended", async () => {
-    studio();
+describe("the announcement bar is one line", () => {
+  async function homeHtml(anns: unknown[]) {
+    vi.stubGlobal("fetch", vi.fn(async (url: string) => {
+      const p = new URL(url).pathname;
+      const body: Record<string, unknown> = { "/api/content/announcements": anns, "/api/content/locations": locations, "/api/content/navigation": [{ id: "m1", label: "Start Here", href: "/visit/" }] };
+      return { ok: p in body, json: async () => body[p] ?? {} } as Response;
+    }));
+    vi.stubEnv("NEXT_PUBLIC_CMS_URL", "https://studio.example.test");
     vi.resetModules();
     const Layout = (await import("@/app/layout")).default;
-    const html = renderToStaticMarkup(await Layout({ children: createElement("main", null, "home") }));
-    expect(html).toContain("Marriage Night");
-    expect(html).toContain("App is live");
-    expect(html).not.toContain("Last month");
-    // a notice's priority number does not rank it: the always-on one (priority 2) does not hide the dated one
-    expect(html.indexOf("App is live")).toBeLessThan(html.indexOf("Marriage Night"));
-    expect(html).toContain('data-cms-pick="announcement:ann_1"');
+    return renderToStaticMarkup(await Layout({ children: createElement("main", null, "home") }));
+  }
+  it("with two active announcements only the higher-priority one is in the Home HTML; raising the other swaps them; an ended one never shows", async () => {
+    const html = await homeHtml(ANNOUNCEMENTS);
+    expect(html).toContain("App is live"); // priority 2
+    expect(html).not.toContain("Marriage Night"); // priority 1
+    expect(html).not.toContain("Last month"); // ended, even with priority 9
+    expect((html.match(/data-announcement/g) || []).length).toBe(1);
     expect(html).toContain('data-cms-pick="announcement:ann_2"');
     expect(html).toContain('data-cms-pick="nav:menu"');
+    const raised = await homeHtml(ANNOUNCEMENTS.map((a) => (a.id === "ann_1" ? { ...a, priority: 5 } : a)));
+    expect(raised).toContain("Marriage Night");
+    expect(raised).not.toContain("App is live");
+    expect((raised.match(/data-announcement/g) || []).length).toBe(1);
   });
-  it("order: started first, then newest; an ended or future one is never shown", async () => {
+  it("no announcement on: no bar at all", async () => {
+    expect(await homeHtml([ANNOUNCEMENTS[2]])).not.toContain("data-announcement");
+  });
+  it("order: priority, then the earlier start, then the newest; an ended or future one is never first", async () => {
     const { currentAnnouncements } = await import("@/lib/announcements");
-    const mk = (id: string, o: object) => ({ id, title: id, body: "", surface: "web", active: true, ...o });
+    const mk = (id: string, o: object) => ({ id, title: id, body: "", surface: "web", active: true, priority: 1, ...o });
     const out = currentAnnouncements([
       mk("new", { starts_at: "2026-11-01", created_at: "2026-11-02" }),
       mk("old", { starts_at: "2026-10-01", created_at: "2026-10-01" }),
-      mk("tie-newer", { starts_at: "2026-11-01", created_at: "2026-11-05" }),
-      mk("future", { starts_at: "2026-12-01" }),
-      mk("ended", { starts_at: "2026-09-01", ends_at: "2026-11-10" }),
+      mk("tie-newer", { starts_at: "2026-10-01", created_at: "2026-11-05" }),
+      mk("top", { priority: 3, starts_at: "2026-11-15" }),
+      mk("future", { priority: 9, starts_at: "2026-12-01" }),
+      mk("ended", { priority: 9, starts_at: "2026-09-01", ends_at: "2026-11-10" }),
     ], "2026-11-21");
-    expect(out.map((a) => a.id)).toEqual(["old", "tie-newer", "new"]);
+    expect(out.map((a) => a.id)).toEqual(["top", "tie-newer", "old", "new"]);
   });
 });
 
