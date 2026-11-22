@@ -4,6 +4,9 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 
+// These render whole pages and the root layout (a cold import of every component): allow for a loaded machine.
+vi.setConfig({ testTimeout: 60_000 });
+
 /**
  * Service rows from Studio are read at the boundary: a `day` must be a weekday name and a `room` is plain text.
  * The input is the shape of Studio's published locations (tests/fixtures/studio-locations.json) with one row
@@ -23,7 +26,7 @@ async function pageHtml(path: "hays" | "colby") {
   vi.resetModules();
   vi.stubEnv("NEXT_PUBLIC_CMS_URL", "https://studio.example.test");
   const mod = await import(path === "hays" ? "@/app/locations/hays/page" : "@/app/locations/colby/page");
-  const el = await (mod.default as () => Promise<React.ReactElement>)();
+  const el = await (mod.default as (p: object) => Promise<React.ReactElement>)({});
   return renderToStaticMarkup(el);
 }
 

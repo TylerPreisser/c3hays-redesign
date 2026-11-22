@@ -5,6 +5,9 @@ import { createElement } from "react";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 
+// These render whole pages and the root layout (a cold import of every component): allow for a loaded machine.
+vi.setConfig({ testTimeout: 60_000 });
+
 vi.mock("next/navigation", () => ({ usePathname: () => "/", useRouter: () => ({}), useSearchParams: () => new URLSearchParams() }));
 vi.mock("next/font/google", () => ({ Hanken_Grotesk: () => ({ variable: "font-x", className: "font-x" }) }));
 
