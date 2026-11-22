@@ -17,6 +17,7 @@
 import { cache } from "react";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 import type { SectionMeta } from "@/lib/home-content";
+import { getForwardSecret } from "@/lib/signup-config";
 
 const CMS_BASE = process.env.NEXT_PUBLIC_CMS_URL || "";
 
@@ -36,7 +37,24 @@ const CMS_BASE = process.env.NEXT_PUBLIC_CMS_URL || "";
  * URL is always built from CMS_BASE; only the FETCHER differs.
  */
 type FetchLike = (input: string, init?: RequestInit) => Promise<Response>;
+/**
+ * Studio's staging wall lets this site through only with the shared secret in this header (the same secret and header the
+ * signup forward uses). Sent on every Studio request when the secret is bound; never logged. Production Studio ignores it.
+ */
+export const SITE_DOOR_HEADER = "x-c3-forward-secret";
+function withDoor(f: FetchLike): FetchLike {
+  return (input, init) => {
+    const secret = getForwardSecret();
+    if (!secret) return f(input, init);
+    const headers = new Headers(init?.headers);
+    headers.set(SITE_DOOR_HEADER, secret);
+    return f(input, { ...init, headers });
+  };
+}
 function cmsFetcher(): FetchLike {
+  return withDoor(rawFetcher());
+}
+function rawFetcher(): FetchLike {
   try {
     const env = getCloudflareContext().env as
       | { CMS?: { fetch: (input: RequestInfo | URL, init?: RequestInit) => Promise<Response> } }

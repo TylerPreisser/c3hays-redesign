@@ -36,4 +36,38 @@ describe("the site says whether it read Studio", () => {
     const { studioContentState } = await load();
     expect(await studioContentState(0)).toBe("studio");
   });
+
+  // Studio's staging wall: no shared secret in the header, no content.
+  const SECRET = "site-forward-secret-0123456789abcdef";
+  const wall = () => vi.fn(async (_u: string, init?: RequestInit) => {
+    const h = new Headers(init?.headers);
+    return h.get("x-c3-forward-secret") === SECRET ? good() : refused();
+  });
+  it("with the secret bound, reads carry it and Studio answers: studio", async () => {
+    vi.stubEnv("SITE_FORWARD_SECRET", SECRET);
+    const f = wall();
+    vi.stubGlobal("fetch", f);
+    const { studioContentState, getCMSLocations } = await load();
+    expect(await studioContentState(0)).toBe("studio");
+    expect(await getCMSLocations()).toEqual({ name: "C3" });
+    expect(new Headers((f.mock.calls[0][1] as RequestInit).headers).get("x-c3-forward-secret")).toBe(SECRET);
+  });
+  it("with no secret bound, the wall answers 403: fallback, a log line, and the content read is null", async () => {
+    vi.stubEnv("SITE_FORWARD_SECRET", "");
+    vi.stubGlobal("fetch", wall());
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    const { studioContentState, getCMSLocations } = await load();
+    expect(await studioContentState(0)).toBe("fallback");
+    expect(await getCMSLocations()).toBeNull();
+    expect(warn.mock.calls.flat().join(" ")).toMatch(/\[c3-content\] fallback/);
+  });
+  it("never logs the secret", async () => {
+    vi.stubEnv("SITE_FORWARD_SECRET", SECRET);
+    vi.stubGlobal("fetch", vi.fn(async () => refused()));
+    const out: string[] = [];
+    for (const k of ["warn", "error", "log"] as const) vi.spyOn(console, k).mockImplementation((...a) => { out.push(a.join(" ")); });
+    const { studioContentState } = await load();
+    await studioContentState(0);
+    expect(out.join("\n")).not.toContain(SECRET);
+  });
 });
