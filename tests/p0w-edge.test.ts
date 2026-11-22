@@ -18,6 +18,8 @@ describe("security headers", () => {
     expect(csp).not.toContain(STUDIO_ORIGINS.production);
     expect(csp).toMatch(/style-src [^;]*'unsafe-inline'/);
     expect(csp).toContain("https://challenges.cloudflare.com");
+    expect(csp).toMatch(/connect-src [^;]*https:\/\/app\.espace\.cool(;| )/); // the calendar fetch, exactly this origin
+    expect(csp).not.toMatch(/connect-src [^;]*(\*|https:( |;|$))/);
     expect(csp).toContain("object-src 'none'");
   });
   it("sends Referrer-Policy strict-origin-when-cross-origin", () => {

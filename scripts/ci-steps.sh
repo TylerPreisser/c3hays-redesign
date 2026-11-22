@@ -17,5 +17,7 @@ ci_steps() {
   [ -f "$WT/.next/BUILD_ID" ] || { echo "next build left no .next/BUILD_ID" >> "$LOG"; return 1; }
   run audit . npm audit --omit=dev --audit-level=high
   run regression-bed . bash regression/run.sh
+  # Built Worker in a real browser: every page type, fails on any CSP violation or failed request (about 2 minutes with the Worker build). Needs Playwright with Chromium (this repo, ../c3-backend, or the npx cache) and ports 4652/4673 free.
+  run csp-crawl . npm run check:csp
 }
 ci_summary() { printf 'tsc clean; SSR build %s' "$(cat "$WT/.next/BUILD_ID" 2>/dev/null)"; }
