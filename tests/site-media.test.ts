@@ -13,7 +13,7 @@ vi.mock("next/font/google", () => ({ Hanken_Grotesk: () => ({ variable: "font-x"
  * service binding the content reads use.
  */
 const STUDIO = "https://c3-studio-staging.preissersolutions.com";
-const KEY = "aB3dEfGhIj-sunday-crowd.jpg";
+const KEY = "aB3dEfGhIjKlMnOpQr_-Zz.jpg"; // 22 characters + an allowed extension, as Studio names a website image
 const PNG = new Uint8Array([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 1, 2, 3, 4]);
 
 afterEach(() => { vi.unstubAllGlobals(); vi.unstubAllEnvs(); vi.resetModules(); });
@@ -21,35 +21,35 @@ afterEach(() => { vi.unstubAllGlobals(); vi.unstubAllEnvs(); vi.resetModules(); 
 describe("an uploaded image's address is the site's own", () => {
   it.each([
     [`/api/media/site/${KEY}`],
-    [`/uploads/site/${KEY}`],
     [`${STUDIO}/api/media/site/${KEY}`],
-    [`${STUDIO}/uploads/site/${KEY}`],
     [`https://c3-studio.tylerpreisser.workers.dev/api/media/site/${KEY}`],
-  ])("%s becomes /media/site/<name>", async (v) => {
+  ])("%s becomes /media/<name> (no site/ segment in what a visitor sees)", async (v) => {
     vi.stubEnv("NEXT_PUBLIC_CMS_URL", STUDIO);
     const { assetPath } = await import("@/lib/asset-path");
-    expect(assetPath(v)).toBe(`/media/site/${KEY}`);
+    expect(assetPath(v)).toBe(`/media/${KEY}`);
   });
-  it("anything else is left alone: site files, other hosts, look-alike hosts, Studio paths that are not uploads", async () => {
+  it("anything else is left alone: site files, other hosts, look-alike hosts, other Studio paths, any other name shape or prefix", async () => {
     vi.stubEnv("NEXT_PUBLIC_CMS_URL", STUDIO);
     const { assetPath } = await import("@/lib/asset-path");
+    const short = KEY.slice(0, 21 - 4) + ".jpg", long = "A" + KEY;
     for (const v of ["/images/exterior.webp", "https://images.example.org/x.jpg", `${STUDIO}.evil.example/api/media/site/${KEY}`, `https://evil.example/api/media/site/${KEY}`,
       `${STUDIO}/api/content/home`, `${STUDIO}/api/media/site/a/b`, "/api/media/site/../x.jpg", "data:image/png;base64,AAAA",
-      // only the one fixed prefix is a website image: no prefix, another prefix, a different case, a doubled prefix
-      `/api/media/${KEY}`, `/api/media/private/${KEY}`, `/api/media/SITE/${KEY}`, `/api/media/site/site/${KEY}`, `${STUDIO}/api/media/${KEY}`]) {
+      `/api/media/${KEY}`, `/api/media/private/${KEY}`, `/api/media/SITE/${KEY}`, `/api/media/site/site/${KEY}`, `${STUDIO}/api/media/${KEY}`, `/uploads/site/${KEY}`,
+      `/api/media/site/${short}`, `/api/media/site/${long}`, `/api/media/site/${KEY.replace(".jpg", ".svg")}`, `/api/media/site/${KEY.replace(".jpg", ".jpeg")}`, `/api/media/site/${KEY.replace(".jpg", "")}`,
+      `/api/media/site/${KEY}?x=1`, `/api/media/site/${KEY}/`]) {
       expect(assetPath(v), v).toBe(v);
     }
   });
   it("a CSS background value is rewritten too, and only its Studio uploads", async () => {
     vi.stubEnv("NEXT_PUBLIC_CMS_URL", STUDIO);
     const { mediaInCss } = await import("@/lib/media-path");
-    expect(mediaInCss(`url("${STUDIO}/api/media/site/${KEY}") center / cover no-repeat`)).toBe(`url("/media/site/${KEY}") center / cover no-repeat`);
+    expect(mediaInCss(`url("${STUDIO}/api/media/site/${KEY}") center / cover no-repeat`)).toBe(`url("/media/${KEY}") center / cover no-repeat`);
     expect(mediaInCss('url("https://images.example.org/x.jpg") center / cover')).toBe('url("https://images.example.org/x.jpg") center / cover');
     const { buildBgCss } = await import("@/lib/backgrounds");
-    expect(mediaInCss(buildBgCss([], { "home.hero": `url("${STUDIO}/api/media/site/${KEY}") center / cover no-repeat` }))).toContain(`/media/site/${KEY}`);
+    expect(mediaInCss(buildBgCss([], { "home.hero": `url("${STUDIO}/api/media/site/${KEY}") center / cover no-repeat` }))).toContain(`/media/${KEY}`);
     expect(mediaInCss(buildBgCss([], { "home.hero": `url("${STUDIO}/api/media/site/${KEY}") center / cover no-repeat` }))).not.toContain(STUDIO);
   });
-  it("a published Hays hero photo that was uploaded renders /media/site/<name>, and no Studio address", async () => {
+  it("a published Hays hero photo that was uploaded renders /media/<name>, and no Studio address", async () => {
     vi.stubEnv("NEXT_PUBLIC_CMS_URL", STUDIO);
     vi.stubGlobal("fetch", vi.fn(async (url: string) => {
       const u = new URL(url);
@@ -60,12 +60,12 @@ describe("an uploaded image's address is the site's own", () => {
     const mod = await import("@/app/locations/hays/page");
     const html = renderToStaticMarkup(await (mod.default as (p: object) => Promise<React.ReactElement>)({}));
     const plainHtml = html.replace(/%2F/gi, "/"); // the image element's srcset carries the address URL-encoded
-    expect(plainHtml).toContain(`/media/site/${KEY}`);
+    expect(plainHtml).toContain(`/media/${KEY}`);
     expect(plainHtml).not.toContain("c3-studio-staging");
   });
 });
 
-describe("GET /media/site/<name> serves the image from Studio, through the content transport", () => {
+describe("GET /media/<name> serves the image from Studio, through the content transport", () => {
   async function route(opts: { upstream?: (url: string, init?: RequestInit) => Response; key?: string; path?: string[]; method?: string; headers?: Record<string, string> } = {}) {
     const seen: { url: string; init?: RequestInit }[] = [];
     vi.stubEnv("NEXT_PUBLIC_CMS_URL", STUDIO);
@@ -76,7 +76,7 @@ describe("GET /media/site/<name> serves the image from Studio, through the conte
     }));
     vi.resetModules();
     const { GET, HEAD } = await import("@/app/media/[...path]/route");
-    const path = opts.path ?? ["site", opts.key ?? KEY];
+    const path = opts.path ?? [opts.key ?? KEY];
     const req = new Request(`https://site.test/media/${path.map(encodeURIComponent).join("/")}`, { method: opts.method ?? "GET", headers: opts.headers });
     const res = await ((opts.method === "HEAD" ? HEAD : GET) as (r: Request, c: { params: Promise<{ path: string[] }> }) => Promise<Response>)(req, { params: Promise.resolve({ path }) });
     return { res, seen };
@@ -93,23 +93,25 @@ describe("GET /media/site/<name> serves the image from Studio, through the conte
     expect(seen[0].url).toBe(`${STUDIO}/api/media/site/${KEY}`); // the host comes from config, the prefix is the one fixed value, the path is built here
     expect(new Headers(seen[0].init?.headers).get("x-c3-forward-secret")).toBe("site-forward-secret-0123456789abcdef");
   });
-  it("a plain name without a random prefix gets a short cache", async () => {
-    const { res } = await route({ key: "hero.png" });
-    expect(res.headers.get("cache-control")).toMatch(/max-age=300/);
-    expect(res.headers.get("cache-control")).not.toMatch(/immutable/);
+  it("every allowed extension is served", async () => {
+    for (const ext of ["jpg", "png", "webp", "avif", "gif"]) {
+      const key = `aB3dEfGhIjKlMnOpQr_-Zz.${ext}`;
+      const { res, seen } = await route({ key });
+      expect(res.status, ext).toBe(200);
+      expect(seen[0].url).toBe(`${STUDIO}/api/media/site/${key}`);
+    }
   });
-  it("refuses any shape but the one fixed prefix plus a name, without asking Studio", async () => {
-    for (const path of [[], [KEY], ["private", KEY], ["SITE", KEY], ["site"], ["site", "site", KEY], ["site", "a", "b"], ["", KEY], ["site/x", KEY], ["site", "private/x.jpg"], [".", KEY], ["..", KEY], ["site", ".."], ["%73ite", KEY]]) {
+  it("refuses every other shape before Studio is asked: the fake Studio sees zero requests", async () => {
+    const base = KEY.slice(0, 22);
+    const paths: string[][] = [
+      [], ["site", KEY], ["private", KEY], ["site", "site", KEY], [KEY, "x"], ["", KEY], ["site/" + KEY], ["private/" + KEY],
+      [base.slice(0, 21) + ".jpg"], [base + "A.jpg"], [base + ".svg"], [base + ".jpeg"], [base + ".JPG"], [base], [base + ".jpg.png"], [base + ".jpg "], ["." + base.slice(1) + ".jpg"],
+      ["..", ], [".."], ["%2e%2e"], ["a%2fb.jpg"], [base.slice(0, 20) + "%2f.jpg"], [base.slice(0, 20) + "\\" + ".jpg"], [base.slice(0, 20) + "\u0000.jpg"], [base.slice(0, 20) + "?.jpg"], ["../" + KEY], ["x".repeat(200) + ".jpg"],
+    ];
+    for (const path of paths) {
       const { res, seen } = await route({ path });
       expect(res.status, JSON.stringify(path)).toBe(404);
       expect(seen, JSON.stringify(path)).toHaveLength(0);
-    }
-  });
-  it("refuses traversal, encoded slashes, dot-only, empty and over-long names without asking Studio", async () => {
-    for (const key of ["..", ".", "../auth/staging-persona", "a/b", "a\\b", "%2e%2e", "a%00b", "", "a".repeat(121), "a b", "x?y=1"]) {
-      const { res, seen } = await route({ key });
-      expect(res.status, JSON.stringify(key)).toBe(404);
-      expect(seen, JSON.stringify(key)).toHaveLength(0);
     }
   });
   it("refuses an SVG, and anything that is not an allowed image type, whatever Studio says", async () => {
@@ -154,7 +156,7 @@ describe("GET /media/site/<name> serves the image from Studio, through the conte
     vi.stubGlobal("fetch", vi.fn());
     vi.resetModules();
     const { GET } = await import("@/app/media/[...path]/route");
-    const res = await GET(new Request("https://site.test/media/site/x.png"), { params: Promise.resolve({ path: ["site", "x.png"] }) });
+    const res = await GET(new Request(`https://site.test/media/${KEY}`), { params: Promise.resolve({ path: [KEY] }) });
     expect(res.status).toBe(404);
     expect(fetch).not.toHaveBeenCalled();
   });

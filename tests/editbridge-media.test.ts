@@ -11,16 +11,16 @@ const STUDIO = "https://c3-studio-staging.preissersolutions.com";
 describe("editor:apply for an image", () => {
   it("an upload on Studio's address is shown as /media/<name>", async () => {
     h = await mountEditor(PAGE, { mode: "edit" });
-    await h.send("editor:apply", { path: "hero.bg", value: `${STUDIO}/api/media/site/aB3dEfGhIj-crowd.jpg` });
+    await h.send("editor:apply", { path: "hero.bg", value: `${STUDIO}/api/media/site/aB3dEfGhIjKlMnOpQr_-Zz.jpg` });
     await flush(50);
-    expect(document.querySelector("[data-cms-img='hero.bg'] img")!.getAttribute("src")).toBe("/media/site/aB3dEfGhIj-crowd.jpg");
+    expect(document.querySelector("[data-cms-img='hero.bg'] img")!.getAttribute("src")).toBe("/media/aB3dEfGhIjKlMnOpQr_-Zz.jpg");
   });
   it("a relative upload path too; any other address is shown as given", async () => {
     h = await mountEditor(PAGE, { mode: "edit" });
-    await h.send("editor:apply", { path: "hero.bg", value: "/uploads/site/aB3dEfGhIj-crowd.jpg" });
+    await h.send("editor:apply", { path: "hero.bg", value: "/api/media/site/aB3dEfGhIjKlMnOpQr_-Zz.jpg" });
     await h.send("editor:apply", { path: "other", value: "https://images.example.org/x.jpg" });
     await flush(50);
-    expect(document.querySelector("[data-cms-img='hero.bg'] img")!.getAttribute("src")).toBe("/media/site/aB3dEfGhIj-crowd.jpg");
+    expect(document.querySelector("[data-cms-img='hero.bg'] img")!.getAttribute("src")).toBe("/media/aB3dEfGhIjKlMnOpQr_-Zz.jpg");
     expect(document.querySelector("[data-cms-img='other'] img")!.getAttribute("src")).toBe("https://images.example.org/x.jpg");
   });
 });
