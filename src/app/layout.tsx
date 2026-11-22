@@ -12,7 +12,7 @@ import { site } from "@/data/site";
 import { assetPath } from "@/lib/asset-path";
 import { headers } from "next/headers";
 import { getGlobalsContent, getMenu, getDraftMark } from "@/lib/cms";
-import { getAnnouncements } from "@/lib/announcements";
+import { getAnnouncements, MAX_BANNERS } from "@/lib/announcements";
 import { isCmsLive } from "@/lib/cms-live";
 import { getServiceTimes } from "@/lib/service-times";
 import { ServiceTimesProvider } from "@/providers/ServiceTimesProvider";
@@ -144,7 +144,7 @@ export default async function RootLayout({
           <SignupConfigProvider turnstileSiteKey={getTurnstileSiteKey()}>
             <SmoothScrollProvider>
               <a href="#main" className="skip-link">Skip to main content</a>
-              <Header globals={globals} menu={menu.items} announcement={announcements[0] ?? null} />
+              <Header globals={globals} menu={menu.items} announcements={announcements.slice(0, MAX_BANNERS)} />
               <main id="main" tabIndex={-1}>{children}</main>
               <Footer globals={globals} menu={menu.items} />
             </SmoothScrollProvider>

@@ -14,12 +14,15 @@ export function safeHref(v: unknown): string | undefined {
 const day = (v: unknown): string | null => (typeof v === "string" && /^\d{4}-\d{2}-\d{2}/.test(v) ? v.slice(0, 10) : null);
 
 /**
- * The announcement to show today: active, on the web surface, started and not yet ended (the end day is the last day
- * shown), highest priority first. `today` is a yyyy-MM-dd day in the church's time zone, passed in so the rule is testable.
+ * Every announcement that is on today: active, on the web surface, started and not yet ended (the end day is the last
+ * day shown). Order: the one that started first, then the newest published; a notice's priority number does not rank it
+ * (an always-on notice must not hide a dated one). The site shows them all, at most `MAX_BANNERS`. `today` is a
+ * yyyy-MM-dd day in the church's time zone, passed in so the rule is testable.
  */
+export const MAX_BANNERS = 3;
 export function currentAnnouncements(raw: unknown, today: string): Announcement[] {
   if (!Array.isArray(raw)) return [];
-  const out: (Announcement & { _at: string })[] = [];
+  const out: (Announcement & { _at: string; _made: string })[] = [];
   for (const r of raw) {
     if (!r || typeof r !== "object") continue;
     const o = r as Record<string, unknown>;
@@ -37,9 +40,12 @@ export function currentAnnouncements(raw: unknown, today: string): Announcement[
       linkUrl: safeHref(o.link_url),
       priority: typeof o.priority === "number" ? o.priority : 0,
       _at: start ?? "",
+      _made: typeof o.created_at === "string" ? o.created_at : "",
     });
   }
-  return out.sort((a, b) => b.priority - a.priority || b._at.localeCompare(a._at)).map(({ _at: _, ...a }) => a);
+  return out
+    .sort((a, b) => a._at.localeCompare(b._at) || b._made.localeCompare(a._made) || b.id.localeCompare(a.id))
+    .map(({ _at: _a, _made: _m, ...a }) => a);
 }
 
 /** Today as yyyy-MM-dd in the church's time zone (Hays, Kansas). */

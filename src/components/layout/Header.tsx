@@ -24,7 +24,7 @@ type BarChild = { key: string; label: string; href: string; cmsLink?: string };
 /** One bar entry — a link-parent (has `href`) OR a pure toggle group (no `href`). */
 type BarEntry = { key: string; label: string; href?: string; cmsLink?: string; children: BarChild[] };
 
-export default function Header({ globals = {}, menu = null, announcement = null }: { globals?: CMSOverrides; menu?: StudioNavItem[] | null; announcement?: { title: string; body: string; linkLabel?: string; linkUrl?: string } | null }) {
+export default function Header({ globals = {}, menu = null, announcements = [] }: { globals?: CMSOverrides; menu?: StudioNavItem[] | null; announcements?: { id: string; title: string; body: string; linkLabel?: string; linkUrl?: string }[] }) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   // BUG #3 (nav not editable): inside C3 Studio the canvas iframe is ~1180px wide
@@ -274,8 +274,8 @@ export default function Header({ globals = {}, menu = null, announcement = null 
           ...(nav.bg && isScrolled ? { backgroundColor: nav.bg } : {}),
         }}
       >
-        {announcement && !mobileOpen && (
-          <div role="region" aria-label="Announcement" data-announcement style={{ background: "#0f3f3a", color: "#fff" }}>
+        {!mobileOpen && announcements.map((announcement) => (
+          <div key={announcement.id} role="region" aria-label="Announcement" data-announcement data-cms-pick={`announcement:${announcement.id}`} style={{ background: "#0f3f3a", color: "#fff" }}>
             <p className="container-c3 body-sm" style={{ margin: 0, padding: "0.45rem 0", display: "flex", flexWrap: "wrap", gap: "0.25rem 0.75rem", alignItems: "center", justifyContent: "center", textAlign: "center" }}>
               <strong>{announcement.title}</strong>
               {announcement.body && <span style={{ color: "rgba(255,255,255,0.86)" }}>{announcement.body}</span>}
@@ -286,7 +286,7 @@ export default function Header({ globals = {}, menu = null, announcement = null 
               )}
             </p>
           </div>
-        )}
+        ))}
         <nav ref={navRef} className="container-c3 flex items-center justify-between h-16 lg:h-[4.5rem]">
 
           {/* Logo — light on transparent dark hero, dark on scrolled white header */}
@@ -302,14 +302,14 @@ export default function Header({ globals = {}, menu = null, announcement = null 
           {/* MEDIUM bar (768–1279px): the 8 destinations folded into 4 dropdown GROUPS
               so the bar never crowds or wraps on tablets / small laptops (G5). HIDDEN in
               edit mode (its group toggles aren't editable — see BUG #3). */}
-          <ul className={`${editMode ? "hidden" : "hidden md:flex xl:hidden"} items-center gap-0.5`} role="list">
+          <ul className={`${editMode ? "hidden" : "hidden md:flex xl:hidden"} items-center gap-0.5`} role="list" data-cms-pick="nav:menu">
             {groupEntries.map((e) => renderEntry(e, "px-2.5"))}
           </ul>
 
           {/* FULL bar (≥1280px, OR always in edit mode): every primary item inline as an
               editable data-cms-link, About/Locations dropdowns. In edit mode we show it
               from md up (tighter px) so the editor canvas gets the editable bar. */}
-          <ul className={`${editMode ? "hidden md:flex" : "hidden xl:flex"} items-center gap-1`} role="list">
+          <ul className={`${editMode ? "hidden md:flex" : "hidden xl:flex"} items-center gap-1`} role="list" data-cms-pick="nav:menu">
             {fullEntries.map((e) => renderEntry(e, editMode ? "px-2" : "px-3"))}
           </ul>
 

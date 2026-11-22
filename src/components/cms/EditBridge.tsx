@@ -141,6 +141,8 @@ export default function EditBridge() {
     const lastSent = new Map<string, string>();
     const editable = new Set<HTMLElement>();
     const tabAdded = new WeakSet<HTMLElement>();
+    const inputSent = new Set<string>(); // paths whose first input event of this burst was already announced
+    const tabWas = new Map<HTMLElement, string | null>(); // the site's own controls while they are taken out of the tab order
 
     const draftServed = () => {
       const m = root.getAttribute("data-cms-draft") ?? document.querySelector("[data-cms-draft]")?.getAttribute("data-cms-draft");
@@ -154,6 +156,10 @@ export default function EditBridge() {
     const byAttr = (attr: string, value: string) =>
       Array.from(document.querySelectorAll<HTMLElement>(`[${attr}]`)).filter((el) => el.getAttribute(attr) === value);
     const fields = () => Array.from(document.querySelectorAll<HTMLElement>("[data-cms]"));
+    // Select-only markers (the menu, the announcement band, a service-time line): a click or Enter on one tells Studio
+    // to open that thing's sheet. They are never editable text.
+    const picks = () => Array.from(document.querySelectorAll<HTMLElement>("[data-cms-pick]"));
+    const pickOf = (t: EventTarget | null) => ((t as HTMLElement | null)?.closest?.("[data-cms-pick]") as HTMLElement | null) || null;
     const pathOf = (el: HTMLElement) => el.getAttribute("data-cms") || "";
     const inChrome = (t: EventTarget | null) => !!(t as HTMLElement | null)?.closest?.("#c3-toolbar,#c3-link-card,#c3-cap");
     const fieldOf = (t: EventTarget | null) => ((t as HTMLElement | null)?.closest?.("[data-cms]") as HTMLElement | null) || null;
@@ -313,10 +319,10 @@ export default function EditBridge() {
       return { x: Math.round(r.left), y: Math.round(r.top), width: Math.round(r.width), height: Math.round(r.height) };
     };
     const sections = () => Array.from(document.querySelectorAll<HTMLElement>("[data-section]"));
-    const KIND_ATTR: Record<string, string> = { text: "data-cms", image: "data-cms-img", link: "data-cms-link", section: "data-section" };
+    const KIND_ATTR: Record<string, string> = { text: "data-cms", image: "data-cms-img", link: "data-cms-link", section: "data-section", pick: "data-cms-pick" };
 
     /** Select an element: ring it and tell Studio. `extra` rides along (label/href); `echo` marks an editor:select answer. */
-    function select(el: HTMLElement, kind: "text" | "image" | "link" | "section", extra: Record<string, unknown> = {}, opts: { echo?: boolean; quiet?: boolean } = {}) {
+    function select(el: HTMLElement, kind: "text" | "image" | "link" | "section" | "pick", extra: Record<string, unknown> = {}, opts: { echo?: boolean; quiet?: boolean } = {}) {
       const attr = KIND_ATTR[kind];
       const value = el.getAttribute(attr) || "";
       const same = !!sel && sel.attr === attr && sel.value === value;
@@ -324,7 +330,7 @@ export default function EditBridge() {
       secSelId = kind === "section" ? value : "";
       stamp(); positionRing();
       if (opts.quiet || (same && !opts.echo)) return;
-      post({ type: "cms:select", path: value, kind, box: boxOf(el), ...extra, ...(opts.echo ? { echo: true } : {}) });
+      post({ type: "cms:select", path: value, kind: kind === "pick" ? "text" : kind, box: boxOf(el), ...extra, ...(opts.echo ? { echo: true } : {}) });
     }
     function clearSelection(tell: boolean) {
       const had = !!sel;
@@ -346,11 +352,22 @@ export default function EditBridge() {
           if (!el.hasAttribute("tabindex")) { el.setAttribute("tabindex", "0"); tabAdded.add(el); }
           editable.add(el);
         });
+        picks().forEach((el) => { if (!el.hasAttribute("tabindex")) { el.setAttribute("tabindex", "0"); tabAdded.add(el); } });
+        // Tab walks the editable things in reading order: the site's own links and controls step out of the tab order.
+        document.querySelectorAll<HTMLElement>(SITE_CONTROLS).forEach((el) => {
+          if (inChrome(el) || el.hasAttribute("data-cms") || el.hasAttribute("data-cms-pick") || tabWas.has(el)) return;
+          tabWas.set(el, el.getAttribute("tabindex"));
+          el.setAttribute("tabindex", "-1");
+        });
       } else {
         editable.forEach((el) => { el.removeAttribute("contenteditable"); if (tabAdded.has(el)) { el.removeAttribute("tabindex"); tabAdded.delete(el); } });
         editable.clear();
+        picks().forEach((el) => { if (tabAdded.has(el)) { el.removeAttribute("tabindex"); tabAdded.delete(el); } });
+        tabWas.forEach((was, el) => { if (was === null) el.removeAttribute("tabindex"); else el.setAttribute("tabindex", was); });
+        tabWas.clear();
       }
     };
+    const SITE_CONTROLS = "a[href],button,input,select,textarea,summary,[tabindex]";
 
     /* keep rings and editability across a client re-render that mounts fresh nodes */
     const CMS_SELECTOR = "[data-cms],[data-cms-img],[data-cms-link]";
@@ -382,6 +399,7 @@ export default function EditBridge() {
       dirty.delete(el);
       const path = pathOf(el);
       if (!path) return;
+      inputSent.delete(path);
       const value = sanitizeHtml(el.innerHTML);
       if (lastSent.get(path) === value) return;
       lastSent.set(path, value);
@@ -616,6 +634,8 @@ export default function EditBridge() {
 
     const onFocusIn = (e: FocusEvent) => {
       if (inChrome(e.target)) return;
+      const pk = pickOf(e.target);
+      if (pk && !fieldOf(e.target) && effMode() === "edit") { select(pk, "pick"); return; }
       const el = fieldOf(e.target);
       if (!el) return;
       activeEl = el;
@@ -640,6 +660,9 @@ export default function EditBridge() {
       if (c && !composing) trimToCap(el, c);
       markDirty(el);
       updateCounter(el);
+      // the first keystroke of a burst is announced at once (no wait), so Studio can show "Editing" in the same frame
+      const ip = pathOf(el);
+      if (ip && !inputSent.has(ip)) { inputSent.add(ip); post({ type: "cms:input", path: ip }); }
     };
     const BLOCKED_INPUT = /^(insertFromDrop|insertFromYank|insertOrderedList|insertUnorderedList|insertHorizontalRule|insertTranspose|formatUnderline|formatStrikeThrough|formatSuperscript|formatSubscript|formatJustify.*|formatIndent|formatOutdent|formatFontName|formatFontSize.*|formatForeColor|formatBackColor|formatSetBlockTextDirection|formatSetInlineTextDirection)$/;
     const onBeforeInput = (e: Event) => {
@@ -712,6 +735,12 @@ export default function EditBridge() {
         if (a && h && !h.startsWith("#")) { e.preventDefault(); e.stopPropagation(); }
         return;
       }
+      const pk = pickOf(tgt);
+      if (pk && !text) {
+        e.preventDefault(); e.stopPropagation();
+        select(pk, "pick");
+        return;
+      }
       const img = tgt?.closest?.("[data-cms-img]") as HTMLElement | null;
       const link = tgt?.closest?.("[data-cms-link]") as HTMLElement | null;
       if (img && !text) {
@@ -745,7 +774,7 @@ export default function EditBridge() {
       if (!t?.closest?.("[data-cms]")) hideBar();
       if (mode === "visitor") return;
       if (t?.closest?.("[data-cms]")) return; // real text: let the caret land
-      const obj = t?.closest?.("[data-cms-img],[data-cms-link],[data-section]");
+      const obj = t?.closest?.("[data-cms-img],[data-cms-link],[data-cms-pick],[data-section]");
       if (obj) {
         // no stray caret or text selection from pressing on a photo, button or section...
         e.preventDefault();
@@ -762,12 +791,24 @@ export default function EditBridge() {
     const onKeyDown = (e: KeyboardEvent) => {
       const em = effMode();
       const k = e.key;
+      // Studio owns these: with focus inside the page they would otherwise be lost to the browser (or save the page as a file).
+      if ((e.metaKey || e.ctrlKey) && !e.altKey && (k === "Enter" || k === "s" || k === "S" || ((k === "z" || k === "Z") && !fieldOf(document.activeElement)))) {
+        e.preventDefault();
+        flushAll();
+        post({ type: "cms:key", key: k.length === 1 ? k.toLowerCase() : k, mod: true, shift: e.shiftKey });
+        return;
+      }
+      if ((k === "Enter" || k === " ") && em === "edit" && !e.metaKey && !e.ctrlKey && !e.altKey) {
+        const pk = pickOf(document.activeElement);
+        if (pk && !fieldOf(document.activeElement)) { e.preventDefault(); sel = null; select(pk, "pick"); return; }
+      }
       if ((e.metaKey || e.ctrlKey) && !e.altKey && !e.shiftKey && (k === "k" || k === "K")) {
         if (em === "edit" && selectedFieldRange()) { e.preventDefault(); openLinkCard(); }
         return;
       }
       if (k === "Escape") {
         if (card && card.style.display === "flex") { e.preventDefault(); closeLinkCard(true); return; }
+        post({ type: "cms:key", key: "Escape", mod: false, shift: false });
         const cur = activeEl || fieldOf(document.activeElement);
         if (cur && document.activeElement === cur) {
           flushAll(); cur.blur(); activeEl = null; hideBar(); if (cap) cap.style.display = "none";
