@@ -54,6 +54,7 @@ export function plainRoom(raw: unknown): string | null {
   return v && v.length <= 40 && /^[\p{L}\p{N} .,'’()\-/#]+$/u.test(v) ? v : null;
 }
 
+/** A day's slots: [] when the day has none (the day is dropped), null when something in it is unusable (the record is refused). */
 function normalizeSlots(svc: Record<string, unknown>): Slot[] | null {
   const out: Slot[] = [];
   if (Array.isArray(svc.slots) && svc.slots.length > 0) {
@@ -72,21 +73,22 @@ function normalizeSlots(svc: Record<string, unknown>): Slot[] | null {
     }
     return out;
   }
-  return null;
+  return out;
 }
 
-/** One Studio location record -> CampusTimes, or null when anything about its times is unusable. */
+/** One Studio location record -> CampusTimes (with no days when none has a time), or null when anything about its times is unusable. */
 export function normalizeCampus(rec: unknown): CampusTimes | null {
   if (!rec || typeof rec !== "object") return null;
   const r = rec as Record<string, unknown>;
   const slug = typeof r.slug === "string" ? r.slug : typeof r.id === "string" ? r.id : "";
-  if (!/^[a-z0-9-]+$/i.test(slug) || !Array.isArray(r.services) || r.services.length === 0) return null;
+  if (!/^[a-z0-9-]+$/i.test(slug) || !Array.isArray(r.services)) return null;
   const services: DayServices[] = [];
   for (const s of r.services as Array<Record<string, unknown>>) {
     const day = canonDay(s?.day);
     if (!day) return null;
     const slots = normalizeSlots(s);
     if (!slots) return null;
+    if (slots.length === 0) continue; // a day with no times is dropped; the campus's other days stay
     services.push({ day, slots });
   }
   const name = plainRoom(r.name) ?? slug[0].toUpperCase() + slug.slice(1);
@@ -113,7 +115,9 @@ export function slotLabel(s: Slot): string {
   return parts.length ? `${s.time} (${parts.join(", ")})` : s.time;
 }
 export const dayLine = (s: DayServices): string => `${s.day} ${s.slots.map(slotLabel).join(", ")}`;
-export const campusLine = (c: CampusTimes): string => c.services.map(dayLine).join("; ");
+/** What the site says for a campus with no times: honest, never blank and never the built-in times. */
+export const TIMES_TBA = "Times to be announced";
+export const campusLine = (c: CampusTimes): string => (c.services.length ? c.services.map(dayLine).join("; ") : TIMES_TBA);
 
 /** "Saturday 5:00 PM; Sunday 8:00 AM (C3 Gym), 9:00 AM (with C3Kids), ...; Colby Sunday 10:00 AM" */
 export function fullLine(d: ServiceTimesData): string {
@@ -121,7 +125,7 @@ export function fullLine(d: ServiceTimesData): string {
 }
 /** Footer form: "Sat 5:00 PM · Sun 8:00 AM (C3 Gym), 9:00 AM (with C3Kids), ...". */
 export const compactLine = (c: CampusTimes): string =>
-  c.services.map((s) => `${s.day.slice(0, 3)} ${s.slots.map(slotLabel).join(", ")}`).join(" · ");
+  !c.services.length ? TIMES_TBA : c.services.map((s) => `${s.day.slice(0, 3)} ${s.slots.map(slotLabel).join(", ")}`).join(" · ");
 
 /** A time with its note when it is not confirmed: "5:00 PM (time to be confirmed)". */
 export const timeText = (s: Slot): string => (s.tbc ? `${s.time} (${TBC_NOTE})` : s.time);
@@ -129,13 +133,14 @@ export const timeText = (s: Slot): string => (s.tbc ? `${s.time} (${TBC_NOTE})` 
 const andJoin = (xs: string[]): string => (xs.length < 2 ? xs.join("") : `${xs.slice(0, -1).join(", ")} and ${xs[xs.length - 1]}`);
 /** "Saturdays at 5:00 PM and Sundays at 8:00 AM, 9:00 AM and 10:45 AM" */
 export const spokenLine = (c: CampusTimes): string =>
-  andJoin(c.services.map((s) => `${s.day}s at ${andJoin(s.slots.map(timeText))}`));
+  !c.services.length ? "times to be announced" : andJoin(c.services.map((s) => `${s.day}s at ${andJoin(s.slots.map(timeText))}`));
 /** Times of the services that run C3Kids: "9:00 AM and 10:45 AM" ("" when none). */
 export const kidsTimes = (c: CampusTimes): string =>
   andJoin(c.services.flatMap((s) => s.slots.filter((x) => x.kids).map(timeText)));
 /** "Saturday · 5:00 PM", the first service of the campus. */
 export function firstService(c: CampusTimes): string {
   const s = c.services[0];
+  if (!s) return TIMES_TBA;
   return `${s.day} · ${timeText(s.slots[0])}`;
 }
 /** Back-compat shape for components that only list times per day. */

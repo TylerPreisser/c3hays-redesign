@@ -142,6 +142,7 @@ export default function LiveCalendar() {
 
   return (
     <div
+      data-cms-pick="fact:events"
       style={{
         borderRadius: "var(--radius-md)",
         background: "#fff",

@@ -12,7 +12,7 @@ import { isExampleSection, renderExample } from "@/lib/section-examples";
 import { tx, imgCss, txTimesSafe } from "@/lib/home-content";
 import StaffGrid from "@/components/about/StaffGrid";
 import { getServiceTimes } from "@/lib/service-times";
-import { campus, campusLine, dayLine, kidsTimes, spokenLine } from "@/lib/service-times-core";
+import { campus, campusLine, dayLine, kidsTimes, spokenLine, TIMES_TBA } from "@/lib/service-times-core";
 
 export async function generateMetadata(): Promise<Metadata> {
   const hays = campus(await getServiceTimes(), "hays");
@@ -128,7 +128,7 @@ export default async function HaysCampusPage({
 
               <p
                 className="body-lg mb-5"
-                data-cms="t:hays-details-body-1"
+                data-cms-pick="fact:service_times:hays"
                 style={{ color: "rgba(27,28,28,0.65)" }}
                 dangerouslySetInnerHTML={{
                   __html: txTimesSafe(
@@ -141,7 +141,7 @@ export default async function HaysCampusPage({
 
               <p
                 className="body-base mb-10"
-                data-cms="t:hays-details-body-2"
+                data-cms-pick="fact:service_times:hays"
                 style={{ color: "rgba(27,28,28,0.55)" }}
                 dangerouslySetInnerHTML={{
                   __html: txTimesSafe(
@@ -178,7 +178,8 @@ export default async function HaysCampusPage({
                   style={{ fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.16em", color: "#1b1c1c" }}
                   dangerouslySetInnerHTML={{ __html: tx(t, "hays-sidebar-times-heading", "Service Times") }}
                 />
-                <div className="flex flex-col gap-4" data-service-times="hays">
+                <div className="flex flex-col gap-4" data-service-times="hays" data-cms-pick="fact:service_times:hays">
+                  {hays.services.length === 0 && <p className="text-sm" style={{ color: "rgba(27,28,28,0.70)" }}>{TIMES_TBA}</p>}
                   {hays.services.map((sv) => (
                     <div key={sv.day} className="flex items-start gap-3">
                       <Clock size={14} style={{ color: "#1cc3af", marginTop: 3 }} className="shrink-0" />

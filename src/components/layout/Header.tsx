@@ -24,7 +24,7 @@ type BarChild = { key: string; label: string; href: string; cmsLink?: string };
 /** One bar entry — a link-parent (has `href`) OR a pure toggle group (no `href`). */
 type BarEntry = { key: string; label: string; href?: string; cmsLink?: string; children: BarChild[] };
 
-export default function Header({ globals = {}, menu = null, announcements = [] }: { globals?: CMSOverrides; menu?: StudioNavItem[] | null; announcements?: { id: string; title: string; body: string; linkLabel?: string; linkUrl?: string }[] }) {
+export default function Header({ globals = {}, menu = null, announcements = [] }: { globals?: CMSOverrides; menu?: StudioNavItem[] | null; announcements?: { id: string; title: string; eyebrow?: string; body: string; linkLabel?: string; linkUrl?: string }[] }) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   // BUG #3 (nav not editable): inside C3 Studio the canvas iframe is ~1180px wide
@@ -277,6 +277,7 @@ export default function Header({ globals = {}, menu = null, announcements = [] }
         {!mobileOpen && announcements.map((announcement) => (
           <div key={announcement.id} role="region" aria-label="Announcement" data-announcement data-cms-pick={`announcement:${announcement.id}`} style={{ background: "#0f3f3a", color: "#fff" }}>
             <p className="container-c3 body-sm" style={{ margin: 0, padding: "0.45rem 0", display: "flex", flexWrap: "wrap", gap: "0.25rem 0.75rem", alignItems: "center", justifyContent: "center", textAlign: "center" }}>
+              {announcement.eyebrow && <span data-announcement-eyebrow style={{ color: "rgba(255,255,255,0.86)" }}>{announcement.eyebrow}</span>}
               <strong>{announcement.title}</strong>
               {announcement.body && <span style={{ color: "rgba(255,255,255,0.86)" }}>{announcement.body}</span>}
               {announcement.linkUrl && (

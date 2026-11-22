@@ -3,7 +3,7 @@
 import { tx, type BtnStyle } from "@/lib/home-content";
 import { btnCss } from "./Hero";
 import { useServiceTimes } from "@/providers/ServiceTimesProvider";
-import { campus, campusLine, dayLine, type CampusTimes } from "@/lib/service-times-core";
+import { campus, campusLine, dayLine, TIMES_TBA, type CampusTimes } from "@/lib/service-times-core";
 
 /**
  * ServiceTimes — an addable, on-brand "when we gather" section. Generic + fully
@@ -59,8 +59,10 @@ export default function ServiceTimes({
       <div aria-hidden style={{ height: 1, background: "rgba(255,255,255,0.08)", marginBottom: "1.1rem" }} />
       <p
         data-service-times={c.slug}
+        data-cms-pick={`fact:service_times:${c.slug}`}
         style={{ color: "rgba(255,255,255,0.82)", margin: 0, fontSize: "1.075rem", lineHeight: 2, letterSpacing: "0.005em" }}
       >
+        {c.services.length === 0 && <span style={{ display: "block" }}>{TIMES_TBA}</span>}
         {c.services.map((sv, i) => (
           <span key={i} style={{ display: "block" }}>{dayLine(sv)}</span>
         ))}

@@ -1,6 +1,6 @@
 import { getCMSAnnouncements, getCMSGivingCampaigns, getCMSSite } from "@/lib/cms";
 
-export interface Announcement { id: string; title: string; body: string; linkLabel?: string; linkUrl?: string; priority: number }
+export interface Announcement { id: string; title: string; eyebrow?: string; body: string; linkLabel?: string; linkUrl?: string; priority: number }
 export interface Campaign { id: string; title: string; blurb?: string; goal: number; raised: number | null; currency: string; giveUrl?: string }
 
 /** A link target the site will render: a site path or https/http/mailto/tel. Anything else (javascript:, data:) is dropped. */
@@ -12,6 +12,14 @@ export function safeHref(v: unknown): string | undefined {
 }
 
 const day = (v: unknown): string | null => (typeof v === "string" && /^\d{4}-\d{2}-\d{2}/.test(v) ? v.slice(0, 10) : null);
+
+/** The date line Studio sends (`eyebrow`, e.g. "Wed 2 Dec") as plain text, or undefined. Never built from the start and end dates. */
+const EYEBROW_MAX = 60;
+export function plainEyebrow(v: unknown): string | undefined {
+  if (typeof v !== "string") return undefined;
+  const t = v.replace(/<[^>]*>/g, "").replace(/[<>]/g, "").replace(/\s+/g, " ").trim().slice(0, EYEBROW_MAX).trim();
+  return t || undefined;
+}
 
 /**
  * The announcement bar is ONE line. Of the announcements that are on today (active, on the web surface, started and not
@@ -35,6 +43,7 @@ export function currentAnnouncements(raw: unknown, today: string): Announcement[
     out.push({
       id: o.id,
       title: o.title.trim(),
+      eyebrow: plainEyebrow(o.eyebrow),
       body: typeof o.body === "string" ? o.body.trim() : "",
       linkLabel: typeof o.link_label === "string" && o.link_label.trim() ? o.link_label.trim() : undefined,
       linkUrl: safeHref(o.link_url),

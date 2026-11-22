@@ -21,6 +21,7 @@ import { useEffect } from "react";
  *               mode = the mode IN FORCE: a page that is not the draft is held in "view" whatever was asked.
  *   cms:select  {path, kind: "text"|"image"|"link"|"section"|"none", box: {x,y,width,height}|null,
  *                label?, href? (link), hrefPath?, href? (text inside a data-cms-href), echo?: true}
+ *               text? = the element's current text (text and pick kinds), trimmed and capped at 200 characters.
  *               `echo` marks the answer to editor:select, so Studio does not select twice.
  *   cms:edit    {path, value}             value = allow-listed HTML (b, strong, i, em, br, a[href])
  *   cms:section {op: "move"|"deselect", id, index}   index = position among the page's [data-section]
@@ -35,6 +36,8 @@ import { useEffect } from "react";
  */
 
 const V = 2;
+/** The longest `text` a cms:select carries. */
+const SELECT_TEXT_CAP = 200;
 export type BridgeMode = "edit" | "view" | "visitor";
 const MODES: BridgeMode[] = ["edit", "view", "visitor"];
 
@@ -330,7 +333,9 @@ export default function EditBridge() {
       secSelId = kind === "section" ? value : "";
       stamp(); positionRing();
       if (opts.quiet || (same && !opts.echo)) return;
-      post({ type: "cms:select", path: value, kind: kind === "pick" ? "text" : kind, box: boxOf(el), ...extra, ...(opts.echo ? { echo: true } : {}) });
+      // a text or pick selection says what the element reads now (trimmed, spaces collapsed, capped), so Studio can show it
+      const text = kind === "text" || kind === "pick" ? { text: (el.textContent || "").replace(/\s+/g, " ").trim().slice(0, SELECT_TEXT_CAP) } : {};
+      post({ type: "cms:select", path: value, kind: kind === "pick" ? "text" : kind, box: boxOf(el), ...text, ...extra, ...(opts.echo ? { echo: true } : {}) });
     }
     function clearSelection(tell: boolean) {
       const had = !!sel;
@@ -635,7 +640,8 @@ export default function EditBridge() {
     const onFocusIn = (e: FocusEvent) => {
       if (inChrome(e.target)) return;
       const pk = pickOf(e.target);
-      if (pk && !fieldOf(e.target) && effMode() === "edit") { select(pk, "pick"); return; }
+      // a pick marker is selected by a click or Enter/Space, never by focus alone (Tab onto it, or a focus that follows a click)
+      if (pk && !fieldOf(e.target)) return;
       const el = fieldOf(e.target);
       if (!el) return;
       activeEl = el;

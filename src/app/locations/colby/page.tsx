@@ -11,7 +11,7 @@ import { isExampleSection, renderExample } from "@/lib/section-examples";
 import { tx, imgCss, txTimesSafe } from "@/lib/home-content";
 import StaffGrid from "@/components/about/StaffGrid";
 import { getServiceTimes } from "@/lib/service-times";
-import { campus, dayLine, campusLine, spokenLine } from "@/lib/service-times-core";
+import { campus, dayLine, campusLine, spokenLine, TIMES_TBA } from "@/lib/service-times-core";
 
 export async function generateMetadata(): Promise<Metadata> {
   const colby = campus(await getServiceTimes(), "colby");
@@ -111,7 +111,7 @@ export default async function ColbyCampusPage({
               color: "rgba(255,255,255,0.72)",
               maxWidth: "36rem",
             }}
-            data-cms="t:colby-hero-tagline"
+            data-cms-pick="fact:service_times:colby"
             dangerouslySetInnerHTML={{
               __html: txTimesSafe(
                 t,
@@ -156,7 +156,7 @@ export default async function ColbyCampusPage({
               <p
                 className="body-lg mb-5"
                 style={{ color: "rgba(27,28,28,0.65)" }}
-                data-cms="t:colby-details-body-1"
+                data-cms-pick="fact:service_times:colby"
                 dangerouslySetInnerHTML={{
                   __html: txTimesSafe(
                     t,
@@ -218,12 +218,12 @@ export default async function ColbyCampusPage({
                     <p
                       className="font-semibold mb-0.5"
                       style={{ color: "#1b1c1c" }}
-                      data-cms="t:colby-service-day"
+                      data-cms-pick="fact:service_times:colby"
                       dangerouslySetInnerHTML={{
                         __html: tx(t, "colby-service-day", "Sunday"),
                       }}
                     />
-                    <p data-service-times="colby">{colby.services.map((sv) => dayLine(sv).slice(sv.day.length + 1)).join("; ")}</p>
+                    <p data-service-times="colby" data-cms-pick="fact:service_times:colby">{colby.services.length === 0 ? TIMES_TBA : colby.services.map((sv) => dayLine(sv).slice(sv.day.length + 1)).join("; ")}</p>
                   </div>
                 </div>
               </div>
@@ -322,7 +322,7 @@ export default async function ColbyCampusPage({
           <p
             className="body-lg mb-10"
             style={{ color: "rgba(27,28,28,0.60)" }}
-            data-cms="t:colby-cta-body"
+            data-cms-pick="fact:service_times:colby"
             dangerouslySetInnerHTML={{
               __html: txTimesSafe(
                 t,

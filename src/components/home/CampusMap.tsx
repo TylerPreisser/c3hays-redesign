@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { tx, type BtnStyle } from "@/lib/home-content";
 import { useServiceTimes } from "@/providers/ServiceTimesProvider";
-import { campus, dayLine } from "@/lib/service-times-core";
+import { campus, dayLine, TIMES_TBA } from "@/lib/service-times-core";
 
 /**
  * CampusMap — an addable "interactive campus map" navigation section.
@@ -261,7 +261,8 @@ export default function CampusMap({ text, className }: CampusMapProps) {
                     dangerouslySetInnerHTML={{ __html: tx(text, `campusmap-${active.id}-${row.field}-label`, row.label) }}
                   />
                   {row.field === "times" ? (
-                    <span data-service-times={active.id}>
+                    <span data-service-times={active.id} data-cms-pick={`fact:service_times:${active.id}`}>
+                      {campus(serviceTimes, active.id).services.length === 0 && <span style={{ display: "block" }}>{TIMES_TBA}</span>}
                       {campus(serviceTimes, active.id).services.map((sv, i) => (
                         <span key={i} style={{ display: "block" }}>{dayLine(sv)}</span>
                       ))}

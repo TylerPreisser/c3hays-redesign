@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import { Navigation } from "lucide-react";
 import { getServiceTimes } from "@/lib/service-times";
-import { campus, dayLine } from "@/lib/service-times-core";
+import { campus, dayLine, TIMES_TBA } from "@/lib/service-times-core";
 import { locations } from "@/data/locations";
 import { assetPath } from "@/lib/asset-path";
 import { getPageContent } from "@/lib/cms";
@@ -203,7 +203,8 @@ export default async function LocationsPage({
                         />
 
                         {/* Service times */}
-                        <div className="body-sm" data-service-times={loc.id} style={{ color: "rgba(255,255,255,0.55)", lineHeight: 1.7 }}>
+                        <div className="body-sm" data-service-times={loc.id} data-cms-pick={`fact:service_times:${loc.id}`} style={{ color: "rgba(255,255,255,0.55)", lineHeight: 1.7 }}>
+                          {campus(serviceTimes, loc.id).services.length === 0 && <div>{TIMES_TBA}</div>}
                           {campus(serviceTimes, loc.id).services.map((sv) => (
                             <div key={sv.day}>{dayLine(sv)}</div>
                           ))}
