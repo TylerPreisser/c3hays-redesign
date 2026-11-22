@@ -11,7 +11,11 @@ export interface Slot {
   time: string;
   room: string | null;
   kids: boolean;
+  /** Studio marked this time "to confirm". Absent means confirmed (a record without the field reads as confirmed). */
+  tbc?: boolean;
 }
+/** The plain note shown beside an unconfirmed time, wherever the times are listed. */
+export const TBC_NOTE = "time to be confirmed";
 export interface DayServices {
   day: string;
   slots: Slot[];
@@ -56,7 +60,7 @@ function normalizeSlots(svc: Record<string, unknown>): Slot[] | null {
     for (const s of svc.slots as Array<Record<string, unknown>>) {
       const time = canonTime(s?.time);
       if (!time) return null;
-      out.push({ time, room: plainRoom(s.room), kids: s.kids === true });
+      out.push({ time, room: plainRoom(s.room), kids: s.kids === true, ...(s.tbc === true ? { tbc: true } : {}) });
     }
     return out;
   }
@@ -105,7 +109,7 @@ export const campus = (d: ServiceTimesData, slug: string): CampusTimes =>
   d.campuses.find((c) => c.slug === slug) ?? d.campuses[0];
 
 export function slotLabel(s: Slot): string {
-  const parts = [s.room, s.kids ? "with C3Kids" : null].filter(Boolean);
+  const parts = [s.room, s.kids ? "with C3Kids" : null, s.tbc ? TBC_NOTE : null].filter(Boolean);
   return parts.length ? `${s.time} (${parts.join(", ")})` : s.time;
 }
 export const dayLine = (s: DayServices): string => `${s.day} ${s.slots.map(slotLabel).join(", ")}`;
@@ -119,21 +123,24 @@ export function fullLine(d: ServiceTimesData): string {
 export const compactLine = (c: CampusTimes): string =>
   c.services.map((s) => `${s.day.slice(0, 3)} ${s.slots.map(slotLabel).join(", ")}`).join(" · ");
 
+/** A time with its note when it is not confirmed: "5:00 PM (time to be confirmed)". */
+export const timeText = (s: Slot): string => (s.tbc ? `${s.time} (${TBC_NOTE})` : s.time);
+
 const andJoin = (xs: string[]): string => (xs.length < 2 ? xs.join("") : `${xs.slice(0, -1).join(", ")} and ${xs[xs.length - 1]}`);
 /** "Saturdays at 5:00 PM and Sundays at 8:00 AM, 9:00 AM and 10:45 AM" */
 export const spokenLine = (c: CampusTimes): string =>
-  andJoin(c.services.map((s) => `${s.day}s at ${andJoin(s.slots.map((x) => x.time))}`));
+  andJoin(c.services.map((s) => `${s.day}s at ${andJoin(s.slots.map(timeText))}`));
 /** Times of the services that run C3Kids: "9:00 AM and 10:45 AM" ("" when none). */
 export const kidsTimes = (c: CampusTimes): string =>
-  andJoin(c.services.flatMap((s) => s.slots.filter((x) => x.kids).map((x) => x.time)));
+  andJoin(c.services.flatMap((s) => s.slots.filter((x) => x.kids).map(timeText)));
 /** "Saturday · 5:00 PM", the first service of the campus. */
 export function firstService(c: CampusTimes): string {
   const s = c.services[0];
-  return `${s.day} · ${s.slots[0].time}`;
+  return `${s.day} · ${timeText(s.slots[0])}`;
 }
 /** Back-compat shape for components that only list times per day. */
 export const daysAndTimes = (c: CampusTimes): { day: string; times: string[] }[] =>
-  c.services.map((s) => ({ day: s.day, times: s.slots.map((x) => x.time) }));
+  c.services.map((s) => ({ day: s.day, times: s.slots.map(timeText) }));
 
 /**
  * A text override that spells out a clock time is stale by construction: times are Studio location data now, so a

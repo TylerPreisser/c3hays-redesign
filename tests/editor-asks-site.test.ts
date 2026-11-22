@@ -107,3 +107,36 @@ describe("campus pages are named sections", () => {
     expect(sectionName("someNewThing")).toBe("Some new thing");
   });
 });
+
+describe("an unconfirmed service time says so wherever times are listed", () => {
+  const withTbc = (on: boolean) => {
+    const recs = JSON.parse(JSON.stringify(locations));
+    const sat = recs.find((l: any) => l.slug === "hays").services[0].slots[0];
+    if (on) sat.tbc = true;
+    return recs;
+  };
+  async function places(recs: unknown[]) {
+    vi.resetModules();
+    vi.stubEnv("NEXT_PUBLIC_CMS_URL", "https://studio.example.test");
+    const { resolveTimes } = await import("@/lib/service-times-core");
+    const { SERVICE_TIMES_SNAPSHOT } = await import("@/data/service-times.snapshot");
+    const times = resolveTimes(recs, SERVICE_TIMES_SNAPSHOT);
+    const { ServiceTimesProvider } = await import("@/providers/ServiceTimesProvider");
+    const wrap = (el: React.ReactElement) => renderToStaticMarkup(createElement(ServiceTimesProvider as never, { value: times } as never, el));
+    const home = wrap(createElement((await import("@/components/home/LocationsSection")).default as never, { text: {}, btn: {} } as never));
+    const footer = wrap(createElement((await import("@/components/layout/Footer")).default as never, { globals: {} } as never));
+    const visit = wrap(createElement((await import("@/components/visit/JoinPanel")).default as never, { t: {}, text: {}, media: {}, img: {}, btn: {} } as never));
+    vi.stubGlobal("fetch", vi.fn(async (url: string) => ({ ok: true, json: async () => (String(url).endsWith("/api/content/locations") ? recs : {}) }) as Response));
+    vi.resetModules();
+    const hays = renderToStaticMarkup(await ((await import("@/app/locations/hays/page")).default as (p: object) => Promise<React.ReactElement>)({}));
+    return { home, footer, visit, hays };
+  }
+  it("a campus with one unconfirmed slot shows the note on Home, the campus page, the footer and Plan a Visit", async () => {
+    const p = await places(withTbc(true));
+    for (const [name, html] of Object.entries(p)) expect(html, name).toContain("5:00 PM (time to be confirmed)");
+  });
+  it("confirmed, and a record without the field, show no note", async () => {
+    const p = await places(withTbc(false));
+    for (const [name, html] of Object.entries(p)) { expect(html, name).not.toContain("to be confirmed"); expect(html, name).toContain("5:00 PM"); }
+  });
+});

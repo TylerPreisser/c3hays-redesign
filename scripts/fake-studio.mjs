@@ -50,6 +50,7 @@ const locations = [
 ];
 const announcements = [
   { id: "ann_now", title: "Fall Serve Day", body: "Join us Saturday to serve around Hays.", link_label: "Sign up", link_url: "/connect/", surface: "web", starts_at: iso(-1), ends_at: iso(3), priority: 5, active: true },
+  { id: "ann_app", title: "App is live", body: "Download the C3 app.", link_label: "Get the app", link_url: "https://example.org/app", surface: "web", starts_at: null, ends_at: null, priority: 2, active: true, created_at: "2026-07-24T00:00:00.000Z" },
   { id: "ann_old", title: "Past announcement", body: "Should not show.", surface: "web", starts_at: iso(-30), ends_at: iso(-20), priority: 1, active: true },
   { id: "ann_future", title: "Future announcement", body: "Should not show yet.", surface: "web", starts_at: iso(10), ends_at: iso(20), priority: 1, active: true },
 ];
