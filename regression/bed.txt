@@ -1,2 +1,5 @@
 # one "<kind> <entry>" per line; run.sh replays each.
 vitest tests/service-times.test.ts
+vitest tests/event-twin-key.test.ts
+vitest tests/event-reach-golden.test.ts
+vitest tests/events-espace-mode-unchanged.test.ts

@@ -11,9 +11,7 @@ import SectionHeader from "@/components/ui/SectionHeader";
 import PageComposer from "@/components/cms/PageComposer";
 import LiveCalendar from "@/components/events/LiveCalendar";
 import UpcomingEventsLive from "@/components/events/UpcomingEventsLive";
-import StudioEventsList from "@/components/events/StudioEventsList";
-import { EVENTS_FROM_STUDIO } from "@/lib/espace";
-import { getStudioEvents } from "@/lib/studio-events";
+import { getEventsMode, getStudioEventLists, type StudioEvent } from "@/lib/studio-events";
 import UpcomingEventsAuthored from "@/components/events/UpcomingEventsAuthored";
 import { parseEventCards } from "@/components/events/events-content";
 
@@ -64,8 +62,11 @@ export default async function EventsPage({
   // Authored cards (round-2) OVERRIDE the live eSpace feed when present; absent ⇒ the
   // live island keeps auto-populating (live-by-default). See events-content.ts.
   const authoredCards = parseEventCards(ov);
-  // Flag OFF (the default): eSpace stays the source. ON: Studio's events, and eSpace again if Studio does not answer.
-  const studioEvents = EVENTS_FROM_STUDIO ? await getStudioEvents() : null;
+  // Mode `espace` (the default, and the only one until Studio says otherwise): the page is eSpace's calendar, exactly as it
+  // always was. Mode `studio`: events published in Studio are merged in; two reads, the full list for the calendar and the
+  // church-day-kept list for the Upcoming strip. Studio answering nothing leaves eSpace alone.
+  const studioLists: { all: StudioEvent[]; upcoming: StudioEvent[] } | null =
+    (await getEventsMode()) === "studio" ? await getStudioEventLists() : null;
 
   const render = (id: string, variant?: string): React.ReactNode => {
     switch (id) {
@@ -136,10 +137,8 @@ export default async function EventsPage({
             />
             {authoredCards.length > 0 ? (
               <UpcomingEventsAuthored cards={authoredCards} text={t} media={media} />
-            ) : studioEvents ? (
-              <StudioEventsList events={studioEvents} edit={!!preview} />
             ) : (
-              <UpcomingEventsLive text={t} media={media} />
+              <UpcomingEventsLive text={t} media={media} studio={studioLists?.upcoming} />
             )}
           </Section>
         );
@@ -165,7 +164,7 @@ export default async function EventsPage({
                 />
               }
             />
-            <LiveCalendar />
+            <LiveCalendar studio={studioLists?.all} />
           </Section>
         );
 

@@ -3,6 +3,8 @@
 import { useEffect, useMemo, useState } from "react";
 import UpcomingEventsGrid from "@/components/events/UpcomingEventsGrid";
 import { fetchEspaceEvents, upcomingEvents, type CalEvent } from "@/lib/espace";
+import { studioToCalEvent, upcomingMerged } from "@/lib/event-merge";
+import type { StudioEvent } from "@/lib/studio-events";
 
 /**
  * <UpcomingEventsLive> — Phase 4, EV2/Wave 3 (editor-native rebuild). Replaces the
@@ -66,9 +68,16 @@ export interface UpcomingEventsLiveProps {
   text?: Record<string, string>;
   /** Page media overrides — a swapped image src per `events-upcoming-${i}-img` key. */
   media?: Record<string, string>;
+  /**
+   * Studio's events still to come (kept through their church day), given only in `studio` mode. Mapped here, in the browser,
+   * because each carries the church's wall clock in a Date made in the zone it runs in. Merged with eSpace's; if eSpace
+   * cannot be reached the Studio events still show.
+   */
+  studio?: StudioEvent[];
 }
 
-export default function UpcomingEventsLive({ text, media }: UpcomingEventsLiveProps) {
+export default function UpcomingEventsLive({ text, media, studio }: UpcomingEventsLiveProps) {
+  const studioCal = useMemo(() => (studio ?? []).map(studioToCalEvent), [studio]);
   const [events, setEvents] = useState<CalEvent[] | null>(null);
   const [status, setStatus] = useState<"loading" | "ready" | "error">("loading");
 
@@ -97,8 +106,8 @@ export default function UpcomingEventsLive({ text, media }: UpcomingEventsLivePr
   }, []);
 
   const top = useMemo(
-    () => (events ? upcomingEvents(events, 3) : []),
-    [events]
+    () => (studioCal.length > 0 ? upcomingMerged(studioCal, events ?? [], 3) : events ? upcomingEvents(events, 3) : []),
+    [events, studioCal]
   );
 
   if (status === "loading") {
@@ -111,7 +120,7 @@ export default function UpcomingEventsLive({ text, media }: UpcomingEventsLivePr
     );
   }
 
-  if (status === "error" || top.length === 0) {
+  if ((status === "error" && studioCal.length === 0) || top.length === 0) {
     return <Note />;
   }
 

@@ -6,6 +6,8 @@ import { useEffect, useMemo, useState } from "react";
 import type { CSSProperties } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { fetchEspaceEvents, monthMatrix, dayKey, type CalEvent } from "@/lib/espace";
+import { mergeEvents, studioToCalEvent } from "@/lib/event-merge";
+import type { StudioEvent } from "@/lib/studio-events";
 import {
   Skeleton,
   ErrorState,
@@ -37,9 +39,16 @@ const MONTH_YEAR = new Intl.DateTimeFormat("en-US", {
 });
 const BORDER = "1px solid rgba(27,28,28,0.08)";
 
-export default function LiveCalendar() {
+/**
+ * `studio` is Studio's full list of scheduled events (no limit, no past filter), given only in `studio` mode. It is mapped here,
+ * in the browser, because each event carries the church's wall clock in a Date made in the zone it runs in. Merged into every
+ * month it fetches; if eSpace cannot be reached the Studio events still show.
+ */
+export default function LiveCalendar({ studio }: { studio?: StudioEvent[] } = {}) {
   const editMode = useEditMode();
-  const [events, setEvents] = useState<CalEvent[] | null>(null);
+  const studioCal = useMemo(() => (studio ?? []).map(studioToCalEvent), [studio]);
+  const [espaceEvents, setEvents] = useState<CalEvent[] | null>(null);
+  const events = useMemo(() => (studioCal.length > 0 && espaceEvents ? mergeEvents(studioCal, espaceEvents) : espaceEvents), [studioCal, espaceEvents]);
   const [status, setStatus] = useState<"loading" | "ready" | "error">("loading");
   const [viewDate, setViewDate] = useState(() => {
     const n = new Date();
@@ -78,12 +87,19 @@ export default function LiveCalendar() {
       .catch((err) => {
         if (!alive) return;
         console.error("[LiveCalendar] failed to load eSpace events:", err);
+        if (studioCal.length > 0) {
+          // studio mode: eSpace is down, Studio's events still show
+          setEvents([]);
+          setStatus("ready");
+          setLoadedKey(`${year}-${month}`);
+          return;
+        }
         setStatus("error");
       });
     return () => {
       alive = false;
     };
-  }, [year, month]);
+  }, [year, month, studioCal]);
 
   useEffect(() => {
     if (typeof window === "undefined" || !window.matchMedia) return;

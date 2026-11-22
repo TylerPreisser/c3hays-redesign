@@ -1,3 +1,4 @@
+import { churchDay as churchDayOf, churchToday as churchTodayOf } from "@/lib/church-time";
 import { getCMSAnnouncements, getCMSGivingCampaigns, getCMSSite } from "@/lib/cms";
 
 export interface Announcement { id: string; title: string; eyebrow?: string; body: string; linkLabel?: string; linkUrl?: string; priority: number }
@@ -21,11 +22,7 @@ export function churchDay(v: unknown): string | null {
   if (typeof v !== "string") return null;
   const t = v.trim();
   if (!/^\d{4}-\d{2}-\d{2}/.test(t)) return null;
-  if (/(?:Z|[+-]\d{2}:?\d{2})$/i.test(t) && /T/i.test(t)) {
-    const d = new Date(t);
-    return Number.isNaN(d.getTime()) ? null : churchToday(d);
-  }
-  return t.slice(0, 10);
+  return churchDayOf(t);
 }
 const day = churchDay;
 
@@ -75,7 +72,7 @@ export function currentAnnouncements(raw: unknown, today: string): Announcement[
 
 /** Today as yyyy-MM-dd in the church's time zone (Hays, Kansas). */
 export function churchToday(now = new Date()): string {
-  return new Intl.DateTimeFormat("en-CA", { timeZone: "America/Chicago", year: "numeric", month: "2-digit", day: "2-digit" }).format(now);
+  return churchTodayOf(now);
 }
 
 export async function getAnnouncements(): Promise<Announcement[]> {

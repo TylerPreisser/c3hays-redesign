@@ -82,11 +82,11 @@ describe("W8 a text that holds a time is never free-editable", () => {
     for (const k of ["t:colby-hero-tagline", "t:colby-details-body-1", "t:colby-cta-body"]) expect(html).not.toContain(`data-cms="${k}"`);
     expect(html).toContain('data-cms="t:colby-details-body-2"'); // "We'd love to see you this Sunday." holds no time
   });
-  it("the events list is a pick that opens the events sheet", async () => {
-    const { default: List } = await import("@/components/events/StudioEventsList");
-    const events = [{ id: "e1", title: "Marriage Night", start: "2026-12-02T18:30:00", allDay: false } as any];
-    expect(renderToStaticMarkup(createElement(List, { events }))).not.toContain("data-cms-pick");
-    expect(renderToStaticMarkup(createElement(List, { events, edit: true }))).toContain('data-cms-pick="fact:events"');
+  it("the events calendar is a pick that opens the events sheet, only on the editor's canvas", async () => {
+    const { default: Calendar } = await import("@/components/events/LiveCalendar");
+    const { EditModeProvider } = await import("@/providers/EditModeProvider");
+    expect(renderToStaticMarkup(createElement(Calendar))).not.toContain("data-cms-pick");
+    expect(renderToStaticMarkup(createElement(EditModeProvider as never, { edit: true } as never, createElement(Calendar)))).toContain('data-cms-pick="fact:events"');
   });
 });
 

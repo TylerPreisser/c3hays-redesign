@@ -14,3 +14,6 @@ hold is the one allowed edit, recorded with sha256 before and after.
 | Case | Input (captured) | Oracle | What must hold |
 |---|---|---|---|
 | service-times | celebratejesus.org, fetched 2026-11-21 (sha256 in `service-times/PROVENANCE.md`) | the church's own published times | no clock-time literal outside the snapshot; Studio records and the snapshot both render the church's line |
+| event-twin-key | the rule in the event-reach design (sections 4.3 and 4.6); the SAME file is held in Studio's repo | the rule's own text (CHARACTERIZATION); the one real input is the church's own Marriage Night day and time | the church wall clock of an instant, the twin key and which pairs are one occasion, byte-identical in both repos (pinned by sha256) |
+| event-reach-marriage-night | the church's public eSpace feed, titles and times only, captured 2026-11-22 (`PROVENANCE.md`) | the church's own newsletter words for the day and time | Studio's published event and its eSpace twin are one card, Wed 2 Dec 6:30 PM, in a UTC and an Asia/Tokyo process |
+| events-espace-mode | the markup of /events as a visitor got it before the events-reach work | what the page was (CHARACTERIZATION) | in mode `espace` the page is byte-identical, whatever Studio sends |
