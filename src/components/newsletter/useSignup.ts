@@ -11,7 +11,7 @@ export type SignupStatus = "idle" | "sending" | "done" | "invalid" | "captcha" |
 
 export const SIGNUP_ERRORS: Partial<Record<SignupStatus, string>> = {
   invalid: "Please enter a valid email address.",
-  captcha: "Please complete the check below, then send again.",
+  captcha: "Please complete the check, then send again.",
   limited: "Too many tries from here. Please wait a minute and try again.",
   failed: "We could not record that just now. Please try again in a little while.",
 };

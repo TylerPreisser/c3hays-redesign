@@ -25,7 +25,7 @@ function load(): Promise<void> {
 }
 
 /** Cloudflare Turnstile. `onToken(null)` when the token expires or the widget errors; `resetKey` re-arms it after a submit. */
-export default function TurnstileWidget({ siteKey, onToken, resetKey = 0, theme = "auto" }: { siteKey: string; onToken: (t: string | null) => void; resetKey?: number; theme?: "auto" | "light" | "dark" }) {
+export default function TurnstileWidget({ siteKey, onToken, resetKey = 0, theme = "auto", attention = false }: { siteKey: string; onToken: (t: string | null) => void; resetKey?: number; theme?: "auto" | "light" | "dark"; attention?: boolean }) {
   const box = useRef<HTMLDivElement>(null);
   const id = useRef<string | undefined>(undefined);
   const cb = useRef(onToken);
@@ -55,5 +55,12 @@ export default function TurnstileWidget({ siteKey, onToken, resetKey = 0, theme 
     if (resetKey > 0 && id.current) window.turnstile?.reset(id.current);
   }, [resetKey]);
 
-  return <div ref={box} data-turnstile style={{ minHeight: 65 }} />;
+  // The form says the check is still to do: take the visitor to it (keyboard focus and into view, also on a phone).
+  useEffect(() => {
+    if (!attention || !box.current) return;
+    box.current.focus({ preventScroll: true });
+    box.current.scrollIntoView({ block: "center", behavior: "smooth" });
+  }, [attention, resetKey]); // resetKey: a second refusal in a row takes them back to it again
+
+  return <div ref={box} data-turnstile tabIndex={-1} style={{ minHeight: 65, outline: "none" }} />;
 }

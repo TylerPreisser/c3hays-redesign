@@ -110,7 +110,7 @@ export default function WeeklySignup({ text = {}, bgKey = "weekly-signup-card", 
           </div>
           {/* Honeypot: off screen and out of the tab order; a person never fills it. */}
           <input type="text" name="company" tabIndex={-1} autoComplete="off" aria-hidden="true" value={trap} onChange={(e) => setTrap(e.target.value)} style={{ position: "absolute", left: "-9999px", width: 1, height: 1, opacity: 0 }} />
-          {turnstileSiteKey && <TurnstileWidget siteKey={turnstileSiteKey} onToken={setToken} resetKey={resetKey} theme={onLight ? "light" : "dark"} />}
+          {turnstileSiteKey && <TurnstileWidget siteKey={turnstileSiteKey} onToken={setToken} resetKey={resetKey} attention={status === "captcha"} theme={onLight ? "light" : "dark"} />}
           {SIGNUP_ERRORS[status] && (
             <span className="body-sm" style={{ color: errColor, textShadow: labelShadow }} role="alert">
               {SIGNUP_ERRORS[status]}

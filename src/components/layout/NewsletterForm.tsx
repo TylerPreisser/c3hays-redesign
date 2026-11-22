@@ -41,7 +41,7 @@ export default function NewsletterForm() {
       />
       {/* Honeypot: off screen and out of the tab order; a person never fills it. */}
       <input type="text" name="company" tabIndex={-1} autoComplete="off" aria-hidden="true" value={trap} onChange={(e) => setTrap(e.target.value)} style={{ position: "absolute", left: "-9999px", width: 1, height: 1, opacity: 0 }} />
-      {turnstileSiteKey && <TurnstileWidget siteKey={turnstileSiteKey} onToken={setToken} resetKey={resetKey} theme="dark" />}
+      {turnstileSiteKey && <TurnstileWidget siteKey={turnstileSiteKey} onToken={setToken} resetKey={resetKey} attention={status === "captcha"} theme="dark" />}
       <button type="submit" className="btn btn-primary w-full" disabled={status === "sending" || !turnstileSiteKey}>
         {status === "sending" ? "Sending…" : "Subscribe"}
       </button>
