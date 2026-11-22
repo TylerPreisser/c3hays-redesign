@@ -32,7 +32,7 @@ export async function POST(req: NextRequest) {
   const email = typeof body.email === "string" ? body.email.trim() : "";
   if (!EMAIL.test(email) || email.length > 254) return reply(400, { code: "invalid_email" });
 
-  const token = typeof body.turnstileToken === "string" ? body.turnstileToken : "";
+  const token = typeof body.turnstile_token === "string" ? body.turnstile_token : "";
   if (!token || token.length > 2048) return reply(400, { code: "captcha_required" });
 
   const secret = getForwardSecret();
@@ -47,11 +47,12 @@ export async function POST(req: NextRequest) {
     const res = await cmsForward("/api/comms/subscribe", {
       method: "POST",
       headers: { "content-type": "application/json", "x-c3-client-ip": ip, "x-c3-forward-secret": secret },
-      body: JSON.stringify({ email, name, turnstileToken: token, company: "" }),
+      body: JSON.stringify({ email, name, turnstile_token: token, company: "" }), // Studio's field name (tests/fixtures/signup-forward-body.json)
       signal: AbortSignal.timeout(8000),
     });
     if (res.ok) return reply(201, { ok: true });
     if (res.status === 429) return reply(429, { code: "rate_limited" });
+    if (res.status === 403) return reply(400, { code: "captcha_failed" }); // Studio refused the Turnstile check: the form says so in a sentence
     if (res.status === 400) {
       const j = (await res.json().catch(() => ({}))) as { code?: string };
       return reply(400, { code: j.code === "invalid_email" ? "invalid_email" : "captcha_failed" });

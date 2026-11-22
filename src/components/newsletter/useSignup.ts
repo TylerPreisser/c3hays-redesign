@@ -29,7 +29,7 @@ export function useSignup() {
       const res = await fetch("/api/newsletter/subscribe/", { // trailing slash: the site redirects the bare path (trailingSlash)
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ email: email.trim(), turnstileToken: token, company: honeypot }),
+        body: JSON.stringify({ email: email.trim(), turnstile_token: token, company: honeypot }),
       });
       if (res.ok) return setStatus("done");
       setResetKey((k) => k + 1); // a Turnstile token is single use

@@ -77,18 +77,18 @@ describe("signup route", () => {
     expect(sent).toEqual([]);
   });
   it("forwards a signup with the token, the visitor's ip and the forward secret", async () => {
-    const res = await post({ email: "a@example.org", turnstileToken: "tok" });
+    const res = await post({ email: "a@example.org", turnstile_token: "tok" });
     expect(res.status).toBe(201);
     const h = sent[0].init.headers as Record<string, string>;
     expect(sent[0].url).toBe("/api/comms/subscribe");
     expect(h["x-c3-client-ip"]).toBe("203.0.113.9");
     expect(h["x-c3-forward-secret"]).toBe("test-secret");
-    expect(JSON.parse(String(sent[0].init.body))).toMatchObject({ email: "a@example.org", turnstileToken: "tok" });
+    expect(JSON.parse(String(sent[0].init.body))).toMatchObject({ email: "a@example.org", turnstile_token: "tok" });
   });
   it("refuses a cross-origin post and fails closed with no forward secret", async () => {
-    expect((await post({ email: "a@example.org", turnstileToken: "t" }, { origin: "https://evil.test" })).status).toBe(403);
+    expect((await post({ email: "a@example.org", turnstile_token: "t" }, { origin: "https://evil.test" })).status).toBe(403);
     delete process.env.SITE_FORWARD_SECRET;
-    expect((await post({ email: "a@example.org", turnstileToken: "t" })).status).toBe(503);
+    expect((await post({ email: "a@example.org", turnstile_token: "t" })).status).toBe(503);
     expect(sent).toEqual([]);
   });
 });
