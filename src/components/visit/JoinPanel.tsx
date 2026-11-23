@@ -63,7 +63,8 @@ export default function JoinPanel({ t }: { t: Record<string, string> }) {
   return (
     <Section
       container
-      style={{ backgroundColor: "#ffffff", color: "var(--color-ink)" }}
+      // the first thing on the page sits under the fixed header (announcement bar included): never less than 9.5rem from the top
+      style={{ backgroundColor: "#ffffff", color: "var(--color-ink)", paddingTop: "max(var(--section-y), 9.5rem)" }}
       bgKey="visit-join-bg"
     >
       {/* ── Join Us heading ────────────────────────────────────── */}

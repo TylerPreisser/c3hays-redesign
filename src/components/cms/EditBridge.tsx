@@ -175,6 +175,8 @@ export default function EditBridge() {
     /* ── chrome: stylesheet, ring, counter, bar, link card ── */
     let style: HTMLStyleElement | null = null;
     let ring: HTMLDivElement | null = null;
+    let fring: HTMLDivElement | null = null; // the keyboard-focus ring of a photo, a marker or a link
+    let focusEl: HTMLElement | null = null;
     let cap: HTMLDivElement | null = null;
     let bar: HTMLDivElement | null = null;
     let card: HTMLDivElement | null = null;
@@ -194,7 +196,13 @@ export default function EditBridge() {
       [data-cms-img], [data-cms-link]{ cursor:pointer; }
       [data-cms-img][data-cms-fixed]{ cursor:default; }
       [data-cms-img][data-cms-fixed]:hover::after{ display:none!important; }
-      [data-cms-img]:focus-visible{ outline:2px solid #0F6F64!important; outline-offset:-4px; }
+      /* keyboard focus on a photo, a marker or a link is drawn by #c3-focus-ring, a fixed element ABOVE the picture (an outline is painted
+         under the photo's own image and overlays, which is why it could not be seen) */
+      [data-cms-img]:focus, [data-cms-img]:focus-visible, [data-cms-pick]:focus, [data-cms-pick]:focus-visible, [data-cms-link]:focus-visible{ outline:none !important; }
+      #c3-focus-ring{
+        position:fixed; pointer-events:none; z-index:2147483450; display:none; box-sizing:border-box;
+        border-radius:9px; box-shadow: 0 0 0 3px #fff, 0 0 0 6px ${INK};
+      }
       /* hover: a quiet outline over the element, never over its own background and never in the way of a click */
       [data-cms]:hover::after, [data-cms-img]:hover::after, [data-cms-link]:hover::after{
         content:""; position:absolute;
@@ -259,6 +267,8 @@ export default function EditBridge() {
       document.head.appendChild(style);
       ring = document.createElement("div"); ring.id = "c3-sel-ring"; ring.setAttribute("aria-hidden", "true");
       document.body.appendChild(ring);
+      fring = document.createElement("div"); fring.id = "c3-focus-ring"; fring.setAttribute("aria-hidden", "true");
+      document.body.appendChild(fring);
       cap = document.createElement("div"); cap.id = "c3-cap"; cap.setAttribute("role", "status"); cap.setAttribute("aria-live", "polite");
       document.body.appendChild(cap);
       bar = document.createElement("div"); bar.id = "c3-toolbar"; bar.setAttribute("role", "toolbar"); bar.setAttribute("aria-label", "Format"); bar.contentEditable = "false";
@@ -279,13 +289,13 @@ export default function EditBridge() {
       cardRemove.style.display = "none";
       card.append(cardInput, cardList, cardRemove);
       document.body.appendChild(card);
-      const loop = () => { positionRing(); ringRaf = requestAnimationFrame(loop); };
+      const loop = () => { positionRing(); positionFocusRing(); ringRaf = requestAnimationFrame(loop); };
       ringRaf = requestAnimationFrame(loop);
     };
     const dropChrome = () => {
       cancelAnimationFrame(ringRaf);
-      style?.remove(); ring?.remove(); cap?.remove(); bar?.remove(); card?.remove();
-      style = ring = cap = bar = card = cardInput = cardList = cardRemove = null;
+      style?.remove(); ring?.remove(); fring?.remove(); cap?.remove(); bar?.remove(); card?.remove();
+      style = ring = fring = cap = bar = card = cardInput = cardList = cardRemove = null;
     };
 
     /* ── selection ring ── */
@@ -314,6 +324,22 @@ export default function EditBridge() {
       ring.style.left = `${r.left - pad}px`; ring.style.top = `${r.top - pad}px`;
       ring.style.width = `${r.width + pad * 2}px`; ring.style.height = `${r.height + pad * 2}px`;
       ring.style.display = "block";
+    }
+    /** The ring for keyboard focus on a photo/marker: two tones (white, then ink) so it shows on any picture, kept on screen even for a full-bleed photo. */
+    function positionFocusRing() {
+      if (!fring) return;
+      const hide = () => { if (fring!.style.display !== "none") fring!.style.display = "none"; };
+      const el = focusEl;
+      if (!el || !document.contains(el) || document.activeElement !== el || (sel && selTargets().includes(el))) return hide();
+      const r = el.getBoundingClientRect();
+      if (r.width === 0 && r.height === 0) return hide();
+      const m = 7; // the two-tone ring is 6 px thick outside its box: where the photo runs past the window, the ring stays inside it
+      const l = Math.max(r.left, m), t = Math.max(r.top, m), rt = Math.min(r.right, innerWidth - m), b = Math.min(r.bottom, innerHeight - m);
+      if (rt - l < 4 || b - t < 4) return hide();
+      const rad = parseFloat(getComputedStyle(el).borderTopLeftRadius) || 0;
+      fring.style.borderRadius = `${Math.max(7, rad)}px`;
+      fring.style.left = `${l}px`; fring.style.top = `${t}px`; fring.style.width = `${rt - l}px`; fring.style.height = `${b - t}px`;
+      fring.style.display = "block";
     }
     const clearMarks = () => {
       document.querySelectorAll(".cms-sel").forEach((n) => n.classList.remove("cms-sel"));
@@ -366,7 +392,15 @@ export default function EditBridge() {
           if (!el.hasAttribute("tabindex")) { el.setAttribute("tabindex", "0"); tabAdded.add(el); }
           editable.add(el);
         });
-        picks().forEach((el) => { if (!el.hasAttribute("tabindex")) { el.setAttribute("tabindex", "0"); tabAdded.add(el); } });
+        // a fact shown in several places on a page (the service times) is ONE Tab stop: the first; a click on any of them still opens it
+        const pickSeen = new Set<string>();
+        picks().forEach((el) => {
+          const v = el.getAttribute("data-cms-pick") || "";
+          if (el.getClientRects().length === 0) { if (!el.hasAttribute("tabindex")) { el.setAttribute("tabindex", "0"); tabAdded.add(el); } return; } // the other layout's copy (the phone menu): not a stop here
+          if (pickSeen.has(v)) { if (tabAdded.has(el)) { el.removeAttribute("tabindex"); tabAdded.delete(el); } return; }
+          pickSeen.add(v);
+          if (!el.hasAttribute("tabindex")) { el.setAttribute("tabindex", "0"); tabAdded.add(el); }
+        });
         // a photo is reachable by keyboard: Tab stops on it and Enter or Space opens it, as a press does
         document.querySelectorAll<HTMLElement>("[data-cms-img]").forEach((el) => {
           if (!el.hasAttribute("tabindex")) { el.setAttribute("tabindex", "0"); tabAdded.add(el); imgTabbed.add(el); }
@@ -656,9 +690,29 @@ export default function EditBridge() {
     /* ── events on the page ── */
     const ownerAnchors = (t: HTMLElement) => t.closest("a,button") as HTMLElement | null;
 
+    let kbdNav = false; // the last thing a person did in the page was press a key (not a click)
+    function ensureVisible(el: HTMLElement) {
+      const hd = document.querySelector("header")?.getBoundingClientRect().bottom ?? 0;
+      const top = Math.max(0, hd) + 12, bot = innerHeight - 14;
+      const b = el.getBoundingClientRect();
+      const fits = b.height <= bot - top;
+      const placed = fits ? b.top >= top && b.bottom <= bot : b.top < bot - (bot - top) * 0.2 && b.bottom > top + (bot - top) * 0.2;
+      if (placed) return;
+      window.scrollTo({ top: Math.max(0, scrollY + (fits ? b.top + b.height / 2 - (top + bot) / 2 : b.top - top)), behavior: "instant" as ScrollBehavior });
+    }
     const onFocusIn = (e: FocusEvent) => {
       if (inChrome(e.target)) return;
       const pk = pickOf(e.target);
+      const ph = (e.target as HTMLElement | null)?.closest?.("[data-cms-img]") as HTMLElement | null;
+      // a photo, a marker or a link takes the keyboard-focus ring; the ring of the words before it goes (never two places lit)
+      if (!fieldOf(e.target) && (ph || pk)) {
+        focusEl = ph || pk;
+        if (sel && sel.kind === "text") clearSelection(true);
+        positionFocusRing();
+      } else focusEl = null;
+      // by keyboard, whatever took focus is brought fully into view, clear of the fixed header (words, photos and markers alike)
+      const tgt = (fieldOf(e.target) || ph || pk) as HTMLElement | null;
+      if (tgt && effMode() === "edit" && (!fieldOf(e.target) ? tgt.matches(":focus-visible") : kbdNav)) ensureVisible(tgt);
       // a pick marker is selected by a click or Enter/Space, never by focus alone (Tab onto it, or a focus that follows a click)
       if (pk && !fieldOf(e.target)) return;
       const el = fieldOf(e.target);
@@ -670,6 +724,7 @@ export default function EditBridge() {
       updateCounter(el);
     };
     const onFocusOut = (e: FocusEvent) => {
+      if (focusEl && !(e.relatedTarget && focusEl.contains(e.relatedTarget as Node))) { focusEl = null; positionFocusRing(); }
       const el = fieldOf(e.target);
       if (!el) return;
       flushEl(el);
@@ -809,6 +864,7 @@ export default function EditBridge() {
       if (ownerAnchors(tgt)) { e.preventDefault(); e.stopPropagation(); }
     };
     const onDocMouseDown = (e: MouseEvent) => {
+      kbdNav = false;
       if (inChrome(e.target)) return;
       const t = e.target as HTMLElement;
       if (!t?.closest?.("[data-cms]")) hideBar();
@@ -831,6 +887,7 @@ export default function EditBridge() {
     /** A photo marker may be an empty aria-hidden layer (the shared hero): it is still a stop, so only real hiding counts. */
     const shown = (el: HTMLElement) => { const cs = getComputedStyle(el); return cs.display !== "none" && cs.visibility !== "hidden"; };
     const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Tab") kbdNav = true;
       const em = effMode();
       const k = e.key;
       // Studio owns these: with focus inside the page they would otherwise be lost to the browser (or save the page as a file).
@@ -842,9 +899,9 @@ export default function EditBridge() {
       }
       if ((k === "Enter" || k === " ") && em === "edit" && !e.metaKey && !e.ctrlKey && !e.altKey) {
         const ph = (document.activeElement as HTMLElement | null)?.closest?.("[data-cms-img]") as HTMLElement | null;
-        if (ph && !fieldOf(document.activeElement)) { e.preventDefault(); sel = null; select(ph, "image"); return; }
+        if (ph && !fieldOf(document.activeElement)) { e.preventDefault(); sel = null; select(ph, "image", { key: true }); return; }
         const pk = pickOf(document.activeElement);
-        if (pk && !fieldOf(document.activeElement)) { e.preventDefault(); sel = null; select(pk, "pick"); return; }
+        if (pk && !fieldOf(document.activeElement)) { e.preventDefault(); sel = null; select(pk, "pick", { key: true }); return; }
       }
       if ((e.metaKey || e.ctrlKey) && !e.altKey && !e.shiftKey && (k === "k" || k === "K")) {
         if (em === "edit" && selectedFieldRange()) { e.preventDefault(); openLinkCard(); }
