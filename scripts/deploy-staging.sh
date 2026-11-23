@@ -117,6 +117,11 @@ cmd_verify() {
   csp="$(header_of content-security-policy "$T/h.head")"
   [[ "$csp" == *"frame-ancestors $STUDIO;"* || "$csp" == *"frame-ancestors $STUDIO" ]] || die "frame-ancestors is not exactly $STUDIO"
   echo "ok: frame-ancestors $STUDIO"
+  # Every page type of the LIVE origin in a real browser, third parties not stubbed: a policy violation or failed request of ours fails verify
+  # (the Cloudflare beacon and the Turnstile widget's own frame print as WARN: see scripts/csp-crawl.mjs). Needs PLAYWRIGHT_DIR like build.
+  [ -n "${PLAYWRIGHT_DIR:-}" ] && [ -d "$PLAYWRIGHT_DIR/node_modules/playwright" ] || die "set PLAYWRIGHT_DIR to a directory whose node_modules/playwright has Chromium installed: verify runs the live browser policy check"
+  node "$REPO/scripts/csp-crawl.mjs" --live "$URL" > "$T/csp-live.log" 2>&1 || { cat "$T/csp-live.log"; die "the live site fails the browser policy check"; }
+  cat "$T/csp-live.log"
 }
 
 case "${1:-}" in

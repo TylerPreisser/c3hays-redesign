@@ -50,6 +50,7 @@ export default function SmoothScrollProvider({
 
       return () => {
         gsap.ticker.remove(rafLoop);
+        gsap.ticker.lagSmoothing(500, 33); // GSAP's default, restored: lagSmoothing(0) was a global setting left behind
       };
     }
 
@@ -76,6 +77,7 @@ export default function SmoothScrollProvider({
 
     return () => {
       gsap.ticker.remove(rafLoop);
+      gsap.ticker.lagSmoothing(500, 33);
       lenis.destroy();
       lenisRef.current = null;
     };

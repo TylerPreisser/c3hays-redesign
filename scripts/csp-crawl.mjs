@@ -34,7 +34,8 @@ const REPO = resolve(opt("dir", fileURLToPath(new URL("..", import.meta.url))));
 const SHOTS = opt("shots", ""); // a folder: also save stills of /events (1440, 1366, 390)
 const ARTIFACT = args.includes("--artifact");
 const MODE = opt("mode", "espace"); // the events mode the fake Studio serves: espace | studio
-const ORIGIN = `http://127.0.0.1:${PORT}`;
+const LIVE = (opt("live", "") || "").replace(/\/$/, ""); // --live <origin>: read-only GETs of a DEPLOYED origin, third parties NOT stubbed
+const ORIGIN = LIVE || `http://127.0.0.1:${PORT}`;
 const BOOT_MS = 180_000;
 
 function playwrightFromEnv() {
@@ -54,7 +55,7 @@ const stopAll = () => { for (const c of children) { try { process.kill(-c.pid, "
 process.on("exit", () => { stopAll(); rmSync(TMP, { recursive: true, force: true }); });
 for (const s of ["SIGINT", "SIGTERM"]) process.on(s, () => process.exit(130));
 
-if (!existsSync(join(REPO, ".open-next", "worker.js"))) { console.log("FAIL no .open-next/worker.js: build first (see the header of this file)"); process.exit(1); }
+if (!LIVE && !existsSync(join(REPO, ".open-next", "worker.js"))) { console.log("FAIL no .open-next/worker.js: build first (see the header of this file)"); process.exit(1); }
 const pwPath = playwrightFromEnv();
 if (!pwPath) { console.log("FAIL csp-crawl: set PLAYWRIGHT_DIR to a directory whose node_modules/playwright has Chromium installed (it is unset or does not hold a working Playwright)"); process.exit(1); }
 const { chromium } = createRequire(import.meta.url)(pwPath);
@@ -82,6 +83,8 @@ async function until(fn, what, ms) {
 }
 
 const findings = [];
+const warnings = [];
+const warn = (page, kind, detail) => { warnings.push({ page, kind, detail: String(detail).slice(0, 240) }); };
 const note = (page, kind, detail) => { findings.push({ page, kind, detail: String(detail).slice(0, 240) }); };
 
 // what a page's third parties get instead of the internet
@@ -113,36 +116,52 @@ const ALL_PAGES = [
   ["signup form (visit)", "/visit/"], ["messages", "/messages/"], ["watch", "/watch/"], ["media image", "/media/aB3dEfGhIjKlMnOpQr_-Zz.png"],
   ["edit-mode canvas", "/?preview=crawl-token&cmsEdit=1"], ["not found page", "/nope-xyz/"],
 ];
-const PAGES = ARTIFACT ? ALL_PAGES.filter(([n]) => !n.startsWith("article")) : ALL_PAGES;
+const PAGES = LIVE ? ALL_PAGES.filter(([n]) => !n.startsWith("article")) : ARTIFACT ? ALL_PAGES.filter(([n]) => !n.startsWith("article")) : ALL_PAGES;
 const EXPECT = { "/media/aB3dEfGhIjKlMnOpQr_-Zz.png": 404, "/nope-xyz/": 404 }; // the media route's plain 404 (Studio has no such file) and the site's 404 page
 
 try {
-  if (!ARTIFACT) {
+  if (!ARTIFACT && !LIVE) {
     launch(process.execPath, [join(REPO, "scripts/fake-studio.mjs"), String(STUDIO_PORT)], { cwd: REPO, env: { ...process.env, FAKE_EVENTS_MODE: MODE } });
     await until(async () => { try { return (await fetch(`http://127.0.0.1:${STUDIO_PORT}/api/content/site`)).ok; } catch { return false; } }, "fake Studio", 20_000);
   }
-  const w = launch(join(REPO, "node_modules/.bin/wrangler"), ["dev", "-c", join(TMP, "wrangler.jsonc"), "--local", "--port", String(PORT), "--ip", "127.0.0.1", "--persist-to", join(TMP, "state"), "--show-interactive-dev-session=false"], { cwd: REPO, env: { ...process.env, CI: "1", WRANGLER_LOG_PATH: join(TMP, "wl") } });
-  await until(() => { if (w.c.exitCode !== null) throw new Error(`wrangler dev exited\n${w.text().slice(-2000)}`); return /Ready on http/.test(w.text()); }, "wrangler dev", BOOT_MS);
+  const w = LIVE ? null : launch(join(REPO, "node_modules/.bin/wrangler"), ["dev", "-c", join(TMP, "wrangler.jsonc"), "--local", "--port", String(PORT), "--ip", "127.0.0.1", "--persist-to", join(TMP, "state"), "--show-interactive-dev-session=false"], { cwd: REPO, env: { ...process.env, CI: "1", WRANGLER_LOG_PATH: join(TMP, "wl") } });
+  if (w) await until(() => { if (w.c.exitCode !== null) throw new Error(`wrangler dev exited\n${w.text().slice(-2000)}`); return /Ready on http/.test(w.text()); }, "wrangler dev", BOOT_MS);
 
   const browser = await chromium.launch();
   const VIEWS = [{ name: "desktop", viewport: { width: 1440, height: 900 }, mobile: false }, { name: "phone", viewport: { width: 390, height: 844 }, mobile: true }];
   if (SHOTS) { VIEWS.push({ name: "laptop", viewport: { width: 1366, height: 768 }, mobile: false }); mkdirSync(SHOTS, { recursive: true }); }
   for (const v of VIEWS) {
     const ctx = await browser.newContext({ viewport: v.viewport, isMobile: v.mobile, hasTouch: v.mobile, deviceScaleFactor: v.mobile ? 2 : 1 });
-    await ctx.route("**/*", stub);
+    if (!LIVE) await ctx.route("**/*", stub);
     for (const [name, path] of PAGES) {
       if (v.name === "laptop" && path !== "/events/") continue; // the extra view is for the stills only
       const label = `${name} (${v.name})`;
       const page = await ctx.newPage();
       await page.addInitScript(() => {
         window.__csp = [];
-        document.addEventListener("securitypolicyviolation", (e) => window.__csp.push(`${e.violatedDirective} blocked ${e.blockedURI}`));
+        document.addEventListener("securitypolicyviolation", (e) => window.__csp.push(`${e.violatedDirective} blocked ${e.blockedURI}${e.sourceFile ? ` (from ${e.sourceFile}:${e.lineNumber})` : ""}`));
+        // name who fetches a data: URL: wrap fetch and XHR and keep the JS stack
+        const of = window.fetch; window.fetch = function (i, ...a) { try { const u = typeof i === "string" ? i : i && i.url; if (/^data:/i.test(u || "")) window.__csp.push(`initiator fetch(${String(u).slice(0, 40)}) ${new Error().stack.split("\n").slice(2, 6).join(" | ")}`); } catch {} return of.call(this, i, ...a); };
+        const ox = XMLHttpRequest.prototype.open; XMLHttpRequest.prototype.open = function (m, u, ...a) { try { if (/^data:/i.test(String(u))) window.__csp.push(`initiator xhr(${String(u).slice(0, 40)}) ${new Error().stack.split("\n").slice(2, 6).join(" | ")}`); } catch {} return ox.call(this, m, u, ...a); };
       });
       page.on("pageerror", (e) => note(label, "page error", e.message));
-      page.on("console", (m) => { if (m.type() === "error" && /Content Security Policy|violates the following/.test(m.text())) note(label, "csp console", m.text()); });
+      // --live only. Two things are not ours and not ours to fix, so they print as WARN, never FAIL:
+      //  (1) the Cloudflare Web Analytics beacon the edge injects (the owner's call: allow it in the policy or turn it off for the hostname);
+      //  (2) whatever the Turnstile widget's OWN frame (challenges.cloudflare.com, under Cloudflare's own policy) does inside itself.
+      const cfBeacon = (t) => LIVE && /static\.cloudflareinsights\.com|cloudflareinsights\.com/.test(t);
+      const inTurnstile = (u) => { try { return LIVE && /(^|\.)challenges\.cloudflare\.com$/.test(new URL(u).hostname); } catch { return /(^|\.)challenges\.cloudflare\.com$/.test(u); } };
+      page.on("console", (m) => {
+        if (m.type() !== "error" || !/Content Security Policy|violates the following/.test(m.text())) return;
+        if (cfBeacon(m.text())) return warn(label, "cloudflare web analytics beacon blocked (the owner's call, see the Ask)", m.text());
+        // the frame's own policy names Cloudflare's hosts (hagen./brunhild.challenges.cloudflare.com) and the probe is fetch("data:,"); our policy never lists either
+        if (inTurnstile(m.location().url || "") || (LIVE && /hagen\.challenges\.cloudflare\.com|Fetch API cannot load data:,?\./.test(m.text()))) return warn(label, "inside the Turnstile widget's own frame (its own policy, not ours)", m.text());
+        note(label, "csp console", m.text());
+      });
       page.on("requestfailed", (r) => {
         const why = r.failure()?.errorText ?? "";
         if (/ERR_ABORTED/.test(why) && /[?&]_rsc=/.test(r.url())) return; // a router prefetch the page's own navigation cancelled
+        if (cfBeacon(r.url())) return warn(label, "cloudflare web analytics beacon blocked (the owner's call, see the Ask)", `${r.url()} ${why}`);
+        if (inTurnstile(r.url())) return warn(label, "Turnstile's own probe host unreachable from this machine (its own frame)", `${new URL(r.url()).hostname} ${why}`);
         note(label, "request failed", `${r.url()} ${why}`);
       });
       page.on("response", (r) => {
@@ -159,7 +178,11 @@ try {
         // let the page's own browser code run: lazy sections, the calendar's fetch, embedded players, the signup widget
         await page.evaluate(async () => { for (let y = 0; y < document.body.scrollHeight; y += 700) { window.scrollTo(0, y); await new Promise((r) => setTimeout(r, 80)); } });
         await page.waitForTimeout(1500);
-        for (const m of await page.evaluate(() => window.__csp)) note(label, "securitypolicyviolation", m);
+        if (LIVE) await page.waitForTimeout(3500); // a fixed settle: the signup widget keeps a Turnstile worker request open, so networkidle never arrives
+        for (const m of await page.evaluate(() => window.__csp)) {
+          if (LIVE && /cloudflareinsights\.com/.test(m)) warn(label, "cloudflare web analytics beacon blocked (the owner's call, see the Ask)", m);
+          else note(label, m.startsWith("initiator") ? "data: fetch initiator" : "securitypolicyviolation", m);
+        }
         if (SHOTS && path === "/events/") {
           // a tall element capture lays fixed things (the sticky header, the off-screen skip link) over the middle of the picture; hide them for the still only
           await page.evaluate(() => { for (const el of document.querySelectorAll("body *")) if (getComputedStyle(el).position === "fixed") el.style.display = "none"; });
@@ -170,7 +193,7 @@ try {
             await loc.screenshot({ path: join(SHOTS, `${MODE}-${sec}-${v.name === "desktop" ? "1440" : v.name === "laptop" ? "1366" : "390"}.png`) });
           }
         }
-        if (path === "/events/" && v.name === "desktop") {
+        if (!LIVE && path === "/events/" && v.name === "desktop") {
           const txt = (await page.textContent("main")) || "";
           if (!/Cornhole League/.test(txt)) note(label, "events not rendered", "the church's calendar events are not on the page");
           if (!(await page.locator("a[href='https://example.org/register/crawl']").count())) note(label, "registration link", "the event with a registration link shows no link on the page");
@@ -186,6 +209,7 @@ try {
 }
 stopAll();
 
+for (const w of new Map(warnings.map((x) => [`${x.kind} :: ${x.detail.replace(/\/beacon\.min\.js\/\S+/, "/beacon.min.js/...").slice(0, 60)}`, x])).values()) console.log(`WARN ${w.kind} :: ${w.detail} (on ${[...new Set(warnings.filter((y) => y.kind === w.kind).map((y) => y.page))].length} page views)`);
 // the same finding on every page is one line
 const seen = new Map();
 for (const f of findings) { const k = `${f.kind} :: ${f.detail}`; seen.set(k, [...(seen.get(k) ?? []), f.page]); }
