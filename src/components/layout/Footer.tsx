@@ -30,7 +30,11 @@ import { tx } from "@/lib/home-content";
  * other text. Content comes from the global overrides bag (falls back to the
  * hand-built defaults when the CMS is off).
  */
-export default function Footer({ globals = {}, menu = null }: { globals?: CMSOverrides; menu?: StudioNavItem[] | null }) {
+/**
+ * `placed`: this page already prints the one call-to-check line under its own times (the layout knows which pages do), so the
+ * footer must not print a second. On every other page the footer's times are bare, and the line sits directly under them.
+ */
+export default function Footer({ globals = {}, menu = null, placed = false }: { globals?: CMSOverrides; menu?: StudioNavItem[] | null; placed?: boolean }) {
   const t = globals.text || {};
   // THE one menu: the Explore links are Studio's `navigation` items (top level), then Give. Without it (Studio down, or
   // an empty list) the code list below stays. Menu words are not text-overridable here: the Menu form owns them.
@@ -41,8 +45,8 @@ export default function Footer({ globals = {}, menu = null }: { globals?: CMSOve
   const variant = (t["footer-variant"] || "editorial").toLowerCase();
 
   if (variant === "minimal") return <FooterMinimal t={t} m={m} links={links} />;
-  if (variant === "bigcta") return <FooterEditorial t={t} m={m} preCta links={links} />;
-  return <FooterEditorial t={t} m={m} links={links} />;
+  if (variant === "bigcta") return <FooterEditorial t={t} m={m} preCta links={links} placed={placed} />;
+  return <FooterEditorial t={t} m={m} links={links} placed={placed} />;
 }
 
 /* ─────────────────────────────────────────────────────────────────────────
@@ -119,7 +123,6 @@ function BottomBar({ t }: { t: TextBag }) {
     <div style={{ borderTop: "1px solid rgba(255,255,255,0.10)", paddingTop: "var(--s-8, 32px)" }}>
       <div className="container-c3 pb-8 text-xs flex flex-col items-center gap-2 md:flex-row md:items-center md:justify-between md:gap-4" style={{ color: "rgba(255,255,255,0.62)" }}>
         <p data-cms="g:footer-copyright" dangerouslySetInnerHTML={{ __html: tx(t, "footer-copyright", `© ${YEAR} Celebration Community Church · All Rights Reserved`) }} />
-        <TimesCheckNote />
       </div>
     </div>
   );
@@ -128,7 +131,7 @@ function BottomBar({ t }: { t: TextBag }) {
 /* ─────────────────────────────────────────────────────────────────────────
    VARIANT: Editorial Dark (default) — optional Big-CTA pre-band (preCta)
    ───────────────────────────────────────────────────────────────────────── */
-function FooterEditorial({ t, m, links, preCta = false }: { t: TextBag; m: MediaBag; links: ExploreLink[]; preCta?: boolean }) {
+function FooterEditorial({ t, m, links, preCta = false, placed = false }: { t: TextBag; m: MediaBag; links: ExploreLink[]; preCta?: boolean; placed?: boolean }) {
   return (
     <footer data-cms-bg="g:footer" style={{ backgroundColor: "#1b1c1c", color: "rgba(255,255,255,0.75)" }}>
       {/* Seamless entry from the page canvas */}
@@ -197,6 +200,7 @@ function FooterEditorial({ t, m, links, preCta = false }: { t: TextBag; m: Media
                   </div>
                 </div>
               ))}
+              {!placed && <TimesCheckNote className="text-xs" style={{ color: "rgba(255,255,255,0.78)", margin: 0 }} />}
             </div>
           </div>
 

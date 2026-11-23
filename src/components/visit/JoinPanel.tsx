@@ -2,6 +2,7 @@ import type { CSSProperties } from "react";
 import { MapPin, Smartphone } from "lucide-react";
 import ServiceTimesText from "@/components/ServiceTimesText";
 import KidsLine from "@/components/visit/KidsLine";
+import TimesCheckNote from "@/components/TimesCheckNote";
 import { locations } from "@/data/locations";
 import { site } from "@/data/site";
 import { Tx } from "@/components/cms/Editable";
@@ -73,16 +74,16 @@ export default function JoinPanel({ t }: { t: Record<string, string> }) {
           k="visit-times-eyebrow"
           fallback="Plan your visit"
           as="h1"
-          className="overline"
-          style={{ color: "var(--color-teal-deep)" }}
+          className="display-1 text-balance"
+          style={{ color: "var(--color-ink)", paddingTop: "calc(var(--header-h, 72px) + 2.5rem)", fontWeight: 600 }}
         />
         <Tx
           text={t}
           k="visit-times-heading"
           fallback="When &amp; where we meet"
           as="h2"
-          className="display-2 text-balance"
-          style={{ color: "var(--color-ink)" }}
+          className="overline"
+          style={{ color: "var(--color-teal-deep)" }}
         />
       </Stack>
 
@@ -140,6 +141,7 @@ export default function JoinPanel({ t }: { t: Record<string, string> }) {
           </div>
         ))}
       </div>
+      <TimesCheckNote className="body-base" style={{ color: "var(--color-ink)", marginTop: "var(--space-block)" }} />
       <KidsLine />
       {/* ── Social icon buttons (connect bar) ──────────────────────
           #4: the redundant in-page C3 logo is REMOVED — the header/nav already

@@ -12,6 +12,7 @@ import { isExampleSection, renderExample } from "@/lib/section-examples";
 import { tx, imgCss, txTimesSafe } from "@/lib/home-content";
 import StaffGrid from "@/components/about/StaffGrid";
 import { getServiceTimes } from "@/lib/service-times";
+import TimesCheckNote from "@/components/TimesCheckNote";
 import { campus, dayLine, campusLine, spokenLine, TIMES_TBA } from "@/lib/service-times-core";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -39,7 +40,8 @@ export default async function ColbyCampusPage({
   const preview = typeof sp.preview === "string" ? sp.preview : undefined;
   const edit = !!preview; // the editor's canvas: the select-only markers are drawn only here
   const ov = (await getPageContent("/locations/colby", preview)) || {};
-  const colby = campus(await getServiceTimes(), "colby");
+  const allTimes = await getServiceTimes();
+  const colby = campus(allTimes, "colby");
   const spoken = spokenLine(colby);
   const t = ov.text || {};
   const media = ov.media || {};
@@ -228,6 +230,7 @@ export default async function ColbyCampusPage({
                     <p data-service-times="colby" {...pickProps(edit, "fact:service_times:colby")}>{colby.services.length === 0 ? TIMES_TBA : colby.services.map((sv) => dayLine(sv).slice(sv.day.length + 1)).join("; ")}</p>
                   </div>
                 </div>
+                <TimesCheckNote scope="colby" data={allTimes} className="text-sm" style={{ color: "rgba(27,28,28,0.78)", marginTop: "1rem" }} />
               </div>
 
               {/* Location card */}

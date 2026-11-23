@@ -5,6 +5,7 @@ import Image from "next/image";
 import { motion } from "framer-motion";
 import { assetPath } from "@/lib/asset-path";
 import CampusChooser from "./CampusChooser";
+import ThisSundayLine from "./ThisSundayLine";
 import { btnCss } from "./btn-css";
 import { HERO_DEFAULTS, tx, type HeroContent, type BtnStyle } from "@/lib/home-content";
 
@@ -131,6 +132,7 @@ export default function Hero({ content = HERO_DEFAULTS, btnStyle, text = {}, btn
               <span data-cms-link-label>{content.ctaLabel}</span>
             </Link>
           </motion.div>
+          <div className="mt-6 text-center"><ThisSundayLine /></div>
         </div>
       </section>
     );
@@ -183,6 +185,7 @@ export default function Hero({ content = HERO_DEFAULTS, btnStyle, text = {}, btn
                   <span data-cms-link-label>{content.ctaLabel}</span>
                 </Link>
               </div>
+              <ThisSundayLine />
             </motion.div>
 
             {/* ── Right: image inside a large rounded card ── */}
@@ -283,6 +286,7 @@ export default function Hero({ content = HERO_DEFAULTS, btnStyle, text = {}, btn
             <span data-cms-link-label>{content.ctaLabel}</span>
           </Link>
         </motion.div>
+        <div className="mt-6"><ThisSundayLine tone="dark" /></div>
       </div>
     </section>
   );

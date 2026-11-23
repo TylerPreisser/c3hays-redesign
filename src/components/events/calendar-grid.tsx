@@ -215,9 +215,6 @@ export function AgendaView({
                             display: "block",
                             color: "var(--color-mute)",
                             marginTop: "0.2rem",
-                            whiteSpace: "nowrap",
-                            overflow: "hidden",
-                            textOverflow: "ellipsis",
                             maxWidth: "52ch",
                           }}
                         >

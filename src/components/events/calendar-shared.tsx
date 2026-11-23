@@ -65,30 +65,14 @@ export function Skeleton() {
 
 /* ───────────────────────── Error state ───────────────────────── */
 export function ErrorState({ onRetry }: { onRetry?: () => void }) {
+  // The Upcoming block above already says the calendar did not load and offers Try again; this one only points at the full calendar.
+  void onRetry;
   return (
-    <div style={{ textAlign: "center", padding: "clamp(2rem, 6vw, 4rem) 1rem" }}>
-      <p className="heading-3" style={{ color: "var(--color-ink)" }}>
-        The live calendar is slow right now.
-      </p>
-      <p className="body-base" style={{ color: "var(--color-mute)", marginTop: "0.6rem" }}>
-        You can still browse everything on the full church calendar.
-      </p>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: "0.75rem", justifyContent: "center", marginTop: "var(--space-cta)" }}>
-        {onRetry && (
-          <button type="button" className="btn btn-outline" onClick={onRetry} style={{ minHeight: 44 }}>
-            Try again
-          </button>
-        )}
-        <a
-          href={ESPACE_FULL_CALENDAR_URL}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="btn btn-primary"
-        >
-          Open the full calendar
-          <ArrowUpRight size={18} />
-        </a>
-      </div>
+    <div style={{ textAlign: "center", padding: "clamp(1.5rem, 4vw, 2.5rem) 1rem" }}>
+      <a href={ESPACE_FULL_CALENDAR_URL} target="_blank" rel="noopener noreferrer" className="btn btn-primary">
+        Open the full calendar
+        <ArrowUpRight size={18} />
+      </a>
     </div>
   );
 }
@@ -326,7 +310,7 @@ export function DayDetail({
                   </span>
                 )}
               </span>
-              {ev.description && (
+              {ev.description && ev.description !== ev.timeLabel && (
                 <span className="body-sm" style={{ color: "var(--color-mute)" }}>
                   {ev.description}
                 </span>

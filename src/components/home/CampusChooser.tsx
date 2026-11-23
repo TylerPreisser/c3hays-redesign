@@ -8,7 +8,7 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { ChevronDown, MapPin } from "lucide-react";
 import { useServiceTimes } from "@/providers/ServiceTimesProvider";
-import { campus, firstService } from "@/lib/service-times-core";
+import { campus, compactLine } from "@/lib/service-times-core";
 import { locations } from "@/data/locations";
 import { btnCss } from "./btn-css";
 import type { BtnStyle } from "@/lib/home-content";
@@ -88,7 +88,7 @@ export default function CampusChooser({
 
       {open && (
         <div
-          className="absolute z-30 mt-3 left-1/2 -translate-x-1/2 sm:left-0 sm:translate-x-0"
+          className="absolute z-30 mt-3 left-0"
           style={{
             width: "min(92vw, 340px)",
             background: "#fff",
@@ -121,9 +121,9 @@ export default function CampusChooser({
                 <span className="block font-bold leading-tight" data-cms-link-label style={{ color: "var(--color-ink)" }}>
                   {loc.name}
                 </span>
-                <span className="block text-sm truncate" style={{ color: "rgba(27,28,28,0.55)" }}>
+                <span className="block text-sm" style={{ color: "rgba(27,28,28,0.7)", lineHeight: 1.4 }}>
                   {loc.city}, {loc.state} ·{" "}
-                  {firstService(campus(serviceTimes, loc.id))}
+                  {compactLine(campus(serviceTimes, loc.id))}
                 </span>
               </span>
               <ChevronDown size={16} className="ml-auto -rotate-90 shrink-0" style={{ color: "rgba(27,28,28,0.35)" }} />

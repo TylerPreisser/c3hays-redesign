@@ -1,5 +1,6 @@
 "use client";
 
+import { site } from "@/data/site";
 import { useMemo, useState } from "react";
 import Image from "next/image";
 import { Search, Clock, Inbox } from "lucide-react";
@@ -131,8 +132,8 @@ export default function IssueBrowser({ issues }: IssueBrowserProps) {
             <Inbox size={20} />
           </span>
           <p className="body-base" style={{ color: "var(--color-mute)" }}>
-            The first issue of <strong style={{ color: "var(--color-ink)" }}>C3 News</strong> is
-            on its way.
+            Nothing posted here yet. <strong style={{ color: "var(--color-ink)" }}>C3 News</strong> comes by email: call the office at{" "}
+            <a href={`tel:${site.phone.replace(/\D/g, "")}`} style={{ color: "var(--color-ink)", fontWeight: 600, textDecoration: "underline", display: "inline-block", padding: "0.5rem 0" }}>{site.phone}</a> to be added.
           </p>
         </div>
       ) : filtered.length === 0 ? (

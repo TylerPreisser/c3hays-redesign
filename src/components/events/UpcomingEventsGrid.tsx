@@ -37,7 +37,7 @@ function detailLine(ev: CalEvent): string {
   const clipped = desc.length > 140 ? `${desc.slice(0, 140).trimEnd()}…` : desc;
   // an event made in Studio says its whole day and time ("Wednesday, December 2 · 6:30 PM"); the chip above shows only month and day
   const when = ev.whenLabel ?? ev.timeLabel;
-  return clipped ? `${when} · ${clipped}` : when;
+  return clipped && clipped !== when ? `${when} · ${clipped}` : when;
 }
 
 function campusLabel(ev: CalEvent): string {

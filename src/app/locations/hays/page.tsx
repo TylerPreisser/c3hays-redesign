@@ -14,6 +14,7 @@ import { tx, imgCss, txTimesSafe } from "@/lib/home-content";
 import StaffGrid from "@/components/about/StaffGrid";
 import { getServiceTimes } from "@/lib/service-times";
 import { telHref, mailHref } from "@/lib/contact-facts";
+import TimesCheckNote from "@/components/TimesCheckNote";
 import { campus, campusLine, dayLine, kidsTimes, spokenLine, TIMES_TBA } from "@/lib/service-times-core";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -40,7 +41,8 @@ export default async function HaysCampusPage({
   const preview = typeof sp.preview === "string" ? sp.preview : undefined;
   const edit = !!preview; // the editor's canvas: the select-only markers are drawn only here
   const ov = (await getPageContent("/locations/hays", preview)) || {};
-  const hays = campus(await getServiceTimes(), "hays");
+  const allTimes = await getServiceTimes();
+  const hays = campus(allTimes, "hays");
   const kids = kidsTimes(hays);
   const t = ov.text || {};
   const media = ov.media || {};
@@ -193,6 +195,7 @@ export default async function HaysCampusPage({
                     </div>
                   ))}
                 </div>
+                <TimesCheckNote scope="hays" data={allTimes} className="text-sm" style={{ color: "rgba(27,28,28,0.78)", marginTop: "1rem" }} />
               </div>
 
               {/* Location card */}

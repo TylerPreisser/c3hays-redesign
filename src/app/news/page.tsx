@@ -8,6 +8,7 @@ import { isExampleSection, renderExample, SECTION_EXAMPLE_IDS } from "@/lib/sect
 import { Tx } from "@/components/cms/Editable";
 import PageComposer from "@/components/cms/PageComposer";
 import Section from "@/components/ui/Section";
+import { NEWSLETTER_SIGNUP_LIVE } from "@/lib/newsletter-signup";
 import IssueBrowser from "@/components/newsletter/IssueBrowser";
 import WeeklySignup from "@/components/newsletter/WeeklySignup";
 import { getNewsIssues } from "@/lib/news-issues";
@@ -114,7 +115,7 @@ export default async function NewsPage({
                   <Tx
                     text={t}
                     k="weekly-hero-lead"
-                    fallback="What&rsquo;s coming up, this week&rsquo;s message, and simple next steps. Browse past issues below."
+                    fallback={`What&rsquo;s coming up, this week&rsquo;s message, and simple next steps.${newsletterIssues.length > 0 ? ' Browse past issues below.' : ''}`}
                     as="p"
                     className="body-lg"
                     style={{ color: "rgba(255,255,255,0.82)", maxWidth: "34rem", lineHeight: 1.7 }}
@@ -122,7 +123,7 @@ export default async function NewsPage({
                 </div>
 
                 {/* RIGHT — editor-native signup OVERLAY. */}
-                <WeeklySignup text={t} />
+                {(newsletterIssues.length > 0 || NEWSLETTER_SIGNUP_LIVE) && <WeeklySignup text={t} />}
               </div>
             </div>
           </section>
@@ -132,7 +133,7 @@ export default async function NewsPage({
           <Section
             /* On-brand clean WHITE field (NOT tan) so the white issue cards + teal
                accents read premium — mirrors home's light sections. */
-            style={{ backgroundColor: "#ffffff", color: "var(--color-ink)" }}
+            style={{ backgroundColor: "#ffffff", color: "var(--color-ink)", ...(newsletterIssues.length === 0 ? { paddingBlock: "2rem" } : {}) }}
             bgKey="weekly-list-bg"
           >
             <div style={{ width: `min(100% - 2 * ${GUTTER}, 1600px)`, marginInline: "auto" }}>

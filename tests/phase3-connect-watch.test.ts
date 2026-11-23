@@ -59,16 +59,13 @@ describe("Connect — form first, no captcha copy, real CCB form", () => {
   it("wires a real Church Community Builder form URL", () => {
     expect(both).toContain("celebration.ccbchurch.com/goto/forms");
   });
-  it("renders the contact form BEFORE the intent/next-step cards", () => {
-    // The form must appear earlier in the client than the intent/next-step cards.
-    // Phase-5 redesign folded the old connect-form-heading into the glass-card
-    // header, so anchor on the first form FIELD (stable) instead of that removed key.
-    const formIdx = client.indexOf("connect-field-firstname");
-    const intentsIdx = client.indexOf("connect-intents");
-    expect(formIdx).toBeGreaterThan(-1);
-    expect(intentsIdx).toBeGreaterThan(-1);
-    expect(formIdx).toBeLessThan(intentsIdx);
+  it("has no form of ours: the office phone and email come first, then the church's own forms", () => {
+    expect(client).not.toContain("<form");
+    expect(client).not.toContain("preventDefault");
+    expect(client.indexOf("data-connect-routes")).toBeGreaterThan(-1);
+    expect(client.indexOf("data-connect-routes")).toBeLessThan(client.indexOf("connect-intents"));
   });
+
 });
 
 describe("The C3 Weekly — real /news page; old /newsletter redirects", () => {

@@ -9,6 +9,7 @@ import "./animations.css";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import EditBridge from "@/components/cms/EditBridge";
+import HydratedMark from "@/components/layout/HydratedMark";
 import FreeOffsetStyle from "@/components/cms/FreeOffsetStyle";
 import RevealPlayer from "@/components/cms/RevealPlayer";
 import SmoothScrollProvider from "@/providers/SmoothScrollProvider";
@@ -37,6 +38,13 @@ export const viewport: Viewport = {
   initialScale: 1,
   viewportFit: "cover",
 };
+
+/** Pages that print the one call-to-check line under their own times; the footer prints it everywhere else. */
+const REVEAL_SELECTOR = '[style*="opacity:0;"],[style$="opacity:0"]';
+const REVEAL_FALLBACK_CSS = `@keyframes c3-reveal-fallback{to{opacity:1;transform:none}}html:not(.hydrated) ${REVEAL_SELECTOR.split(",").join(",html:not(.hydrated) ")}{animation:c3-reveal-fallback 0s 2.5s forwards}`;
+const REVEAL_NOSCRIPT_CSS = `${REVEAL_SELECTOR}{opacity:1!important;transform:none!important}`;
+
+const PAGES_WITH_OWN_TIMES_NOTE = new Set(["/", "/visit", "/events", "/locations/hays", "/locations/colby"]);
 
 export const metadata: Metadata = {
   title: {
@@ -130,6 +138,11 @@ export default async function RootLayout({
         {/* v6 R7: the href is GENERATED from the shared FONT_CATALOG, so the fonts
             the editor offers and the fonts the site loads can never drift apart. */}
         <link href={buildGoogleFontsHref()} rel="stylesheet" />
+        {/* Words are visible by default: an entrance animation starts a block at opacity 0, and if the script is off or late the
+            block must still show. With no script it shows at once (noscript); with a late script it shows after 2.5 s unless the page has
+            hydrated by then (HydratedMark adds the class that ends the rule). */}
+        <style dangerouslySetInnerHTML={{ __html: REVEAL_FALLBACK_CSS }} />
+        <noscript><style dangerouslySetInnerHTML={{ __html: REVEAL_NOSCRIPT_CSS }} /></noscript>
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdFor(globals.text || {})).replace(/</g, "\\u003c") }}
@@ -147,6 +160,7 @@ export default async function RootLayout({
         {/* On-page editor bridge — mounted globally so EVERY page (not just Home)
             is click-to-edit when loaded in C3 Studio with ?cmsEdit=1. */}
         <EditBridge />
+        <HydratedMark />
         {/* v6 R6 (6b): entrance-reveal player for global elements (footer/header).
             Home-page element reveals feed content.anim into a RevealPlayer in page.tsx. */}
         <RevealPlayer anim={globals.anim} />
@@ -157,7 +171,7 @@ export default async function RootLayout({
               <a href="#main" className="skip-link">Skip to main content</a>
               <Header globals={globals} menu={menu.items} announcements={announcements.slice(0, MAX_BANNERS)} />
               <main id="main" tabIndex={-1}>{children}</main>
-              <Footer globals={globals} menu={menu.items} />
+              <Footer globals={globals} menu={menu.items} placed={PAGES_WITH_OWN_TIMES_NOTE.has(pathname.replace(/\/+$/, "") || "/")} />
             </SmoothScrollProvider>
           </SignupConfigProvider>
         </ServiceTimesProvider>

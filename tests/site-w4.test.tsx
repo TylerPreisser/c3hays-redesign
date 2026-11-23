@@ -44,7 +44,8 @@ describe("M1 the calendar prints Studio's times, not eSpace's free text", () => 
     expect(text).not.toContain("9:30");
     expect(text).not.toContain("11:00");
     expect(text).toContain("10:45 AM"); // Studio's Hays Sunday times
-    expect(text).toContain("Hays: Saturday 5:00 PM");
+    expect(text).toContain("Hays 8:00 AM (C3 Gym)");
+    expect(text).not.toContain("12:30 PM");
     await act(async () => root.unmount());
   });
   it("a staff set-up job is not an event for visitors (Upcoming and the calendar)", async () => {
@@ -62,7 +63,7 @@ describe("M8 events with eSpace failing", () => {
     expect(html).toContain("Hays: Saturday 5:00 PM");
     expect(html).toContain("Colby: Sunday 10:00 AM");
     const m = await mount(({ Upcoming }) => createElement(Upcoming), "down");
-    expect(m.host.textContent).toContain("The live calendar is slow right now.");
+    expect(m.host.textContent).toContain("The church calendar did not load.");
     expect(m.host.textContent).not.toContain("couldn");
     expect(Array.from(m.host.querySelectorAll("button")).map((b) => b.textContent)).toContain("Try again");
     expect(m.host.querySelector("a[href*='espace.cool']")).toBeTruthy();

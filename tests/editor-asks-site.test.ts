@@ -162,7 +162,8 @@ describe("an unconfirmed service time is shown, with ONE plain call-to-check lin
     for (const [name, html] of Object.entries(p)) {
       expect(html, name).toContain("5:00 PM");
       expect(html, name).not.toContain("to be confirmed");
-      if (name === "footer") expect(count(html, CHECK), name).toBe(1);
+      // one line per page, directly under the times it is about: on the Plan a Visit card and the Hays page, and (a page the layout does not place it on) the footer
+      if (name === "footer" || name === "visit" || name === "hays") expect(count(html, CHECK), name).toBe(1);
       else expect(html, name).not.toContain(CHECK);
     }
   });

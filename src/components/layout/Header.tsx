@@ -103,9 +103,22 @@ export default function Header({ globals = {}, menu = null, announcements = [] }
   useEffect(() => {
     if (!mobileOpen) return;
     closeRef.current?.focus();
-    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") { setMobileOpen(false); burgerRef.current?.focus(); } };
+    // The page behind the drawer is inert while it is open, and Tab wraps inside it.
+    const behind = Array.from(document.querySelectorAll<HTMLElement>("main, footer, .skip-link"));
+    behind.forEach((el) => el.setAttribute("inert", ""));
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") { setMobileOpen(false); burgerRef.current?.focus(); return; }
+      if (e.key !== "Tab") return;
+      const drawer = document.querySelector<HTMLElement>('[aria-label="Mobile navigation"]');
+      const items = drawer ? Array.from(drawer.querySelectorAll<HTMLElement>("a[href],button:not([disabled])")).filter((n) => n.offsetParent !== null || n === document.activeElement) : [];
+      if (items.length === 0) return;
+      const first = items[0], last = items[items.length - 1];
+      if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+      else if (!drawer?.contains(document.activeElement)) { e.preventDefault(); first.focus(); }
+    };
     document.addEventListener("keydown", onKey);
-    return () => document.removeEventListener("keydown", onKey);
+    return () => { document.removeEventListener("keydown", onKey); behind.forEach((el) => el.removeAttribute("inert")); };
   }, [mobileOpen]);
 
   // iOS scroll-lock: position:fixed + capture scrollY prevents bounce-scroll
@@ -342,6 +355,8 @@ export default function Header({ globals = {}, menu = null, announcements = [] }
             onClick={() => setMobileOpen(!mobileOpen)}
             aria-label={mobileOpen ? "Close menu" : "Open menu"}
             aria-expanded={mobileOpen}
+            aria-hidden={mobileOpen ? true : undefined}
+            tabIndex={mobileOpen ? -1 : undefined}
             style={{
               color: isScrolled ? "#1b1c1c" : "#ffffff",
               transition: "color 200ms cubic-bezier(0.33, 0, 0.19, 1)",

@@ -116,6 +116,7 @@ const ALL_PAGES = [
   ["signup form (visit)", "/visit/"], ["messages", "/messages/"], ["watch", "/watch/"], ["media image", "/media/aB3dEfGhIjKlMnOpQr_-Zz.png"],
   ["edit-mode canvas", "/?preview=crawl-token&cmsEdit=1"], ["not found page", "/nope-xyz/"],
 ];
+const STILL_PATHS = ["/", "/visit/", "/connect/", "/news/", "/events/", "/locations/hays/", "/locations/colby/"];
 const PAGES = LIVE ? ALL_PAGES.filter(([n]) => !n.startsWith("article")) : ARTIFACT ? ALL_PAGES.filter(([n]) => !n.startsWith("article")) : ALL_PAGES;
 const EXPECT = { "/media/aB3dEfGhIjKlMnOpQr_-Zz.png": 404, "/nope-xyz/": 404 }; // the media route's plain 404 (Studio has no such file) and the site's 404 page
 
@@ -134,7 +135,7 @@ try {
     const ctx = await browser.newContext({ viewport: v.viewport, isMobile: v.mobile, hasTouch: v.mobile, deviceScaleFactor: v.mobile ? 2 : 1 });
     if (!LIVE) await ctx.route("**/*", stub);
     for (const [name, path] of PAGES) {
-      if (v.name === "laptop" && path !== "/events/") continue; // the extra view is for the stills only
+      if (v.name === "laptop" && !STILL_PATHS.includes(path)) continue; // the extra view is for the stills only
       const label = `${name} (${v.name})`;
       const page = await ctx.newPage();
       await page.addInitScript(() => {
@@ -202,6 +203,19 @@ try {
           await page.locator("footer").first().screenshot({ path: join(SHOTS, `footer-${tag}-${v.name === "desktop" ? "1440" : "390"}.png`) });
           if (path === "/news/") await page.locator("[data-section='weekly-hero']").first().screenshot({ path: join(SHOTS, `news-hero-${v.name === "desktop" ? "1440" : "390"}.png`) }).catch(() => {});
         }
+        if (SHOTS && STILL_PATHS.includes(path)) {
+          // the first screen as a visitor lands on it, then the whole page (fixed things hidden for the tall capture only)
+          const w = v.name === "desktop" ? "1440" : v.name === "laptop" ? "1366" : "390";
+          const slug = path === "/" ? "home" : path.replace(/^\/|\/$/g, "").replace(/\//g, "-");
+          await page.evaluate(() => window.scrollTo(0, 0)); await page.waitForTimeout(900);
+          await page.screenshot({ path: join(SHOTS, `${slug}-${w}-top.png`) });
+          if (path === "/" && v.name !== "laptop") {
+            const open = page.getByRole("button", { name: /find your campus/i }).first();
+            if (await open.count()) { await open.click(); await page.waitForTimeout(600); await page.screenshot({ path: join(SHOTS, `home-${w}-campus-menu.png`) }); await page.keyboard.press("Escape"); }
+          }
+          await page.evaluate(() => { for (const el of document.querySelectorAll("body *")) if (getComputedStyle(el).position === "fixed") el.style.display = "none"; });
+          await page.screenshot({ path: join(SHOTS, `${slug}-${w}-full.png`), fullPage: true });
+        }
         if (!LIVE && path === "/events/" && v.name === "desktop") {
           const txt = (await page.textContent("main")) || "";
           if (!/Cornhole League/.test(txt)) note(label, "events not rendered", "the church's calendar events are not on the page");
@@ -211,6 +225,28 @@ try {
       await page.close();
     }
     await ctx.close();
+  }
+  if (!LIVE && !process.env.SKIP_BEHAVIOUR) {
+    // Behaviour the pages promise: words show with the script off; the phone menu keeps Tab inside it; a failed calendar says it is trying.
+    const bctx = await browser.newContext({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true, javaScriptEnabled: false });
+    await bctx.route("**/*", stub);
+    const np = await bctx.newPage();
+    await np.goto(`${ORIGIN}/`, { waitUntil: "load" });
+    const op = await np.evaluate(() => Number(getComputedStyle(document.querySelector("h1")).opacity));
+    if (!(op > (process.env.PLANT_BEHAVIOUR ? 1.5 : 0.99))) note("home (no script)", "words hidden", `the h1 opacity is ${op} with scripts off`);
+    await bctx.close();
+    const mctx = await browser.newContext({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true });
+    await mctx.route("**/*", stub);
+    const mp = await mctx.newPage();
+    await mp.goto(`${ORIGIN}/`, { waitUntil: "load" }); await mp.waitForTimeout(1200);
+    await mp.getByRole("button", { name: "Open menu" }).click(); await mp.waitForTimeout(700);
+    const names = [];
+    for (let i = 0; i < 14; i++) { await mp.keyboard.press("Tab"); names.push(await mp.evaluate(() => { const a = document.activeElement; return `${a.closest('[aria-label="Mobile navigation"]') ? "in" : "OUT"}:${(a.getAttribute("aria-label") || a.textContent || "").trim().slice(0, 24)}`; })); }
+    if (names.some((n) => n.startsWith("OUT"))) note("home (menu open)", "focus left the menu", names.join(" | "));
+    if (!names.slice(1).some((n) => n === names[0])) note("home (menu open)", "tab did not wrap", names.join(" | "));
+    const closes = await mp.getByRole("button", { name: "Close menu" }).count();
+    if (closes !== (process.env.PLANT_BEHAVIOUR ? 2 : 1)) note("home (menu open)", "close buttons", `${closes} buttons named Close menu`);
+    await mctx.close();
   }
   await browser.close();
 } catch (e) {

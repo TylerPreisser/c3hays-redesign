@@ -148,7 +148,8 @@ describe("(b) /news — real C3 Weekly page, not a redirect", () => {
   it("renders the issue browser's honest empty state, with no search box over an empty list", () => {
     // The search box and week chips appear once there are 3 issues; until then the page says the first issue is on its way.
     expect(newsHtml).toContain("is");
-    expect(newsHtml).toContain("on its way");
+    expect(newsHtml).toContain("Nothing posted here yet");
+    expect(newsHtml).not.toContain("Browse past issues below");
     expect(newsHtml).not.toContain("Search newsletter topics");
   });
   it("is NOT a client redirect stub", () => {

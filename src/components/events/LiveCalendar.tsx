@@ -8,7 +8,7 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { fetchEspaceEvents, monthMatrix, dayKey, type CalEvent } from "@/lib/espace";
 import { mergeEvents, studioToCalEvent, withStudioWeekendLine, withoutInternalEvents } from "@/lib/event-merge";
 import { useServiceTimes } from "@/providers/ServiceTimesProvider";
-import { weekendLine } from "@/lib/service-times-core";
+import { weekendLine, weekendDayLine } from "@/lib/service-times-core";
 import type { StudioEvent } from "@/lib/studio-events";
 import {
   Skeleton,
@@ -54,7 +54,7 @@ export default function LiveCalendar({ studio }: { studio?: StudioEvent[] } = {}
   const events = useMemo(() => {
     const base = studioCal.length > 0 && espaceEvents ? mergeEvents(studioCal, espaceEvents) : espaceEvents;
     // Weekend Services rows say Studio's times, not eSpace's free text; staff set-up jobs are not shown to visitors
-    return base ? withoutInternalEvents(withStudioWeekendLine(base, weekendLine(times))) : base;
+    return base ? withoutInternalEvents(withStudioWeekendLine(base, weekendLine(times), (w) => weekendDayLine(times, w))) : base;
   }, [studioCal, espaceEvents, times]);
   const [attempt, setAttempt] = useState(0);
   const [status, setStatus] = useState<"loading" | "ready" | "error">("loading");

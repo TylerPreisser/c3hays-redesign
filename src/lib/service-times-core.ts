@@ -19,6 +19,22 @@ export interface Slot {
  * The times themselves are always shown as they are: no caveat rides on a time, in a hero sentence or in the footer.
  */
 export const CHECK_NOTE = "Please call the office at (785) 625-5483 to check before you come.";
+/**
+ * The unconfirmed times, named, for the one call-to-check line that sits under the times it qualifies. `scope` "all" names
+ * every campus ("Saturday 5:00 PM", "Colby 10:00 AM"); a campus slug names only that campus's own ("Sunday 10:00 AM").
+ * Empty when Studio has confirmed everything, which is how the line goes away by itself.
+ */
+export function unconfirmedLabels(d: ServiceTimesData, scope: "all" | string = "all"): string[] {
+  const out: string[] = [];
+  for (const c of d.campuses) {
+    if (scope !== "all" && c.slug !== scope) continue;
+    for (const sv of c.services) for (const x of sv.slots) {
+      if (!x.tbc) continue;
+      out.push(scope === "all" && c.slug !== "hays" ? `${c.name} ${x.time}` : `${sv.day} ${x.time}`);
+    }
+  }
+  return out;
+}
 /** True when any service time of any campus is marked "to confirm" by Studio. */
 export const anyUnconfirmed = (d: ServiceTimesData): boolean => d.campuses.some((c) => c.services.some((s) => s.slots.some((x) => x.tbc)));
 export interface DayServices {
@@ -174,3 +190,37 @@ export const weekendLine = (d: ServiceTimesData): string =>
 
 /** The calendar's weekend-service row title as the church's eSpace names it. */
 export const isWeekendServiceTitle = (t: string): boolean => /^\s*weekend services?\s*$/i.test(t);
+
+/** "Hays 8:00 AM (C3 Gym), 9:00 AM (with C3Kids), 10:45 AM (with C3Kids) · Colby 10:00 AM": the Sunday services of every campus, from the record only. "" when no campus has a Sunday. */
+export function sundayLine(d: ServiceTimesData): string {
+  return d.campuses
+    .map((c) => {
+      const sv = c.services.find((x) => x.day === "Sunday");
+      return sv ? `${c.name} ${sv.slots.map(slotLabel).join(", ")}` : "";
+    })
+    .filter(Boolean)
+    .join(" \u00b7 ");
+}
+/** The clock minutes (0-1439) of a canonical "H:MM AM/PM". */
+export const slotMinutes = (time: string): number => {
+  const m = /^(\d{1,2}):(\d{2}) ([AP])M$/.exec(time);
+  return m ? ((Number(m[1]) % 12) + (m[3] === "P" ? 12 : 0)) * 60 + Number(m[2]) : 0;
+};
+/** The start minute of the last Sunday service of any campus, or null when there is none. */
+export function lastSundayStart(d: ServiceTimesData): number | null {
+  const all = d.campuses.flatMap((c) => c.services.filter((x) => x.day === "Sunday").flatMap((x) => x.slots.map((y) => slotMinutes(y.time))));
+  return all.length ? Math.max(...all) : null;
+}
+
+/** That one day's own times from the record, for a Weekend Services row: Saturday gives the Saturday times, Sunday the Sunday services of every campus. "" for any other day. */
+export function weekendDayLine(d: ServiceTimesData, weekday: number): string {
+  if (weekday === 0) return sundayLine(d);
+  if (weekday !== 6) return "";
+  return d.campuses
+    .map((c) => {
+      const sv = c.services.find((x) => x.day === "Saturday");
+      return sv ? `${c.name} ${sv.slots.map(slotLabel).join(", ")}` : "";
+    })
+    .filter(Boolean)
+    .join(" \u00b7 ");
+}

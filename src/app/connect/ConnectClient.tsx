@@ -1,14 +1,12 @@
 "use client";
 
 import { telHref, mailHref } from "@/lib/contact-facts";
-import { useState } from "react";
 import Image from "next/image";
 import {
   Hand,
   HeartHandshake,
   MessageCircle,
   CalendarDays,
-  Check,
   ArrowUpRight,
   MapPin,
   Phone,
@@ -25,8 +23,8 @@ import Section from "@/components/ui/Section";
 import Stack from "@/components/ui/Stack";
 
 /* Connect — a PREMIUM full-bleed photo + glass contact card, then the real
-   next-step links. VISUAL ONLY: the form is intentionally non-functional
-   (onSubmit preventDefault → success state). The connect actions on the live
+   next-step links. No form of ours: it sent nothing, so the page gives the office phone, email and the church's own forms
+   The connect actions on the live
    site run on Church Community Builder (CCB) forms — those exact URLs are the
    real links preserved below (sourced from the content inventory).
 
@@ -43,9 +41,12 @@ const CCB = "https://celebration.ccbchurch.com/goto/forms";
 const CCB_VISIT = `${CCB}/47/responses/new`; // "Let us know you're coming"
 const CCB_SERVE = `${CCB}/397/responses/new`; // Hays serve
 const CCB_COUNSELING = `${CCB}/258/responses/new`; // Counseling appt
-
-/* "What's this about?" — visual-only routing hint. */
-const REASONS = ["Visiting", "Prayer", "Serving", "General"];
+/** The forms the church already runs, shown on the page in place of a form of ours (sourced from the content inventory). */
+const CCB_FORMS = [
+  { label: "Let us know you\u2019re coming", href: CCB_VISIT },
+  { label: "Sign up to serve", href: CCB_SERVE },
+  { label: "Make a counseling appointment", href: CCB_COUNSELING },
+];
 
 /* Real next-step destinations (from the inventory). */
 const NEXT_STEPS = [
@@ -99,7 +100,6 @@ interface ConnectHeroProps {
    Every authored surface stays editable via <Tx> / data-cms-link / data-cms-img,
    exactly as before (nothing removed). ─────────────────────────────────────── */
 export function ConnectHero({ text, media = {}, img = {} }: ConnectHeroProps) {
-  const [submitted, setSubmitted] = useState(false);
 
   const addr = site.address;
   const addressLine = `${addr.street}, ${addr.city}, ${addr.state} ${addr.zip}`;
@@ -170,157 +170,34 @@ export function ConnectHero({ text, media = {}, img = {} }: ConnectHeroProps) {
             <Tx
               text={text}
               k="connect-hero-body"
-              fallback="Send a note and a real person from our team will personally reach out. No pressure, just a warm welcome."
+              fallback="Call or email the church office, or use one of the church&rsquo;s own forms. No pressure, just a warm welcome."
               as="p"
               className="body-base"
               style={{ color: "rgba(255,255,255,0.82)", marginBottom: "var(--s-8)" }}
             />
 
-            {submitted ? (
-              /* Success state (visual only) */
-              <div className="text-center connect-stagger" style={{ padding: "1.5rem 0" }}>
-                <div
-                  className="flex items-center justify-center mx-auto"
-                  style={{
-                    width: 64,
-                    height: 64,
-                    borderRadius: 999,
-                    marginBottom: "var(--space-heading)",
-                    background: "rgba(28,195,175,0.18)",
-                    border: "2px solid var(--color-teal)",
-                  }}
-                >
-                  <Check size={28} style={{ color: "var(--color-teal)" }} />
-                </div>
-                <Tx
-                  text={text}
-                  k="connect-thanks-heading"
-                  fallback="Thanks, we&rsquo;ll be in touch."
-                  as="h2"
-                  className="connect-card-title"
-                  style={{ marginBottom: "var(--space-eyebrow)" }}
-                />
-                <Tx
-                  text={text}
-                  k="connect-thanks-body"
-                  fallback="A real person from our team will reach out personally. We&rsquo;d love to see you this weekend."
-                  as="p"
-                  className="body-base mx-auto"
-                  style={{ color: "rgba(255,255,255,0.82)", maxWidth: 380 }}
-                />
-              </div>
-            ) : (
-              <form
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  setSubmitted(true);
-                }}
-                noValidate
-              >
-                <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-body)" }}>
-                  <div className="connect-form-grid2">
-                  <GlassField
-                    label={tx(text, "connect-field-firstname", "Name")}
-                    delay={120}
-                    required
-                  >
-                    <input
-                      type="text"
-                      required
-                      autoComplete="name"
-                      className="input-c3"
-                      placeholder="Jane Smith"
-                    />
-                  </GlassField>
-
-                  <GlassField
-                    label={tx(text, "connect-field-email", "Email")}
-                    delay={180}
-                    required
-                  >
-                    <input
-                      type="email"
-                      required
-                      autoComplete="email"
-                      inputMode="email"
-                      className="input-c3"
-                      placeholder="jane@example.com"
-                    />
-                  </GlassField>
-                  </div>
-
-                  <GlassField
-                    label={tx(text, "connect-field-reason", "What&rsquo;s this about?")}
-                    delay={240}
-                  >
-                    <select className="input-c3" style={selectStyle} defaultValue="">
-                      <option value="">
-                        {tx(text, "connect-field-reason-placeholder", "Pick what fits best…")}
-                      </option>
-                      {REASONS.map((r) => (
-                        <option key={r} value={r}>
-                          {r}
-                        </option>
-                      ))}
-                    </select>
-                  </GlassField>
-
-                  <GlassField
-                    label={tx(text, "connect-field-message", "Your message")}
-                    delay={300}
-                  >
-                    <textarea
-                      className="input-c3 textarea-c3"
-                      rows={3}
-                      placeholder={tx(
-                        text,
-                        "connect-field-message-placeholder",
-                        "Prayer requests, questions, or just say hi…"
-                      )}
-                    />
-                  </GlassField>
-                </div>
-
-                {/* Submit (visual only) */}
-                <button
-                  type="submit"
-                  className="btn btn-primary btn-lg w-full connect-stagger"
-                  style={{ marginTop: "var(--space-cta)", animationDelay: "360ms" }}
-                  data-cms-link="connect-submit"
-                >
-                  <span data-cms-link-label>{tx(text, "connect-submit-label", "Send message")}</span>
-                </button>
-
-                {/* Real CCB alternative — preserved */}
-                <p
-                  className="text-center connect-stagger"
-                  style={{
-                    marginTop: "var(--space-body)",
-                    fontSize: "0.9rem",
-                    color: "rgba(255,255,255,0.7)",
-                    animationDelay: "420ms",
-                  }}
-                >
-                  {tx(text, "connect-ccb-pretext", "Planning a first visit? ")}
-                  <a
-                    href={text["connect-ccb-href"] || CCB_VISIT}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="group font-semibold"
-                    style={{ color: "var(--color-teal)" }}
-                    data-cms-link="connect-ccb"
-                  >
-                    <span data-cms-link-label>
-                      {tx(text, "connect-ccb-label", "Let us know you're coming")}
-                    </span>
-                    <ArrowUpRight
-                      size={15}
-                      className="inline-block ml-0.5 -mt-0.5 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
-                    />
-                  </a>
-                </p>
-              </form>
-            )}
+            {/* The church's own routes. No form here: nothing behind a form on this site is read by anyone at the church. */}
+            <div className="connect-stagger" style={{ display: "grid", gap: "var(--space-body)" }} data-connect-routes>
+              <a href={`tel:${site.phone.replace(/\D/g, "")}`} className="btn btn-primary btn-lg w-full" style={{ minHeight: 48 }}>
+                <Phone size={18} aria-hidden="true" />
+                <span>Call {site.phone}</span>
+              </a>
+              <a href={`mailto:${site.email}`} className="btn btn-outline btn-lg w-full" style={{ minHeight: 48 }}>
+                <Mail size={18} aria-hidden="true" />
+                <span>Email {site.email}</span>
+              </a>
+              <p style={{ margin: "var(--space-body) 0 0", fontSize: "0.95rem", color: "rgba(255,255,255,0.82)" }}>Or use one of the church&rsquo;s own forms:</p>
+              <ul style={{ listStyle: "none", margin: 0, padding: 0, display: "grid", gap: "0.25rem" }}>
+                {CCB_FORMS.map((f) => (
+                  <li key={f.href}>
+                    <a href={f.href} target="_blank" rel="noopener noreferrer" className="group font-semibold" style={{ color: "var(--color-teal)", display: "inline-flex", alignItems: "center", gap: "0.25rem", minHeight: 44 }}>
+                      {f.label}
+                      <ArrowUpRight size={15} aria-hidden="true" className="transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
 
             {/* Quick-contact + map ─────────────────────────────── */}
             <div className="connect-contact connect-stagger" style={{ animationDelay: "480ms" }}>
@@ -531,42 +408,6 @@ export default function ConnectClient({ text, media = {}, img = {} }: ConnectCli
       <ConnectHero text={text} media={media} img={img} />
       <ConnectSteps text={text} />
     </>
-  );
-}
-
-/* ── Shared select style ── */
-const selectStyle: React.CSSProperties = {
-  backgroundImage:
-    "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%231b1c1c' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E\")",
-  backgroundRepeat: "no-repeat",
-  backgroundPosition: "right 0.75rem center",
-  appearance: "none",
-  paddingRight: "2.5rem",
-  cursor: "pointer",
-};
-
-/* ── Glass field wrapper (staggered) ── */
-function GlassField({
-  label,
-  required,
-  delay,
-  children,
-}: {
-  label: string;
-  required?: boolean;
-  delay: number;
-  children: React.ReactNode;
-}) {
-  return (
-    <div className="flex flex-col gap-2 connect-stagger" style={{ animationDelay: `${delay}ms` }}>
-      <label
-        style={{ fontSize: "0.875rem", fontWeight: 600, color: "rgba(255,255,255,0.9)" }}
-        dangerouslySetInnerHTML={{
-          __html: required ? `${label} <span style="color:var(--color-teal)">*</span>` : label,
-        }}
-      />
-      {children}
-    </div>
   );
 }
 

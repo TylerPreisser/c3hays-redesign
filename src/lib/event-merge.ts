@@ -87,9 +87,15 @@ export function upcomingMerged(studio: CalEvent[], espace: CalEvent[], n: number
  * 11:00"). The site never prints that note: those rows carry the line built from Studio's service times instead, the same
  * record every other page reads. The eSpace text itself is the church's to fix in eSpace; nothing here edits it.
  */
-export function withStudioWeekendLine(events: CalEvent[], line: string): CalEvent[] {
+export function withStudioWeekendLine(events: CalEvent[], line: string, dayLine?: (weekday: number) => string): CalEvent[] {
   if (!line) return events;
-  return events.map((e) => (isWeekendServiceTitle(e.title) ? { ...e, description: line } : e));
+  return events.map((e) => {
+    if (!isWeekendServiceTitle(e.title)) return e;
+    // A row shows that day's own times from the record, never eSpace's block ("8:00 AM - 12:30 PM" reads as one long service).
+    const p = churchWallParts(e.start);
+    const own = p && dayLine ? dayLine(new Date(Date.UTC(p.year, p.month - 1, p.day)).getUTCDay()) : "";
+    return own ? { ...e, description: own, timeLabel: own } : { ...e, description: line };
+  });
 }
 
 /** eSpace rows that are set-up jobs for staff, not events for visitors. Matched by title, case-insensitive. */
