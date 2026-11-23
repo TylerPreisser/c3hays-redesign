@@ -323,8 +323,14 @@ export default function EditBridge() {
       ring.style.borderRadius = `${Math.max(pad < 0 ? 4 : 7, rad + pad)}px`;
       ring.style.left = `${r.left - pad}px`; ring.style.top = `${r.top - pad}px`;
       ring.style.width = `${r.width + pad * 2}px`; ring.style.height = `${r.height + pad * 2}px`;
+      ring.style.clipPath = clipUnderHeader(r.top - pad - 4);
       ring.style.display = "block";
     }
+    /** A ring never draws across the site's fixed header (nav and announcement bar): what lies under it is cut off. `top` is the ring's outer top edge. */
+    const clipUnderHeader = (top: number): string => {
+      const hd = document.querySelector("header")?.getBoundingClientRect().bottom ?? 0;
+      return hd > top ? `inset(${Math.ceil(hd - top)}px -20px -20px -20px)` : "none";
+    };
     /** The ring for keyboard focus on a photo/marker: two tones (white, then ink) so it shows on any picture, kept on screen even for a full-bleed photo. */
     function positionFocusRing() {
       if (!fring) return;
@@ -339,6 +345,7 @@ export default function EditBridge() {
       const rad = parseFloat(getComputedStyle(el).borderTopLeftRadius) || 0;
       fring.style.borderRadius = `${Math.max(7, rad)}px`;
       fring.style.left = `${l}px`; fring.style.top = `${t}px`; fring.style.width = `${rt - l}px`; fring.style.height = `${b - t}px`;
+      fring.style.clipPath = clipUnderHeader(t - 6);
       fring.style.display = "block";
     }
     const clearMarks = () => {
@@ -358,6 +365,14 @@ export default function EditBridge() {
     const sections = () => Array.from(document.querySelectorAll<HTMLElement>("[data-section]"));
     const KIND_ATTR: Record<string, string> = { text: "data-cms", image: "data-cms-img", link: "data-cms-link", section: "data-section", pick: "data-cms-pick" };
 
+    /** How a photo is framed where it sits now: the editor draws the chosen picture the same way (how it is fitted, and which part it keeps). */
+    const frameOf = (el: HTMLElement): { fit: string; pos: string; known: boolean } => {
+      const img = el.matches("img") ? el : el.querySelector("img");
+      const cs = getComputedStyle(img ?? el);
+      if (img) return { fit: cs.objectFit || "fill", pos: cs.objectPosition || "50% 50%", known: true };
+      // a background picture: its size and position; an element with no picture of its own (the invisible marker over a hero) is not known
+      return cs.backgroundImage && cs.backgroundImage !== "none" ? { fit: cs.backgroundSize || "cover", pos: cs.backgroundPosition || "50% 50%", known: true } : { fit: "cover", pos: "50% 50%", known: false };
+    };
     /** Select an element: ring it and tell Studio. `extra` rides along (label/href); `echo` marks an editor:select answer. */
     function select(el: HTMLElement, kind: "text" | "image" | "link" | "section" | "pick", extra: Record<string, unknown> = {}, opts: { echo?: boolean; quiet?: boolean } = {}) {
       const attr = KIND_ATTR[kind];
@@ -369,7 +384,7 @@ export default function EditBridge() {
       if (opts.quiet || (same && !opts.echo)) return;
       // a text or pick selection says what the element reads now (trimmed, spaces collapsed, capped), so Studio can show it
       const text = kind === "text" || kind === "pick" ? { text: (el.textContent || "").replace(/\s+/g, " ").trim().slice(0, SELECT_TEXT_CAP) } : {};
-      post({ type: "cms:select", path: value, kind: kind === "pick" ? "text" : kind, box: boxOf(el), ...text, ...extra, ...(opts.echo ? { echo: true } : {}) });
+      post({ type: "cms:select", path: value, kind: kind === "pick" ? "text" : kind, box: boxOf(el), ...(kind === "image" ? { frame: frameOf(el) } : {}), ...text, ...extra, ...(opts.echo ? { echo: true } : {}) });
     }
     function clearSelection(tell: boolean) {
       const had = !!sel;
@@ -562,6 +577,9 @@ export default function EditBridge() {
       let rect: DOMRect | null = null;
       try { rect = f.range.getBoundingClientRect(); } catch { rect = null; }
       if (!rect || (rect.width === 0 && rect.height === 0)) rect = f.el.getBoundingClientRect();
+      // the words scrolled out of the window (or under the header): the bar does not stay behind, pinned over the page; it is back with the words
+      const hd = document.querySelector("header")?.getBoundingClientRect().bottom ?? 0;
+      if (rect.bottom < hd + 4 || rect.top > innerHeight - 4) { if (!card || card.style.display !== "flex") hideBar(); return; }
       bar.style.display = "flex";
       const bw = bar.offsetWidth || 150;
       let top = rect.top - (bar.offsetHeight || 38) - 10;
@@ -1038,6 +1056,12 @@ export default function EditBridge() {
           // bring it into view first, so the box we answer with is where the person will see it
           try { hit.el.scrollIntoView({ block: "nearest" }); } catch { /* old engine */ }
           select(hit.el, hit.kind, hit.kind === "text" ? textExtra(hit.el) : {}, { echo: true });
+          // the section rail pressed from the keyboard: the keyboard goes into the section, to its first stop
+          if (hit.kind === "section" && d.focusIn === true && effMode() === "edit") {
+            const first = Array.from(hit.el.querySelectorAll<HTMLElement>("[data-cms],[data-cms-img],[data-cms-pick]")).find((n) => n.getAttribute("tabindex") === "0" && n.getClientRects().length > 0 && (n.hasAttribute("data-cms") ? editable.has(n) : true));
+            if (first) { kbdNav = true; first.focus({ preventScroll: true }); ensureVisible(first); }
+            return;
+          }
           if (hit.kind === "text" && effMode() === "edit" && editable.has(hit.el)) {
             hit.el.focus({ preventScroll: true });
             setCaretAt(hit.el, textLen(hit.el));
