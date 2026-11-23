@@ -144,6 +144,8 @@ try {
         const of = window.fetch; window.fetch = function (i, ...a) { try { const u = typeof i === "string" ? i : i && i.url; if (/^data:/i.test(u || "")) window.__csp.push(`initiator fetch(${String(u).slice(0, 40)}) ${new Error().stack.split("\n").slice(2, 6).join(" | ")}`); } catch {} return of.call(this, i, ...a); };
         const ox = XMLHttpRequest.prototype.open; XMLHttpRequest.prototype.open = function (m, u, ...a) { try { if (/^data:/i.test(String(u))) window.__csp.push(`initiator xhr(${String(u).slice(0, 40)}) ${new Error().stack.split("\n").slice(2, 6).join(" | ")}`); } catch {} return ox.call(this, m, u, ...a); };
       });
+      // No form on the site takes a sign-up while NEWSLETTER_SIGNUP_LIVE is false, so no page may load the Turnstile widget for nothing.
+      if (!LIVE) page.on("request", (r) => { if (/(^|\.)challenges\.cloudflare\.com$/.test(new URL(r.url()).hostname)) note(label, "turnstile loaded", `${r.url()} (no form needs it)`); });
       page.on("pageerror", (e) => note(label, "page error", e.message));
       // --live only. Two things are not ours and not ours to fix, so they print as WARN, never FAIL:
       //  (1) the Cloudflare Web Analytics beacon the edge injects (the owner's call: allow it in the policy or turn it off for the hostname);
@@ -192,6 +194,13 @@ try {
             await loc.scrollIntoViewIfNeeded(); await page.waitForTimeout(500);
             await loc.screenshot({ path: join(SHOTS, `${MODE}-${sec}-${v.name === "desktop" ? "1440" : v.name === "laptop" ? "1366" : "390"}.png`) });
           }
+        }
+        if (SHOTS && (path === "/news/" || path === "/") && v.name !== "laptop") {
+          await page.evaluate(() => { for (const el of document.querySelectorAll("body *")) if (getComputedStyle(el).position === "fixed") el.style.display = "none"; });
+          const tag = path === "/" ? "home" : "news";
+          await page.locator("footer").first().scrollIntoViewIfNeeded(); await page.waitForTimeout(400);
+          await page.locator("footer").first().screenshot({ path: join(SHOTS, `footer-${tag}-${v.name === "desktop" ? "1440" : "390"}.png`) });
+          if (path === "/news/") await page.locator("[data-section='weekly-hero']").first().screenshot({ path: join(SHOTS, `news-hero-${v.name === "desktop" ? "1440" : "390"}.png`) }).catch(() => {});
         }
         if (!LIVE && path === "/events/" && v.name === "desktop") {
           const txt = (await page.textContent("main")) || "";

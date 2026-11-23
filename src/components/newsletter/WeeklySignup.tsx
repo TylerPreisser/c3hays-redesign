@@ -4,6 +4,7 @@ import { useState, type CSSProperties } from "react";
 import { Check } from "lucide-react";
 import { tx } from "@/lib/home-content";
 import TurnstileWidget from "./TurnstileWidget";
+import { NEWSLETTER_CALL_LINE, NEWSLETTER_SIGNUP_LIVE } from "@/lib/newsletter-signup";
 import { SIGNUP_DONE, SIGNUP_ERRORS, SIGNUP_NOTE, useSignup } from "./useSignup";
 import { useSignupConfig } from "@/providers/SignupConfigProvider";
 
@@ -78,6 +79,13 @@ export default function WeeklySignup({ text = {}, bgKey = "weekly-signup-card", 
     ...style,
   };
 
+  if (!NEWSLETTER_SIGNUP_LIVE) {
+    return (
+      <div className={className} data-cms-bg={bgKey} style={surface} aria-label="C3 News by email">
+        <p className="body-base" style={{ color: onLight ? "var(--color-ink)" : "#fff", fontWeight: 600, textShadow: labelShadow, margin: 0, ...(onLight ? {} : { background: "rgba(10,12,14,0.55)", padding: "1rem 1.25rem", borderRadius: "var(--radius-md)" }) }}>{NEWSLETTER_CALL_LINE}</p>
+      </div>
+    );
+  }
   return (
     <div className={className} data-cms-bg={bgKey} style={surface} aria-label="Subscribe to C3 News">
       {status === "done" ? (

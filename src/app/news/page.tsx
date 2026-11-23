@@ -114,7 +114,7 @@ export default async function NewsPage({
                   <Tx
                     text={t}
                     k="weekly-hero-lead"
-                    fallback="What&rsquo;s coming up, this week&rsquo;s message, and simple next steps. Leave your email and the church office will add you, or browse past issues below."
+                    fallback="What&rsquo;s coming up, this week&rsquo;s message, and simple next steps. Browse past issues below."
                     as="p"
                     className="body-lg"
                     style={{ color: "rgba(255,255,255,0.82)", maxWidth: "34rem", lineHeight: 1.7 }}

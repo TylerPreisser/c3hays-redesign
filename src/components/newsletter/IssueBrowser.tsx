@@ -132,7 +132,7 @@ export default function IssueBrowser({ issues }: IssueBrowserProps) {
           </span>
           <p className="body-base" style={{ color: "var(--color-mute)" }}>
             The first issue of <strong style={{ color: "var(--color-ink)" }}>C3 News</strong> is
-            on its way. Leave your email and the church office will add you.
+            on its way.
           </p>
         </div>
       ) : filtered.length === 0 ? (

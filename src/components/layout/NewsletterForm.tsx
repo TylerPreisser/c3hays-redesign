@@ -4,6 +4,7 @@ import { useState } from "react";
 import TurnstileWidget from "@/components/newsletter/TurnstileWidget";
 import { SIGNUP_DONE, SIGNUP_ERRORS, SIGNUP_NOTE, useSignup } from "@/components/newsletter/useSignup";
 import { useSignupConfig } from "@/providers/SignupConfigProvider";
+import { NEWSLETTER_CALL_LINE, NEWSLETTER_SIGNUP_LIVE } from "@/lib/newsletter-signup";
 
 export default function NewsletterForm() {
   const { turnstileSiteKey } = useSignupConfig();
@@ -13,6 +14,9 @@ export default function NewsletterForm() {
   const [trap, setTrap] = useState("");
   const small = { color: "rgba(255,255,255,0.55)", fontSize: "0.75rem", lineHeight: 1.5, margin: 0 } as const;
 
+  if (!NEWSLETTER_SIGNUP_LIVE) {
+    return <p style={{ ...small, color: "rgba(255,255,255,0.85)", fontSize: "0.9rem" }}>{NEWSLETTER_CALL_LINE}</p>;
+  }
   if (status === "done") {
     return <p role="status" style={{ ...small, color: "rgba(255,255,255,0.85)", fontSize: "0.85rem" }}>{SIGNUP_DONE}</p>;
   }

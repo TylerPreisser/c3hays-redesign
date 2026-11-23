@@ -71,16 +71,20 @@ describe("M8 events with eSpace failing", () => {
 });
 
 describe("M3 and M5 the newsletter form and the app bar", () => {
-  it("the footer form says what happens, is required, posts, and uses one name", async () => {
+  it("while nobody at the church reads signups: no email field, no Turnstile, the call-the-office line, one name", async () => {
+    const { NEWSLETTER_SIGNUP_LIVE } = await import("@/lib/newsletter-signup");
+    expect(NEWSLETTER_SIGNUP_LIVE).toBe(false);
     const { default: Form } = await import("@/components/layout/NewsletterForm");
+    const { default: Weekly } = await import("@/components/newsletter/WeeklySignup");
     const { SignupConfigProvider } = await import("@/providers/SignupConfigProvider");
-    const html = renderToStaticMarkup(createElement(SignupConfigProvider as never, { turnstileSiteKey: "k" } as never, createElement(Form)));
-    expect(html).not.toContain("does not subscribe");
-    expect(html).toContain("the church office will add you to C3 News");
-    expect(html).toContain('method="post"');
-    expect(html).toContain('action="/api/newsletter/subscribe"');
-    expect(html).toMatch(/<input[^>]*type="email"[^>]*required|<input[^>]*required[^>]*type="email"/);
-    expect(html).not.toContain("C3 Weekly");
+    for (const el of [createElement(Form), createElement(Weekly)]) {
+      const html = renderToStaticMarkup(createElement(SignupConfigProvider as never, { turnstileSiteKey: "k" } as never, el));
+      expect(html).toContain("Want C3 News by email? Call the office at (785) 625-5483.");
+      expect(html).not.toContain("<input");
+      expect(html).not.toContain("<form");
+      expect(html).not.toContain("does not subscribe");
+      expect(html).not.toContain("C3 Weekly");
+    }
   });
   it("a bare App Store front page becomes the church's app listing; a real listing and a site link are left alone", async () => {
     const { appListing } = await import("@/lib/announcements");
