@@ -17,5 +17,7 @@ ci_steps() {
   [ -f "$WT/.next/BUILD_ID" ] || { echo "next build left no .next/BUILD_ID" >> "$LOG"; return 1; }
   run audit . npm audit --omit=dev --audit-level=high
   run regression-bed . bash regression/run.sh
+  # Ready to switch on once `playwright` is an exact-version devDependency (then set PLAYWRIGHT_DIR=$WT in the step); today it runs in scripts/deploy-staging.sh build:
+  # run csp-crawl . env PLAYWRIGHT_DIR="$WT" npm run check:csp
 }
 ci_summary() { printf 'tsc clean; SSR build %s' "$(cat "$WT/.next/BUILD_ID" 2>/dev/null)"; }

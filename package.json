@@ -11,6 +11,7 @@
     "test:watch": "vitest",
     "shoot:sections": "node scripts/shoot-sections.mjs",
     "cf:build": "opennextjs-cloudflare build",
+    "check:csp": "CMS_LIVE=1 NEXT_PUBLIC_CMS_URL=http://127.0.0.1:4673 npm run cf:build && node scripts/csp-crawl.mjs",
     "cf:deploy": "opennextjs-cloudflare deploy",
     "cf:preview": "opennextjs-cloudflare preview"
   },

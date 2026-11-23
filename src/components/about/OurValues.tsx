@@ -143,7 +143,9 @@ export default function OurValues({
                 />
               </div>
 
-              {/* Body */}
+              {/* Body: shown only when it says something the line above does not (a card must not say its sentence twice) */}
+              {tx(text, `about-value-${v.id}-body`, v.body).replace(/\s+/g, " ").trim().toLowerCase() !==
+                tx(text, `about-value-${v.id}-line`, `We exist to ${v.line}.`).replace(/\s+/g, " ").trim().toLowerCase() && (
               <div className="md:col-span-6">
                 <p
                   className="body-lg"
@@ -159,6 +161,7 @@ export default function OurValues({
                   }}
                 />
               </div>
+              )}
             </div>
           ))}
         </div>

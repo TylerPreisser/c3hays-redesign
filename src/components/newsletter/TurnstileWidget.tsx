@@ -39,6 +39,8 @@ export default function TurnstileWidget({ siteKey, onToken, resetKey = 0, theme 
         id.current = window.turnstile.render(box.current, {
           sitekey: siteKey,
           theme,
+          // nothing shows under the field unless Turnstile needs the visitor to do something
+          appearance: "interaction-only",
           callback: (t: string) => cb.current(t),
           "expired-callback": () => cb.current(null),
           "error-callback": () => cb.current(null),

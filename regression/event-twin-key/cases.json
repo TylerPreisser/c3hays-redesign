@@ -1,0 +1,77 @@
+{
+  "about": "The twin key of an event: the church day, the start minute (or all-day) and the normalised title. Two events with the same key are one occasion; when both campuses are known and differ they are two. The same file, byte for byte, is replayed by the website and by Studio.",
+  "label": "CHARACTERIZATION of the rule written in DESIGN-event-reach.md sections 4.3 and 4.6 (the rule's own text is the oracle). The only real-world input is the Wednesday 2 December 2026, 6:30 PM Central Marriage Night the church wrote in its own newsletter. Every other title is a plain stand-in; no names, no addresses.",
+  "zone": "America/Chicago",
+  "normalise": "lower case; accents removed; every run of characters that are not letters or digits becomes one space; trimmed",
+  "key_format": "YYYY-MM-DD|HH:MM|<normalised title>   (all-day events: YYYY-MM-DD|all-day|<normalised title>)",
+  "instants": [
+    { "name": "winter, evening Central falls on the next UTC day", "instant": "2026-12-03T00:30:00.000Z", "wall": "2026-12-02T18:30" },
+    { "name": "summer time (UTC-5)", "instant": "2026-07-05T23:30:00.000Z", "wall": "2026-07-05T18:30" },
+    { "name": "just before the church midnight", "instant": "2026-12-13T05:59:00.000Z", "wall": "2026-12-12T23:59" },
+    { "name": "church midnight", "instant": "2026-12-13T06:00:00.000Z", "wall": "2026-12-13T00:00" },
+    { "name": "spring forward day, after the change", "instant": "2026-03-08T14:00:00.000Z", "wall": "2026-03-08T09:00" },
+    { "name": "fall back day, after the change", "instant": "2026-11-01T14:00:00.000Z", "wall": "2026-11-01T08:00" }
+  ],
+  "keys": [
+    { "title": "Marriage Night", "wall": "2026-12-02T18:30", "allDay": false, "key": "2026-12-02|18:30|marriage night" },
+    { "title": "  MARRIAGE   NIGHT!  ", "wall": "2026-12-02T18:30", "allDay": false, "key": "2026-12-02|18:30|marriage night" },
+    { "title": "Café Night: Hays & Colby", "wall": "2026-12-05T19:00", "allDay": false, "key": "2026-12-05|19:00|cafe night hays colby" },
+    { "title": "Community Meal", "wall": "2026-12-06T00:00", "allDay": true, "key": "2026-12-06|all-day|community meal" }
+  ],
+  "pairs": [
+    {
+      "name": "same day, same minute, same title: one occasion (the Studio one is kept)",
+      "a": { "source": "studio", "title": "Marriage Night", "wall": "2026-12-02T18:30", "allDay": false, "campus": null },
+      "b": { "source": "espace", "title": "Marriage Night", "wall": "2026-12-02T18:30", "allDay": false, "campus": null },
+      "result": "merge"
+    },
+    {
+      "name": "same occasion with different capitals, spacing and punctuation",
+      "a": { "source": "studio", "title": "Marriage Night", "wall": "2026-12-02T18:30", "allDay": false, "campus": "Hays" },
+      "b": { "source": "espace", "title": "MARRIAGE  NIGHT!", "wall": "2026-12-02T18:30", "allDay": false, "campus": "Hays" },
+      "result": "merge"
+    },
+    {
+      "name": "one side does not know the campus: still one occasion",
+      "a": { "source": "studio", "title": "Marriage Night", "wall": "2026-12-02T18:30", "allDay": false, "campus": "Hays" },
+      "b": { "source": "espace", "title": "Marriage Night", "wall": "2026-12-02T18:30", "allDay": false, "campus": null },
+      "result": "merge"
+    },
+    {
+      "name": "same title, same minute, other campus: two events, both kept",
+      "a": { "source": "studio", "title": "Community Meal", "wall": "2026-12-06T12:00", "allDay": false, "campus": "Hays" },
+      "b": { "source": "espace", "title": "Community Meal", "wall": "2026-12-06T12:00", "allDay": false, "campus": "Colby" },
+      "result": "keep_both"
+    },
+    {
+      "name": "same title, same day, other minute: two events, both kept",
+      "a": { "source": "studio", "title": "Marriage Night", "wall": "2026-12-02T18:30", "allDay": false, "campus": "Hays" },
+      "b": { "source": "espace", "title": "Marriage Night", "wall": "2026-12-02T18:31", "allDay": false, "campus": "Hays" },
+      "result": "keep_both"
+    },
+    {
+      "name": "same title, other day: two events, both kept",
+      "a": { "source": "studio", "title": "Marriage Night", "wall": "2026-12-02T18:30", "allDay": false, "campus": null },
+      "b": { "source": "espace", "title": "Marriage Night", "wall": "2026-12-09T18:30", "allDay": false, "campus": null },
+      "result": "keep_both"
+    },
+    {
+      "name": "a paraphrased title is not matched (stated residual: it shows twice)",
+      "a": { "source": "studio", "title": "Marriage Night", "wall": "2026-12-02T18:30", "allDay": false, "campus": null },
+      "b": { "source": "espace", "title": "Marriage Nights Are Back", "wall": "2026-12-02T18:30", "allDay": false, "campus": null },
+      "result": "keep_both"
+    },
+    {
+      "name": "all-day on the same day with the same title: one occasion",
+      "a": { "source": "studio", "title": "Community Meal", "wall": "2026-12-06T00:00", "allDay": true, "campus": null },
+      "b": { "source": "espace", "title": "Community Meal", "wall": "2026-12-06T00:00", "allDay": true, "campus": null },
+      "result": "merge"
+    },
+    {
+      "name": "an all-day event and a timed event with one title are two events",
+      "a": { "source": "studio", "title": "Community Meal", "wall": "2026-12-06T00:00", "allDay": true, "campus": null },
+      "b": { "source": "espace", "title": "Community Meal", "wall": "2026-12-06T12:00", "allDay": false, "campus": null },
+      "result": "keep_both"
+    }
+  ]
+}

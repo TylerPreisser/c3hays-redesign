@@ -132,7 +132,7 @@ describe("campus pages are named sections", () => {
   });
 });
 
-describe("an unconfirmed service time says so wherever times are listed", () => {
+describe("an unconfirmed service time is shown, with ONE plain call-to-check line per page", () => {
   const withTbc = (on: boolean) => {
     const recs = JSON.parse(JSON.stringify(locations));
     const sat = recs.find((l: any) => l.slug === "hays").services[0].slots[0];
@@ -155,12 +155,19 @@ describe("an unconfirmed service time says so wherever times are listed", () => 
     const hays = renderToStaticMarkup(await ((await import("@/app/locations/hays/page")).default as (p: object) => Promise<React.ReactElement>)({}));
     return { home, footer, visit, hays };
   }
-  it("a campus with one unconfirmed slot shows the note on Home, the campus page, the footer and Plan a Visit", async () => {
+  const CHECK = "to check before you come";
+  const count = (html: string, needle: string) => html.split(needle).length - 1;
+  it("the time is shown plainly everywhere; no caveat rides on it; only the footer carries the one line", async () => {
     const p = await places(withTbc(true));
-    for (const [name, html] of Object.entries(p)) expect(html, name).toContain("5:00 PM (time to be confirmed)");
+    for (const [name, html] of Object.entries(p)) {
+      expect(html, name).toContain("5:00 PM");
+      expect(html, name).not.toContain("to be confirmed");
+      if (name === "footer") expect(count(html, CHECK), name).toBe(1);
+      else expect(html, name).not.toContain(CHECK);
+    }
   });
-  it("confirmed, and a record without the field, show no note", async () => {
+  it("confirmed, and a record without the field, show no line at all", async () => {
     const p = await places(withTbc(false));
-    for (const [name, html] of Object.entries(p)) { expect(html, name).not.toContain("to be confirmed"); expect(html, name).toContain("5:00 PM"); }
+    for (const [name, html] of Object.entries(p)) { expect(html, name).not.toContain("to be confirmed"); expect(html, name).not.toContain(CHECK); expect(html, name).toContain("5:00 PM"); }
   });
 });

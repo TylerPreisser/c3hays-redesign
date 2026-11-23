@@ -33,7 +33,8 @@ export function contentSecurityPolicy(opts: { studio: string; dev?: boolean }): 
     "font-src": ["'self'", "data:", "https://fonts.gstatic.com"],
     "img-src": ["'self'", "data:", "blob:", "https:"],
     "media-src": ["'self'", "blob:", "https:"],
-    "connect-src": ["'self'", turnstile, ...(opts.dev ? ["ws://localhost:*", "http://localhost:*"] : [])],
+    // https://app.espace.cool: the Events page's browser code reads the church's eSpace calendar from it (src/lib/espace.ts, GetFullCalendarEvents). That one origin, for fetch only: nothing from eSpace is framed or loaded as script.
+    "connect-src": ["'self'", turnstile, "https://app.espace.cool", ...(opts.dev ? ["ws://localhost:*", "http://localhost:*"] : [])],
     "frame-src": [turnstile, "https://www.youtube.com", "https://www.youtube-nocookie.com", "https://www.google.com", "https://maps.google.com"],
     "frame-ancestors": ancestors,
     "form-action": ["'self'"],

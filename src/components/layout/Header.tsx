@@ -9,6 +9,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X, ChevronDown, Search } from "lucide-react";
 import { textNavItems, searchItem, navGroups, ctaItem } from "@/data/navigation";
 import type { NavItem as StudioNavItem } from "@/lib/cms";
+import AnnouncementBar from "@/components/layout/AnnouncementBar";
 import Logo from "@/components/brand/Logo";
 import type { CMSOverrides } from "@/lib/cms";
 import { tx } from "@/lib/home-content";
@@ -165,8 +166,8 @@ export default function Header({ globals = {}, menu = null, announcements = [] }
   // one "More" toggle, so the order the church chose is the order shown.
   const groupEntries: BarEntry[] = fromStudio
     ? [
-        ...fullEntries.slice(0, 4),
-        ...(fullEntries.length > 4
+        ...fullEntries.slice(0, fullEntries.length === 5 ? 5 : 4), // a single left-over entry (Connect) stays its own row, not "More"
+        ...(fullEntries.length > 5
           ? [{
               key: "grp-more",
               label: "More",
@@ -192,6 +193,14 @@ export default function Header({ globals = {}, menu = null, announcements = [] }
       ? {
           onMouseEnter: () => setOpenMenu(entry.key),
           onMouseLeave: () => setOpenMenu((cur) => (cur === entry.key ? null : cur)),
+          // keyboard: focus anywhere inside keeps the panel open, so Tab reaches its links; leaving it closes it
+          onFocus: () => setOpenMenu(entry.key),
+          onBlur: (e: React.FocusEvent<HTMLLIElement>) => {
+            if (!e.currentTarget.contains(e.relatedTarget as Node | null)) setOpenMenu((cur) => (cur === entry.key ? null : cur));
+          },
+          onKeyDown: (e: React.KeyboardEvent<HTMLLIElement>) => {
+            if (e.key === "Escape") { setOpenMenu(null); (e.currentTarget.querySelector("a,button") as HTMLElement | null)?.focus(); }
+          },
         }
       : {};
     const parentCls = `nav-link-underline flex items-center gap-1 ${padClass} py-2 text-xs font-semibold uppercase tracking-[0.12em] transition-colors duration-200`;
@@ -277,20 +286,7 @@ export default function Header({ globals = {}, menu = null, announcements = [] }
           ...(nav.bg && isScrolled ? { backgroundColor: nav.bg } : {}),
         }}
       >
-        {!mobileOpen && announcements.map((announcement) => (
-          <div key={announcement.id} role="region" aria-label="Announcement" data-announcement {...pickProps(pickEdit, `announcement:${announcement.id}`)} style={{ background: "#0f3f3a", color: "#fff" }}>
-            <p className="container-c3 body-sm" style={{ margin: 0, padding: "0.45rem 0", display: "flex", flexWrap: "wrap", gap: "0.25rem 0.75rem", alignItems: "center", justifyContent: "center", textAlign: "center" }}>
-              {announcement.eyebrow && <span data-announcement-eyebrow style={{ color: "rgba(255,255,255,0.86)" }}>{announcement.eyebrow}</span>}
-              <strong>{announcement.title}</strong>
-              {announcement.body && <span style={{ color: "rgba(255,255,255,0.86)" }}>{announcement.body}</span>}
-              {announcement.linkUrl && (
-                <a href={announcement.linkUrl} style={{ color: "#7ff0e0", fontWeight: 600, textDecoration: "underline", textUnderlineOffset: 3, display: "inline-block", padding: "0.3rem 0.25rem" }}>
-                  {announcement.linkLabel || "Learn more"}
-                </a>
-              )}
-            </p>
-          </div>
-        ))}
+        {!mobileOpen && announcements.map((announcement) => <AnnouncementBar key={announcement.id} announcement={announcement} pickAttrs={pickProps(pickEdit, `announcement:${announcement.id}`)} canDismiss={!pickEdit} />)}
         <nav ref={navRef} className="container-c3 flex items-center justify-between h-16 lg:h-[4.5rem]">
 
           {/* Logo — light on transparent dark hero, dark on scrolled white header */}

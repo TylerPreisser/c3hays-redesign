@@ -4,7 +4,8 @@
 # frames it), but tells search engines to stay out. Never touches the production Worker `c3hays-live`. Three commands:
 #   build <sha>        no remote write. Clean detached worktree of <sha>, npm ci, tsc, `cf:build` with the staging
 #                      origins, `wrangler deploy --dry-run --env staging`, then scripts/smoke-workerd.mjs (the built Worker
-#                      under workerd). Writes BUILD_ID = <sha>-<UTC> beside the worktree; the sha is re-read from the built tree.
+#                      under workerd), then scripts/csp-crawl.mjs --artifact (every page type in a real browser; fails on any
+#                      CSP violation or failed request; needs PLAYWRIGHT_DIR, a directory whose node_modules/playwright has Chromium). Writes BUILD_ID = <sha>-<UTC> beside the worktree; the sha is re-read from the built tree.
 #   rollout <worktree> remote write. Prints the rollback command first, then `wrangler deploy --env staging`.
 #   verify <BUILD_ID>  fetches the live address: 200 on / /news /locations/hays /search, 404 on an unknown path, x-c3-build = BUILD_ID,
 #                      X-Robots-Tag noindex, robots.txt disallow-all, frame-ancestors = Studio staging only.
@@ -31,6 +32,8 @@ guard_name() {
 
 cmd_build() {
   local SHA_ARG="${1:?usage: deploy-staging.sh build <sha>}" SHA BASE WT BUILD_ID BUILT
+  # the browser check at the end needs Playwright: name the variable now, not after a long build
+  [ -n "${PLAYWRIGHT_DIR:-}" ] && [ -d "$PLAYWRIGHT_DIR/node_modules/playwright" ] || die "set PLAYWRIGHT_DIR to a directory whose node_modules/playwright has Chromium installed (e.g. the Studio repo); it is unset or does not hold playwright"
   git -C "$REPO" fetch -q origin
   SHA="$(git -C "$REPO" rev-parse --verify --quiet "${SHA_ARG}^{commit}" || true)"
   [ -n "$SHA" ] || die "$SHA_ARG is not a commit"
@@ -53,6 +56,9 @@ cmd_build() {
   npx --no-install wrangler deploy --dry-run --env staging --outdir "$BASE/dist" > "$BASE/dry.log" 2>&1 || { cat "$BASE/dry.log"; exit 1; }
   node "$REPO/scripts/smoke-workerd.mjs" --dir "$WT" --env staging --port "${SMOKE_PORT:-4641}" > "$BASE/smoke.log" 2>&1 || { cat "$BASE/smoke.log"; die "the built Worker failed under workerd: no rollout"; }
   cat "$BASE/smoke.log"
+  # Every page type of the built Worker in a real browser: a policy violation or failed request refuses the build.
+  node "$REPO/scripts/csp-crawl.mjs" --artifact --dir "$WT" --port "${CRAWL_PORT:-4652}" > "$BASE/csp-crawl.log" 2>&1 || { cat "$BASE/csp-crawl.log"; die "the built site fails the browser policy check: no rollout"; }
+  cat "$BASE/csp-crawl.log"
   printf '%s\n' "$BUILD_ID" > "$BASE/build-id"
   echo "== built $BUILD_ID in $WT (no remote write)"
   echo "== ROLLOUT, its own command: ALLOW_DEPLOY=1 python3 ~/.claude/tools/secrets.py env CLOUDFLARE_API_TOKEN_PREISSER:CLOUDFLARE_API_TOKEN -- bash \"$REPO/scripts/deploy-staging.sh\" rollout \"$WT\""
@@ -103,14 +109,21 @@ cmd_verify() {
   echo "ok: /media/<missing name> -> 404 from the media route"
   [ "$(header_of x-robots-tag "$T/h.head")" = "noindex, nofollow" ] || die "X-Robots-Tag missing on /"
   echo "ok: X-Robots-Tag noindex, nofollow"
-  p="$(curl -sS --max-time 30 "$URL/" | grep -o '/_next/static/[^"]*\.js' | head -1)"; [ -n "$p" ] || die "no static asset found on /"
+  home="$(curl -sS --max-time 30 "$URL/")"   # no pipe into grep -q / head: under pipefail an early exit gives curl EPIPE (23)
+  p="$(grep -o '/_next/static/[^"]*\.js' <<<"$home" | head -1 || true)"; [ -n "$p" ] || die "no static asset found on /"
   [ "$(curl -sSI --max-time 30 "$URL$p" | grep -i '^x-robots-tag:' | tr -d '\r' | sed 's/^[^:]*: *//')" = "noindex, nofollow" ] || die "X-Robots-Tag missing on the static asset $p"
   echo "ok: X-Robots-Tag on the static asset $p"
-  curl -sS --max-time 30 "$URL/robots.txt" | grep -q '^Disallow: /$' || die "robots.txt is not disallow-all"
+  robots="$(curl -sS --max-time 30 "$URL/robots.txt")"
+  grep -q '^Disallow: /$' <<<"$robots" || die "robots.txt is not disallow-all"
   echo "ok: robots.txt disallow-all"
   csp="$(header_of content-security-policy "$T/h.head")"
   [[ "$csp" == *"frame-ancestors $STUDIO;"* || "$csp" == *"frame-ancestors $STUDIO" ]] || die "frame-ancestors is not exactly $STUDIO"
   echo "ok: frame-ancestors $STUDIO"
+  # Every page type of the LIVE origin in a real browser, third parties not stubbed: a policy violation or failed request of ours fails verify
+  # (the Cloudflare beacon and the Turnstile widget's own frame print as WARN: see scripts/csp-crawl.mjs). Needs PLAYWRIGHT_DIR like build.
+  [ -n "${PLAYWRIGHT_DIR:-}" ] && [ -d "$PLAYWRIGHT_DIR/node_modules/playwright" ] || die "set PLAYWRIGHT_DIR to a directory whose node_modules/playwright has Chromium installed: verify runs the live browser policy check"
+  node "$REPO/scripts/csp-crawl.mjs" --live "$URL" > "$T/csp-live.log" 2>&1 || { cat "$T/csp-live.log"; die "the live site fails the browser policy check"; }
+  cat "$T/csp-live.log"
 }
 
 case "${1:-}" in

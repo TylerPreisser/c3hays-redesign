@@ -15,5 +15,9 @@ export default defineConfig({
   test: {
     environment: "node", // jsdom is opt-in per file via `// @vitest-environment jsdom`
     include: ["tests/**/*.test.ts", "tests/**/*.test.tsx"],
+    setupFiles: ["tests/support/gsap-teardown.ts"],
+    // several files cold-import a whole page in beforeAll; two suites at once on a busy machine pass 10 s
+    hookTimeout: 60_000,
+    testTimeout: 30_000,
   },
 });

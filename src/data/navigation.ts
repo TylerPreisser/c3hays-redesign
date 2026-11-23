@@ -24,9 +24,9 @@ export const navItems: NavItem[] = [
     ],
   },
   { label: "Messages", href: "/messages/" },
-  // The C3 Weekly now lives at its OWN page, /news. The legacy /newsletter route is
+  // C3 News now lives at its OWN page, /news. The legacy /newsletter route is
   // kept as a redirect → /news (SEO/back-compat) by the page coder.
-  { label: "C3 Weekly", href: "/news/" },
+  { label: "C3 News", href: "/news/" },
   // Events is a real top-level page (built by the events coder at /events/).
   { label: "Events", href: "/events/" },
   { label: "Watch", href: "/watch/" },
@@ -80,7 +80,7 @@ export const navGroups: NavGroup[] = [
     label: "Media",
     children: [
       { label: "Messages", href: "/messages/" },
-      { label: "C3 Weekly", href: "/news/" },
+      { label: "C3 News", href: "/news/" },
       { label: "Events", href: "/events/" },
       { label: "Watch", href: "/watch/" },
     ],

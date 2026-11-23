@@ -98,7 +98,9 @@ try {
       const res = await fetch(`http://127.0.0.1:${PORT}${path}`, { redirect: "manual" });
       const body = await res.text();
       const ct = res.headers.get("content-type") || "";
-      if (res.status === 404 && /^text\/plain/.test(ct) && !/<html/i.test(body)) ok(`${path} -> 404 from the media route`);
+      // a well-formed name asks Studio: 404 when it has no such file, or 502 when this machine cannot reach the Studio a staging build is aimed at; either way the route's plain text, never a page
+      const wellFormed = /^\/media\/[A-Za-z0-9_-]{22}\.png$/.test(path);
+      if ((res.status === 404 || (wellFormed && res.status === 502)) && /^text\/plain/.test(ct) && !/<html/i.test(body)) ok(`${path} -> ${res.status} from the media route`);
       else fail(`${path} -> ${res.status} ${ct}: ${firstLine(body)} (expected the media route's plain 404)`);
     }
   }

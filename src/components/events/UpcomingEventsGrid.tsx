@@ -34,8 +34,10 @@ const GRID: React.CSSProperties = {
 
 function detailLine(ev: CalEvent): string {
   const desc = ev.description ? ev.description.trim() : "";
-  const clipped = desc.length > 60 ? `${desc.slice(0, 60).trimEnd()}…` : desc;
-  return clipped ? `${ev.timeLabel} · ${clipped}` : ev.timeLabel;
+  const clipped = desc.length > 140 ? `${desc.slice(0, 140).trimEnd()}…` : desc;
+  // an event made in Studio says its whole day and time ("Wednesday, December 2 · 6:30 PM"); the chip above shows only month and day
+  const when = ev.whenLabel ?? ev.timeLabel;
+  return clipped ? `${when} · ${clipped}` : when;
 }
 
 function campusLabel(ev: CalEvent): string {

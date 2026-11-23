@@ -3,8 +3,8 @@
 import { useCallback, useState } from "react";
 
 /** What the form says. Until Studio sends C3 News or the church's mailing-list key exists, the address is only recorded. */
-export const SIGNUP_NOTE = "We record your address for the church. This does not subscribe you to C3 News yet.";
-export const SIGNUP_DONE = "Thanks. We have recorded your address for the church. You are not subscribed to C3 News yet.";
+export const SIGNUP_NOTE = "Leave your email and the church office will add you to C3 News.";
+export const SIGNUP_DONE = "Thanks. The church office will add you to C3 News.";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 export type SignupStatus = "idle" | "sending" | "done" | "invalid" | "captcha" | "limited" | "failed";

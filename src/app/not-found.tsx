@@ -1,6 +1,11 @@
 import Link from "next/link";
 import Image from "next/image";
+import type { Metadata } from "next";
 import { assetPath } from "@/lib/asset-path";
+import { site } from "@/data/site";
+
+// The browser tab and a screen reader must not call this the home page.
+export const metadata: Metadata = { title: "Page not found" };
 
 export default function NotFound() {
   return (
@@ -35,6 +40,16 @@ export default function NotFound() {
             Plan a Visit
           </Link>
         </div>
+        <p className="body-base mt-10" style={{ color: "rgba(255,255,255,0.78)" }}>
+          Looking for a campus?{" "}
+          <Link href="/locations/hays/" className="underline">Hays</Link>
+          {" · "}
+          <Link href="/locations/colby/" className="underline">Colby</Link>
+          {" · "}
+          <Link href="/search/" className="underline">Search the site</Link>
+          {" · "}
+          Call the office at <a href={`tel:${site.phone.replace(/\D/g, "")}`} className="underline">{site.phone}</a>
+        </p>
       </div>
     </section>
   );

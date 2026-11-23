@@ -17,12 +17,6 @@
  *    the browser; works in both static-export and CMS_LIVE server modes.
  */
 
-/**
- * Events from Studio on the site, behind a flag that is OFF. Until the church decides (plan Q16) eSpace stays the
- * calendar; flipping this to "1" at build time only swaps the upcoming-events list for Studio's, never the calendar.
- */
-export const EVENTS_FROM_STUDIO = process.env.NEXT_PUBLIC_EVENTS_FROM_STUDIO === "1";
-
 /** GetFullCalendarEvents base — the JSON feed we map into <CalEvent>s. */
 export const ESPACE_ENDPOINT =
   "https://app.espace.cool/Public/GetFullCalendarEvents";
@@ -35,7 +29,7 @@ const MINISTRY_ID = "16599";
 const CALENDAR_ID = "1774";
 
 /** Fallback accent when a record carries no category color. */
-const DEFAULT_COLOR = "#1cc3af"; // --color-teal
+export const DEFAULT_COLOR = "#1cc3af"; // --color-teal
 
 export interface CalEvent {
   id: string;
@@ -53,6 +47,8 @@ export interface CalEvent {
   isHoliday: boolean;
   /** External link, only present when the record supplies a usable url. */
   registerUrl?: string;
+  /** Set on events made in Studio: the full day and time as a person reads it, "Wednesday, December 2 · 6:30 PM". */
+  whenLabel?: string;
 }
 
 /** Shape of a raw eSpace record — every field optional/unknown until validated. */

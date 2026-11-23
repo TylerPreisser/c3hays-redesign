@@ -36,6 +36,8 @@ const nextConfig: NextConfig = {
   async redirects() {
     return [
       { source: "/beliefs", destination: "/about", permanent: true },
+      // the church's old calendar address
+      { source: "/calendar", destination: "/events", permanent: true },
     ];
   },
 };

@@ -18,7 +18,7 @@
   /* ── TEAL — the ONLY chromatic accent ────── */
   --color-teal:       #1cc3af;   /* PRIMARY ACCENT */
   --color-teal-soft:  #4acfbf;   /* hover/lighter teal */
-  --color-teal-deep:  #179c8c;   /* pressed/darker teal */
+  --color-teal-deep:  #0e7f72;   /* pressed/darker teal; also the teal for TEXT on light grounds (4.5:1 on white) */
 
   /* ── Legacy fallbacks (do not use for new code) */
   --color-black:      #0a0a0a;
@@ -327,7 +327,7 @@ body::before {
 /* Primary — teal fill */
 .btn-primary {
   background-color: var(--color-teal);
-  color: #fff;
+  color: #08312c; /* dark text on the teal: 7:1 (white on this teal is 2.2:1) */
   border-color: var(--color-teal);
 }
 

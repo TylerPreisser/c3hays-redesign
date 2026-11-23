@@ -7,9 +7,9 @@ import Link from "next/link";
 /**
  * /newsletter → /news/ redirect.
  *
- * "The C3 Weekly" now lives at its OWN page, /news. This legacy route forwards there
+ * "C3 News" now lives at its OWN page, /news. This legacy route forwards there
  * (SEO / back-compat) so the old /newsletter link and the editor's "News" resolve to
- * the real C3 Weekly content — NOT the old Visit page (reversing the redirect-orphan
+ * the real C3 News content — NOT the old Visit page (reversing the redirect-orphan
  * chain news → newsletter → the-visit-page that made the editor's "News" show Visit).
  *
  * Robust for BOTH build modes (next.config redirects are ignored by output:export):
@@ -44,15 +44,15 @@ export default function NewsletterRedirect() {
       >
         <div className="container-c3">
           <p className="overline" style={{ color: "var(--color-teal-deep)", marginBottom: "var(--space-eyebrow)" }}>
-            The C3 Weekly
+            C3 News
           </p>
           <h1 className="display-2 text-balance" style={{ marginBottom: "var(--space-heading)" }}>
-            Taking you to The C3 Weekly&hellip;
+            Taking you to C3 News&hellip;
           </h1>
           <p className="body-lg" style={{ color: "var(--color-stone)" }}>
             If you aren&rsquo;t redirected automatically,{" "}
             <Link href={TARGET} style={{ color: "var(--color-teal-deep)", fontWeight: 600, textDecoration: "underline" }}>
-              continue to The C3 Weekly
+              continue to C3 News
             </Link>
             .
           </p>

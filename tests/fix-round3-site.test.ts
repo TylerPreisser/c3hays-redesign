@@ -82,11 +82,11 @@ describe("W8 a text that holds a time is never free-editable", () => {
     for (const k of ["t:colby-hero-tagline", "t:colby-details-body-1", "t:colby-cta-body"]) expect(html).not.toContain(`data-cms="${k}"`);
     expect(html).toContain('data-cms="t:colby-details-body-2"'); // "We'd love to see you this Sunday." holds no time
   });
-  it("the events list is a pick that opens the events sheet", async () => {
-    const { default: List } = await import("@/components/events/StudioEventsList");
-    const events = [{ id: "e1", title: "Marriage Night", start: "2026-12-02T18:30:00", allDay: false } as any];
-    expect(renderToStaticMarkup(createElement(List, { events }))).not.toContain("data-cms-pick");
-    expect(renderToStaticMarkup(createElement(List, { events, edit: true }))).toContain('data-cms-pick="fact:events"');
+  it("the events calendar is a pick that opens the events sheet, only on the editor's canvas", async () => {
+    const { default: Calendar } = await import("@/components/events/LiveCalendar");
+    const { EditModeProvider } = await import("@/providers/EditModeProvider");
+    expect(renderToStaticMarkup(createElement(Calendar))).not.toContain("data-cms-pick");
+    expect(renderToStaticMarkup(createElement(EditModeProvider as never, { edit: true } as never, createElement(Calendar)))).toContain('data-cms-pick="fact:events"');
   });
 });
 
@@ -98,10 +98,11 @@ describe("W9 an empty day is dropped, not the whole record", () => {
     expect(c?.services.map((s) => s.day)).toEqual(["Sunday"]);
   });
   it("a tbc slot is kept and marked", async () => {
-    const { normalizeCampus, campusLine } = await import("@/lib/service-times-core");
+    const { normalizeCampus, anyUnconfirmed } = await import("@/lib/service-times-core");
     const c = normalizeCampus({ slug: "hays", name: "Hays", services: [{ day: "Saturday", slots: [{ time: "5:00 PM", room: null, kids: false, tbc: true }] }, { day: "Sunday", slots: [] }] });
     expect(c?.services).toHaveLength(1);
-    expect(campusLine(c!)).toContain("time to be confirmed");
+    expect(c?.services[0].slots[0].tbc).toBe(true);
+    expect(anyUnconfirmed({ campuses: [c!] })).toBe(true);
   });
   it("a campus with no days left is a valid record with no days (not null)", async () => {
     const { normalizeCampus } = await import("@/lib/service-times-core");

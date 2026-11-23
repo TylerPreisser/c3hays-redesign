@@ -12,7 +12,10 @@
  *
  * Plus editable-by-construction: no collapsed data-cms-link on the page.
  */
-import { describe, it, expect, beforeAll } from "vitest";
+import { describe, it, expect, beforeAll, vi } from "vitest";
+
+// These guards are about the signup form's editability, so they run with sign-ups switched ON; the OFF page is tests/site-w4.test.tsx.
+vi.mock("@/lib/newsletter-signup", async (orig) => ({ ...(await orig<typeof import("@/lib/newsletter-signup")>()), NEWSLETTER_SIGNUP_LIVE: true }));
 import { renderToStaticMarkup } from "react-dom/server";
 
 function q(html: string) {
