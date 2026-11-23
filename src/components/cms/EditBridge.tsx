@@ -707,6 +707,7 @@ export default function EditBridge() {
       // a photo, a marker or a link takes the keyboard-focus ring; the ring of the words before it goes (never two places lit)
       if (!fieldOf(e.target) && (ph || pk)) {
         focusEl = ph || pk;
+        activeEl = null; if (cap) cap.style.display = "none"; hideBar(); // the counter and the format bar belong to the words just left
         if (sel && sel.kind === "text") clearSelection(true);
         positionFocusRing();
       } else focusEl = null;
@@ -955,7 +956,7 @@ export default function EditBridge() {
         post({ type: "cms:section", op: "move", id: secSelId, index: j });
       }
     };
-    const onScroll = () => { positionRing(); updateBar(); if (activeEl) updateCounter(activeEl); };
+    const onScroll = () => { positionRing(); updateBar(); if (activeEl && document.activeElement === activeEl) updateCounter(activeEl); };
     const onResize = () => { positionRing(); updateBar(); };
     const onHide = () => flushAll();
     const onVis = () => { if (document.visibilityState === "hidden") flushAll(); };
