@@ -11,6 +11,7 @@ import SectionHeader from "@/components/ui/SectionHeader";
 import PageComposer from "@/components/cms/PageComposer";
 import LiveCalendar from "@/components/events/LiveCalendar";
 import UpcomingEventsLive from "@/components/events/UpcomingEventsLive";
+import WeekendLine from "@/components/WeekendLine";
 import { getEventsMode, getStudioEventLists, type StudioEvent } from "@/lib/studio-events";
 import UpcomingEventsAuthored from "@/components/events/UpcomingEventsAuthored";
 import { parseEventCards } from "@/components/events/events-content";
@@ -135,6 +136,7 @@ export default async function EventsPage({
               }
               title={<Tx text={t} k="events-heading" fallback="Upcoming Events" />}
             />
+            <WeekendLine className="body-base" style={{ color: "rgba(255,255,255,0.86)", textAlign: "center", maxWidth: "46rem", margin: "0 auto var(--space-block)" }} />
             {authoredCards.length > 0 ? (
               <UpcomingEventsAuthored cards={authoredCards} text={t} media={media} />
             ) : (

@@ -98,10 +98,11 @@ describe("W9 an empty day is dropped, not the whole record", () => {
     expect(c?.services.map((s) => s.day)).toEqual(["Sunday"]);
   });
   it("a tbc slot is kept and marked", async () => {
-    const { normalizeCampus, campusLine } = await import("@/lib/service-times-core");
+    const { normalizeCampus, anyUnconfirmed } = await import("@/lib/service-times-core");
     const c = normalizeCampus({ slug: "hays", name: "Hays", services: [{ day: "Saturday", slots: [{ time: "5:00 PM", room: null, kids: false, tbc: true }] }, { day: "Sunday", slots: [] }] });
     expect(c?.services).toHaveLength(1);
-    expect(campusLine(c!)).toContain("time to be confirmed");
+    expect(c?.services[0].slots[0].tbc).toBe(true);
+    expect(anyUnconfirmed({ campuses: [c!] })).toBe(true);
   });
   it("a campus with no days left is a valid record with no days (not null)", async () => {
     const { normalizeCampus } = await import("@/lib/service-times-core");

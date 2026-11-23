@@ -49,7 +49,7 @@ export default function InboxTile({
   };
 
   return (
-    <aside className={className} style={surface} aria-label="Subscribe to The C3 Weekly">
+    <aside className={className} style={surface} aria-label="Subscribe to C3 News">
       <span
         className="inline-flex items-center justify-center"
         style={{

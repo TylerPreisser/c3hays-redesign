@@ -64,25 +64,31 @@ export function Skeleton() {
 }
 
 /* ───────────────────────── Error state ───────────────────────── */
-export function ErrorState() {
+export function ErrorState({ onRetry }: { onRetry?: () => void }) {
   return (
     <div style={{ textAlign: "center", padding: "clamp(2rem, 6vw, 4rem) 1rem" }}>
       <p className="heading-3" style={{ color: "var(--color-ink)" }}>
-        We couldn&rsquo;t load the live calendar right now.
+        The live calendar is slow right now.
       </p>
       <p className="body-base" style={{ color: "var(--color-mute)", marginTop: "0.6rem" }}>
         You can still browse everything on the full church calendar.
       </p>
-      <a
-        href={ESPACE_FULL_CALENDAR_URL}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="btn btn-primary"
-        style={{ marginTop: "var(--space-cta)" }}
-      >
-        Open the full calendar
-        <ArrowUpRight size={18} />
-      </a>
+      <div style={{ display: "flex", flexWrap: "wrap", gap: "0.75rem", justifyContent: "center", marginTop: "var(--space-cta)" }}>
+        {onRetry && (
+          <button type="button" className="btn btn-outline" onClick={onRetry} style={{ minHeight: 44 }}>
+            Try again
+          </button>
+        )}
+        <a
+          href={ESPACE_FULL_CALENDAR_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="btn btn-primary"
+        >
+          Open the full calendar
+          <ArrowUpRight size={18} />
+        </a>
+      </div>
     </div>
   );
 }

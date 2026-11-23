@@ -1,6 +1,7 @@
 import { DEFAULT_COLOR, dayKey, type CalEvent } from "@/lib/espace";
 import { churchWallParts, clockLabel, wallDate, whenLabel, type WallParts } from "@/lib/church-time";
 import type { StudioEvent } from "@/lib/studio-events";
+import { isWeekendServiceTitle } from "@/lib/service-times-core";
 
 /**
  * Studio events and the eSpace calendar on one page. Pure: no fetch, no zone of its own (every time goes through church-time).
@@ -79,4 +80,21 @@ export function mergeEvents(studio: CalEvent[], espace: CalEvent[]): CalEvent[] 
 export function upcomingMerged(studio: CalEvent[], espace: CalEvent[], n: number, nowMs: number = Date.now()): CalEvent[] {
   const merged = mergeEvents(studio, espace.filter((e) => e.start.getTime() >= nowMs));
   return [...merged.filter((e) => !e.isHoliday), ...merged.filter((e) => e.isHoliday)].slice(0, Math.max(0, n));
+}
+
+/**
+ * The church's own calendar (eSpace) carries a free-text note on its "Weekend Services" rows that can be stale ("9:30 and
+ * 11:00"). The site never prints that note: those rows carry the line built from Studio's service times instead, the same
+ * record every other page reads. The eSpace text itself is the church's to fix in eSpace; nothing here edits it.
+ */
+export function withStudioWeekendLine(events: CalEvent[], line: string): CalEvent[] {
+  if (!line) return events;
+  return events.map((e) => (isWeekendServiceTitle(e.title) ? { ...e, description: line } : e));
+}
+
+/** eSpace rows that are set-up jobs for staff, not events for visitors. Matched by title, case-insensitive. */
+export const INTERNAL_EVENT_TITLES = ["gym set up", "gym setup"];
+export function withoutInternalEvents(events: CalEvent[], extra: string[] = []): CalEvent[] {
+  const hide = new Set([...INTERNAL_EVENT_TITLES, ...extra.map((t) => t.trim().toLowerCase())]);
+  return events.filter((e) => !hide.has(normaliseTitle(e.title)) && !hide.has(e.title.trim().toLowerCase()));
 }

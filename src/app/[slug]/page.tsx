@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getPageContent, getCMSScreen, getCMSBundle } from "@/lib/cms";
 import { isCmsLive } from "@/lib/cms-live";
@@ -46,6 +47,15 @@ export async function generateStaticParams(): Promise<{ slug: string }[]> {
     .map((s) => s.slug.replace(/^\/+/, ""))
     .filter((seg) => seg && !STATIC_ROUTES.has(seg))
     .map((slug) => ({ slug }));
+}
+
+/** The tab and screen readers must not call a missing page the home page: a slug with no title is "Page not found". */
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const { slug } = await params;
+  const path = `/${slug}`;
+  const [ov, screen] = await Promise.all([getPageContent(path).catch(() => null), getCMSScreen(path).catch(() => null)]);
+  const title = ov?.text?.["page-title"] || screen?.screen?.title;
+  return { title: title ? String(title).replace(/<[^>]*>/g, "").trim() || "Page not found" : "Page not found" };
 }
 
 export default async function GenericPage({

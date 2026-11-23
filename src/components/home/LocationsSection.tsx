@@ -155,10 +155,10 @@ export default function LocationsSection({ text = {}, btn = {} }: { text?: Recor
                 <p className="text-sm" {...pickProps(editMode, `t:campus-${loc.id}-info`)} style={{ color: "rgba(255,255,255,0.7)", marginBottom: "1.75rem" }}>{`${loc.street}, ${loc.city}, ${loc.state} · ${campusLine(campus(serviceTimes, loc.id))}`}</p>
                 <div className="flex flex-wrap gap-3">
                   <Link href={text[`campusbtn-${loc.id}-info-href`] || `/locations/${loc.slug}/`} data-cms-link={`campusbtn-${loc.id}-info`} className="btn btn-primary btn-sm" style={btnCss(btn[`campusbtn-${loc.id}-info`])}>
-                    <span data-cms-link-label>{text[`campusbtn-${loc.id}-info-label`] || "Campus Info"}</span>
+                    <span data-cms-link-label>{text[`campusbtn-${loc.id}-info-label`] || "Campus Info"}</span><span className="sr-only"> for {loc.name}</span>
                   </Link>
                   <a href={text[`campusbtn-${loc.id}-dir-href`] || loc.mapsUrl} target="_blank" rel="noopener noreferrer" data-cms-link={`campusbtn-${loc.id}-dir`} className="btn btn-outline btn-sm" style={btnCss(btn[`campusbtn-${loc.id}-dir`])}>
-                    <span data-cms-link-label>{text[`campusbtn-${loc.id}-dir-label`] || "Get Directions"}</span>
+                    <span data-cms-link-label>{text[`campusbtn-${loc.id}-dir-label`] || "Get Directions"}</span><span className="sr-only"> to {loc.name}</span>
                   </a>
                 </div>
               </div>

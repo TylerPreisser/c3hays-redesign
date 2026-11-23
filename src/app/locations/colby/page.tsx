@@ -102,7 +102,7 @@ export default async function ColbyCampusPage({
             className="display-1 text-white"
             data-cms="t:colby-hero-title"
             dangerouslySetInnerHTML={{
-              __html: tx(t, "colby-hero-title", "Colby"),
+              __html: tx(t, "colby-hero-title", "Our Colby campus."),
             }}
           />
 

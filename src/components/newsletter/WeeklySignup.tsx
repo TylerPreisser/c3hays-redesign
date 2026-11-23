@@ -8,7 +8,7 @@ import { SIGNUP_DONE, SIGNUP_ERRORS, SIGNUP_NOTE, useSignup } from "./useSignup"
 import { useSignupConfig } from "@/providers/SignupConfigProvider";
 
 /**
- * <WeeklySignup> — the editor-native C3 Weekly newsletter signup (round-3).
+ * <WeeklySignup> — the editor-native C3 News newsletter signup (round-3).
  *
  * MINIMAL + TRANSPARENT: just an editable email field + a "Sign Up" button, laid
  * directly over the hero photo (NO white card surface, NO icon box, NO heading /
@@ -79,13 +79,13 @@ export default function WeeklySignup({ text = {}, bgKey = "weekly-signup-card", 
   };
 
   return (
-    <div className={className} data-cms-bg={bgKey} style={surface} aria-label="Subscribe to The C3 Weekly">
+    <div className={className} data-cms-bg={bgKey} style={surface} aria-label="Subscribe to C3 News">
       {status === "done" ? (
         <p className="body-base inline-flex items-center gap-2" style={{ color: doneColor, fontWeight: 600, textShadow: labelShadow }} role="status">
           <Check size={18} /> {SIGNUP_DONE}
         </p>
       ) : (
-        <form className="flex flex-col gap-2.5 w-full min-w-0" onSubmit={onSubmit} noValidate>
+        <form className="flex flex-col gap-2.5 w-full min-w-0" onSubmit={onSubmit} method="post" action="/api/newsletter/subscribe" noValidate>
           {/* #6b: the redundant visible "your@email.com" label ABOVE the field is REMOVED
               (it duplicated the input's own placeholder). The field keeps a screen-reader
               label via aria-label, and the placeholder is still driven by the
@@ -93,6 +93,8 @@ export default function WeeklySignup({ text = {}, bgKey = "weekly-signup-card", 
           <div className="flex flex-col sm:flex-row gap-2.5 w-full min-w-0">
             <input
               id="weekly-signup-email"
+              name="email"
+              required
               type="email"
               inputMode="email"
               autoComplete="email"
@@ -117,7 +119,7 @@ export default function WeeklySignup({ text = {}, bgKey = "weekly-signup-card", 
             </span>
           )}
           <span className="body-sm" style={{ color: onLight ? "var(--color-stone)" : "rgba(255,255,255,0.78)", textShadow: labelShadow }}>
-            {turnstileSiteKey ? SIGNUP_NOTE : "Signup is not switched on yet."}
+            {turnstileSiteKey ? SIGNUP_NOTE : "Sign-up here is not switched on yet. Call the office at (785) 625-5483 and we will add you."}
           </span>
         </form>
       )}

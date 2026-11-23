@@ -6,7 +6,9 @@ import { useEffect, useMemo, useState } from "react";
 import type { CSSProperties } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { fetchEspaceEvents, monthMatrix, dayKey, type CalEvent } from "@/lib/espace";
-import { mergeEvents, studioToCalEvent } from "@/lib/event-merge";
+import { mergeEvents, studioToCalEvent, withStudioWeekendLine, withoutInternalEvents } from "@/lib/event-merge";
+import { useServiceTimes } from "@/providers/ServiceTimesProvider";
+import { weekendLine } from "@/lib/service-times-core";
 import type { StudioEvent } from "@/lib/studio-events";
 import {
   Skeleton,
@@ -48,7 +50,13 @@ export default function LiveCalendar({ studio }: { studio?: StudioEvent[] } = {}
   const editMode = useEditMode();
   const studioCal = useMemo(() => (studio ?? []).map(studioToCalEvent), [studio]);
   const [espaceEvents, setEvents] = useState<CalEvent[] | null>(null);
-  const events = useMemo(() => (studioCal.length > 0 && espaceEvents ? mergeEvents(studioCal, espaceEvents) : espaceEvents), [studioCal, espaceEvents]);
+  const times = useServiceTimes();
+  const events = useMemo(() => {
+    const base = studioCal.length > 0 && espaceEvents ? mergeEvents(studioCal, espaceEvents) : espaceEvents;
+    // Weekend Services rows say Studio's times, not eSpace's free text; staff set-up jobs are not shown to visitors
+    return base ? withoutInternalEvents(withStudioWeekendLine(base, weekendLine(times))) : base;
+  }, [studioCal, espaceEvents, times]);
+  const [attempt, setAttempt] = useState(0);
   const [status, setStatus] = useState<"loading" | "ready" | "error">("loading");
   const [viewDate, setViewDate] = useState(() => {
     const n = new Date();
@@ -99,7 +107,7 @@ export default function LiveCalendar({ studio }: { studio?: StudioEvent[] } = {}
     return () => {
       alive = false;
     };
-  }, [year, month, studioCal]);
+  }, [year, month, studioCal, attempt]);
 
   useEffect(() => {
     if (typeof window === "undefined" || !window.matchMedia) return;
@@ -191,7 +199,7 @@ export default function LiveCalendar({ studio }: { studio?: StudioEvent[] } = {}
       `}</style>
 
       {status === "error" ? (
-        <ErrorState />
+        <ErrorState onRetry={() => { setStatus("loading"); setAttempt((n) => n + 1); }} />
       ) : events === null ? (
         <Skeleton />
       ) : (

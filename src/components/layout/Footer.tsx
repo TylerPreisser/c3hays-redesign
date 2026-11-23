@@ -5,6 +5,7 @@ import { site } from "@/data/site";
 import Logo from "@/components/brand/Logo";
 import NewsletterForm from "./NewsletterForm";
 import ServiceTimesText from "@/components/ServiceTimesText";
+import TimesCheckNote from "@/components/TimesCheckNote";
 import type { CMSOverrides, NavItem as StudioNavItem } from "@/lib/cms";
 import { ctaItem } from "@/data/navigation";
 import { tx } from "@/lib/home-content";
@@ -54,18 +55,13 @@ const EXPLORE_LINKS: ExploreLink[] = [
   { id: "footer-explore-0", label: "About", href: "/about/" },
   { id: "footer-explore-1", label: "Locations", href: "/locations/" },
   { id: "footer-explore-2", label: "Messages", href: "/messages/" },
-  { id: "footer-explore-3", label: "C3 Weekly", href: "/news/" },
+  { id: "footer-explore-3", label: "C3 News", href: "/news/" },
   { id: "footer-explore-4", label: "Events", href: "/events/" },
   { id: "footer-explore-5", label: "Watch Live", href: "/watch/" },
   { id: "footer-explore-6", label: "Counseling", href: "/counseling/" },
   { id: "footer-explore-7", label: "Connect", href: "/connect/" },
   { id: "footer-explore-8", label: "Plan a Visit", href: "/visit/" },
   { id: "footer-explore-9", label: "Give", href: "/give/" },
-];
-const LEGAL_LINKS = [
-  { id: "footer-legal-0", label: "Privacy", href: "/privacy/" },
-  { id: "footer-legal-1", label: "Terms", href: "/terms/" },
-  { id: "footer-legal-2", label: "Accessibility", href: "/accessibility/" },
 ];
 const CAMPUSES = [
   { id: "hays", name: "Hays", addr: [`${site.address.street}`, `${site.address.city}, ${site.address.state} ${site.address.zip}`] },
@@ -123,9 +119,7 @@ function BottomBar({ t }: { t: TextBag }) {
     <div style={{ borderTop: "1px solid rgba(255,255,255,0.10)", paddingTop: "var(--s-8, 32px)" }}>
       <div className="container-c3 pb-8 text-xs flex flex-col items-center gap-2 md:flex-row md:items-center md:justify-between md:gap-4" style={{ color: "rgba(255,255,255,0.62)" }}>
         <p data-cms="g:footer-copyright" dangerouslySetInnerHTML={{ __html: tx(t, "footer-copyright", `© ${YEAR} Celebration Community Church · All Rights Reserved`) }} />
-        <div className="flex items-center gap-5">
-          {LEGAL_LINKS.map((l) => <FLink key={l.id} t={t} {...l} />)}
-        </div>
+        <TimesCheckNote />
       </div>
     </div>
   );
@@ -209,7 +203,7 @@ function FooterEditorial({ t, m, links, preCta = false }: { t: TextBag; m: Media
           {/* Newsletter + social */}
           <div className="lg:col-span-3 w-full max-w-sm md:max-w-none">
             <FooterHeading id="footer-news-head" t={t}>Stay in the loop</FooterHeading>
-            <p className="body-sm" data-cms="g:footer-news-blurb" style={{ color: "rgba(255,255,255,0.65)", lineHeight: 1.65 }} dangerouslySetInnerHTML={{ __html: tx(t, "footer-news-blurb", "The C3 Weekly: what's happening at C3, straight to your inbox.") }} />
+            <p className="body-sm" data-cms="g:footer-news-blurb" style={{ color: "rgba(255,255,255,0.65)", lineHeight: 1.65 }} dangerouslySetInnerHTML={{ __html: tx(t, "footer-news-blurb", "C3 News: what's happening at C3, in your inbox.") }} />
             {/* v8 P3: widen the cramped blurb→form gap. The blurb is a <p>, and globals.css
                has an UNLAYERED `p{margin:0}` reset that beats Tailwind's layered `mb-*`
                utility, so `mb-5`/`mb-8` on the blurb compute to 0 (verified live). The

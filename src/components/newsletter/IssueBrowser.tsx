@@ -10,7 +10,7 @@ import IssueReader from "./IssueReader";
 /**
  * <IssueBrowser> — Phase 4, NL5 + NL6.
  *
- * A clickable, navigable way to browse The C3 Weekly: FILTER BY WEEK (date
+ * A clickable, navigable way to browse C3 News: FILTER BY WEEK (date
  * facets derived from the issues) + SEARCH TOPICS (client-side over title,
  * excerpt, and topic tags). Renders premium issue cards; clicking one opens the
  * <IssueReader> modal for the full custom display.
@@ -68,7 +68,8 @@ export default function IssueBrowser({ issues }: IssueBrowserProps) {
 
   return (
     <div>
-      {/* Controls: search + week facets */}
+      {/* Controls: search + week facets. Not shown over a list too short to need them (under 3 issues). */}
+      {issues.length >= 3 && (
       <div className="flex flex-col gap-4" style={{ marginBottom: "2rem" }}>
         <div className="relative" style={{ maxWidth: 420 }}>
           <Search
@@ -108,6 +109,7 @@ export default function IssueBrowser({ issues }: IssueBrowserProps) {
           ))}
         </div>
       </div>
+      )}
 
       {/* Results */}
       {filtered.length === 0 && issues.length === 0 ? (
@@ -129,8 +131,8 @@ export default function IssueBrowser({ issues }: IssueBrowserProps) {
             <Inbox size={20} />
           </span>
           <p className="body-base" style={{ color: "var(--color-mute)" }}>
-            The first issue of <strong style={{ color: "var(--color-ink)" }}>The C3 Weekly</strong> is
-            on its way. Subscribe and you&rsquo;ll be the first to read it.
+            The first issue of <strong style={{ color: "var(--color-ink)" }}>C3 News</strong> is
+            on its way. Leave your email and the church office will add you.
           </p>
         </div>
       ) : filtered.length === 0 ? (

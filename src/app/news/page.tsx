@@ -13,13 +13,13 @@ import WeeklySignup from "@/components/newsletter/WeeklySignup";
 import { getNewsIssues } from "@/lib/news-issues";
 
 export const metadata: Metadata = {
-  title: "The C3 Weekly",
+  title: "C3 News",
   description:
-    "The C3 Weekly: one short email each week from Celebration Community Church in Hays and Colby, Kansas. Browse past issues or get it in your inbox.",
+    "C3 News: one short email each week from Celebration Community Church in Hays and Colby, Kansas. Browse past issues or get it in your inbox.",
 };
 
 /**
- * /news — "The C3 Weekly" (its OWN page).
+ * /news — "C3 News" (its OWN page).
  *
  * REVERTED (per Tyler): the "Stay Connected / Gather with us" WeeklyConnect block is
  * gone — it had nothing to do with this page. The newsletter ISSUE BROWSER is restored:
@@ -76,7 +76,7 @@ export default async function NewsPage({
             <div className="absolute inset-0" data-cms-img="weekly-hero-photo">
               <Image
                 src={assetPath(media["weekly-hero-photo"] || "/images/congregation.webp")}
-                alt="The C3 Weekly"
+                alt="C3 News"
                 fill
                 priority
                 sizes="100vw"
@@ -91,14 +91,14 @@ export default async function NewsPage({
               style={{ background: "linear-gradient(90deg, rgba(10,12,14,0.78) 0%, rgba(10,12,14,0.55) 42%, rgba(10,12,14,0.25) 100%)", pointerEvents: "none" }}
             />
 
-            <div className="container-c3 relative hero-passthru" style={{ paddingTop: "var(--section-y)", paddingBottom: "var(--section-y)", width: "100%" }}>
+            <div className="container-c3 relative hero-passthru" style={{ paddingTop: "clamp(10.5rem, 16vw, 12rem)", paddingBottom: "var(--section-y)", width: "100%" }}>
               <div className="grid grid-cols-1 lg:grid-cols-[1.1fr_minmax(20rem,26rem)] gap-10 lg:gap-16 items-center hero-passthru">
                 {/* LEFT — header, left-aligned over the image. White text over the scrim. */}
                 <div data-cms-bg="weekly-hero-copy" style={{ maxWidth: "40rem" }}>
                   <Tx
                     text={t}
                     k="weekly-hero-eyebrow"
-                    fallback="The C3 Weekly"
+                    fallback="C3 News"
                     as="p"
                     className="overline"
                     style={{ color: "var(--color-teal)", marginBottom: "var(--space-eyebrow)" }}
@@ -114,7 +114,7 @@ export default async function NewsPage({
                   <Tx
                     text={t}
                     k="weekly-hero-lead"
-                    fallback="One short email each week, what&rsquo;s coming up, this week&rsquo;s message, and simple next steps. Sign up, or browse past issues below."
+                    fallback="What&rsquo;s coming up, this week&rsquo;s message, and simple next steps. Leave your email and the church office will add you, or browse past issues below."
                     as="p"
                     className="body-lg"
                     style={{ color: "rgba(255,255,255,0.82)", maxWidth: "34rem", lineHeight: 1.7 }}

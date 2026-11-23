@@ -44,9 +44,13 @@ const sermons = [
   { id: "srm_1", title: "Sample Message One", speaker: "Sample Speaker", date: "2026-11-15", description: "A sample message for local checks.", youtube_video_id: "M7lc1UVf-VE", thumbnail_url: null, scripture_references: ["John 1:1-5"], duration: 1800, created_at: T, updated_at: T },
   { id: "srm_2", title: "Sample Message Two", speaker: "Sample Speaker", date: "2026-11-08", description: null, youtube_video_id: "M7lc1UVf-VE", thumbnail_url: null, scripture_references: [], duration: null, created_at: T, updated_at: T },
 ];
+const slot = (time, extra = {}) => ({ time, room: null, kids: false, ...extra });
 const locations = [
-  { id: "hays", name: "Hays", services: [{ day: "Sunday", times: ["8:00 AM", "9:00 AM", "10:45 AM"] }] },
-  { id: "colby", name: "Colby", services: [{ day: "Sunday", times: ["10:00 AM"] }] },
+  { id: "hays", slug: "hays", name: "Hays", services: [
+    { day: "Saturday", slots: [slot("5:00 PM", { tbc: true })] },
+    { day: "Sunday", slots: [slot("8:00 AM", { room: "C3 Gym" }), slot("9:00 AM", { kids: true }), slot("10:45 AM", { kids: true })] },
+  ] },
+  { id: "colby", slug: "colby", name: "Colby", services: [{ day: "Sunday", slots: [slot("10:00 AM", { tbc: true })] }] },
 ];
 const announcements = [
   { id: "ann_now", title: "Fall Serve Day", body: "Join us Saturday to serve around Hays.", link_label: "Sign up", link_url: "/connect/", surface: "web", starts_at: iso(-1), ends_at: iso(3), priority: 5, active: true },

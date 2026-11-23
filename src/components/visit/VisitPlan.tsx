@@ -96,6 +96,7 @@ export default function VisitPlan({ t: tIn }: { t: Record<string, string> }) {
           return (
           <details
             key={id}
+            open={id === "kids"}
             data-cms-bg={`visit-block-${id}-bg`}
             style={{
               background: "#252727",

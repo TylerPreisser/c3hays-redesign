@@ -9,10 +9,12 @@ const origin = (process.argv[2] || "").replace(/\/$/, "");
 const laps = Number(process.argv[3] || 10);
 if (!origin || !process.env.PLAYWRIGHT_DIR) { console.log("FAIL usage: PLAYWRIGHT_DIR=<dir> node scripts/nav-leak.mjs <origin> [laps]"); process.exit(1); }
 const { chromium } = createRequire(import.meta.url)(process.env.PLAYWRIGHT_DIR + "/node_modules/playwright");
+// PLANT_LEAK=1 proves the check can fail: every client navigation then leaks one new window listener and one interval, and the run must exit 1.
+const PLANT = process.env.PLANT_LEAK === "1";
 const b = await chromium.launch();
 const ctx = await b.newContext({ viewport: { width: 1440, height: 900 } });
 const p = await ctx.newPage();
-await p.addInitScript(() => {
+await p.addInitScript((PLANT_FLAG) => {
   // a listener is live from its first add until its remove; adding the same function twice is one listener (the browser dedupes), so key by identity
   const live = new Map(); // fn -> Set of "target:type:capture"
   const name = (t) => (t === window ? "window" : t === document ? "document" : t === document.body ? "body" : t === document.documentElement ? "html" : null);
@@ -23,8 +25,12 @@ await p.addInitScript(() => {
   const timers = new Set(); const si = window.setInterval, ci = window.clearInterval;
   window.setInterval = function (...a) { const id = si.apply(this, a); timers.add(id); return id; };
   window.clearInterval = function (id) { timers.delete(id); return ci.call(this, id); };
+  if (PLANT_FLAG) {
+    const ps = history.pushState.bind(history);
+    history.pushState = function (...a) { window.addEventListener("resize", () => void a.length); window.setInterval(() => {}, 60000); return ps(...a); };
+  }
   window.__leak = () => { const by = {}; for (const set of live.values()) for (const k of set) by[k] = (by[k] || 0) + 1; return { listeners: Object.values(by).reduce((a, b) => a + b, 0), intervals: timers.size, byKey: by, pins: document.querySelectorAll(".pin-spacer").length }; };
-});
+}, PLANT);
 const go = async (href, test) => { await p.locator(`a[href='${href}'], a[href='${href}/']`).filter({ visible: true }).first().click({ timeout: 15000 }); await p.waitForFunction(test, null, { timeout: 15000 }); await p.waitForTimeout(1200); };
 await p.goto(origin + "/", { waitUntil: "load" }); await p.waitForTimeout(3000);
 const rows = [];

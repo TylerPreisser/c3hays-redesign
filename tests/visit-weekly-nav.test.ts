@@ -145,10 +145,11 @@ describe("(b) /news — real C3 Weekly page, not a redirect", () => {
     expect(ids).toContain("weekly-hero");
     expect(ids).toContain("weekly-list");
   });
-  it("renders C3 Weekly browse content (issue browser)", () => {
-    // The redundant "Browse The C3 Weekly" SectionHeader was removed (the hero already
-    // carries the page identity); assert the actual issue-browser UI renders instead.
-    expect(newsHtml).toContain("Search newsletter topics");
+  it("renders the issue browser's honest empty state, with no search box over an empty list", () => {
+    // The search box and week chips appear once there are 3 issues; until then the page says the first issue is on its way.
+    expect(newsHtml).toContain("is");
+    expect(newsHtml).toContain("on its way");
+    expect(newsHtml).not.toContain("Search newsletter topics");
   });
   it("is NOT a client redirect stub", () => {
     const src = readApp("news/page.tsx");
@@ -172,8 +173,8 @@ describe("(d) shared nav — identical across pages, includes C3 Weekly → /new
   it("renders identically regardless of page (pathname-independent)", () => {
     expect(headerA).toBe(headerB);
   });
-  it("carries a 'C3 Weekly' nav entry pointing at /news/", () => {
-    expect(headerA).toContain("C3 Weekly");
+  it("carries a 'C3 News' nav entry pointing at /news/", () => {
+    expect(headerA).toContain("C3 News");
     // next/link renders the trailing-slash-stripped href on the <a>.
     expect(headerA).toContain('href="/news"');
   });

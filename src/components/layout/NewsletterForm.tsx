@@ -22,7 +22,8 @@ export default function NewsletterForm() {
        overflowing the grid track. */
     <form
       className="flex flex-col gap-2.5 w-full min-w-0"
-      noValidate
+      method="post"
+      action="/api/newsletter/subscribe"
       onSubmit={(e) => {
         e.preventDefault();
         void submit(email, token, trap);
@@ -34,6 +35,8 @@ export default function NewsletterForm() {
         autoComplete="email"
         placeholder="your@email.com"
         className="newsletter-input w-full min-w-0"
+        name="email"
+        required
         aria-label="Email address"
         aria-invalid={status === "invalid"}
         value={email}
@@ -46,7 +49,7 @@ export default function NewsletterForm() {
         {status === "sending" ? "Sending…" : "Subscribe"}
       </button>
       {SIGNUP_ERRORS[status] && <p role="alert" style={{ ...small, color: "#ffd7d0" }}>{SIGNUP_ERRORS[status]}</p>}
-      <p style={small}>{turnstileSiteKey ? SIGNUP_NOTE : "Signup is not switched on yet."}</p>
+      <p style={small}>{turnstileSiteKey ? SIGNUP_NOTE : "Sign-up here is not switched on yet. Call the office at (785) 625-5483 and we will add you."}</p>
     </form>
   );
 }

@@ -14,8 +14,13 @@ export interface Slot {
   /** Studio marked this time "to confirm". Absent means confirmed (a record without the field reads as confirmed). */
   tbc?: boolean;
 }
-/** The plain note shown beside an unconfirmed time, wherever the times are listed. */
-export const TBC_NOTE = "time to be confirmed";
+/**
+ * One plain line per page, in a visitor's words, when any listed time is not yet confirmed (Saturday and Colby alike).
+ * The times themselves are always shown as they are: no caveat rides on a time, in a hero sentence or in the footer.
+ */
+export const CHECK_NOTE = "Please call the office at (785) 625-5483 to check before you come.";
+/** True when any service time of any campus is marked "to confirm" by Studio. */
+export const anyUnconfirmed = (d: ServiceTimesData): boolean => d.campuses.some((c) => c.services.some((s) => s.slots.some((x) => x.tbc)));
 export interface DayServices {
   day: string;
   slots: Slot[];
@@ -111,7 +116,7 @@ export const campus = (d: ServiceTimesData, slug: string): CampusTimes =>
   d.campuses.find((c) => c.slug === slug) ?? d.campuses[0];
 
 export function slotLabel(s: Slot): string {
-  const parts = [s.room, s.kids ? "with C3Kids" : null, s.tbc ? TBC_NOTE : null].filter(Boolean);
+  const parts = [s.room, s.kids ? "with C3Kids" : null].filter(Boolean);
   return parts.length ? `${s.time} (${parts.join(", ")})` : s.time;
 }
 export const dayLine = (s: DayServices): string => `${s.day} ${s.slots.map(slotLabel).join(", ")}`;
@@ -127,8 +132,8 @@ export function fullLine(d: ServiceTimesData): string {
 export const compactLine = (c: CampusTimes): string =>
   !c.services.length ? TIMES_TBA : c.services.map((s) => `${s.day.slice(0, 3)} ${s.slots.map(slotLabel).join(", ")}`).join(" · ");
 
-/** A time with its note when it is not confirmed: "5:00 PM (time to be confirmed)". */
-export const timeText = (s: Slot): string => (s.tbc ? `${s.time} (${TBC_NOTE})` : s.time);
+/** A time as it is shown. An unconfirmed time is shown too: the page's one CHECK_NOTE line covers it. */
+export const timeText = (s: Slot): string => s.time;
 
 const andJoin = (xs: string[]): string => (xs.length < 2 ? xs.join("") : `${xs.slice(0, -1).join(", ")} and ${xs[xs.length - 1]}`);
 /** "Saturdays at 5:00 PM and Sundays at 8:00 AM, 9:00 AM and 10:45 AM" */
@@ -162,3 +167,10 @@ export function withoutStaleTimes(text: Record<string, string>, keys: string[]):
   for (const k of keys) if (hasClock(out[k])) delete out[k];
   return out;
 }
+
+/** "Hays: Saturday 5:00 PM; Sunday 8:00 AM (C3 Gym), 9:00 AM (with C3Kids), 10:45 AM (with C3Kids). Colby: Sunday 10:00 AM." From Studio's record only. */
+export const weekendLine = (d: ServiceTimesData): string =>
+  d.campuses.filter((c) => c.services.length).map((c) => `${c.name}: ${campusLine(c)}.`).join(" ");
+
+/** The calendar's weekend-service row title as the church's eSpace names it. */
+export const isWeekendServiceTitle = (t: string): boolean => /^\s*weekend services?\s*$/i.test(t);

@@ -1,4 +1,5 @@
 import { churchDay as churchDayOf, churchToday as churchTodayOf } from "@/lib/church-time";
+import { site } from "@/data/site";
 import { getCMSAnnouncements, getCMSGivingCampaigns, getCMSSite } from "@/lib/cms";
 
 export interface Announcement { id: string; title: string; eyebrow?: string; body: string; linkLabel?: string; linkUrl?: string; priority: number }
@@ -10,6 +11,12 @@ export function safeHref(v: unknown): string | undefined {
   const h = v.trim();
   if (/^\/(?!\/)/.test(h) || /^(https?:|mailto:|tel:)/i.test(h)) return h;
   return undefined;
+}
+
+/** A bare App Store or Play Store front page is not the church's app: it becomes the listing the footer links (one constant, site.appStore). */
+export function appListing(href: string | undefined): string | undefined {
+  if (!href) return href;
+  return /^https?:\/\/(apps\.apple\.com|itunes\.apple\.com)\/?(?:[a-z]{2}\/?)?(?:[?#].*)?$/i.test(href) ? site.appStore : href;
 }
 
 /**
@@ -59,7 +66,7 @@ export function currentAnnouncements(raw: unknown, today: string): Announcement[
       eyebrow: plainEyebrow(o.eyebrow),
       body: typeof o.body === "string" ? o.body.trim() : "",
       linkLabel: typeof o.link_label === "string" && o.link_label.trim() ? o.link_label.trim() : undefined,
-      linkUrl: safeHref(o.link_url),
+      linkUrl: appListing(safeHref(o.link_url)),
       priority: typeof o.priority === "number" ? o.priority : 0,
       _at: start ?? "",
       _made: typeof o.created_at === "string" ? o.created_at : "",

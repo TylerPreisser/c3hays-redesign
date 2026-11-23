@@ -81,7 +81,7 @@ describe("P2-W reads", () => {
     expect(html).not.toContain("Stale List Item");
     expect(html).not.toContain("OLD OVERRIDE");
     const fallback = renderToStaticMarkup(createElement(Header, { menu: null }));
-    expect(fallback).toContain("C3 Weekly"); // the code list
+    expect(fallback).toContain("C3 News"); // the code list
   });
 
   it("the footer links come from the same menu", async () => {

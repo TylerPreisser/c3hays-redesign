@@ -208,6 +208,9 @@ export default async function MessagesPage({
 
               {/* Searchable + filterable grid (client component) */}
               <PastMessagesGrid messages={cards} channelHref={YOUTUBE} />
+              <p className="body-base" style={{ marginTop: "1.5rem", color: "var(--color-mute)" }}>
+                Older messages are on our <a href={YOUTUBE} target="_blank" rel="noopener noreferrer" style={{ color: "var(--color-teal-deep)", fontWeight: 600, textDecoration: "underline" }}>YouTube channel</a>.
+              </p>
             </div>
           </section>
         );

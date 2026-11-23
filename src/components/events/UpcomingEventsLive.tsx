@@ -3,7 +3,10 @@
 import { useEffect, useMemo, useState } from "react";
 import UpcomingEventsGrid from "@/components/events/UpcomingEventsGrid";
 import { fetchEspaceEvents, upcomingEvents, type CalEvent } from "@/lib/espace";
-import { studioToCalEvent, upcomingMerged } from "@/lib/event-merge";
+import { studioToCalEvent, upcomingMerged, withStudioWeekendLine, withoutInternalEvents } from "@/lib/event-merge";
+import { useServiceTimes } from "@/providers/ServiceTimesProvider";
+import { weekendLine } from "@/lib/service-times-core";
+import { ESPACE_FULL_CALENDAR_URL } from "@/lib/espace";
 import type { StudioEvent } from "@/lib/studio-events";
 
 /**
@@ -52,14 +55,17 @@ function SkeletonCard() {
   );
 }
 
-function Note() {
+function Note({ onRetry }: { onRetry: () => void }) {
   return (
-    <p
-      className="body-base"
-      style={{ color: "rgba(255,255,255,0.6)", textAlign: "center" }}
-    >
-      See the full calendar below.
-    </p>
+    <div style={{ textAlign: "center" }}>
+      <p className="body-base" style={{ color: "rgba(255,255,255,0.78)", margin: 0 }}>
+        The live calendar is slow right now. The full calendar is just below.
+      </p>
+      <div style={{ display: "flex", flexWrap: "wrap", gap: "0.75rem", justifyContent: "center", marginTop: "1rem" }}>
+        <button type="button" className="btn btn-outline" onClick={onRetry} style={{ minHeight: 44 }}>Try again</button>
+        <a href={ESPACE_FULL_CALENDAR_URL} target="_blank" rel="noopener noreferrer" className="btn btn-primary" style={{ minHeight: 44 }}>Open the full calendar</a>
+      </div>
+    </div>
   );
 }
 
@@ -80,6 +86,8 @@ export default function UpcomingEventsLive({ text, media, studio }: UpcomingEven
   const studioCal = useMemo(() => (studio ?? []).map(studioToCalEvent), [studio]);
   const [events, setEvents] = useState<CalEvent[] | null>(null);
   const [status, setStatus] = useState<"loading" | "ready" | "error">("loading");
+  const [attempt, setAttempt] = useState(0);
+  const times = useServiceTimes();
 
   useEffect(() => {
     let alive = true;
@@ -103,12 +111,13 @@ export default function UpcomingEventsLive({ text, media, studio }: UpcomingEven
     return () => {
       alive = false;
     };
-  }, []);
+  }, [attempt]);
 
-  const top = useMemo(
-    () => (studioCal.length > 0 ? upcomingMerged(studioCal, events ?? [], 3) : events ? upcomingEvents(events, 3) : []),
-    [events, studioCal]
-  );
+  const top = useMemo(() => {
+    // Weekend Services rows say Studio's times, not eSpace's free text; staff set-up jobs are not shown to visitors
+    const clean = events ? withoutInternalEvents(withStudioWeekendLine(events, weekendLine(times))) : null;
+    return studioCal.length > 0 ? upcomingMerged(studioCal, clean ?? [], 3) : clean ? upcomingEvents(clean, 3) : [];
+  }, [events, studioCal, times]);
 
   if (status === "loading") {
     return (
@@ -121,7 +130,7 @@ export default function UpcomingEventsLive({ text, media, studio }: UpcomingEven
   }
 
   if ((status === "error" && studioCal.length === 0) || top.length === 0) {
-    return <Note />;
+    return <Note onRetry={() => { setStatus("loading"); setAttempt((n) => n + 1); }} />;
   }
 
   return <UpcomingEventsGrid events={top} text={text} media={media} />;

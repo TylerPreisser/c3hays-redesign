@@ -27,7 +27,7 @@ export const metadata: Metadata = {
  * data-cms-bg, every heading/body is a <Tx>, and every button is an editable link.
  *
  * REMOVED per product tweak: the "coming this weekend" CCB-form CTA, and the
- * "Browse The C3 Weekly" block (now its OWN page at /news — The C3 Weekly).
+ * "Browse C3 News" block (now its OWN page at /news — C3 News).
  *
  * Server component; reads PUBLISHED CMS overrides (export-safe, no preview branch).
  */

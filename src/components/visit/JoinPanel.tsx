@@ -1,6 +1,7 @@
 import type { CSSProperties } from "react";
 import { MapPin, Smartphone } from "lucide-react";
 import ServiceTimesText from "@/components/ServiceTimesText";
+import KidsLine from "@/components/visit/KidsLine";
 import { locations } from "@/data/locations";
 import { site } from "@/data/site";
 import { Tx } from "@/components/cms/Editable";
@@ -65,62 +66,13 @@ export default function JoinPanel({ t }: { t: Record<string, string> }) {
       style={{ backgroundColor: "#ffffff", color: "var(--color-ink)" }}
       bgKey="visit-join-bg"
     >
-      {/* ── Social icon buttons (connect bar) ──────────────────────
-          #4: the redundant in-page C3 logo is REMOVED — the header/nav already
-          shows the mark, so a second logo here was duplicative. This row is now
-          just the "Connect with C3" icon bar, aligned to the end. */}
-      <div
-        className="flex flex-wrap sm:justify-end gap-3"
-        style={{ marginBottom: "var(--space-block)" }}
-      >
-        <div className="flex flex-wrap items-center gap-3" aria-label="Connect with C3">
-          {/* Icon-only, but NOT collapsed: each anchor carries an `sr-only`
-              [data-cms-link-label] span (house pattern, MeetGrowServe.tsx:423).
-              Without it EditBridge falls back to `link.innerText` (EditBridge.tsx:610),
-              which on an svg-only <a> is "" — the editor showed an empty label field
-              and any label typed there wrote a `-label` key this component never read.
-              The span is also the anchor's ACCESSIBLE NAME: the old hard-coded
-              aria-label is gone precisely because aria-label wins over text content, so
-              keeping it would have let an edited label silently fail to reach a screen
-              reader. `title` reads from the same key for the same reason. */}
-          {SOCIALS.map(({ id, label, href, Icon }) => {
-            const linkLabel = t[`visit-social-${id}-label`] || label;
-            return (
-            <a
-              key={id}
-              href={t[`visit-social-${id}-href`] || href}
-              target="_blank"
-              rel="noopener noreferrer"
-              title={linkLabel}
-              data-cms-link={`visit-social-${id}`}
-              className="bento-tile inline-flex items-center justify-center"
-              style={{
-                width: "3rem",
-                height: "3rem",
-                borderRadius: "var(--radius-md)",
-                background: "var(--color-mist)",
-                border: "1px solid rgba(27,28,28,0.08)",
-                color: "var(--color-ink)",
-                boxShadow: "var(--shadow-rest)",
-              }}
-            >
-              <Icon size={22} />
-              <span className="sr-only" data-cms-link-label>
-                {linkLabel}
-              </span>
-            </a>
-            );
-          })}
-        </div>
-      </div>
-
       {/* ── Join Us heading ────────────────────────────────────── */}
       <Stack gap="eyebrow" style={{ marginBottom: "var(--space-block)" }}>
         <Tx
           text={t}
           k="visit-times-eyebrow"
-          fallback="Join Us"
-          as="p"
+          fallback="Plan your visit"
+          as="h1"
           className="overline"
           style={{ color: "var(--color-teal-deep)" }}
         />
@@ -188,6 +140,56 @@ export default function JoinPanel({ t }: { t: Record<string, string> }) {
           </div>
         ))}
       </div>
+      <KidsLine />
+      {/* ── Social icon buttons (connect bar) ──────────────────────
+          #4: the redundant in-page C3 logo is REMOVED — the header/nav already
+          shows the mark, so a second logo here was duplicative. This row is now
+          just the "Connect with C3" icon bar, aligned to the end. */}
+      <div
+        className="flex flex-wrap sm:justify-end gap-3"
+        style={{ marginTop: "var(--space-block)" }}
+      >
+        <div className="flex flex-wrap items-center gap-3" aria-label="Connect with C3">
+          {/* Icon-only, but NOT collapsed: each anchor carries an `sr-only`
+              [data-cms-link-label] span (house pattern, MeetGrowServe.tsx:423).
+              Without it EditBridge falls back to `link.innerText` (EditBridge.tsx:610),
+              which on an svg-only <a> is "" — the editor showed an empty label field
+              and any label typed there wrote a `-label` key this component never read.
+              The span is also the anchor's ACCESSIBLE NAME: the old hard-coded
+              aria-label is gone precisely because aria-label wins over text content, so
+              keeping it would have let an edited label silently fail to reach a screen
+              reader. `title` reads from the same key for the same reason. */}
+          {SOCIALS.map(({ id, label, href, Icon }) => {
+            const linkLabel = t[`visit-social-${id}-label`] || label;
+            return (
+            <a
+              key={id}
+              href={t[`visit-social-${id}-href`] || href}
+              target="_blank"
+              rel="noopener noreferrer"
+              title={linkLabel}
+              data-cms-link={`visit-social-${id}`}
+              className="bento-tile inline-flex items-center justify-center"
+              style={{
+                width: "3rem",
+                height: "3rem",
+                borderRadius: "var(--radius-md)",
+                background: "var(--color-mist)",
+                border: "1px solid rgba(27,28,28,0.08)",
+                color: "var(--color-ink)",
+                boxShadow: "var(--shadow-rest)",
+              }}
+            >
+              <Icon size={22} />
+              <span className="sr-only" data-cms-link-label>
+                {linkLabel}
+              </span>
+            </a>
+            );
+          })}
+        </div>
+      </div>
+
     </Section>
   );
 }
