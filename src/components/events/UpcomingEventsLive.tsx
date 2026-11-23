@@ -61,8 +61,8 @@ function Note({ onRetry, retrying, again }: { onRetry: () => void; retrying: boo
   const msg = offline
     ? "You\u2019re offline. The service times above are still right."
     : again
-      ? `Still can\u2019t reach the church calendar. Open it on eSpace, or call ${site.phone}.`
-      : "The church calendar did not load. The service times above are still right.";
+      ? `Still can\u2019t reach our calendar. Open it on eSpace, or call ${site.phone}.`
+      : "Our calendar did not load. The service times above are still right.";
   return (
     <div style={{ textAlign: "center" }} role="status">
       <p className="body-base" style={{ color: "rgba(255,255,255,0.78)", margin: 0 }}>{msg}</p>

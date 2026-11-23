@@ -63,7 +63,7 @@ describe("M8 events with eSpace failing", () => {
     expect(html).toContain("Hays: Saturday 5:00 PM");
     expect(html).toContain("Colby: Sunday 10:00 AM");
     const m = await mount(({ Upcoming }) => createElement(Upcoming), "down");
-    expect(m.host.textContent).toContain("The church calendar did not load.");
+    expect(m.host.textContent).toContain("Our calendar did not load.");
     expect(m.host.textContent).not.toContain("couldn");
     expect(Array.from(m.host.querySelectorAll("button")).map((b) => b.textContent)).toContain("Try again");
     expect(m.host.querySelector("a[href*='espace.cool']")).toBeTruthy();

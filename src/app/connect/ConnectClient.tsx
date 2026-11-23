@@ -170,7 +170,7 @@ export function ConnectHero({ text, media = {}, img = {} }: ConnectHeroProps) {
             <Tx
               text={text}
               k="connect-hero-body"
-              fallback="Call or email the church office, or use one of the church&rsquo;s own forms. No pressure, just a warm welcome."
+              fallback="Call or email the church office, or use one of our forms. No pressure, just a warm welcome."
               as="p"
               className="body-base"
               style={{ color: "rgba(255,255,255,0.82)", marginBottom: "var(--s-8)" }}
@@ -186,7 +186,7 @@ export function ConnectHero({ text, media = {}, img = {} }: ConnectHeroProps) {
                 <Mail size={18} aria-hidden="true" />
                 <span>Email {site.email}</span>
               </a>
-              <p style={{ margin: "var(--space-body) 0 0", fontSize: "0.95rem", color: "rgba(255,255,255,0.82)" }}>Or use one of the church&rsquo;s own forms:</p>
+              <p style={{ margin: "var(--space-body) 0 0", fontSize: "0.95rem", color: "rgba(255,255,255,0.82)" }}>Or use one of our forms:</p>
               <ul style={{ listStyle: "none", margin: 0, padding: 0, display: "grid", gap: "0.25rem" }}>
                 {CCB_FORMS.map((f) => (
                   <li key={f.href}>

@@ -61,7 +61,7 @@ describe("Upcoming strip", () => {
   });
   it("espace mode with eSpace down: today's quiet pointer to the calendar", async () => {
     const { host, root } = await mount(({ Upcoming }) => <Upcoming />, "down");
-    expect(host.textContent).toContain("The church calendar did not load.");
+    expect(host.textContent).toContain("Our calendar did not load.");
     await act(async () => root.unmount());
   });
 });
