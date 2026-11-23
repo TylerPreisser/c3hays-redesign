@@ -323,12 +323,14 @@ export default function EditBridge() {
       ring.style.borderRadius = `${Math.max(pad < 0 ? 4 : 7, rad + pad)}px`;
       ring.style.left = `${r.left - pad}px`; ring.style.top = `${r.top - pad}px`;
       ring.style.width = `${r.width + pad * 2}px`; ring.style.height = `${r.height + pad * 2}px`;
-      ring.style.clipPath = clipUnderHeader(r.top - pad - 4);
+      ring.style.clipPath = clipUnderHeader(r.top - pad - 4, el);
       ring.style.display = "block";
     }
     /** A ring never draws across the site's fixed header (nav and announcement bar): what lies under it is cut off. `top` is the ring's outer top edge. */
-    const clipUnderHeader = (top: number): string => {
-      const hd = document.querySelector("header")?.getBoundingClientRect().bottom ?? 0;
+    const clipUnderHeader = (top: number, el: HTMLElement): string => {
+      const header = document.querySelector("header");
+      if (!header || header.contains(el)) return "none"; // the header's own logo, menu and announcement are ringed in place
+      const hd = header.getBoundingClientRect().bottom;
       return hd > top ? `inset(${Math.ceil(hd - top)}px -20px -20px -20px)` : "none";
     };
     /** The ring for keyboard focus on a photo/marker: two tones (white, then ink) so it shows on any picture, kept on screen even for a full-bleed photo. */
@@ -345,7 +347,7 @@ export default function EditBridge() {
       const rad = parseFloat(getComputedStyle(el).borderTopLeftRadius) || 0;
       fring.style.borderRadius = `${Math.max(7, rad)}px`;
       fring.style.left = `${l}px`; fring.style.top = `${t}px`; fring.style.width = `${rt - l}px`; fring.style.height = `${b - t}px`;
-      fring.style.clipPath = clipUnderHeader(t - 6);
+      fring.style.clipPath = clipUnderHeader(t - 6, el);
       fring.style.display = "block";
     }
     const clearMarks = () => {
