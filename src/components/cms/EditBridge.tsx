@@ -371,7 +371,7 @@ export default function EditBridge() {
         document.querySelectorAll<HTMLElement>("[data-cms-img]").forEach((el) => {
           if (!el.hasAttribute("tabindex")) { el.setAttribute("tabindex", "0"); tabAdded.add(el); imgTabbed.add(el); }
           if (!el.hasAttribute("role")) { el.setAttribute("role", "button"); imgTabbed.add(el); }
-          if (!el.hasAttribute("aria-label")) { el.setAttribute("aria-label", fixedImg.has(el.getAttribute("data-cms-img") || "") ? "Photo built into the website" : "Change photo"); imgTabbed.add(el); }
+          if (!el.hasAttribute("aria-label")) { el.setAttribute("aria-label", fixedImg.has(el.getAttribute("data-cms-img") || "") ? (/^g:logo/.test(el.getAttribute("data-cms-img") || "") ? "Church logo, set in the website's files" : "Photo built into the website") : "Change photo"); imgTabbed.add(el); }
           el.toggleAttribute("data-cms-fixed", fixedImg.has(el.getAttribute("data-cms-img") || ""));
         });
         // Tab walks the editable things in reading order: the site's own links and controls step out of the tab order.
@@ -866,17 +866,24 @@ export default function EditBridge() {
         return;
       }
       if (k === "Tab" && em === "edit" && !e.ctrlKey && !e.metaKey && !e.altKey && !inChrome(e.target)) {
-        const cur = fieldOf(document.activeElement);
+        // One reading order for everything a person can edit: words, photos and the select-only markers, as the page lays them out.
+        const act = document.activeElement as HTMLElement | null;
+        const stopOf = (n: HTMLElement | null): HTMLElement | null => (n ? fieldOf(n) ?? (n.closest?.("[data-cms-img]") as HTMLElement | null) ?? pickOf(n) : null);
+        const cur = stopOf(act);
         if (!cur) return;
-        const list = fields().filter((f) => editable.has(f) && visible(f));
-        const i = list.indexOf(cur);
-        const next = list[i + (e.shiftKey ? -1 : 1)];
-        if (i < 0 || !next) return; // past the first or last field: let focus leave the page
+        const stops = Array.from(document.querySelectorAll<HTMLElement>("[data-cms],[data-cms-img],[data-cms-pick]"))
+          .filter((n) => (n.hasAttribute("data-cms") ? editable.has(n) : n.getAttribute("tabindex") === "0") && visible(n) && n.getClientRects().length > 0 && (n === cur || !n.contains(cur)))
+          .sort((x, y) => (x === y ? 0 : x.compareDocumentPosition(y) & Node.DOCUMENT_POSITION_FOLLOWING ? -1 : 1));
+        const i = stops.indexOf(cur);
+        const next = stops[i + (e.shiftKey ? -1 : 1)];
+        if (i < 0 || !next) return; // past the first or last stop: let focus leave the page
         e.preventDefault();
         flushAll();
         next.focus({ preventScroll: false });
-        const r = document.createRange(); r.selectNodeContents(next);
-        const s = window.getSelection(); s?.removeAllRanges(); s?.addRange(r);
+        if (next.hasAttribute("data-cms")) {
+          const r = document.createRange(); r.selectNodeContents(next);
+          const sl = window.getSelection(); sl?.removeAllRanges(); sl?.addRange(r);
+        } else window.getSelection()?.removeAllRanges();
         return;
       }
       if (e.altKey && (k === "ArrowUp" || k === "ArrowDown") && em === "edit" && secSelId && !fieldOf(document.activeElement)) {

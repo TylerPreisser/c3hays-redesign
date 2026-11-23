@@ -62,11 +62,9 @@ const EXPLORE_LINKS: ExploreLink[] = [
   { id: "footer-explore-8", label: "Plan a Visit", href: "/visit/" },
   { id: "footer-explore-9", label: "Give", href: "/give/" },
 ];
-const LEGAL_LINKS = [
-  { id: "footer-legal-0", label: "Privacy", href: "/privacy/" },
-  { id: "footer-legal-1", label: "Terms", href: "/terms/" },
-  { id: "footer-legal-2", label: "Accessibility", href: "/accessibility/" },
-];
+// Privacy, Terms and Accessibility pages do not exist yet (they answered 404 from every footer). They return here, each one,
+// when the church has supplied its own wording and the page is published: { id: "footer-legal-0", label: "Privacy", href: "/privacy/" } etc.
+const LEGAL_LINKS: { id: string; label: string; href: string }[] = [];
 const CAMPUSES = [
   { id: "hays", name: "Hays", addr: [`${site.address.street}`, `${site.address.city}, ${site.address.state} ${site.address.zip}`] },
   { id: "colby", name: "Colby", addr: ["1923 S Range", "Colby, KS 67701"] },
