@@ -371,6 +371,7 @@ export default function EditBridge() {
         document.querySelectorAll<HTMLElement>("[data-cms-img]").forEach((el) => {
           if (!el.hasAttribute("tabindex")) { el.setAttribute("tabindex", "0"); tabAdded.add(el); imgTabbed.add(el); }
           if (!el.hasAttribute("role")) { el.setAttribute("role", "button"); imgTabbed.add(el); }
+          if (el.getAttribute("aria-hidden") === "true") { el.removeAttribute("aria-hidden"); } // a focusable button is not hidden from assistive tech
           if (!el.hasAttribute("aria-label")) { el.setAttribute("aria-label", fixedImg.has(el.getAttribute("data-cms-img") || "") ? (/^g:logo/.test(el.getAttribute("data-cms-img") || "") ? "Church logo, set in the website's files" : "Photo built into the website") : "Change photo"); imgTabbed.add(el); }
           el.toggleAttribute("data-cms-fixed", fixedImg.has(el.getAttribute("data-cms-img") || ""));
         });
@@ -827,6 +828,8 @@ export default function EditBridge() {
       const cs = getComputedStyle(el);
       return cs.display !== "none" && cs.visibility !== "hidden";
     };
+    /** A photo marker may be an empty aria-hidden layer (the shared hero): it is still a stop, so only real hiding counts. */
+    const shown = (el: HTMLElement) => { const cs = getComputedStyle(el); return cs.display !== "none" && cs.visibility !== "hidden"; };
     const onKeyDown = (e: KeyboardEvent) => {
       const em = effMode();
       const k = e.key;
@@ -872,7 +875,7 @@ export default function EditBridge() {
         const cur = stopOf(act);
         if (!cur) return;
         const stops = Array.from(document.querySelectorAll<HTMLElement>("[data-cms],[data-cms-img],[data-cms-pick]"))
-          .filter((n) => (n.hasAttribute("data-cms") ? editable.has(n) : n.getAttribute("tabindex") === "0") && visible(n) && n.getClientRects().length > 0 && (n === cur || !n.contains(cur)))
+          .filter((n) => (n.hasAttribute("data-cms") ? editable.has(n) && visible(n) : n.getAttribute("tabindex") === "0" && (n.hasAttribute("data-cms-img") ? shown(n) : visible(n))) && n.getClientRects().length > 0 && (n === cur || !n.contains(cur)))
           .sort((x, y) => (x === y ? 0 : x.compareDocumentPosition(y) & Node.DOCUMENT_POSITION_FOLLOWING ? -1 : 1));
         const i = stops.indexOf(cur);
         const next = stops[i + (e.shiftKey ? -1 : 1)];
