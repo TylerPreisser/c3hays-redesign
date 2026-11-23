@@ -15,5 +15,6 @@ export default defineConfig({
   test: {
     environment: "node", // jsdom is opt-in per file via `// @vitest-environment jsdom`
     include: ["tests/**/*.test.ts", "tests/**/*.test.tsx"],
+    setupFiles: ["tests/support/gsap-teardown.ts"],
   },
 });
