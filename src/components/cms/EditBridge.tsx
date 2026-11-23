@@ -368,6 +368,24 @@ export default function EditBridge() {
     const KIND_ATTR: Record<string, string> = { text: "data-cms", image: "data-cms-img", link: "data-cms-link", section: "data-section", pick: "data-cms-pick" };
 
     /** How a photo is framed where it sits now: the editor draws the chosen picture the same way (how it is fitted, and which part it keeps). */
+    // the page's own words that sit over a photo (a few, as fractions of the photo), so the editor can show where the picture will sit behind them
+    const wordsOver = (el: HTMLElement): { t: string; x: number; y: number; w: number; s: number; c: string; b: number }[] => {
+      const r = el.getBoundingClientRect();
+      if (r.width < 1 || r.height < 1) return [];
+      const out: { t: string; x: number; y: number; w: number; s: number; c: string; b: number }[] = [];
+      document.querySelectorAll<HTMLElement>("[data-cms]").forEach((n) => {
+        if (out.length >= 6 || el.contains(n) && n === el) return;
+        const b = n.getBoundingClientRect();
+        if (b.width < 1 || b.height < 1) return;
+        const ix = Math.max(0, Math.min(b.right, r.right) - Math.max(b.left, r.left)), iy = Math.max(0, Math.min(b.bottom, r.bottom) - Math.max(b.top, r.top));
+        if (ix * iy < 0.6 * b.width * b.height) return;
+        const t = (n.textContent || "").replace(/\s+/g, " ").trim().slice(0, 80);
+        if (!t) return;
+        const cs = getComputedStyle(n);
+        out.push({ t, x: (b.left - r.left) / r.width, y: (b.top - r.top) / r.height, w: b.width / r.width, s: (parseFloat(cs.fontSize) || 16) / r.width, c: cs.color, b: Number(cs.fontWeight) || 400 });
+      });
+      return out;
+    };
     const frameOf = (el: HTMLElement): { fit: string; pos: string; known: boolean } => {
       const img = el.matches("img") ? el : el.querySelector("img");
       const cs = getComputedStyle(img ?? el);
@@ -386,7 +404,7 @@ export default function EditBridge() {
       if (opts.quiet || (same && !opts.echo)) return;
       // a text or pick selection says what the element reads now (trimmed, spaces collapsed, capped), so Studio can show it
       const text = kind === "text" || kind === "pick" ? { text: (el.textContent || "").replace(/\s+/g, " ").trim().slice(0, SELECT_TEXT_CAP) } : {};
-      post({ type: "cms:select", path: value, kind: kind === "pick" ? "text" : kind, box: boxOf(el), ...(kind === "image" ? { frame: frameOf(el) } : {}), ...text, ...extra, ...(opts.echo ? { echo: true } : {}) });
+      post({ type: "cms:select", path: value, kind: kind === "pick" ? "text" : kind, box: boxOf(el), ...(kind === "image" ? { frame: { ...frameOf(el), words: wordsOver(el) } } : {}), ...text, ...extra, ...(opts.echo ? { echo: true } : {}) });
     }
     function clearSelection(tell: boolean) {
       const had = !!sel;
@@ -462,8 +480,17 @@ export default function EditBridge() {
       const img = (el.tagName === "IMG" ? el : el.querySelector("img")) as HTMLImageElement | null;
       if (img && img.getAttribute("src") !== src) { img.removeAttribute("srcset"); img.removeAttribute("sizes"); img.setAttribute("src", src); }
     };
+    const shimPos: Record<string, string> = {};
+    const applyPosTo = (el: HTMLElement, pos: string) => {
+      const img = (el.tagName === "IMG" ? el : el.querySelector("img")) as HTMLImageElement | null;
+      if (!img) return;
+      if (img.dataset.cmsPos0 === undefined) img.dataset.cmsPos0 = img.style.objectPosition || "";
+      const want = pos || img.dataset.cmsPos0;
+      if (img.style.objectPosition !== want) img.style.objectPosition = want;
+    };
     const observer = new MutationObserver(() => {
       for (const [p, src] of Object.entries(shimImg)) byAttr("data-cms-img", p).forEach((el) => applyImgTo(el, src));
+      for (const [p, pos] of Object.entries(shimPos)) byAttr("data-cms-img", p).forEach((el) => applyPosTo(el, pos));
       if (sel) { stamp(); positionRing(); }
       ensureAnchored(); ensureEditable();
     });
@@ -976,7 +1003,16 @@ export default function EditBridge() {
         post({ type: "cms:section", op: "move", id: secSelId, index: j });
       }
     };
-    const onScroll = () => { positionRing(); updateBar(); if (activeEl && document.activeElement === activeEl) updateCounter(activeEl); };
+    // the editor folds its own page tools while the page is scrolled down: say which way, once per change
+    let lastY = window.scrollY, lastDir = "";
+    const tellScroll = () => {
+      const y = window.scrollY, d = y - lastY;
+      if (Math.abs(d) < 24 && y >= 40) return;
+      const dir = y < 40 ? "top" : d > 0 ? "down" : "up";
+      lastY = y;
+      if (dir !== lastDir) { lastDir = dir; post({ type: "cms:scroll", dir, y: Math.round(y) }); }
+    };
+    const onScroll = () => { positionRing(); updateBar(); tellScroll(); if (activeEl && document.activeElement === activeEl) updateCounter(activeEl); };
     const onResize = () => { positionRing(); updateBar(); };
     const onHide = () => flushAll();
     const onVis = () => { if (document.visibilityState === "hidden") flushAll(); };
@@ -1079,6 +1115,14 @@ export default function EditBridge() {
     };
 
     function applyValue(path: string, value: unknown) {
+      // a framing: where the picture sits inside its frame ("x% y%"), or the page's own framing again when cleared
+      if (path.startsWith("pos:")) {
+        const key = path.slice(4);
+        const pos = typeof value === "string" && /^\d{1,3}(\.\d+)?% \d{1,3}(\.\d+)?%$/.test(value) ? value : "";
+        if (pos) shimPos[key] = pos; else delete shimPos[key];
+        byAttr("data-cms-img", key).forEach((el) => applyPosTo(el, pos));
+        return;
+      }
       // text: a string of HTML, reduced to the allow-list
       if (typeof value === "string") {
         const html = sanitizeHtml(value);
