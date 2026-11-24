@@ -67,7 +67,7 @@ function Note({ onRetry, retrying, again }: { onRetry: () => void; retrying: boo
     <div style={{ textAlign: "center" }} role="status">
       <p className="body-base" style={{ color: "rgba(255,255,255,0.78)", margin: 0 }}>{msg}</p>
       <div style={{ display: "flex", flexWrap: "wrap", gap: "0.75rem", justifyContent: "center", marginTop: "1rem" }}>
-        <button type="button" className="btn btn-outline" onClick={onRetry} disabled={retrying} aria-disabled={retrying} style={{ minHeight: 44 }}>{retrying ? "Trying\u2026" : "Try again"}</button>
+        <button type="button" className="btn btn-outline" onClick={onRetry} disabled={retrying} aria-disabled={retrying} aria-busy={retrying} style={{ minHeight: 44 }}>{retrying ? "Trying\u2026" : "Try again"}</button>
         <a href={ESPACE_FULL_CALENDAR_URL} target="_blank" rel="noopener noreferrer" className="btn btn-primary" style={{ minHeight: 44 }}>Open the full calendar</a>
       </div>
     </div>
@@ -102,6 +102,8 @@ export default function UpcomingEventsLive({ text, media, studio }: UpcomingEven
     const start = new Date();
     const end = new Date();
     end.setDate(end.getDate() + 92);
+    const t0 = Date.now();
+    let timer: ReturnType<typeof setTimeout> | undefined;
     fetchEspaceEvents({ start, end })
       .then((evts) => {
         if (!alive) return;
@@ -111,10 +113,14 @@ export default function UpcomingEventsLive({ text, media, studio }: UpcomingEven
       .catch((err) => {
         if (!alive) return;
         console.error("[UpcomingEventsLive] failed to load eSpace events:", err);
-        setStatus("error");
+        // a retry that answers at once would look like nothing happened: show "Trying..." for at least 600 ms
+        const wait = attempt > 0 ? Math.max(0, 600 - (Date.now() - t0)) : 0;
+        if (wait === 0) setStatus("error");
+        else timer = setTimeout(() => { if (alive) setStatus("error"); }, wait);
       });
     return () => {
       alive = false;
+      if (timer) clearTimeout(timer);
     };
   }, [attempt]);
 

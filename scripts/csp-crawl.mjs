@@ -244,6 +244,20 @@ try {
     for (let i = 0; i < 14; i++) { await mp.keyboard.press("Tab"); names.push(await mp.evaluate(() => { const a = document.activeElement; return `${a.closest('[aria-label="Mobile navigation"]') ? "in" : "OUT"}:${(a.getAttribute("aria-label") || a.textContent || "").trim().slice(0, 24)}`; })); }
     if (names.some((n) => n.startsWith("OUT"))) note("home (menu open)", "focus left the menu", names.join(" | "));
     if (!names.slice(1).some((n) => n === names[0])) note("home (menu open)", "tab did not wrap", names.join(" | "));
+    // The campus panel sits inside the screen, with a gutter, at every phone and tablet width; the Hays row starts with Sunday.
+    for (const w of [320, 360, 375, 390, 414, 768]) {
+      const cctx = await browser.newContext({ viewport: { width: w, height: 844 }, isMobile: w < 700, hasTouch: w < 700 });
+      await cctx.route("**/*", stub);
+      const cp = await cctx.newPage();
+      await cp.goto(`${ORIGIN}/`, { waitUntil: "load" }); await cp.waitForTimeout(1200);
+      await cp.getByRole("button", { name: /find your campus/i }).first().click(); await cp.waitForTimeout(500);
+      const r = await cp.evaluate(() => { const a = document.querySelector('a[href^="/locations/hays"]'); const el = a && a.parentElement; const b = el.getBoundingClientRect(); return { l: b.left, r: b.right, vw: document.documentElement.clientWidth, t: a.textContent }; });
+      const gutter = process.env.PLANT_BEHAVIOUR ? 100 : 15;
+      if (r.l < gutter || r.r > r.vw - gutter) note(`home campus panel (${w})`, "panel off the screen", `left ${Math.round(r.l)}, right ${Math.round(r.r)}, screen ${r.vw}`);
+      if (!/Sun 8:00 AM \(C3 Gym\)/.test(r.t)) note(`home campus panel (${w})`, "Hays row does not lead with Sunday", r.t);
+      if (w === 390 && SHOTS) await cp.screenshot({ path: join(SHOTS, "campus-panel-390.png") });
+      await cctx.close();
+    }
     const closes = await mp.getByRole("button", { name: "Close menu" }).count();
     if (closes !== (process.env.PLANT_BEHAVIOUR ? 2 : 1)) note("home (menu open)", "close buttons", `${closes} buttons named Close menu`);
     await mctx.close();

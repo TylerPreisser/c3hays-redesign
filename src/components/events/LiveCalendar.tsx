@@ -58,6 +58,11 @@ export default function LiveCalendar({ studio }: { studio?: StudioEvent[] } = {}
   }, [studioCal, espaceEvents, times]);
   const [attempt, setAttempt] = useState(0);
   const [status, setStatus] = useState<"loading" | "ready" | "error">("loading");
+  // The page's lead under the heading promises a calendar "below"; while the feed is down it is hidden (see the events page).
+  useEffect(() => {
+    if (status === "error") document.documentElement.setAttribute("data-cal-failed", "");
+    else if (status === "ready") document.documentElement.removeAttribute("data-cal-failed");
+  }, [status]);
   const [viewDate, setViewDate] = useState(() => {
     const n = new Date();
     return new Date(n.getFullYear(), n.getMonth(), 1);
@@ -135,7 +140,7 @@ export default function LiveCalendar({ studio }: { studio?: StudioEvent[] } = {}
     return (events ?? []).filter((e) => {
       if (!sameMonth(e.start, viewDate)) return false;
       if (e.isHoliday && !showHolidays) return false;
-      if (campus !== "All" && e.campus !== campus) return false;
+      if (campus !== "All" && e.campus !== campus && !e.campusTag?.includes(campus)) return false;
       return true;
     });
   }, [events, viewDate, showHolidays, campus]);

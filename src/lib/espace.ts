@@ -49,6 +49,10 @@ export interface CalEvent {
   registerUrl?: string;
   /** Set on events made in Studio: the full day and time as a person reads it, "Wednesday, December 2 · 6:30 PM". */
   whenLabel?: string;
+  /** A Weekend Services row: it lists whole services, so its text is never clamped and it offers no "Add to calendar". */
+  isWeekend?: boolean;
+  /** The tag shown for the row when it speaks for more than one campus: "Hays + Colby". */
+  campusTag?: string;
 }
 
 /** Shape of a raw eSpace record — every field optional/unknown until validated. */

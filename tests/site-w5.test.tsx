@@ -60,21 +60,21 @@ describe("the call-to-check line sits under the times it is about, once, from th
 
 describe("the home campus menu and first screen say the Sunday times", () => {
   it("each campus row prints the record's compact line, not just the unconfirmed Saturday", async () => {
-    const { campus, compactLine } = await import("@/lib/service-times-core");
+    const { campus, weekendRow } = await import("@/lib/service-times-core");
     const d = await times(true);
-    const line = compactLine(campus(d, "hays"));
-    expect(line).toContain("Sun 8:00");
-    expect(line).toContain("10:45");
+    const line = weekendRow(campus(d, "hays"), true);
+    expect(line.startsWith("Sun 8:00 AM (C3 Gym), 9:00 AM, 10:45 AM")).toBe(true); // Sunday first, C3Kids named once
+    expect(line).toContain("C3Kids at 9:00 AM and 10:45 AM");
     const src = readFileSync(join(__dirname, "../src/components/home/CampusChooser.tsx"), "utf8");
-    expect(src).toContain("compactLine(campus(serviceTimes, loc.id))");
+    expect(src).toContain("weekendRow(campus(serviceTimes, loc.id), true)");
     expect(src).not.toContain("firstService(");
   });
   it("'This Sunday' prints every Sunday service from the record, and links to Plan a Visit", async () => {
     const { default: Line } = await import("@/components/home/ThisSundayLine");
     const html = await wrap(await times(true), createElement(Line as never));
-    expect(html).toContain("This Sunday:");
-    expect(html).toContain("Hays 8:00 AM");
-    expect(html).toContain("Colby 10:00 AM");
+    expect(html).toContain("This weekend");
+    expect(html).toContain("Sat 5:00 PM");
+    expect(html).toContain("Sun 10:00 AM");
     expect(html).toMatch(/href="\/visit\/?"/);
   });
   it("it moves to next Sunday once the last Sunday service has started", async () => {

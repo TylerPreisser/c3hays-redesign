@@ -4,11 +4,11 @@
    A rounded pill that opens a small panel to pick your campus (Hays / Colby).
    Works on dark hero backgrounds. Keyboard + click-away accessible. */
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { ChevronDown, MapPin } from "lucide-react";
 import { useServiceTimes } from "@/providers/ServiceTimesProvider";
-import { campus, compactLine } from "@/lib/service-times-core";
+import { campus, weekendRow } from "@/lib/service-times-core";
 import { locations } from "@/data/locations";
 import { btnCss } from "./btn-css";
 import type { BtnStyle } from "@/lib/home-content";
@@ -30,6 +30,21 @@ export default function CampusChooser({
   const [open, setOpen] = useState(false);
   const [editMode, setEditMode] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
+  // The panel is as wide as the screen allows (340 at most, 16 px gutters) and is slid sideways until it sits inside the screen.
+  const [shift, setShift] = useState(0);
+  useLayoutEffect(() => {
+    if (!open || !ref.current) return;
+    const place = () => {
+      const vw = document.documentElement.clientWidth;
+      const w = Math.min(340, vw - 32);
+      const left = ref.current!.getBoundingClientRect().left;
+      setShift(Math.max(16 - left, Math.min(0, vw - 16 - w - left)));
+    };
+    place();
+    window.addEventListener("resize", place);
+    return () => window.removeEventListener("resize", place);
+  }, [open]);
 
   // v8 D2: in the C3 Studio editor (?cmsEdit=1 inside the iframe) the disclosure
   // toggle competes with EditBridge's click-to-SELECT — clicking "Find your campus"
@@ -88,9 +103,11 @@ export default function CampusChooser({
 
       {open && (
         <div
+          ref={panelRef}
           className="absolute z-30 mt-3 left-0"
           style={{
-            width: "min(92vw, 340px)",
+            width: "min(340px, calc(100vw - 32px))",
+            transform: `translateX(${shift}px)`,
             background: "#fff",
             borderRadius: "var(--radius-md)",
             boxShadow: "0 24px 60px rgba(10,10,10,0.28)",
@@ -123,7 +140,7 @@ export default function CampusChooser({
                 </span>
                 <span className="block text-sm" style={{ color: "rgba(27,28,28,0.7)", lineHeight: 1.4 }}>
                   {loc.city}, {loc.state} ·{" "}
-                  {compactLine(campus(serviceTimes, loc.id))}
+                  {weekendRow(campus(serviceTimes, loc.id), true)}
                 </span>
               </span>
               <ChevronDown size={16} className="ml-auto -rotate-90 shrink-0" style={{ color: "rgba(27,28,28,0.35)" }} />

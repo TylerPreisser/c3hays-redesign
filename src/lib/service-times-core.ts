@@ -224,3 +224,23 @@ export function weekendDayLine(d: ServiceTimesData, weekday: number): string {
     .filter(Boolean)
     .join(" \u00b7 ");
 }
+
+const roomOnly = (x: Slot): string => (x.room ? `${x.time} (${x.room})` : x.time);
+/**
+ * One campus's weekend as a short line from the record: "Sat 5:00 PM · Sun 8:00 AM (C3 Gym), 9:00 AM, 10:45 AM · C3Kids at 9:00 AM and 10:45 AM".
+ * C3Kids is named once, after the Sunday times, never "(with C3Kids)" on each. `sundayFirst` leads with Sunday (the campus menu);
+ * otherwise the days keep the record's order (the weekend line). "" when the campus has no times.
+ */
+export function weekendRow(c: CampusTimes, sundayFirst = false): string {
+  const days = c.services.map((s) => ({ day: s.day, text: `${s.day.slice(0, 3)} ${s.slots.map(roomOnly).join(", ")}`, kids: s.slots.filter((x) => x.kids).map((x) => x.time) }));
+  if (sundayFirst) days.sort((a, b) => Number(b.day === "Sunday") - Number(a.day === "Sunday"));
+  const parts: string[] = [];
+  for (const d of days) {
+    parts.push(d.text);
+    if (d.kids.length) parts.push(`C3Kids at ${andJoin(d.kids)}`);
+  }
+  return parts.join(" \u00b7 ");
+}
+/** The weekend line's rows, one per campus: [{ name: "Hays", text: "Sat 5:00 PM \u00b7 Sun ..." }, { name: "Colby", text: "Sun 10:00 AM" }]. */
+export const weekendRows = (d: ServiceTimesData): Array<{ name: string; text: string }> =>
+  d.campuses.map((c) => ({ name: c.name, text: weekendRow(c) })).filter((r) => r.text);

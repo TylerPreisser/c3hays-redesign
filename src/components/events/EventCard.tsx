@@ -48,6 +48,8 @@ export interface EventCardProps {
   day: ReactNode;
   /** Secondary line — time / audience / location, e.g. "Fri 7:00pm · Grades 6–12". */
   detail?: ReactNode;
+  /** Two-line clamp on the detail (default). A card whose detail is the whole answer (the weekend services) turns it off. */
+  clampDetail?: boolean;
   /** Campus tag pill, e.g. "Both campuses" / "Hays campus". Omitted → no pill. */
   campus?: ReactNode;
   /** Local `/images/*.webp` (or absolute URL). Falsy → tasteful gradient. */
@@ -220,6 +222,7 @@ export default function EventCard({
   month,
   day,
   detail,
+  clampDetail = true,
   campus,
   image,
   imageAlt,
@@ -351,10 +354,7 @@ export default function EventCard({
             color: "rgba(255,255,255,0.7)",
             margin: 0,
             // Two-line clamp keeps every card body the same shape → even rows.
-            display: "-webkit-box",
-            WebkitLineClamp: 2,
-            WebkitBoxOrient: "vertical",
-            overflow: "hidden",
+            ...(clampDetail ? { display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical" as const, overflow: "hidden" } : {}),
           }}
         />
       )}

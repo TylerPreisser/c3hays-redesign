@@ -188,7 +188,7 @@ export function AgendaView({
                         >
                           {ev.title}
                         </span>
-                        {ev.campus && (
+                        {(ev.campusTag || ev.campus) && (
                           <span
                             style={{
                               display: "inline-block",
@@ -204,7 +204,7 @@ export function AgendaView({
                               whiteSpace: "nowrap",
                             }}
                           >
-                            {ev.campus}
+                            {ev.campusTag ?? ev.campus}
                           </span>
                         )}
                       </span>

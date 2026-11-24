@@ -161,13 +161,16 @@ export default async function EventsPage({
               }
               title={<Tx text={t} k="events-cal-heading" fallback="The C3 calendar" />}
               lead={
-                <Tx
-                  text={t}
-                  k="events-cal-body"
-                  fallback="Every service, class, and gathering, browse the live church calendar below."
-                />
+                <span data-cal-lead>
+                  <Tx
+                    text={t}
+                    k="events-cal-body"
+                    fallback="Every service, class, and gathering, browse the live church calendar below."
+                  />
+                </span>
               }
             />
+            <style>{"html[data-cal-failed] [data-cal-lead]{display:none}"}</style>
             <LiveCalendar studio={studioLists?.all} />
           </Section>
         );

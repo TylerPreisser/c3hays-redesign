@@ -41,6 +41,7 @@ function detailLine(ev: CalEvent): string {
 }
 
 function campusLabel(ev: CalEvent): string {
+  if (ev.campusTag) return ev.campusTag;
   if (ev.campus) return `${ev.campus} campus`;
   return ev.isHoliday ? "Holiday" : "Both campuses";
 }
@@ -98,12 +99,13 @@ export default function UpcomingEventsGrid({ events, text, media }: UpcomingEven
             day={String(ev.start.getDate()).padStart(2, "0")}
             title={ev.title}
             detail={detailLine(ev)}
+            clampDetail={!ev.isWeekend}
             campus={campusLabel(ev)}
             ctaCmsKey={`${cmsKey}-cta`}
             ctaHref={ev.registerUrl || ESPACE_FULL_CALENDAR_URL}
             ctaLabel="Event details"
             ctaExternal
-            footer={<AddToCalendar event={toCalendarEvent(ev)} />}
+            footer={ev.isWeekend ? undefined : <AddToCalendar event={toCalendarEvent(ev)} />}
           />
         );
       })}

@@ -94,7 +94,7 @@ export function withStudioWeekendLine(events: CalEvent[], line: string, dayLine?
     // A row shows that day's own times from the record, never eSpace's block ("8:00 AM - 12:30 PM" reads as one long service).
     const p = churchWallParts(e.start);
     const own = p && dayLine ? dayLine(new Date(Date.UTC(p.year, p.month - 1, p.day)).getUTCDay()) : "";
-    return own ? { ...e, description: own, timeLabel: own } : { ...e, description: line };
+    return own ? { ...e, description: own, timeLabel: own, isWeekend: true, ...(/Colby/.test(own) && /Hays/.test(own) ? { campusTag: "Hays + Colby" } : {}) } : { ...e, description: line, isWeekend: true };
   });
 }
 
