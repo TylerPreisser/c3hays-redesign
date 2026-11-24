@@ -6,7 +6,7 @@ import UpcomingEventsGrid from "@/components/events/UpcomingEventsGrid";
 import { fetchEspaceEvents, upcomingEvents, type CalEvent } from "@/lib/espace";
 import { studioToCalEvent, upcomingMerged, withStudioWeekendLine, withoutInternalEvents } from "@/lib/event-merge";
 import { useServiceTimes } from "@/providers/ServiceTimesProvider";
-import { weekendLine, weekendDayLine } from "@/lib/service-times-core";
+import { weekendLine, weekendDayLine, lastStartOfWeekday } from "@/lib/service-times-core";
 import { ESPACE_FULL_CALENDAR_URL } from "@/lib/espace";
 import type { StudioEvent } from "@/lib/studio-events";
 
@@ -126,7 +126,7 @@ export default function UpcomingEventsLive({ text, media, studio }: UpcomingEven
 
   const top = useMemo(() => {
     // Weekend Services rows say Studio's times, not eSpace's free text; staff set-up jobs are not shown to visitors
-    const clean = events ? withoutInternalEvents(withStudioWeekendLine(events, weekendLine(times), (w) => weekendDayLine(times, w))) : null;
+    const clean = events ? withoutInternalEvents(withStudioWeekendLine(events, weekendLine(times), (w) => weekendDayLine(times, w), (w) => lastStartOfWeekday(times, w))) : null;
     return studioCal.length > 0 ? upcomingMerged(studioCal, clean ?? [], 3) : clean ? upcomingEvents(clean, 3) : [];
   }, [events, studioCal, times]);
 

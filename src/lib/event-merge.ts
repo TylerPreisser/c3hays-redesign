@@ -1,4 +1,4 @@
-import { DEFAULT_COLOR, dayKey, type CalEvent } from "@/lib/espace";
+import { DEFAULT_COLOR, dayKey, stillAhead, type CalEvent } from "@/lib/espace";
 import { churchWallParts, clockLabel, wallDate, whenLabel, type WallParts } from "@/lib/church-time";
 import type { StudioEvent } from "@/lib/studio-events";
 import { isWeekendServiceTitle } from "@/lib/service-times-core";
@@ -78,7 +78,7 @@ export function mergeEvents(studio: CalEvent[], espace: CalEvent[]): CalEvent[] 
  * have not started, real events before holidays, the first `n`.
  */
 export function upcomingMerged(studio: CalEvent[], espace: CalEvent[], n: number, nowMs: number = Date.now()): CalEvent[] {
-  const merged = mergeEvents(studio, espace.filter((e) => e.start.getTime() >= nowMs));
+  const merged = mergeEvents(studio, espace.filter((e) => stillAhead(e, nowMs)));
   return [...merged.filter((e) => !e.isHoliday), ...merged.filter((e) => e.isHoliday)].slice(0, Math.max(0, n));
 }
 
@@ -87,14 +87,17 @@ export function upcomingMerged(studio: CalEvent[], espace: CalEvent[], n: number
  * 11:00"). The site never prints that note: those rows carry the line built from Studio's service times instead, the same
  * record every other page reads. The eSpace text itself is the church's to fix in eSpace; nothing here edits it.
  */
-export function withStudioWeekendLine(events: CalEvent[], line: string, dayLine?: (weekday: number) => string): CalEvent[] {
+export function withStudioWeekendLine(events: CalEvent[], line: string, dayLine?: (weekday: number) => string, lastStart?: (weekday: number) => number | null): CalEvent[] {
   if (!line) return events;
   return events.map((e) => {
     if (!isWeekendServiceTitle(e.title)) return e;
     // A row shows that day's own times from the record, never eSpace's block ("8:00 AM - 12:30 PM" reads as one long service).
     const p = churchWallParts(e.start);
     const own = p && dayLine ? dayLine(new Date(Date.UTC(p.year, p.month - 1, p.day)).getUTCDay()) : "";
-    return own ? { ...e, description: own, timeLabel: own, isWeekend: true, ...(/Colby/.test(own) && /Hays/.test(own) ? { campusTag: "Hays + Colby" } : {}) } : { ...e, description: line, isWeekend: true };
+    // the row stays among the upcoming events until that day's last service has started (Sunday morning: 10:45, not the 8:00 start)
+    const last = p && lastStart ? lastStart(new Date(Date.UTC(p.year, p.month - 1, p.day)).getUTCDay()) : null;
+    const hold = last !== null ? { holdUntil: new Date(e.start.getFullYear(), e.start.getMonth(), e.start.getDate(), Math.floor(last / 60), last % 60) } : {};
+    return own ? { ...e, ...hold, description: own, timeLabel: own, isWeekend: true, ...(/Colby/.test(own) && /Hays/.test(own) ? { campusTag: "Hays + Colby" } : {}) } : { ...e, description: line, isWeekend: true };
   });
 }
 

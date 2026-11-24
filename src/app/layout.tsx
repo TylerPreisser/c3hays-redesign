@@ -44,7 +44,7 @@ const REVEAL_SELECTOR = '[style*="opacity:0;"],[style$="opacity:0"]';
 const REVEAL_FALLBACK_CSS = `@keyframes c3-reveal-fallback{to{opacity:1;transform:none}}html:not(.hydrated) ${REVEAL_SELECTOR.split(",").join(",html:not(.hydrated) ")}{animation:c3-reveal-fallback 0s 2.5s forwards}`;
 const REVEAL_NOSCRIPT_CSS = `${REVEAL_SELECTOR}{opacity:1!important;transform:none!important}`;
 
-const PAGES_WITH_OWN_TIMES_NOTE = new Set(["/", "/visit", "/events", "/locations/hays", "/locations/colby"]);
+const PAGES_WITH_OWN_TIMES_NOTE = new Set(["/", "/visit", "/events", "/locations", "/locations/hays", "/locations/colby", "/connect"]);
 
 export const metadata: Metadata = {
   title: {

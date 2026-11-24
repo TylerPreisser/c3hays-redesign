@@ -53,6 +53,8 @@ export interface CalEvent {
   isWeekend?: boolean;
   /** The tag shown for the row when it speaks for more than one campus: "Hays + Colby". */
   campusTag?: string;
+  /** A Weekend Services row stays among the upcoming events until this moment: the start of that day's LAST service. */
+  holdUntil?: Date;
 }
 
 /** Shape of a raw eSpace record — every field optional/unknown until validated. */
@@ -271,13 +273,16 @@ export function groupByDay(events: CalEvent[]): Map<string, CalEvent[]> {
   return map;
 }
 
+/** An event is still ahead until its start, or (a weekend row) until the last service of its day has started. */
+export const stillAhead = (e: CalEvent, nowMs: number): boolean => e.start.getTime() >= nowMs || (e.holdUntil !== undefined && e.holdUntil.getTime() > nowMs);
+
 /**
  * Next `n` upcoming events (start >= now), real events first then holidays.
  * Within each group, chronological order is preserved.
  */
 export function upcomingEvents(events: CalEvent[], n: number): CalEvent[] {
   const now = Date.now();
-  const future = events.filter((e) => e.start.getTime() >= now);
+  const future = events.filter((e) => stillAhead(e, now));
   const real = future.filter((e) => !e.isHoliday);
   const holidays = future.filter((e) => e.isHoliday);
   return [...real, ...holidays].slice(0, Math.max(0, n));

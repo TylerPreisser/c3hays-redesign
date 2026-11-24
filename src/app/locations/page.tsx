@@ -12,6 +12,7 @@ import { tx, imgCss, parseSections, exampleContentShim, type SectionMeta } from 
 import { isExampleSection, renderExample, SECTION_EXAMPLE_IDS } from "@/lib/section-examples";
 import PageComposer from "@/components/cms/PageComposer";
 import Section from "@/components/ui/Section";
+import TimesCheckNote from "@/components/TimesCheckNote";
 import Stack from "@/components/ui/Stack";
 
 export const metadata: Metadata = {
@@ -231,6 +232,8 @@ export default async function LocationsPage({
                 </div>
               ))}
             </div>
+            {/* the page's one call-to-check line, directly under the times it is about */}
+            <TimesCheckNote data={serviceTimes} className="body-base" style={{ color: "var(--color-ink)", marginTop: "1.5rem", maxWidth: "46rem" }} />
           </Section>
         );
       default:

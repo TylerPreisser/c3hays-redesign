@@ -92,7 +92,10 @@ const ESPACE_PAYLOAD = (() => {
   const day = (n) => { const d = new Date(Date.now() + n * 86400000); return d.toISOString().slice(0, 10); };
   const ev = (n, h, title, extra = {}) => ({ Title: title, locCodes: "C3Hays - ", start: `${day(n)}T${h}:00:00.0000000`, end: `${day(n)}T${String(+h + 1).padStart(2, "0")}:30:00.0000000`, allDay: false, StartTime: "", EventStartTime: `${+h > 12 ? +h - 12 : +h}:00 ${+h >= 12 ? "PM" : "AM"}`, EventEndTime: `${+h + 1 > 12 ? +h - 11 : +h + 1}:30 ${+h + 1 >= 12 ? "PM" : "AM"}`, IsHoliday: false, url: "", ...extra });
   // the event with a registration link is the soonest, so it is in the Upcoming strip whatever else is merged in
-  return [ev(1, "17", "Registration Night", { url: "https://example.org/register/crawl" }), ev(2, "19", "Cornhole League"), ev(3, "18", "Marriage Night"), ev(4, "08", "Weekend Services")];
+  // long real-shaped titles and a Sunday Weekend Services row (the one tagged for both campuses) so a width check has something to break on
+  const toSunday = (7 - new Date(Date.now() + 86400000).getUTCDay()) % 7 + 1;
+  return [ev(1, "17", "Registration Night", { url: "https://example.org/register/crawl" }), ev(2, "19", "Cornhole League"), ev(3, "18", "Marriage Night"), ev(4, "08", "Weekend Services"),
+    ev(toSunday, "08", "Weekend Services"), ev(toSunday + 1, "09", "Center Stage Theatre Camp: Sign-ups and Auditions for Grades 3 through 8"), ev(toSunday + 2, "10", "Quilt Ministry Work Days")];
 })();
 const PNG = Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR4nGNgYGD4DwABBAEAHtbwVAAAAABJRU5ErkJggg==", "base64");
 async function stub(route) {
@@ -111,12 +114,12 @@ async function stub(route) {
 }
 
 const ALL_PAGES = [
-  ["home", "/"], ["hays campus", "/locations/hays/"], ["colby campus", "/locations/colby/"], ["events", "/events/"], ["news", "/news/"],
+  ["home", "/"], ["locations", "/locations/"], ["hays campus", "/locations/hays/"], ["colby campus", "/locations/colby/"], ["events", "/events/"], ["news", "/news/"],
   ["article (a message)", "/messages/srm_1/"], ["about", "/about/"], ["give", "/give/"], ["contact (connect)", "/connect/"], ["search", "/search/"],
   ["signup form (visit)", "/visit/"], ["messages", "/messages/"], ["watch", "/watch/"], ["media image", "/media/aB3dEfGhIjKlMnOpQr_-Zz.png"],
   ["edit-mode canvas", "/?preview=crawl-token&cmsEdit=1"], ["not found page", "/nope-xyz/"],
 ];
-const STILL_PATHS = ["/", "/give/", "/visit/", "/connect/", "/news/", "/events/", "/locations/hays/", "/locations/colby/"];
+const STILL_PATHS = ["/", "/give/", "/locations/", "/visit/", "/connect/", "/news/", "/events/", "/locations/hays/", "/locations/colby/"];
 const PAGES = LIVE ? ALL_PAGES.filter(([n]) => !n.startsWith("article")) : ARTIFACT ? ALL_PAGES.filter(([n]) => !n.startsWith("article")) : ALL_PAGES;
 const EXPECT = { "/media/aB3dEfGhIjKlMnOpQr_-Zz.png": 404, "/nope-xyz/": 404 }; // the media route's plain 404 (Studio has no such file) and the site's 404 page
 
@@ -259,17 +262,27 @@ try {
       if (w === 390 && SHOTS) await cp.screenshot({ path: join(SHOTS, "campus-panel-390.png") });
       await cctx.close();
     }
-    // At 200 percent text /events/ keeps the width of the screen, and the footer links to it.
-    {
-      const zctx = await browser.newContext({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true });
+    // At 200 percent text /events/ keeps the width of the screen at every phone width, the menu button stays on the screen,
+    // and the footer links to it. A wide font stands in for the church's real one (the crawl has no web fonts).
+    for (const w of [320, 360, 390, 414]) {
+      const zctx = await browser.newContext({ viewport: { width: w, height: 844 }, isMobile: true, hasTouch: true });
       await zctx.route("**/*", stub);
       const zp = await zctx.newPage();
       await zp.goto(`${ORIGIN}/events/`, { waitUntil: "load" }); await zp.waitForTimeout(2500);
-      await zp.evaluate(() => { document.documentElement.style.fontSize = "200%"; });
-      await zp.waitForTimeout(600);
-      const zw = await zp.evaluate(() => ({ page: document.documentElement.scrollWidth, screen: document.documentElement.clientWidth }));
-      if (zw.page > zw.screen + (process.env.PLANT_BEHAVIOUR ? -1 : 1)) note("events (200% text)", "page wider than the screen", `${zw.page} px page on a ${zw.screen} px screen`);
-      if (!(await zp.locator('footer a[href="/events/"], footer a[href="/events"]').count())) note("events footer", "no footer link to /events/", "the Explore list has no Events");
+      await zp.addStyleTag({ content: "html{font-size:200% !important}" });
+      await zp.waitForTimeout(700);
+      const zw = await zp.evaluate(() => {
+        const vw = document.documentElement.clientWidth, over = [];
+        // the innermost elements of the page body that run past the screen edge (the header and banner only follow a widened page)
+        const past = (el) => { const r = el.getBoundingClientRect(); if (el.scrollWidth > el.clientWidth + 1 && el.clientWidth > 0 && r.left + el.scrollWidth > vw + 1 && getComputedStyle(el).overflowX === "visible") return true; return !el.closest("header, [data-announcement]") && r.width > 0 && r.right > vw + 1 && getComputedStyle(el).position !== "fixed" && !el.closest("[aria-hidden='true']"); };
+        for (const el of document.querySelectorAll("body *")) { const r = el.getBoundingClientRect(); if (past(el) && ![...el.children].some(past)) over.push(`${el.tagName.toLowerCase()}${el.className && typeof el.className === "string" ? "." + el.className.split(" ")[0] : ""} ${Math.round(r.right)} "${(el.textContent || "").trim().slice(0, 28)}"`); }
+        const mb = document.querySelector('button[aria-label="Open menu"]');
+        return { page: document.documentElement.scrollWidth, screen: vw, menuRight: mb ? Math.round(mb.getBoundingClientRect().right) : null, over: over.slice(0, 8) };
+      });
+      const slack = process.env.PLANT_BEHAVIOUR ? -1 : 1;
+      if (zw.page > zw.screen + slack || (zw.menuRight !== null && zw.menuRight > zw.screen - (process.env.PLANT_BEHAVIOUR ? 999 : 8))) note(`events (200% text, ${w})`, "page wider than the screen", `${zw.page} px page on a ${zw.screen} px screen, menu button right edge ${zw.menuRight}; wide: ${zw.over.join(", ")}`);
+      if (SHOTS && w === 390) await zp.screenshot({ path: join(SHOTS, "events-200pct-390.png"), fullPage: true });
+      if (w === 390 && !(await zp.locator('footer a[href="/events/"], footer a[href="/events"]').count())) note("events footer", "no footer link to /events/", "the Explore list has no Events");
       await zctx.close();
     }
     const closes = await mp.getByRole("button", { name: "Close menu" }).count();

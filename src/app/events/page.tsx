@@ -170,7 +170,7 @@ export default async function EventsPage({
                 </span>
               }
             />
-            <style>{"html[data-cal-failed] [data-cal-lead]{display:none}"}</style>
+            <style>{"html[data-cal-failed] [data-cal-lead]{display:none} main h1,main h2,main h3{overflow-wrap:break-word}"}</style>
             <LiveCalendar studio={studioLists?.all} />
           </Section>
         );

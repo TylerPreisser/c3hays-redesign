@@ -103,7 +103,8 @@ export default function UpcomingEventsGrid({ events, text, media }: UpcomingEven
             campus={campusLabel(ev)}
             ctaCmsKey={`${cmsKey}-cta`}
             ctaHref={ev.registerUrl || ESPACE_FULL_CALENDAR_URL}
-            ctaLabel="Event details"
+            // with no link of its own the button opens the church calendar (a whole month): it says so
+            ctaLabel={ev.registerUrl ? "Event details" : "Open the church calendar"}
             ctaExternal
             footer={ev.isWeekend ? undefined : <AddToCalendar event={toCalendarEvent(ev)} />}
           />

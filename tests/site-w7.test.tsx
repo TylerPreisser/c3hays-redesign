@@ -67,7 +67,8 @@ describe("the calendar list opens on today", () => {
     document.body.appendChild(host);
     const root = createRoot(host);
     await act(async () => { root.render(createElement(AgendaView as never, { monthEvents: [ev("1", 1), ev("2", 8), ev("3", 24)], onOpen() {} } as never)); });
-    expect(host.textContent).toContain("Earlier this month (2 days)");
+    expect(host.textContent).toContain("Show earlier days this month");
+    expect(host.textContent).toContain("From today");
     expect(host.textContent).not.toContain("E1");
     expect(host.textContent).toContain("E3");
     expect(host.querySelector("[data-agenda-first]")?.textContent).toContain("E3");

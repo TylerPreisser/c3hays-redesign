@@ -244,3 +244,10 @@ export function weekendRow(c: CampusTimes, sundayFirst = false): string {
 /** The weekend line's rows, one per campus: [{ name: "Hays", text: "Sat 5:00 PM \u00b7 Sun ..." }, { name: "Colby", text: "Sun 10:00 AM" }]. */
 export const weekendRows = (d: ServiceTimesData): Array<{ name: string; text: string }> =>
   d.campuses.map((c) => ({ name: c.name, text: weekendRow(c) })).filter((r) => r.text);
+
+/** The clock minute (0-1439) when the last service of a weekday (0 Sunday, 6 Saturday) starts at any campus, or null when there is none. */
+export function lastStartOfWeekday(d: ServiceTimesData, weekday: number): number | null {
+  const day = weekday === 0 ? "Sunday" : weekday === 6 ? "Saturday" : "";
+  const all = day ? d.campuses.flatMap((c) => c.services.filter((x) => x.day === day).flatMap((x) => x.slots.map((y) => slotMinutes(y.time)))) : [];
+  return all.length ? Math.max(...all) : null;
+}

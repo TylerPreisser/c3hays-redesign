@@ -20,6 +20,7 @@ import { useServiceTimes } from "@/providers/ServiceTimesProvider";
 import { campus, compactLine } from "@/lib/service-times-core";
 import { Tx } from "@/components/cms/Editable";
 import Section from "@/components/ui/Section";
+import TimesCheckNote from "@/components/TimesCheckNote";
 import Stack from "@/components/ui/Stack";
 
 /* Connect — a PREMIUM full-bleed photo + glass contact card, then the real
@@ -237,6 +238,7 @@ export function ConnectHero({ text, media = {}, img = {} }: ConnectHeroProps) {
                   <span>{serviceLine}</span>
                 </li>
               </ul>
+              <TimesCheckNote scope="hays" className="text-sm" style={{ margin: "0.75rem 0 0", color: "rgba(255,255,255,0.82)" }} />
 
               {/* Monochrome static-map thumbnail → Google Maps directions */}
               <a

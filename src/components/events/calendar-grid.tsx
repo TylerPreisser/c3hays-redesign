@@ -49,9 +49,12 @@ export function AgendaView({
   return (
     <div style={{ display: "grid", gap: 0 }}>
       {earlier.length > 0 && !showEarlier && (
-        <button type="button" className="lc-agenda-row" onClick={() => setShowEarlier(true)} style={{ minHeight: 44, textAlign: "left", cursor: "pointer", background: "transparent", border: "none", padding: "0.5rem 0.25rem", fontWeight: 700, color: "var(--color-teal-deep)" }}>
-          Earlier this month ({earlier.length} {earlier.length === 1 ? "day" : "days"})
+        <button type="button" className="lc-agenda-row" onClick={() => setShowEarlier(true)} style={{ minHeight: 44, textAlign: "left", cursor: "pointer", background: "transparent", border: "none", padding: "0.5rem 0.25rem", fontWeight: 400, fontSize: "0.9rem", color: "var(--color-mute)" }}>
+          Show earlier days this month &uarr;
         </button>
+      )}
+      {earlier.length > 0 && !showEarlier && keys.length > 0 && (
+        <p className="overline" style={{ margin: "0 0 0.25rem", padding: "0 0.25rem", color: "var(--color-teal-deep)" }}>From today</p>
       )}
       {keys.map((k, gi) => {
         const list = grouped.get(k)!;
@@ -65,9 +68,11 @@ export function AgendaView({
             data-agenda-today={k === todayKey ? "" : undefined}
             data-agenda-first={k === firstKey ? "" : undefined}
             style={{
-              display: "grid",
-              gridTemplateColumns: "clamp(52px, 15vw, 68px) minmax(0, 1fr)",
-              gap: "clamp(0.75rem, 3vw, 1.4rem)",
+              // the day beside its events; at large text sizes the events drop under the day and take the whole width
+              display: "flex",
+              flexWrap: "wrap",
+              alignItems: "flex-start",
+              gap: "0.5rem clamp(0.75rem, 3vw, 1.4rem)",
               padding: "1.15rem 0",
               borderTop: gi === 0 ? "none" : "1px solid rgba(27,28,28,0.09)",
             }}
@@ -78,6 +83,7 @@ export function AgendaView({
                 position: "sticky",
                 top: 12,
                 alignSelf: "start",
+                flex: "0 0 clamp(52px, 15vw, 68px)",
                 display: "flex",
                 flexDirection: "column",
                 alignItems: "center",
@@ -130,18 +136,20 @@ export function AgendaView({
             </div>
 
             {/* ── Event rows for the day ── */}
-            <ul style={{ listStyle: "none", margin: 0, padding: 0, display: "grid", gap: 4 }}>
+            <ul style={{ listStyle: "none", margin: 0, padding: 0, display: "grid", gridTemplateColumns: "minmax(0, 1fr)", gap: 4, flex: "1 1 14rem", minWidth: 0 }}>
               {list.map((ev) => (
-                <li key={ev.id}>
+                <li key={ev.id} style={{ minWidth: 0 }}>
                   <button
                     type="button"
                     onClick={() => onOpen(ev.start)}
                     className="lc-agenda-row"
                     style={{
-                      display: "grid",
-                      gridTemplateColumns: "clamp(58px, 15vw, 82px) 14px minmax(0, 1fr)",
+                      // time, dot, title in one line; at large text sizes the title drops under the time instead of running off the screen
+                      display: "flex",
+                      flexWrap: "wrap",
                       alignItems: "baseline",
-                      gap: "0.7rem",
+                      gap: "0.35rem 0.7rem",
+                      boxSizing: "border-box",
                       width: "100%",
                       textAlign: "left",
                       cursor: "pointer",
@@ -154,6 +162,8 @@ export function AgendaView({
                     <span
                       style={{
                         textAlign: "right",
+                        flex: "0 0 auto",
+                        minWidth: "clamp(58px, 15vw, 82px)",
                         fontSize: "0.78rem",
                         fontWeight: 700,
                         fontVariantNumeric: "tabular-nums",
@@ -171,7 +181,8 @@ export function AgendaView({
                     <span
                       aria-hidden="true"
                       style={{
-                        justifySelf: "center",
+                        flex: "0 0 auto",
+                        margin: "0 2.5px",
                         width: 9,
                         height: 9,
                         borderRadius: 999,
@@ -182,7 +193,7 @@ export function AgendaView({
                           : `0 0 0 3px rgba(28,195,175,0.10)`,
                       }}
                     />
-                    <span style={{ minWidth: 0 }}>
+                    <span style={{ minWidth: 0, flex: "1 1 8rem" }}>
                       <span
                         style={{
                           display: "flex",
@@ -216,7 +227,9 @@ export function AgendaView({
                               color: "var(--color-teal-deep)",
                               background: "rgba(28,195,175,0.10)",
                               border: "1px solid rgba(28,195,175,0.22)",
-                              whiteSpace: "nowrap",
+                              // a tag may drop to its own line and wrap inside it: at large text sizes the row is narrower than the tag
+                              maxWidth: "100%",
+                              overflowWrap: "anywhere",
                             }}
                           >
                             {ev.campusTag ?? ev.campus}
