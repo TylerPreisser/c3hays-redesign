@@ -1,9 +1,9 @@
-import type { Campaign } from "@/lib/announcements";
+import { campaignGiveHref, type Campaign } from "@/lib/announcements";
 
 const money = (n: number, cur: string) => new Intl.NumberFormat("en-US", { style: "currency", currency: cur, maximumFractionDigits: 0 }).format(n);
 
 /** Running campaigns from Studio, each with a progress bar when Studio has a figure. Renders nothing with no campaign. */
-export default function GiveCampaigns({ campaigns }: { campaigns: Campaign[] }) {
+export default function GiveCampaigns({ campaigns, links }: { campaigns: Campaign[]; links?: { hays?: string; colby?: string } }) {
   if (campaigns.length === 0) return null;
   return (
     <section aria-labelledby="campaigns-h" className="section" style={{ backgroundColor: "#f4f5f5" }}>
@@ -25,7 +25,7 @@ export default function GiveCampaigns({ campaigns }: { campaigns: Campaign[] }) 
                   </div>
                 )}
                 {c.giveUrl && (
-                  <a href={c.giveUrl} className="arrow-link" style={{ display: "inline-block", marginTop: "1rem", color: "#0f766e", fontWeight: 700 }}>
+                  <a href={campaignGiveHref(c, links)} className="arrow-link" style={{ display: "inline-block", marginTop: "1rem", color: "#0f766e", fontWeight: 700 }}>
                     Give to this campaign <span className="arrow" aria-hidden="true">→</span>
                   </a>
                 )}

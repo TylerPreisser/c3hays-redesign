@@ -168,6 +168,11 @@ export default function LiveCalendar({ studio }: { studio?: StudioEvent[] } = {}
     setSelectedKey(null);
     const n = new Date();
     setViewDate(new Date(n.getFullYear(), n.getMonth(), 1));
+    // the list scrolls to today's row (or the first row after it) once the month is drawn
+    setTimeout(() => {
+      const row = document.querySelector("[data-agenda-today]") ?? document.querySelector("[data-agenda-first]");
+      row?.scrollIntoView({ block: "center", behavior: "smooth" });
+    }, 60);
   }
 
   const iconBtn: CSSProperties = { width: 40, height: 40 };

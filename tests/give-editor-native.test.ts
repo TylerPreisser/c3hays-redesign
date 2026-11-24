@@ -13,7 +13,7 @@
  *   (b) every card/tile carries its OWN `data-cms-bg`;
  *   (c) every button is a `data-cms-link` with a REQUIRED `data-cms-link-label`
  *       child (no whole-card-collapse, no label concatenation);
- *   (d) the primary Give button points at the real Pushpay giving destination.
+ *   (d) the primary Give button opens the campus choice on the page.
  *
  * RED-FIRST: against the pre-rebuild page this FAILS — the old page emits zero
  * `data-section` wrappers and its cards have no `data-cms-bg`.
@@ -127,12 +127,13 @@ describe("give — editor-native section composition", () => {
     expect(new Set(keys).size).toBe(keys.length);
   });
 
-  it("primary Give button points at the real Pushpay destination", () => {
+  it("primary Give button opens the campus choice on the page, not one campus's Pushpay page", () => {
     const host = document.createElement("div");
     host.innerHTML = html;
     const cta = host.querySelector('[data-cms-link="give-hero-cta"]') as HTMLAnchorElement | null;
     expect(cta).not.toBeNull();
-    expect(cta!.getAttribute("href")).toMatch(/pushpay\.com\/g\/celebratejesus/);
+    expect(cta!.getAttribute("href")).toBe("#give-ways");
+    expect(html).not.toMatch(/data-cms-link="give-hero-cta"[^>]*pushpay/);
     expect(cta!.querySelector("[data-cms-link-label]")?.textContent).toBeTruthy();
   });
 

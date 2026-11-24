@@ -39,7 +39,12 @@ export default function Footer({ globals = {}, menu = null, placed = false }: { 
   // THE one menu: the Explore links are Studio's `navigation` items (top level), then Give. Without it (Studio down, or
   // an empty list) the code list below stays. Menu words are not text-overridable here: the Menu form owns them.
   const links: ExploreLink[] = menu && menu.length
-    ? [...menu.map((n) => ({ id: `footer-menu-${n.id}`, label: n.label, href: n.href, fixed: true })), { id: "footer-menu-give", label: ctaItem.label, href: ctaItem.href, fixed: true }]
+    ? [
+        ...menu.map((n) => ({ id: `footer-menu-${n.id}`, label: n.label, href: n.href, fixed: true })),
+        // the one page that lists what is on is linked from the footer even when Studio's menu does not carry it
+        ...(menu.some((n) => /^\/events\/?$/.test(n.href)) ? [] : [{ id: "footer-menu-events", label: "Events", href: "/events/", fixed: true }]),
+        { id: "footer-menu-give", label: ctaItem.label, href: ctaItem.href, fixed: true },
+      ]
     : EXPLORE_LINKS;
   const m = globals.media || {}; // v3 (R4): editable logo sources by globals key
   const variant = (t["footer-variant"] || "editorial").toLowerCase();

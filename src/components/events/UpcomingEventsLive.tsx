@@ -133,11 +133,14 @@ export default function UpcomingEventsLive({ text, media, studio }: UpcomingEven
   if (status === "loading" && attempt > 0) return <Note onRetry={() => {}} retrying again />;
   if (status === "loading") {
     return (
-      <div style={GRID}>
-        <SkeletonCard />
-        <SkeletonCard />
-        <SkeletonCard />
-      </div>
+      <>
+        <p role="status" className="body-base" style={{ margin: "0 0 1rem", textAlign: "center", color: "rgba(255,255,255,0.78)" }}>Loading the calendar&hellip;</p>
+        <div style={GRID}>
+          <SkeletonCard />
+          <SkeletonCard />
+          <SkeletonCard />
+        </div>
+      </>
     );
   }
 

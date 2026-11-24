@@ -80,7 +80,7 @@ export default async function GivePage({
         freeEls={ov.freeEls}
         freeOffsets={ov.freeOffsets}
       />
-      <GiveCampaigns campaigns={campaigns} />
+      <GiveCampaigns campaigns={campaigns} links={giveLinks} />
     </>
   );
 }

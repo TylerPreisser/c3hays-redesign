@@ -3,7 +3,7 @@ import { site } from "@/data/site";
 import { getCMSAnnouncements, getCMSGivingCampaigns, getCMSSite } from "@/lib/cms";
 
 export interface Announcement { id: string; title: string; eyebrow?: string; body: string; linkLabel?: string; linkUrl?: string; priority: number }
-export interface Campaign { id: string; title: string; blurb?: string; goal: number; raised: number | null; currency: string; giveUrl?: string }
+export interface Campaign { id: string; title: string; blurb?: string; goal: number; raised: number | null; currency: string; giveUrl?: string; campusId?: "hays" | "colby" }
 
 /** A link target the site will render: a site path or https/http/mailto/tel. Anything else (javascript:, data:) is dropped. */
 export function safeHref(v: unknown): string | undefined {
@@ -109,6 +109,7 @@ export function cleanCampaigns(raw: unknown, today: string): Campaign[] {
       raised: hasFigure ? (o.raised_amount as number) : null,
       currency: typeof o.currency === "string" ? o.currency : "USD",
       giveUrl: safeHref(o.give_url),
+      campusId: o.campus_id === "hays" || o.campus_id === "colby" ? o.campus_id : undefined,
     });
   }
   return out;
@@ -133,4 +134,18 @@ export function giveLinksFrom(site: unknown): { hays?: string; colby?: string } 
 
 export async function getGiveLinks() {
   return giveLinksFrom(await getCMSSite());
+}
+
+const handleOf = (u: string): string => u.replace(/^https?:\/\//i, "").replace(/[?#].*$/, "").replace(/\/+$/, "").toLowerCase();
+/**
+ * Where a campaign's "Give to this campaign" goes. A give link staff typed for the campaign itself (one that is not any campus's
+ * own giving page) is used as typed. A link that is just a campus's page is replaced by the page of the campus that owns the
+ * campaign; a campaign with no campus goes to the campus choice on the page, never to one campus's page.
+ */
+export function campaignGiveHref(c: Campaign, links: { hays?: string; colby?: string } = {}): string {
+  const campusPages = { hays: links.hays ?? site.giving.hays, colby: links.colby ?? site.giving.colby };
+  const known = new Set(Object.values({ ...campusPages, online: site.giving.online }).map(handleOf));
+  if (c.giveUrl && !known.has(handleOf(c.giveUrl))) return c.giveUrl;
+  if (c.campusId) return campusPages[c.campusId];
+  return "#give-ways";
 }

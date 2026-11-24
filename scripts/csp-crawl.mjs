@@ -116,7 +116,7 @@ const ALL_PAGES = [
   ["signup form (visit)", "/visit/"], ["messages", "/messages/"], ["watch", "/watch/"], ["media image", "/media/aB3dEfGhIjKlMnOpQr_-Zz.png"],
   ["edit-mode canvas", "/?preview=crawl-token&cmsEdit=1"], ["not found page", "/nope-xyz/"],
 ];
-const STILL_PATHS = ["/", "/visit/", "/connect/", "/news/", "/events/", "/locations/hays/", "/locations/colby/"];
+const STILL_PATHS = ["/", "/give/", "/visit/", "/connect/", "/news/", "/events/", "/locations/hays/", "/locations/colby/"];
 const PAGES = LIVE ? ALL_PAGES.filter(([n]) => !n.startsWith("article")) : ARTIFACT ? ALL_PAGES.filter(([n]) => !n.startsWith("article")) : ALL_PAGES;
 const EXPECT = { "/media/aB3dEfGhIjKlMnOpQr_-Zz.png": 404, "/nope-xyz/": 404 }; // the media route's plain 404 (Studio has no such file) and the site's 404 page
 
@@ -258,6 +258,19 @@ try {
       if (!/Sun 8:00 AM \(C3 Gym\)/.test(r.t)) note(`home campus panel (${w})`, "Hays row does not lead with Sunday", r.t);
       if (w === 390 && SHOTS) await cp.screenshot({ path: join(SHOTS, "campus-panel-390.png") });
       await cctx.close();
+    }
+    // At 200 percent text /events/ keeps the width of the screen, and the footer links to it.
+    {
+      const zctx = await browser.newContext({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true });
+      await zctx.route("**/*", stub);
+      const zp = await zctx.newPage();
+      await zp.goto(`${ORIGIN}/events/`, { waitUntil: "load" }); await zp.waitForTimeout(2500);
+      await zp.evaluate(() => { document.documentElement.style.fontSize = "200%"; });
+      await zp.waitForTimeout(600);
+      const zw = await zp.evaluate(() => ({ page: document.documentElement.scrollWidth, screen: document.documentElement.clientWidth }));
+      if (zw.page > zw.screen + (process.env.PLANT_BEHAVIOUR ? -1 : 1)) note("events (200% text)", "page wider than the screen", `${zw.page} px page on a ${zw.screen} px screen`);
+      if (!(await zp.locator('footer a[href="/events/"], footer a[href="/events"]').count())) note("events footer", "no footer link to /events/", "the Explore list has no Events");
+      await zctx.close();
     }
     const closes = await mp.getByRole("button", { name: "Close menu" }).count();
     if (closes !== (process.env.PLANT_BEHAVIOUR ? 2 : 1)) note("home (menu open)", "close buttons", `${closes} buttons named Close menu`);

@@ -4,8 +4,8 @@ import { imgCss } from "@/lib/home-content";
 import { Tx, EditableLink } from "@/components/cms/Editable";
 import Stack from "@/components/ui/Stack";
 
-/** The real church Pushpay giving destination (celebratejesus handle). */
-export const GIVE_PUSHPAY_URL = "https://pushpay.com/g/celebratejesus";
+/** "Give Now" opens the campus choice on this page (the section below), never one campus's giving page: each campus has its own. */
+export const GIVE_NOW_HREF = "#give-ways";
 
 export interface GiveHeroProps {
   /** Page text override bag. */
@@ -23,7 +23,7 @@ export interface GiveHeroProps {
  * canvas below, so the hero and the give-ways section read as one continuous page
  * (both surfaces are #ffffff — no seam).
  *
- * One editable button: the teal primary → the real Pushpay giving page. Text is the
+ * One editable button: the teal primary → the campus choice below on this page. Text is the
  * real celebratejesus.org /give copy.
  */
 export default function GiveHero({ t, media, img }: GiveHeroProps) {
@@ -91,9 +91,8 @@ export default function GiveHero({ t, media, img }: GiveHeroProps) {
             <EditableLink
               text={t}
               k="give-hero-cta"
-              href={GIVE_PUSHPAY_URL}
+              href={GIVE_NOW_HREF}
               label="Give Now"
-              external
               className="btn btn-primary btn-lg"
             />
           </div>

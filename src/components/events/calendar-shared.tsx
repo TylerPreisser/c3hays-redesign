@@ -38,15 +38,17 @@ export function daySubhead(d: Date): string {
 /* ───────────────────────── Loading skeleton ───────────────────────── */
 export function Skeleton() {
   return (
-    <div aria-hidden="true" style={{ display: "grid", gap: "0.9rem" }}>
-      <div style={{ display: "flex", justifyContent: "space-between", gap: "1rem" }}>
-        <div className="lc-shimmer" style={{ height: 34, width: 220, borderRadius: 10 }} />
-        <div className="lc-shimmer" style={{ height: 34, width: 200, borderRadius: 999 }} />
+    <div style={{ display: "grid", gap: "0.9rem", minWidth: 0 }}>
+      <p role="status" className="body-base" style={{ margin: 0, color: "var(--color-mute)" }}>Loading the calendar&hellip;</p>
+      <div aria-hidden="true" style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", gap: "1rem" }}>
+        <div className="lc-shimmer" style={{ height: 34, width: "min(220px, 100%)", borderRadius: 10 }} />
+        <div className="lc-shimmer" style={{ height: 34, width: "min(200px, 100%)", borderRadius: 999 }} />
       </div>
       <div
+        aria-hidden="true"
         style={{
           display: "grid",
-          gridTemplateColumns: "repeat(7, 1fr)",
+          gridTemplateColumns: "repeat(7, minmax(0, 1fr))",
           gap: 8,
           marginTop: "0.75rem",
         }}
@@ -55,7 +57,7 @@ export function Skeleton() {
           <div
             key={i}
             className="lc-shimmer"
-            style={{ aspectRatio: "1 / 1", borderRadius: 12, minHeight: 64 }}
+            style={{ aspectRatio: "1 / 1", borderRadius: 12, minHeight: 0 }}
           />
         ))}
       </div>

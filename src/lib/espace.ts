@@ -205,6 +205,9 @@ const cache = new Map<string, Promise<CalEvent[]>>();
  * A bad HTTP status or non-array body throws (surfaced by the UI's error state);
  * a single malformed record is silently skipped (not a page-level failure).
  */
+/** How long the browser waits for eSpace before the calendar says it did not load. */
+export const FETCH_TIMEOUT_MS = 10_000;
+
 export async function fetchEspaceEvents(opts?: {
   start?: Date;
   end?: Date;
@@ -222,7 +225,17 @@ export async function fetchEspaceEvents(opts?: {
   if (cached) return cached;
 
   const promise = (async () => {
-    const res = await fetch(url, { headers: { Accept: "application/json" } });
+    // A request that never answers (one bar of signal) must reach the page's failure block: give up after 10 seconds.
+    const ctl = new AbortController();
+    const timer = setTimeout(() => ctl.abort(), FETCH_TIMEOUT_MS);
+    let res: Response;
+    try {
+      res = await fetch(url, { headers: { Accept: "application/json" }, signal: ctl.signal });
+    } catch (e) {
+      throw ctl.signal.aborted ? new Error("eSpace feed timed out") : e;
+    } finally {
+      clearTimeout(timer);
+    }
     if (!res.ok) {
       throw new Error(`eSpace feed returned HTTP ${res.status}`);
     }

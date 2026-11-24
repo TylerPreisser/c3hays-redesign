@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { groupByDay, monthMatrix, dayKey, type CalEvent } from "@/lib/espace";
 import { HAIR, sameMonth, EventPill } from "./calendar-shared";
 
@@ -36,12 +36,23 @@ export function AgendaView({
   onOpen: (d: Date) => void;
 }) {
   const grouped = useMemo(() => groupByDay(monthEvents), [monthEvents]);
-  const keys = Array.from(grouped.keys());
+  const allKeys = Array.from(grouped.keys());
   const todayKey = dayKey(new Date());
+  // In the current month the list opens on today: the days already gone sit behind one "Earlier this month" row.
+  const [showEarlier, setShowEarlier] = useState(false);
+  const isThisMonth = allKeys.length > 0 && allKeys.every((k) => k.slice(0, 7) === todayKey.slice(0, 7));
+  const earlier = isThisMonth ? allKeys.filter((k) => k < todayKey) : [];
+  const keys = showEarlier ? allKeys : allKeys.filter((k) => !earlier.includes(k));
+  const firstKey = keys.find((k) => k >= todayKey) ?? keys[0];
 
   let prevMonth = -1;
   return (
     <div style={{ display: "grid", gap: 0 }}>
+      {earlier.length > 0 && !showEarlier && (
+        <button type="button" className="lc-agenda-row" onClick={() => setShowEarlier(true)} style={{ minHeight: 44, textAlign: "left", cursor: "pointer", background: "transparent", border: "none", padding: "0.5rem 0.25rem", fontWeight: 700, color: "var(--color-teal-deep)" }}>
+          Earlier this month ({earlier.length} {earlier.length === 1 ? "day" : "days"})
+        </button>
+      )}
       {keys.map((k, gi) => {
         const list = grouped.get(k)!;
         const d = list[0].start;
@@ -51,9 +62,11 @@ export function AgendaView({
         return (
           <div
             key={k}
+            data-agenda-today={k === todayKey ? "" : undefined}
+            data-agenda-first={k === firstKey ? "" : undefined}
             style={{
               display: "grid",
-              gridTemplateColumns: "clamp(52px, 15vw, 68px) 1fr",
+              gridTemplateColumns: "clamp(52px, 15vw, 68px) minmax(0, 1fr)",
               gap: "clamp(0.75rem, 3vw, 1.4rem)",
               padding: "1.15rem 0",
               borderTop: gi === 0 ? "none" : "1px solid rgba(27,28,28,0.09)",
@@ -126,7 +139,7 @@ export function AgendaView({
                     className="lc-agenda-row"
                     style={{
                       display: "grid",
-                      gridTemplateColumns: "clamp(58px, 15vw, 82px) 14px 1fr",
+                      gridTemplateColumns: "clamp(58px, 15vw, 82px) 14px minmax(0, 1fr)",
                       alignItems: "baseline",
                       gap: "0.7rem",
                       width: "100%",
@@ -182,6 +195,8 @@ export function AgendaView({
                           className="body-base"
                           style={{
                             fontWeight: 600,
+                            overflowWrap: "anywhere",
+                            minWidth: 0,
                             color: "var(--color-ink)",
                             fontStyle: ev.isHoliday ? "italic" : undefined,
                           }}
