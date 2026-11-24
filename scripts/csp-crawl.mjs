@@ -251,7 +251,8 @@ try {
       const cp = await cctx.newPage();
       await cp.goto(`${ORIGIN}/`, { waitUntil: "load" }); await cp.waitForTimeout(1200);
       await cp.getByRole("button", { name: /find your campus/i }).first().click(); await cp.waitForTimeout(500);
-      const r = await cp.evaluate(() => { const a = document.querySelector('a[href^="/locations/hays"]'); const el = a && a.parentElement; const b = el.getBoundingClientRect(); return { l: b.left, r: b.right, vw: document.documentElement.clientWidth, t: a.textContent }; });
+      // the open panel itself (the page also carries other /locations/hays links, in the nav, that are hidden on a phone)
+      const r = await cp.evaluate(() => { const el = document.querySelector("[data-campus-panel]"); if (!el) return { l: 0, r: 0, vw: document.documentElement.clientWidth, t: "(no open campus panel)" }; const a = el.querySelector('a[href^="/locations/hays"]'); const b = el.getBoundingClientRect(); return { l: b.left, r: b.right, vw: document.documentElement.clientWidth, t: a ? a.textContent : "(no Hays row)" }; });
       const gutter = process.env.PLANT_BEHAVIOUR ? 100 : 15;
       if (r.l < gutter || r.r > r.vw - gutter) note(`home campus panel (${w})`, "panel off the screen", `left ${Math.round(r.l)}, right ${Math.round(r.r)}, screen ${r.vw}`);
       if (!/Sun 8:00 AM \(C3 Gym\)/.test(r.t)) note(`home campus panel (${w})`, "Hays row does not lead with Sunday", r.t);

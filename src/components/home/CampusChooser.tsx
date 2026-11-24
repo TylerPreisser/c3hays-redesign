@@ -104,6 +104,7 @@ export default function CampusChooser({
       {open && (
         <div
           ref={panelRef}
+          data-campus-panel
           className="absolute z-30 mt-3 left-0"
           style={{
             width: "min(340px, calc(100vw - 32px))",
